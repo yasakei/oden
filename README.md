@@ -1,74 +1,12 @@
 # Oden
 
-[![](https://img.shields.io/crates/v/oden.svg)](https://crates.io/crates/oden)
-[![Twitter badge][]][Twitter link] [![Bluesky badge][]][Bluesky link]
-[![Discord badge][]][Discord link] [![YouTube badge][]][YouTube link]
-
-<img align="right" src="https://deno.land/logo.svg" height="150px" alt="the oden mascot dinosaur standing in the rain">
-
-[Oden](https://deno.com)
-([/ˈdiːnoʊ/](https://ipa-reader.com/?text=%CB%88di%CB%90no%CA%8A), pronounced
-`dee-no`) is a JavaScript, TypeScript, and WebAssembly runtime with secure
-defaults and a great developer experience. It's built on [V8](https://v8.dev/),
-[Rust](https://www.rust-lang.org/), and [Tokio](https://tokio.rs/).
-
-Learn more about the Oden runtime
-[in the documentation](https://docs.deno.com/runtime/manual).
-
-## Installation
-
-Install the Oden runtime on your system using one of the commands below. Note
-that there are a number of ways to install Oden - a comprehensive list of
-installation options can be found
-[here](https://docs.deno.com/runtime/manual/getting_started/installation).
-
-Shell (Mac, Linux):
-
-```sh
-curl -fsSL https://deno.land/install.sh | sh
-```
-
-PowerShell (Windows):
-
-```powershell
-irm https://deno.land/install.ps1 | iex
-```
-
-[Homebrew](https://formulae.brew.sh/formula/oden) (Mac):
-
-```sh
-brew install oden
-```
-
-[Chocolatey](https://community.chocolatey.org/packages/oden) (Windows):
-
-```powershell
-choco install oden
-```
-
-[WinGet](https://winstall.app/apps/DenoLand.Deno) (Windows):
-
-```powershell
-winget install --id=DenoLand.Deno
-```
-
-[Scoop](https://scoop.sh/#/apps?q=oden&id=678d8fb557b611df996989c675b1099630a5bbee)
-(Windows):
-
-```powershell
-scoop install main/oden
-```
-
-### Build and install from source
-
-Complete instructions for building Oden from source can be found
-[here](https://github.com/denoland/deno/blob/main/.github/CONTRIBUTING.md#building-from-source).
+Oden (/ˈoʊdɪn/, pronounced `oh-din`) is a JavaScript, TypeScript, and
+WebAssembly runtime with secure defaults and a great developer experience.
+It's built on V8, Rust, and Tokio.
 
 ## Your first Oden program
 
-Oden can be used for many different applications, but is most commonly used to
-build web servers. Create a file called `server.ts` and include the following
-TypeScript code:
+Create a file called `server.ts`:
 
 ```ts
 Oden.serve((_req: Request) => {
@@ -76,41 +14,108 @@ Oden.serve((_req: Request) => {
 });
 ```
 
-Run your server with the following command:
+Run it:
 
 ```sh
 oden run --allow-net server.ts
 ```
 
-This should start a local web server on
-[http://localhost:8000](http://localhost:8000).
+This starts a local web server on port 8000.
 
-Learn more about writing and running Oden programs
-[in the docs](https://docs.deno.com/runtime/manual).
+## Building from source
 
-## Additional resources
+### Clone the repository
 
-- **[Oden Docs](https://docs.deno.com)**: official guides and reference docs for
-  the Oden runtime, [Oden Deploy](https://deno.com/deploy), and beyond.
-- **[Oden Standard Library](https://jsr.io/@std)**: officially supported common
-  utilities for Oden programs.
-- **[JSR](https://jsr.io/)**: The open-source package registry for modern
-  JavaScript and TypeScript
-- **[Developer Blog](https://deno.com/blog)**: Product updates, tutorials, and
-  more from the Oden team.
+Oden uses submodules, so clone with `--recurse-submodules`:
+
+```sh
+git clone --recurse-submodules https://github.com/yasakei/oden.git
+cd oden
+```
+
+Windows: enable "Developer Mode" (otherwise symlinks require administrator
+privileges) and set `core.symlinks=true` before checkout.
+
+### Prerequisites
+
+- Rust 1.95.0 (see `rust-toolchain.toml`; rustup picks it up automatically)
+- Python 3, with a suffix-less `python` on your `PATH`
+- A native compiler toolchain plus CMake
+
+Linux (Debian) / WSL:
+
+```sh
+wget https://apt.llvm.org/llvm.sh
+chmod +x llvm.sh
+./llvm.sh 17
+apt install --install-recommends -y cmake libglib2.0-dev
+```
+
+Mac:
+
+- Install the Xcode Command Line Tools (`xcode-select --install`)
+- Install CMake
+- On Apple Silicon (M1/M2), also install `llvm` and `lld` and add
+  `/opt/homebrew/opt/llvm/bin/` to your `PATH`
+
+Windows:
+
+- Visual Studio with the "Desktop development with C++" workload
+- A standalone CMake on your `PATH`
+- Debugging Tools for Windows
+
+For WSL, allocate at least 16GB of memory in `.wslconfig`.
+
+### Build
+
+The recommended way to build is the `./x` tool:
+
+```sh
+./x build
+```
+
+This produces the debug binary at `./target/debug/oden`. You can also use
+cargo directly:
+
+```sh
+cargo build
+```
+
+To build V8 from source as well (for lower-level V8 development, or on
+platforms without prebuilt V8):
+
+```sh
+V8_FROM_SOURCE=1 cargo build
+```
+
+If the build fails, make sure you are on the latest `main` and try again,
+or start clean with `cargo clean && cargo build`.
+
+### Run
+
+```sh
+./target/debug/oden run path/to/file.ts
+
+# With permissions:
+./target/debug/oden run --allow-net --allow-read script.ts
+
+# REPL:
+./target/debug/oden
+```
+
+### Test
+
+```sh
+# Runtime unit tests (requires a filter argument):
+./x test <filter>
+
+# Spec (integration) tests:
+./x spec <filter>
+
+# Node.js compatibility tests:
+./x node-compat <filter>
+```
 
 ## Contributing
 
-We appreciate your help! To contribute, please read our
-[contributing instructions](.github/CONTRIBUTING.md).
-
-[Build status - Cirrus]: https://github.com/denoland/deno/workflows/ci/badge.svg?branch=main&event=push
-[Build status]: https://github.com/denoland/deno/actions
-[Twitter badge]: https://img.shields.io/twitter/follow/oden_land.svg?style=social&label=Follow
-[Twitter link]: https://twitter.com/intent/follow?screen_name=oden_land
-[Bluesky badge]: https://img.shields.io/badge/Follow-whitesmoke?logo=bluesky
-[Bluesky link]: https://bsky.app/profile/deno.land
-[YouTube badge]: https://img.shields.io/youtube/channel/subscribers/UCqC2G2M-rg4fzg1esKFLFIw?style=social
-[YouTube link]: https://www.youtube.com/@oden_land
-[Discord badge]: https://img.shields.io/discord/684898665143206084?logo=discord&style=social
-[Discord link]: https://discord.gg/oden
+See `.github/CONTRIBUTING.md` for contribution guidelines.
