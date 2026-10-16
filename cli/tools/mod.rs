@@ -24,6 +24,7 @@ pub mod pm;
 pub mod publish;
 pub mod repl;
 pub mod run;
+pub mod sbom;
 pub mod serve;
 pub mod task;
 pub mod task_cache;

@@ -1,0 +1,13 @@
+{
+  "tests": {
+    "basic": {
+      "tempDir": true,
+      "steps": [
+        {
+          "args": "sbom",
+          "output": "sbom.out"
+        }
+      ]
+    }
+  }
+}

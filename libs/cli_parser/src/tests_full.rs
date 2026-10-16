@@ -8098,6 +8098,46 @@ fn clean_subcommand() {
 }
 
 #[test]
+fn sbom_subcommand() {
+  let cases = [
+    (svec![], SbomFlags { output: None }),
+    (
+      svec!["--output", "sbom.json"],
+      SbomFlags {
+        output: Some("sbom.json".to_string()),
+      },
+    ),
+    (
+      svec!["-o", "sbom.json"],
+      SbomFlags {
+        output: Some("sbom.json".to_string()),
+      },
+    ),
+  ];
+  for (input, expected) in cases {
+    let mut args = svec!["oden", "sbom"];
+    args.extend(input);
+    let r = flags_from_vec(args.clone())
+      .inspect_err(|e| {
+        #[allow(clippy::print_stderr, reason = "actually want to output")]
+        {
+          eprintln!("error: {:?} on input: {:?}", e, args);
+        }
+      })
+      .unwrap();
+    assert_eq!(
+      r,
+      Flags {
+        subcommand: OdenSubcommand::Sbom(expected),
+        ..Flags::default()
+      },
+      "incorrect result for args: {:?}",
+      args
+    );
+  }
+}
+
+#[test]
 fn conditions_test() {
   let flags = flags_from_vec(svec![
     "oden",

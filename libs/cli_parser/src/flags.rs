@@ -744,6 +744,11 @@ pub struct CleanFlags {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
+pub struct SbomFlags {
+  pub output: Option<String>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct BundleFlags {
   pub entrypoints: Vec<String>,
   pub output_path: Option<String>,
@@ -794,6 +799,7 @@ pub enum OdenSubcommand {
   Check(CheckFlags),
   Ci(CiFlags),
   Clean(CleanFlags),
+  Sbom(SbomFlags),
   Compile(CompileFlags),
   Completions(CompletionsFlags),
   Desktop(DesktopFlags),

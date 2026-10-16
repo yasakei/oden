@@ -733,6 +733,7 @@ impl CliFactory {
             | OdenSubcommand::Lint { .. }
             | OdenSubcommand::Repl { .. }
             | OdenSubcommand::Run { .. }
+            | OdenSubcommand::Sbom { .. }
             | OdenSubcommand::Serve { .. }
             | OdenSubcommand::Task { .. }
             | OdenSubcommand::Test { .. }

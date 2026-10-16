@@ -1,0 +1,31 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "version": 1,
+  "metadata": {
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "oden",
+          "version": "2.9.7"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "left-pad@1.3.0",
+      "type": "library",
+      "name": "left-pad",
+      "version": "1.3.0",
+      "purl": "pkg:npm/left-pad@1.3.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "c785d91888d33a331d68ec7a1c4b9b84504f9ef26f2ee27f2745765a437d9c887833de0f4554f0d536891779453f6c698275e63369e2ceceb082f12853d0baa1"
+        }
+      ]
+    }
+  ]
+}
