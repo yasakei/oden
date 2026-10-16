@@ -41,6 +41,9 @@
     }
   },
   "workspace": {
+    "dependencies": [
+      "npm:chalk@*"
+    ],
     "packageJson": {
       "dependencies": [
         "npm:chalk@5"
