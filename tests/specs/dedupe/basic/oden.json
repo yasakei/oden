@@ -1,6 +1,6 @@
 {
   "nodeModulesDir": "auto",
   "imports": {
-    "chalk-old": "npm:chalk@*"
+    "abbrev-old": "npm:abbrev@*"
   }
 }

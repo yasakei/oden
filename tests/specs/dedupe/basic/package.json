@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "chalk": "5"
+    "abbrev": "4"
   }
 }
