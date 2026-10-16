@@ -543,14 +543,8 @@ fn slim_package_info_bytes(
   }
   output.push(b'}');
 
-  // The `time` map (per-version publish dates) is only ever consulted
-  // for full packument responses: with `minimumDependencyAge`/`no-downgrade`
-  // policies active the metadata is always fetched in full, and abbreviated
-  // responses (whose package `modified` predates the newest allowed date)
-  // can't contain a too-new version by construction — plus every reader
-  // fails open on missing dates. Dropping it here shrinks the cache entry
-  // (~11% on large packuments) and skips thousands of chrono/semver parses
-  // on every load.
+  // Publish dates are only read from full packuments (policies that need
+  // them always fetch in full), so skip them for abbreviated responses.
   if full_packument {
     write_json_property_name(&mut output, &mut first, "time")
       .map_err(JsErrorBox::from_err)?;
