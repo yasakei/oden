@@ -51,3 +51,6 @@ Untitled*.ipynb
 
 # pyenv
 /.python-version
+
+# Local scratch files
+/todo.md
