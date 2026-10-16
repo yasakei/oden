@@ -14,7 +14,7 @@
             "eval",
             "const lockfile = JSON.parse(await Oden.readTextFile('oden.lock')); console.log(Object.keys(lockfile.npm).length);"
           ],
-          "output": "before.out"
+          "output": "2\n"
         },
         {
           "args": "dedupe",
@@ -25,7 +25,7 @@
             "eval",
             "const lockfile = JSON.parse(await Oden.readTextFile('oden.lock')); console.log(Object.keys(lockfile.npm).length);"
           ],
-          "output": "after.out"
+          "output": "1\n"
         }
       ]
     }
