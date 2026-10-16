@@ -1,14 +1,14 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::fmt::Display;
 use std::fmt::Formatter;
 use std::sync::Mutex;
 use std::sync::OnceLock;
 
-use deno_core::JsRuntime;
-use deno_core::V8TaskSpawner;
-use deno_core::cppgc::make_cppgc_object;
-use deno_core::v8;
+use oden_core::JsRuntime;
+use oden_core::V8TaskSpawner;
+use oden_core::cppgc::make_cppgc_object;
+use oden_core::v8;
 use wgpu_core::binding_model::CreateBindGroupError;
 use wgpu_core::binding_model::CreateBindGroupLayoutError;
 use wgpu_core::binding_model::CreatePipelineLayoutError;
@@ -137,7 +137,7 @@ impl DeviceErrorHandler {
         let error_event_class =
           state.borrow().borrow::<crate::ErrorEventClass>().0.clone();
 
-        let error = deno_core::error::to_v8_error(scope, &err);
+        let error = oden_core::error::to_v8_error(scope, &err);
 
         let error_event_class =
           v8::Local::new(scope, error_event_class.clone());
@@ -160,7 +160,7 @@ impl DeviceErrorHandler {
   }
 }
 
-#[derive(deno_core::WebIDL, Eq, PartialEq)]
+#[derive(oden_core::WebIDL, Eq, PartialEq)]
 #[webidl(enum)]
 pub enum GPUErrorFilter {
   Validation,

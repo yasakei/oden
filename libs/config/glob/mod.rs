@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::path::Path;
@@ -835,7 +835,7 @@ fn ascii_literal_suffix(pattern: &str) -> Box<[u8]> {
 ///
 /// `suffix` comes from a pattern normalized to `/`, but on Windows the path
 /// separator is `\`, so a suffix that spans a directory boundary (e.g.
-/// `/deno.json`) would never match. Treat `\` and `/` as equivalent so the
+/// `/oden.json`) would never match. Treat `\` and `/` as equivalent so the
 /// reject stays a genuine necessary condition on every platform. Normalizing
 /// only ever widens what passes this pre-filter (the real glob engine still
 /// runs afterward), so it never drops a genuine match.
@@ -1056,22 +1056,22 @@ mod test {
     // A directory-spanning suffix must still match a backslash path, otherwise
     // every workspace member config file is rejected on Windows.
     assert!(path_ends_with_ascii_ci(
-      Path::new("C:\\root\\member\\deno.json"),
-      b"/deno.json",
+      Path::new("C:\\root\\member\\oden.json"),
+      b"/oden.json",
     ));
     assert!(path_ends_with_ascii_ci(
-      Path::new("/root/member/deno.json"),
-      b"/deno.json",
+      Path::new("/root/member/oden.json"),
+      b"/oden.json",
     ));
     // case-insensitive
     assert!(path_ends_with_ascii_ci(
-      Path::new("C:\\root\\member\\DENO.JSON"),
-      b"/deno.json",
+      Path::new("C:\\root\\member\\ODEN.JSON"),
+      b"/oden.json",
     ));
     // a genuinely different suffix is still rejected
     assert!(!path_ends_with_ascii_ci(
       Path::new("C:\\root\\member\\package.json"),
-      b"/deno.json",
+      b"/oden.json",
     ));
   }
 
@@ -1772,10 +1772,10 @@ mod test {
     }
     // error for invalid url
     {
-      let err = PathOrPattern::from_relative(&dir, "https://raw.githubusercontent.com%2Fdyedgreen%2Fdeno-sqlite%2Frework_api%2Fmod.ts").unwrap_err();
+      let err = PathOrPattern::from_relative(&dir, "https://raw.githubusercontent.com%2Fdyedgreen%2Foden-sqlite%2Frework_api%2Fmod.ts").unwrap_err();
       assert_eq!(
         format!("{:#}", err),
-        "Invalid URL 'https://raw.githubusercontent.com%2Fdyedgreen%2Fdeno-sqlite%2Frework_api%2Fmod.ts'"
+        "Invalid URL 'https://raw.githubusercontent.com%2Fdyedgreen%2Foden-sqlite%2Frework_api%2Fmod.ts'"
       );
       assert_eq!(
         format!("{:#}", err.source().unwrap()),
@@ -1884,7 +1884,7 @@ mod test {
       }
     }
     for scheme in &["npm", "jsr"] {
-      let url = format!("{}:@denotest/basic", scheme);
+      let url = format!("{}:@odentest/basic", scheme);
       let pattern = PathOrPattern::new(&url).unwrap();
       match pattern {
         PathOrPattern::RemoteUrl(p) => {
@@ -1921,7 +1921,7 @@ mod test {
       }
     }
     for scheme in &["npm", "jsr"] {
-      let url = format!("{}:@denotest/basic", scheme);
+      let url = format!("{}:@odentest/basic", scheme);
       let pattern = PathOrPattern::from_relative(&dir, &url).unwrap();
       match pattern {
         PathOrPattern::RemoteUrl(p) => {

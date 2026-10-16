@@ -1,13 +1,13 @@
-// Copyright 2018-2019 the Deno authors. All rights reserved. MIT license.
-const name = Deno.args[0];
+// Copyright 2018-2019 the Oden authors. All rights reserved. MIT license.
+const name = Oden.args[0];
 // deno-lint-ignore no-explicit-any
 const test: { [key: string]: (...args: any[]) => void | Promise<void> } = {
   read(files: string[]) {
-    files.forEach((file) => Deno.readFileSync(file));
+    files.forEach((file) => Oden.readFileSync(file));
   },
   write(files: string[]) {
     files.forEach((file) =>
-      Deno.writeFileSync(file, new Uint8Array(0), { append: true })
+      Oden.writeFileSync(file, new Uint8Array(0), { append: true })
     );
   },
   netFetch(urls: string[]) {
@@ -20,7 +20,7 @@ const test: { [key: string]: (...args: any[]) => void | Promise<void> } = {
         endpoint.substr(0, index),
         endpoint.substr(index + 1),
       ];
-      const listener = Deno.listen({
+      const listener = Oden.listen({
         transport: "tcp",
         hostname,
         port: parseInt(port, 10),
@@ -35,7 +35,7 @@ const test: { [key: string]: (...args: any[]) => void | Promise<void> } = {
         endpoint.substr(0, index),
         endpoint.substr(index + 1),
       ];
-      const listener = await Deno.connect({
+      const listener = await Oden.connect({
         transport: "tcp",
         hostname,
         port: parseInt(port, 10),
@@ -47,7 +47,7 @@ const test: { [key: string]: (...args: any[]) => void | Promise<void> } = {
 
 if (!test[name]) {
   console.log("Unknown test:", name);
-  Deno.exit(1);
+  Oden.exit(1);
 }
 
-test[name](Deno.args.slice(1));
+test[name](Oden.args.slice(1));

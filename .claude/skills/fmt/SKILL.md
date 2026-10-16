@@ -7,7 +7,7 @@ allowed-tools: Bash(./x fmt)
 
 # Format Code
 
-Run the Deno code formatter:
+Run the Oden code formatter:
 
 ```sh
 ./x fmt

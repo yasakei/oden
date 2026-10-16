@@ -1,0 +1,7 @@
+{
+  "name": "@odentest/cjs-import-dual",
+  "version": "1.0.0",
+  "dependencies": {
+    "@odentest/dual-cjs-esm": "1"
+  }
+}

@@ -1,5 +1,5 @@
 const blob = new Blob(
-  ["export default function() {\n  return <div>Hello Deno!</div>\n}\n"],
+  ["export default function() {\n  return <div>Hello Oden!</div>\n}\n"],
   { type: "text/jsx" },
 );
 const url = URL.createObjectURL(blob);

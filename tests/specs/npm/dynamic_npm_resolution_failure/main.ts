@@ -2,7 +2,7 @@ import chalk from "npm:chalk";
 
 console.log(chalk.green("Hi"));
 try {
-  await import("npm:@denotest/dep-cannot-parse");
+  await import("npm:@odentest/dep-cannot-parse");
 } catch (err) {
   console.log(err);
 }

@@ -1,6 +1,6 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-//! Translation from bun's text lockfile (`bun.lock`) to a deno.lock v5 JSON
+//! Translation from bun's text lockfile (`bun.lock`) to a oden.lock v5 JSON
 //! string.
 //!
 //! Supports the text lockfile (`bun.lock`) introduced in Bun v1.1.39, which is
@@ -14,7 +14,7 @@
 //! "<integrity>"]`. Per-workspace dependency requirements live under
 //! `workspaces` (the root keyed by the empty string, members keyed by their
 //! path), so the workspace section can be reconstructed faithfully here rather
-//! than relying on Deno to rebuild it during resolution.
+//! than relying on Oden to rebuild it during resolution.
 
 use std::collections::BTreeMap;
 use std::collections::HashMap;
@@ -33,9 +33,9 @@ pub enum BunLockfileImportError {
   UnsupportedVersion(String),
 }
 
-/// Convert a `bun.lock` (text lockfile) string into a deno.lock v5 JSON string.
+/// Convert a `bun.lock` (text lockfile) string into a oden.lock v5 JSON string.
 /// Only the npm subset is populated.
-pub fn bun_lock_to_deno_lock_v5(
+pub fn bun_lock_to_oden_lock_v5(
   text: &str,
 ) -> Result<String, BunLockfileImportError> {
   let value =
@@ -129,7 +129,7 @@ pub fn bun_lock_to_deno_lock_v5(
       }
       // Keep the first entry seen for a given `name@version`. The same version
       // can appear under both its hoisted key and a nested `<parent>/<name>`
-      // key; deno.lock's npm graph is flat (one dependency set per version) and
+      // key; oden.lock's npm graph is flat (one dependency set per version) and
       // cannot represent context-sensitive edges, so we record one resolution.
       // The dependency requirements are identical across those keys, and
       // iteration order over `packages` is deterministic, so the choice is
@@ -183,7 +183,7 @@ pub fn bun_lock_to_deno_lock_v5(
 
   Ok(
     serde_json::to_string(&Value::Object(output))
-      .expect("serializing deno.lock v5"),
+      .expect("serializing oden.lock v5"),
   )
 }
 
@@ -259,7 +259,7 @@ fn resolve_dep_version<'a>(
 /// caller to record under the workspace's `packageJson.dependencies`.
 ///
 /// A top-level specifier points at the hoisted version by design; a member
-/// depending on a non-hoisted version is left for Deno to resolve.
+/// depending on a non-hoisted version is left for Oden to resolve.
 fn collect_workspace_specifiers(
   ws: &serde_json::Map<String, Value>,
   hoisted: &HashMap<String, String>,
@@ -292,7 +292,7 @@ fn collect_workspace_specifiers(
   keys
 }
 
-/// Build the deno.lock v5 `workspace` object from the root workspace's deps and
+/// Build the oden.lock v5 `workspace` object from the root workspace's deps and
 /// the per-member dep lists. Returns `None` when nothing was collected so the
 /// caller can omit the section entirely.
 fn build_workspace(
@@ -333,7 +333,7 @@ fn build_workspace(
 }
 
 /// Requirements using a protocol other than a plain npm range are skipped from
-/// `specifiers` (Deno resolves those during install). `npm:` aliases would
+/// `specifiers` (Oden resolves those during install). `npm:` aliases would
 /// produce a malformed `npm:foo@npm:bar@^1` key, and `catalog`/`catalog:` reqs
 /// have no version requirement of their own to record.
 fn is_supported_req(req: &str) -> bool {
@@ -382,7 +382,7 @@ mod tests {
 
   #[test]
   fn translates_bun_text_lock() {
-    let out = bun_lock_to_deno_lock_v5(SAMPLE).unwrap();
+    let out = bun_lock_to_oden_lock_v5(SAMPLE).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["version"], "5");
     assert_eq!(v["specifiers"]["npm:chalk@^4.0.0"], "4.1.2");
@@ -418,7 +418,7 @@ mod tests {
   }
 }
 "#;
-    let out = bun_lock_to_deno_lock_v5(input).unwrap();
+    let out = bun_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["specifiers"]["npm:is-number@^7.0.0"], "7.0.0");
     assert_eq!(v["specifiers"]["npm:is-odd@^3.0.0"], "3.0.1");
@@ -452,7 +452,7 @@ mod tests {
   }
 }
 "#;
-    let out = bun_lock_to_deno_lock_v5(input).unwrap();
+    let out = bun_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     let is_odd_deps =
       v["npm"]["is-odd@3.0.1"]["dependencies"].as_array().unwrap();
@@ -477,7 +477,7 @@ mod tests {
   }
 }
 "#;
-    let out = bun_lock_to_deno_lock_v5(input).unwrap();
+    let out = bun_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["specifiers"]["npm:@scope/pkg@^1.0.0"], "1.2.3");
     assert!(
@@ -505,7 +505,7 @@ mod tests {
   "packages": {}
 }
 "#;
-    let out = bun_lock_to_deno_lock_v5(input).unwrap();
+    let out = bun_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert!(v.get("specifiers").is_none());
     assert!(v.get("workspace").is_none());
@@ -514,7 +514,7 @@ mod tests {
   #[test]
   fn rejects_unsupported_version() {
     let input = r#"{ "lockfileVersion": 99, "packages": {} }"#;
-    let err = bun_lock_to_deno_lock_v5(input).unwrap_err();
+    let err = bun_lock_to_oden_lock_v5(input).unwrap_err();
     assert!(matches!(
       err,
       BunLockfileImportError::UnsupportedVersion(v) if v == "99"

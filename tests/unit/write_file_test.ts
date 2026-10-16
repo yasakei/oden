@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   assert,
   assertEquals,
@@ -7,168 +7,168 @@ import {
   unreachable,
 } from "./test_util.ts";
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function writeFileSyncSuccess() {
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const filename = Deno.makeTempDirSync() + "/test.txt";
-    Deno.writeFileSync(filename, data);
-    const dataRead = Deno.readFileSync(filename);
+    const filename = Oden.makeTempDirSync() + "/test.txt";
+    Oden.writeFileSync(filename, data);
+    const dataRead = Oden.readFileSync(filename);
     const dec = new TextDecoder("utf-8");
     const actual = dec.decode(dataRead);
     assertEquals(actual, "Hello");
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function writeFileSyncUrl() {
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const tempDir = Deno.makeTempDirSync();
+    const tempDir = Oden.makeTempDirSync();
     const fileUrl = new URL(
-      `file://${Deno.build.os === "windows" ? "/" : ""}${tempDir}/test.txt`,
+      `file://${Oden.build.os === "windows" ? "/" : ""}${tempDir}/test.txt`,
     );
-    Deno.writeFileSync(fileUrl, data);
-    const dataRead = Deno.readFileSync(fileUrl);
+    Oden.writeFileSync(fileUrl, data);
+    const dataRead = Oden.readFileSync(fileUrl);
     const dec = new TextDecoder("utf-8");
     const actual = dec.decode(dataRead);
     assertEquals(actual, "Hello");
 
-    Deno.removeSync(tempDir, { recursive: true });
+    Oden.removeSync(tempDir, { recursive: true });
   },
 );
 
-Deno.test({ permissions: { write: true } }, function writeFileSyncFail() {
+Oden.test({ permissions: { write: true } }, function writeFileSyncFail() {
   const enc = new TextEncoder();
   const data = enc.encode("Hello");
   const filename = "/baddir/test.txt";
   // The following should fail because /baddir doesn't exist (hopefully).
   assertThrows(() => {
-    Deno.writeFileSync(filename, data);
-  }, Deno.errors.NotFound);
+    Oden.writeFileSync(filename, data);
+  }, Oden.errors.NotFound);
 });
 
-Deno.test({ permissions: { write: false } }, function writeFileSyncPerm() {
+Oden.test({ permissions: { write: false } }, function writeFileSyncPerm() {
   const enc = new TextEncoder();
   const data = enc.encode("Hello");
   const filename = "/baddir/test.txt";
   // The following should fail due to no write permission
   assertThrows(() => {
-    Deno.writeFileSync(filename, data);
-  }, Deno.errors.NotCapable);
+    Oden.writeFileSync(filename, data);
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function writeFileSyncUpdateMode() {
-    if (Deno.build.os !== "windows") {
+    if (Oden.build.os !== "windows") {
       const enc = new TextEncoder();
       const data = enc.encode("Hello");
-      const filename = Deno.makeTempDirSync() + "/test.txt";
-      Deno.writeFileSync(filename, data, { mode: 0o755 });
-      assertEquals(Deno.statSync(filename).mode! & 0o777, 0o755);
-      Deno.writeFileSync(filename, data, { mode: 0o666 });
-      assertEquals(Deno.statSync(filename).mode! & 0o777, 0o666);
+      const filename = Oden.makeTempDirSync() + "/test.txt";
+      Oden.writeFileSync(filename, data, { mode: 0o755 });
+      assertEquals(Oden.statSync(filename).mode! & 0o777, 0o755);
+      Oden.writeFileSync(filename, data, { mode: 0o666 });
+      assertEquals(Oden.statSync(filename).mode! & 0o777, 0o666);
     }
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function writeFileSyncCreate() {
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const filename = Deno.makeTempDirSync() + "/test.txt";
+    const filename = Oden.makeTempDirSync() + "/test.txt";
     // if create turned off, the file won't be created
     assertThrows(() => {
-      Deno.writeFileSync(filename, data, { create: false });
-    }, Deno.errors.NotFound);
+      Oden.writeFileSync(filename, data, { create: false });
+    }, Oden.errors.NotFound);
 
     // Turn on create, should have no error
-    Deno.writeFileSync(filename, data, { create: true });
-    Deno.writeFileSync(filename, data, { create: false });
-    const dataRead = Deno.readFileSync(filename);
+    Oden.writeFileSync(filename, data, { create: true });
+    Oden.writeFileSync(filename, data, { create: false });
+    const dataRead = Oden.readFileSync(filename);
     const dec = new TextDecoder("utf-8");
     const actual = dec.decode(dataRead);
     assertEquals(actual, "Hello");
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function writeFileSyncCreateNew() {
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const filename = Deno.makeTempDirSync() + "/test.txt";
-    Deno.writeFileSync(filename, data, { createNew: true });
+    const filename = Oden.makeTempDirSync() + "/test.txt";
+    Oden.writeFileSync(filename, data, { createNew: true });
 
     assertThrows(() => {
-      Deno.writeFileSync(filename, data, { createNew: true });
-    }, Deno.errors.AlreadyExists);
+      Oden.writeFileSync(filename, data, { createNew: true });
+    }, Oden.errors.AlreadyExists);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function writeFileSyncAppend() {
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const filename = Deno.makeTempDirSync() + "/test.txt";
-    Deno.writeFileSync(filename, data);
-    Deno.writeFileSync(filename, data, { append: true });
-    let dataRead = Deno.readFileSync(filename);
+    const filename = Oden.makeTempDirSync() + "/test.txt";
+    Oden.writeFileSync(filename, data);
+    Oden.writeFileSync(filename, data, { append: true });
+    let dataRead = Oden.readFileSync(filename);
     const dec = new TextDecoder("utf-8");
     let actual = dec.decode(dataRead);
     assertEquals(actual, "HelloHello");
     // Now attempt overwrite
-    Deno.writeFileSync(filename, data, { append: false });
-    dataRead = Deno.readFileSync(filename);
+    Oden.writeFileSync(filename, data, { append: false });
+    dataRead = Oden.readFileSync(filename);
     actual = dec.decode(dataRead);
     assertEquals(actual, "Hello");
     // append not set should also overwrite
-    Deno.writeFileSync(filename, data);
-    dataRead = Deno.readFileSync(filename);
+    Oden.writeFileSync(filename, data);
+    dataRead = Oden.readFileSync(filename);
     actual = dec.decode(dataRead);
     assertEquals(actual, "Hello");
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function writeFileSuccess() {
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const filename = Deno.makeTempDirSync() + "/test.txt";
-    await Deno.writeFile(filename, data);
-    const dataRead = Deno.readFileSync(filename);
+    const filename = Oden.makeTempDirSync() + "/test.txt";
+    await Oden.writeFile(filename, data);
+    const dataRead = Oden.readFileSync(filename);
     const dec = new TextDecoder("utf-8");
     const actual = dec.decode(dataRead);
     assertEquals(actual, "Hello");
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function writeFileUrl() {
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const tempDir = await Deno.makeTempDir();
+    const tempDir = await Oden.makeTempDir();
     const fileUrl = new URL(
-      `file://${Deno.build.os === "windows" ? "/" : ""}${tempDir}/test.txt`,
+      `file://${Oden.build.os === "windows" ? "/" : ""}${tempDir}/test.txt`,
     );
-    await Deno.writeFile(fileUrl, data);
-    const dataRead = Deno.readFileSync(fileUrl);
+    await Oden.writeFile(fileUrl, data);
+    const dataRead = Oden.readFileSync(fileUrl);
     const dec = new TextDecoder("utf-8");
     const actual = dec.decode(dataRead);
     assertEquals(actual, "Hello");
 
-    Deno.removeSync(tempDir, { recursive: true });
+    Oden.removeSync(tempDir, { recursive: true });
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function writeFileNotFound() {
     const enc = new TextEncoder();
@@ -176,12 +176,12 @@ Deno.test(
     const filename = "/baddir/test.txt";
     // The following should fail because /baddir doesn't exist (hopefully).
     await assertRejects(async () => {
-      await Deno.writeFile(filename, data);
-    }, Deno.errors.NotFound);
+      await Oden.writeFile(filename, data);
+    }, Oden.errors.NotFound);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: false } },
   async function writeFilePerm() {
     const enc = new TextEncoder();
@@ -189,95 +189,95 @@ Deno.test(
     const filename = "/baddir/test.txt";
     // The following should fail due to no write permission
     await assertRejects(async () => {
-      await Deno.writeFile(filename, data);
-    }, Deno.errors.NotCapable);
+      await Oden.writeFile(filename, data);
+    }, Oden.errors.NotCapable);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function writeFileUpdateMode() {
-    if (Deno.build.os !== "windows") {
+    if (Oden.build.os !== "windows") {
       const enc = new TextEncoder();
       const data = enc.encode("Hello");
-      const filename = Deno.makeTempDirSync() + "/test.txt";
-      await Deno.writeFile(filename, data, { mode: 0o755 });
-      assertEquals(Deno.statSync(filename).mode! & 0o777, 0o755);
-      await Deno.writeFile(filename, data, { mode: 0o666 });
-      assertEquals(Deno.statSync(filename).mode! & 0o777, 0o666);
+      const filename = Oden.makeTempDirSync() + "/test.txt";
+      await Oden.writeFile(filename, data, { mode: 0o755 });
+      assertEquals(Oden.statSync(filename).mode! & 0o777, 0o755);
+      await Oden.writeFile(filename, data, { mode: 0o666 });
+      assertEquals(Oden.statSync(filename).mode! & 0o777, 0o666);
     }
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function writeFileCreate() {
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const filename = Deno.makeTempDirSync() + "/test.txt";
+    const filename = Oden.makeTempDirSync() + "/test.txt";
     // if create turned off, the file won't be created
     await assertRejects(async () => {
-      await Deno.writeFile(filename, data, { create: false });
-    }, Deno.errors.NotFound);
+      await Oden.writeFile(filename, data, { create: false });
+    }, Oden.errors.NotFound);
 
     // Turn on create, should have no error
-    await Deno.writeFile(filename, data, { create: true });
-    await Deno.writeFile(filename, data, { create: false });
-    const dataRead = Deno.readFileSync(filename);
+    await Oden.writeFile(filename, data, { create: true });
+    await Oden.writeFile(filename, data, { create: false });
+    const dataRead = Oden.readFileSync(filename);
     const dec = new TextDecoder("utf-8");
     const actual = dec.decode(dataRead);
     assertEquals(actual, "Hello");
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function writeFileCreateNew() {
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const filename = Deno.makeTempDirSync() + "/test.txt";
-    await Deno.writeFile(filename, data, { createNew: true });
+    const filename = Oden.makeTempDirSync() + "/test.txt";
+    await Oden.writeFile(filename, data, { createNew: true });
     await assertRejects(async () => {
-      await Deno.writeFile(filename, data, { createNew: true });
-    }, Deno.errors.AlreadyExists);
+      await Oden.writeFile(filename, data, { createNew: true });
+    }, Oden.errors.AlreadyExists);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function writeFileAppend() {
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const filename = Deno.makeTempDirSync() + "/test.txt";
-    await Deno.writeFile(filename, data);
-    await Deno.writeFile(filename, data, { append: true });
-    let dataRead = Deno.readFileSync(filename);
+    const filename = Oden.makeTempDirSync() + "/test.txt";
+    await Oden.writeFile(filename, data);
+    await Oden.writeFile(filename, data, { append: true });
+    let dataRead = Oden.readFileSync(filename);
     const dec = new TextDecoder("utf-8");
     let actual = dec.decode(dataRead);
     assertEquals(actual, "HelloHello");
     // Now attempt overwrite
-    await Deno.writeFile(filename, data, { append: false });
-    dataRead = Deno.readFileSync(filename);
+    await Oden.writeFile(filename, data, { append: false });
+    dataRead = Oden.readFileSync(filename);
     actual = dec.decode(dataRead);
     assertEquals(actual, "Hello");
     // append not set should also overwrite
-    await Deno.writeFile(filename, data);
-    dataRead = Deno.readFileSync(filename);
+    await Oden.writeFile(filename, data);
+    dataRead = Oden.readFileSync(filename);
     actual = dec.decode(dataRead);
     assertEquals(actual, "Hello");
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function writeFileAbortSignal(): Promise<void> {
     const ac = new AbortController();
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const filename = Deno.makeTempDirSync() + "/test.txt";
+    const filename = Oden.makeTempDirSync() + "/test.txt";
     queueMicrotask(() => ac.abort());
     try {
-      await Deno.writeFile(filename, data, { signal: ac.signal });
+      await Oden.writeFile(filename, data, { signal: ac.signal });
       unreachable();
     } catch (e) {
       assert(e instanceof Error);
@@ -286,17 +286,17 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function writeFileAbortSignalReason(): Promise<void> {
     const ac = new AbortController();
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const filename = Deno.makeTempDirSync() + "/test.txt";
+    const filename = Oden.makeTempDirSync() + "/test.txt";
     const abortReason = new Error();
     queueMicrotask(() => ac.abort(abortReason));
     try {
-      await Deno.writeFile(filename, data, { signal: ac.signal });
+      await Oden.writeFile(filename, data, { signal: ac.signal });
       unreachable();
     } catch (e) {
       assertEquals(e, abortReason);
@@ -304,16 +304,16 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function writeFileAbortSignalPrimitiveReason(): Promise<void> {
     const ac = new AbortController();
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const filename = Deno.makeTempDirSync() + "/test.txt";
+    const filename = Oden.makeTempDirSync() + "/test.txt";
     queueMicrotask(() => ac.abort("Some string"));
     try {
-      await Deno.writeFile(filename, data, { signal: ac.signal });
+      await Oden.writeFile(filename, data, { signal: ac.signal });
       unreachable();
     } catch (e) {
       assertEquals(e, "Some string");
@@ -321,16 +321,16 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function writeFileAbortSignalPreAborted(): Promise<void> {
     const ac = new AbortController();
     ac.abort();
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const filename = Deno.makeTempDirSync() + "/test.txt";
+    const filename = Oden.makeTempDirSync() + "/test.txt";
     try {
-      await Deno.writeFile(filename, data, { signal: ac.signal });
+      await Oden.writeFile(filename, data, { signal: ac.signal });
       unreachable();
     } catch (e) {
       assert(e instanceof Error);
@@ -340,7 +340,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function writeFileAbortSignalReasonPreAborted(): Promise<void> {
     const ac = new AbortController();
@@ -348,9 +348,9 @@ Deno.test(
     ac.abort(abortReason);
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const filename = Deno.makeTempDirSync() + "/test.txt";
+    const filename = Oden.makeTempDirSync() + "/test.txt";
     try {
-      await Deno.writeFile(filename, data, { signal: ac.signal });
+      await Oden.writeFile(filename, data, { signal: ac.signal });
       unreachable();
     } catch (e) {
       assertEquals(e, abortReason);
@@ -359,7 +359,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function writeFileAbortSignalPrimitiveReasonPreAborted(): Promise<
     void
@@ -368,9 +368,9 @@ Deno.test(
     ac.abort("Some string");
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const filename = Deno.makeTempDirSync() + "/test.txt";
+    const filename = Oden.makeTempDirSync() + "/test.txt";
     try {
-      await Deno.writeFile(filename, data, { signal: ac.signal });
+      await Oden.writeFile(filename, data, { signal: ac.signal });
       unreachable();
     } catch (e) {
       assertEquals(e, "Some string");
@@ -380,15 +380,15 @@ Deno.test(
 );
 
 // Test that AbortController's cancel handle is cleaned-up correctly, and do not leak resources.
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function writeFileWithAbortSignalNotCalled() {
     const ac = new AbortController();
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const filename = Deno.makeTempDirSync() + "/test.txt";
-    await Deno.writeFile(filename, data, { signal: ac.signal });
-    const dataRead = Deno.readFileSync(filename);
+    const filename = Oden.makeTempDirSync() + "/test.txt";
+    await Oden.writeFile(filename, data, { signal: ac.signal });
+    const dataRead = Oden.readFileSync(filename);
     const dec = new TextDecoder("utf-8");
     const actual = dec.decode(dataRead);
     assertEquals(actual, "Hello");
@@ -403,14 +403,14 @@ function assertNotExists(filename: string | URL) {
 
 function pathExists(path: string | URL) {
   try {
-    Deno.statSync(path);
+    Oden.statSync(path);
     return true;
   } catch {
     return false;
   }
 }
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function writeFileStream() {
     const stream = new ReadableStream({
@@ -420,17 +420,17 @@ Deno.test(
         controller.close();
       },
     });
-    const filename = Deno.makeTempDirSync() + "/test.txt";
-    await Deno.writeFile(filename, stream);
-    assertEquals(Deno.readFileSync(filename), new Uint8Array([1, 2]));
+    const filename = Oden.makeTempDirSync() + "/test.txt";
+    await Oden.writeFile(filename, stream);
+    assertEquals(Oden.readFileSync(filename), new Uint8Array([1, 2]));
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function overwriteFileWithStream() {
-    const filename = Deno.makeTempDirSync() + "/test.txt";
-    await Deno.writeFile(filename, new Uint8Array([1, 2, 3, 4]));
+    const filename = Oden.makeTempDirSync() + "/test.txt";
+    await Oden.writeFile(filename, new Uint8Array([1, 2, 3, 4]));
 
     const stream = new ReadableStream({
       pull(controller) {
@@ -439,7 +439,7 @@ Deno.test(
         controller.close();
       },
     });
-    await Deno.writeFile(filename, stream);
-    assertEquals(Deno.readFileSync(filename), new Uint8Array([1, 2]));
+    await Oden.writeFile(filename, stream);
+    assertEquals(Oden.readFileSync(filename), new Uint8Array([1, 2]));
   },
 );

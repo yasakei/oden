@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 const foo = await import.source("../wasm_imports/add.wasm");
 const instance = await WebAssembly.instantiate(foo, {
   "./import_from_wasm.mjs": { add: (a, b) => a + b },

@@ -1,15 +1,15 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assert, assertEquals, assertStringIncludes } from "@std/assert";
 import { exists, existsSync } from "node:fs";
 import { promisify } from "node:util";
 import { join } from "@std/path";
 import { symlink } from "node:fs/promises";
 
-Deno.test("[std/node/fs] exists", async function () {
+Oden.test("[std/node/fs] exists", async function () {
   const availableFile = await new Promise((resolve) => {
-    const tmpFilePath = Deno.makeTempFileSync();
+    const tmpFilePath = Oden.makeTempFileSync();
     exists(tmpFilePath, (exists: boolean) => {
-      Deno.removeSync(tmpFilePath);
+      Oden.removeSync(tmpFilePath);
       resolve(exists);
     });
   });
@@ -20,29 +20,29 @@ Deno.test("[std/node/fs] exists", async function () {
   assertEquals(notAvailableFile, false);
 });
 
-Deno.test("[std/node/fs] existsSync", function () {
-  const tmpFilePath = Deno.makeTempFileSync();
+Oden.test("[std/node/fs] existsSync", function () {
+  const tmpFilePath = Oden.makeTempFileSync();
   assertEquals(existsSync(tmpFilePath), true);
-  Deno.removeSync(tmpFilePath);
+  Oden.removeSync(tmpFilePath);
   assertEquals(existsSync("./notAvailable.txt"), false);
 });
 
-Deno.test("[std/node/fs] promisify(exists)", async () => {
-  const tmpFilePath = await Deno.makeTempFile();
+Oden.test("[std/node/fs] promisify(exists)", async () => {
+  const tmpFilePath = await Oden.makeTempFile();
   try {
     const existsPromisified = promisify(exists);
     assert(await existsPromisified(tmpFilePath));
     assert(!await existsPromisified("./notAvailable.txt"));
   } finally {
-    await Deno.remove(tmpFilePath);
+    await Oden.remove(tmpFilePath);
   }
 });
 
-Deno.test("[std/node/fs] exists callback isn't called twice if error is thrown", async () => {
+Oden.test("[std/node/fs] exists callback isn't called twice if error is thrown", async () => {
   // This doesn't use `assertCallbackErrorUncaught()` because `exists()` doesn't return a standard node callback, which is what it expects.
-  const tempFile = await Deno.makeTempFile();
+  const tempFile = await Oden.makeTempFile();
   const importUrl = new URL("node:fs", import.meta.url);
-  const command = new Deno.Command(Deno.execPath(), {
+  const command = new Oden.Command(Oden.execPath(), {
     args: [
       "eval",
       "--no-check",
@@ -57,13 +57,13 @@ Deno.test("[std/node/fs] exists callback isn't called twice if error is thrown",
     ],
   });
   const { success, stderr } = await command.output();
-  await Deno.remove(tempFile);
+  await Oden.remove(tempFile);
   assert(!success);
   assertStringIncludes(new TextDecoder().decode(stderr), "Error: success");
 });
 
-Deno.test("[std/node/fs] exists should return false on invalid symlink", async () => {
-  const tmpDir = await Deno.makeTempDir();
+Oden.test("[std/node/fs] exists should return false on invalid symlink", async () => {
+  const tmpDir = await Oden.makeTempDir();
   const symlinkTarget = join(tmpDir, "noop.link");
   const symlinkPath = join(tmpDir, "link");
   try {
@@ -71,18 +71,18 @@ Deno.test("[std/node/fs] exists should return false on invalid symlink", async (
     const isExists = await promisify(exists)(symlinkPath);
     assert(!isExists);
   } finally {
-    await Deno.remove(tmpDir, { recursive: true });
+    await Oden.remove(tmpDir, { recursive: true });
   }
 });
 
-Deno.test("[std/node/fs] existsSync should return false on invalid symlink", async () => {
-  const tmpDir = await Deno.makeTempDir();
+Oden.test("[std/node/fs] existsSync should return false on invalid symlink", async () => {
+  const tmpDir = await Oden.makeTempDir();
   const symlinkTarget = join(tmpDir, "noop.link");
   const symlinkPath = join(tmpDir, "link");
   try {
     await symlink(symlinkTarget, symlinkPath);
     assert(!existsSync(symlinkPath));
   } finally {
-    await Deno.remove(tmpDir, { recursive: true });
+    await Oden.remove(tmpDir, { recursive: true });
   }
 });

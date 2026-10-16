@@ -1,18 +1,18 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! Minimal startup-time microbenchmark.
 //!
 //! Boots a `MainWorker` with the real CLI snapshot, executes a trivial
 //! script, then tears it down. Intended for fast iteration on startup-perf
-//! work — rebuilds only this example binary, not the full `deno` CLI.
+//! work — rebuilds only this example binary, not the full `oden` CLI.
 //!
 //! Usage:
 //!   cargo run --example startup_bench --release -- [iters]
 //!
 //! Env vars:
-//!   DENO_STARTUP_PHASES=1   Print per-phase breakdown of one iteration
+//!   ODEN_STARTUP_PHASES=1   Print per-phase breakdown of one iteration
 //!                           (V8 init, isolate+snapshot, ops, bootstrap JS).
-//!   DENO_STARTUP_PROFILE=1  Skip the warmup so the first iter shows in profile.
+//!   ODEN_STARTUP_PROFILE=1  Skip the warmup so the first iter shows in profile.
 //!
 //! Tips for fast iteration:
 //!   - Add a release-fast profile (lto=off, codegen-units=256, incremental=true)
@@ -26,18 +26,18 @@ use std::sync::Arc;
 use std::time::Duration;
 use std::time::Instant;
 
-use deno_core::FsModuleLoader;
-use deno_core::ModuleCodeString;
-use deno_core::resolve_path;
-use deno_resolver::npm::DenoInNpmPackageChecker;
-use deno_resolver::npm::NpmResolver;
-use deno_runtime::deno_fs::RealFs;
-use deno_runtime::deno_permissions::Permissions;
-use deno_runtime::deno_permissions::PermissionsContainer;
-use deno_runtime::permissions::RuntimePermissionDescriptorParser;
-use deno_runtime::worker::MainWorker;
-use deno_runtime::worker::WorkerOptions;
-use deno_runtime::worker::WorkerServiceOptions;
+use oden_core::FsModuleLoader;
+use oden_core::ModuleCodeString;
+use oden_core::resolve_path;
+use oden_resolver::npm::OdenInNpmPackageChecker;
+use oden_resolver::npm::NpmResolver;
+use oden_runtime::oden_fs::RealFs;
+use oden_runtime::oden_permissions::Permissions;
+use oden_runtime::oden_permissions::PermissionsContainer;
+use oden_runtime::permissions::RuntimePermissionDescriptorParser;
+use oden_runtime::worker::MainWorker;
+use oden_runtime::worker::WorkerOptions;
+use oden_runtime::worker::WorkerServiceOptions;
 
 #[allow(clippy::disallowed_types, reason = "example binary")]
 type Sys = sys_traits::impls::RealSys;
@@ -56,29 +56,29 @@ fn bootstrap_once() -> MainWorker {
     Arc::new(RuntimePermissionDescriptorParser::new(Sys::default()));
 
   let options = WorkerOptions {
-    startup_snapshot: deno_snapshots::CLI_SNAPSHOT,
-    residual_lazy_js_sources: deno_snapshots::RESIDUAL_LAZY_JS,
-    residual_lazy_esm_sources: deno_snapshots::RESIDUAL_LAZY_ESM,
+    startup_snapshot: oden_snapshots::CLI_SNAPSHOT,
+    residual_lazy_js_sources: oden_snapshots::RESIDUAL_LAZY_JS,
+    residual_lazy_esm_sources: oden_snapshots::RESIDUAL_LAZY_ESM,
     ..Default::default()
   };
 
   MainWorker::bootstrap_from_options::<
-    DenoInNpmPackageChecker,
+    OdenInNpmPackageChecker,
     NpmResolver<Sys>,
     Sys,
   >(
     &main_module,
     WorkerServiceOptions {
-      deno_rt_native_addon_loader: None,
+      oden_rt_native_addon_loader: None,
       module_loader: Rc::new(FsModuleLoader),
       permissions: PermissionsContainer::new(
         permission_desc_parser,
         Permissions::none_without_prompt(),
       ),
       blob_store: std::sync::Arc::new(
-        deno_runtime::deno_web::BlobStore::default(),
+        oden_runtime::oden_web::BlobStore::default(),
       )
-        as std::sync::Arc<dyn deno_runtime::deno_web::BlobStoreTrait>,
+        as std::sync::Arc<dyn oden_runtime::oden_web::BlobStoreTrait>,
       broadcast_channel: Default::default(),
       feature_checker: Default::default(),
       node_services: Default::default(),

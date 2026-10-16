@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and Node.js contributors. All rights reserved. MIT license.
 
 // deno-lint-ignore-file no-explicit-any
@@ -38,34 +38,34 @@ const {
 } = core.ops;
 
 const { default: randomBytes } = core.loadExtScript(
-  "ext:deno_node/internal/crypto/_randomBytes.ts",
+  "ext:oden_node/internal/crypto/_randomBytes.ts",
 );
 const { default: randomFill, randomFillSync } = core.loadExtScript(
-  "ext:deno_node/internal/crypto/_randomFill.mjs",
+  "ext:oden_node/internal/crypto/_randomFill.mjs",
 );
 const { default: randomInt } = core.loadExtScript(
-  "ext:deno_node/internal/crypto/_randomInt.ts",
+  "ext:oden_node/internal/crypto/_randomInt.ts",
 );
 const {
   validateBoolean,
   validateFunction,
   validateInt32,
   validateObject,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
 const {
   isAnyArrayBuffer,
   isArrayBufferView,
   isTypedArray,
-} = core.loadExtScript("ext:deno_node/internal/util/types.ts");
+} = core.loadExtScript("ext:oden_node/internal/util/types.ts");
 const {
   ERR_INVALID_ARG_TYPE,
   ERR_OUT_OF_RANGE,
   NodeError,
   NodeRangeError,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
-const { Buffer } = core.loadExtScript("ext:deno_node/internal/buffer.mjs");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
+const { Buffer } = core.loadExtScript("ext:oden_node/internal/buffer.mjs");
 const { kEmptyObject } = core.loadExtScript(
-  "ext:deno_node/internal/util.mjs",
+  "ext:oden_node/internal/util.mjs",
 );
 
 // OpenSSL BIGNUM max size: INT_MAX / (4 * BN_BITS2) words * 8 bytes/word

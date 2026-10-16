@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -9,10 +9,10 @@ use std::path::PathBuf;
 
 use anyhow::Error as AnyError;
 use deno_error::JsErrorBox;
-use deno_npm::NpmPackageExtraInfo;
-use deno_npm::NpmPackageId;
-use deno_npm::NpmResolutionPackage;
-use deno_npm::resolution::NpmResolutionSnapshot;
+use oden_npm::NpmPackageExtraInfo;
+use oden_npm::NpmPackageId;
+use oden_npm::NpmResolutionPackage;
+use oden_npm::resolution::NpmResolutionSnapshot;
 use deno_semver::SmallStackString;
 use deno_semver::Version;
 use deno_semver::package::PackageNv;
@@ -50,7 +50,7 @@ pub struct LifecycleScriptsExecutorOptions<'a> {
   /// Resolves the on-disk folder of a package for the node_modules layout
   /// being installed, so the executor can locate the dependency bins that
   /// lifecycle scripts invoke. When `None`, the executor falls back to its
-  /// own npm resolver, which assumes the isolated (`.deno`) layout — the
+  /// own npm resolver, which assumes the isolated (`.oden`) layout — the
   /// hoisted installer must provide this to map packages to their hoisted
   /// locations.
   pub resolve_pkg_folder: Option<ResolvePkgFolderFn<'a>>,
@@ -139,7 +139,7 @@ pub trait LifecycleScriptsStrategy {
 /// that workspace-aware scripts such as `@sveltejs/kit`'s `postinstall` operate
 /// on each member.
 ///
-/// When `deno install` runs in a workspace whose root is a `deno.json` (no root
+/// When `oden install` runs in a workspace whose root is a `oden.json` (no root
 /// `package.json`), tools that read the root `package.json` `workspaces` field
 /// (as npm/svelte-kit do) cannot discover the members. Running the script per
 /// member with the member as `INIT_CWD` reproduces what those tools would do in
@@ -320,7 +320,7 @@ impl<'a, TSys: FsMetadata> LifecycleScripts<'a, TSys> {
 }
 
 pub static LIFECYCLE_SCRIPTS_RUNNING_ENV_VAR: &str =
-  "DENO_INTERNAL_IS_LIFECYCLE_SCRIPT";
+  "ODEN_INTERNAL_IS_LIFECYCLE_SCRIPT";
 
 pub fn is_running_lifecycle_script(sys: &impl sys_traits::EnvVar) -> bool {
   sys.env_var(LIFECYCLE_SCRIPTS_RUNNING_ENV_VAR).is_ok()
@@ -451,12 +451,12 @@ mod tests {
   use std::collections::HashMap;
   use std::path::PathBuf;
 
-  use deno_npm::NpmPackageId;
-  use deno_npm::NpmResolutionPackage;
-  use deno_npm::NpmResolutionPackageSystemInfo;
-  use deno_npm::resolution::NpmResolutionSnapshot;
-  use deno_npm::resolution::SerializedNpmResolutionSnapshot;
-  use deno_npm::resolution::SerializedNpmResolutionSnapshotPackage;
+  use oden_npm::NpmPackageId;
+  use oden_npm::NpmResolutionPackage;
+  use oden_npm::NpmResolutionPackageSystemInfo;
+  use oden_npm::resolution::NpmResolutionSnapshot;
+  use oden_npm::resolution::SerializedNpmResolutionSnapshot;
+  use oden_npm::resolution::SerializedNpmResolutionSnapshotPackage;
   use deno_semver::StackString;
   use deno_semver::package::PackageReq;
 

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 use std::collections::HashSet;
@@ -12,22 +12,22 @@ use base64::Engine;
 use base64::prelude::BASE64_STANDARD;
 use deno_ast::ModuleSpecifier;
 use deno_ast::SourceTextInfo;
-use deno_config::deno_json::ConfigFile;
-use deno_config::workspace::JsrPackageConfig;
-use deno_config::workspace::Workspace;
-use deno_core::anyhow::Context;
-use deno_core::anyhow::bail;
-use deno_core::error::AnyError;
-use deno_core::futures::FutureExt;
-use deno_core::futures::StreamExt;
-use deno_core::futures::future::LocalBoxFuture;
-use deno_core::futures::stream::FuturesUnordered;
-use deno_core::serde_json;
-use deno_core::serde_json::Value;
-use deno_core::serde_json::json;
-use deno_core::url::Url;
-use deno_resolver::collections::FolderScopedMap;
-use deno_runtime::deno_fetch;
+use oden_config::oden_json::ConfigFile;
+use oden_config::workspace::JsrPackageConfig;
+use oden_config::workspace::Workspace;
+use oden_core::anyhow::Context;
+use oden_core::anyhow::bail;
+use oden_core::error::AnyError;
+use oden_core::futures::FutureExt;
+use oden_core::futures::StreamExt;
+use oden_core::futures::future::LocalBoxFuture;
+use oden_core::futures::stream::FuturesUnordered;
+use oden_core::serde_json;
+use oden_core::serde_json::Value;
+use oden_core::serde_json::json;
+use oden_core::url::Url;
+use oden_resolver::collections::FolderScopedMap;
+use oden_runtime::oden_fetch;
 use deno_semver::Version;
 use deno_terminal::colors;
 use http_body_util::BodyExt;
@@ -85,23 +85,23 @@ pub async fn publish(
   let directory_path = cli_options.initial_cwd();
   let mut publish_configs = cli_options.start_dir.jsr_packages_for_publish();
   if publish_configs.is_empty() {
-    match cli_options.start_dir.member_deno_json() {
-      Some(deno_json) => {
-        debug_assert!(!deno_json.is_package() || !deno_json.should_publish());
-        if deno_json.json.name.is_none() {
-          bail!("Missing 'name' field in '{}'.", deno_json.specifier);
+    match cli_options.start_dir.member_oden_json() {
+      Some(oden_json) => {
+        debug_assert!(!oden_json.is_package() || !oden_json.should_publish());
+        if oden_json.json.name.is_none() {
+          bail!("Missing 'name' field in '{}'.", oden_json.specifier);
         }
-        if !deno_json.should_publish() {
+        if !oden_json.should_publish() {
           bail!(
             "Package 'publish' field is false in '{}'.",
-            deno_json.specifier
+            oden_json.specifier
           );
         }
-        error_missing_exports_field(deno_json)?;
+        error_missing_exports_field(oden_json)?;
       }
       None => {
         bail!(
-          "Couldn't find a deno.json, deno.jsonc, jsr.json or jsr.jsonc configuration file in {}.",
+          "Couldn't find a oden.json, oden.jsonc, jsr.json or jsr.jsonc configuration file in {}.",
           directory_path.display()
         );
       }
@@ -129,7 +129,7 @@ pub async fn publish(
   // Bail out early if the version is already published, before doing the
   // expensive type checking and tarball preparation. Already-published
   // versions are skipped with a warning (rather than erroring) so that
-  // re-running `deno publish` after a partial or concurrent publish still
+  // re-running `oden publish` after a partial or concurrent publish still
   // succeeds, matching the idempotent behavior of the publish step itself.
   if !publish_flags.dry_run {
     publish_configs = filter_out_published_packages(
@@ -189,7 +189,7 @@ pub async fn publish(
     bail!("No packages to publish");
   }
 
-  if std::env::var("DENO_TESTING_DISABLE_GIT_CHECK")
+  if std::env::var("ODEN_TESTING_DISABLE_GIT_CHECK")
     .ok()
     .is_none()
     && !publish_flags.allow_dirty
@@ -242,7 +242,7 @@ fn validate_publish_configs(
 
     let version =
       config.config_file.json.version.as_deref().ok_or_else(|| {
-        deno_core::anyhow::anyhow!(
+        oden_core::anyhow::anyhow!(
           "{} is missing 'version' field",
           config.config_file.specifier
         )
@@ -284,7 +284,7 @@ async fn filter_out_published_packages(
     )
     .await
   });
-  let results = deno_core::futures::future::join_all(checks).await;
+  let results = oden_core::futures::future::join_all(checks).await;
 
   let mut remaining = Vec::with_capacity(publish_configs.len());
   for (config, already_published) in publish_configs.into_iter().zip(results) {
@@ -384,7 +384,7 @@ impl PublishPreparer {
         .boxed()
       })
       .collect::<Vec<_>>();
-    let results = deno_core::futures::future::join_all(results).await;
+    let results = oden_core::futures::future::join_all(results).await;
     for result in results {
       let (package_name, package) = result?;
       package_by_name.insert(package_name, package);
@@ -400,7 +400,7 @@ impl PublishPreparer {
     allow_slow_types: bool,
     diagnostics_collector: &PublishDiagnosticsCollector,
     package_configs: &[JsrPackageConfig],
-  ) -> Result<Arc<deno_graph::ModuleGraph>, deno_core::anyhow::Error> {
+  ) -> Result<Arc<deno_graph::ModuleGraph>, oden_core::anyhow::Error> {
     let build_fast_check_graph = !allow_slow_types;
     let graph = self
       .module_graph_creator
@@ -429,7 +429,7 @@ impl PublishPreparer {
         colors::yellow("Warning"),
       );
       Ok(Arc::new(graph))
-    } else if std::env::var("DENO_INTERNAL_FAST_CHECK_OVERWRITE").as_deref()
+    } else if std::env::var("ODEN_INTERNAL_FAST_CHECK_OVERWRITE").as_deref()
       == Ok("1")
     {
       if check_if_git_repo_dirty(self.cli_options.initial_cwd())
@@ -437,7 +437,7 @@ impl PublishPreparer {
         .is_some()
       {
         bail!(
-          "When using DENO_INTERNAL_FAST_CHECK_OVERWRITE, the git repo must be in a clean state."
+          "When using ODEN_INTERNAL_FAST_CHECK_OVERWRITE, the git repo must be in a clean state."
         );
       }
 
@@ -456,7 +456,7 @@ impl PublishPreparer {
         }
       }
 
-      bail!("Exiting due to DENO_INTERNAL_FAST_CHECK_OVERWRITE")
+      bail!("Exiting due to ODEN_INTERNAL_FAST_CHECK_OVERWRITE")
     } else {
       log::info!("Checking for slow types in the public API...");
       for package in package_configs {
@@ -498,7 +498,7 @@ impl PublishPreparer {
               concat!(
                 "Failed ensuring public API type output is valid.\n\n",
                 "{:#}\n\n",
-                "You may have discovered a bug in Deno. Please open an issue at: ",
+                "You may have discovered a bug in Oden. Please open an issue at: ",
                 "https://github.com/denoland/deno/issues/"
               ),
               check_diagnostics
@@ -516,24 +516,24 @@ impl PublishPreparer {
     graph: Arc<deno_graph::ModuleGraph>,
     diagnostics_collector: &PublishDiagnosticsCollector,
   ) -> Result<Rc<PreparedPublishPackage>, AnyError> {
-    let deno_json = &package.config_file;
-    let config_path = deno_json.specifier.to_file_path().unwrap();
+    let oden_json = &package.config_file;
+    let config_path = oden_json.specifier.to_file_path().unwrap();
     let root_dir = config_path.parent().unwrap().to_path_buf();
-    let version = deno_json.json.version.clone().ok_or_else(|| {
-      deno_core::anyhow::anyhow!(
+    let version = oden_json.json.version.clone().ok_or_else(|| {
+      oden_core::anyhow::anyhow!(
         "{} is missing 'version' field",
-        deno_json.specifier
+        oden_json.specifier
       )
     })?;
     let (scope, name_no_scope) = registry::parse_package_name(&package.name)?;
     let file_patterns = package.member_dir.to_publish_config()?.files;
 
-    let tarball = deno_core::unsync::spawn_blocking({
+    let tarball = oden_core::unsync::spawn_blocking({
       let diagnostics_collector = diagnostics_collector.clone();
       let module_content_provider = self.module_content_provider.clone();
       let cli_options = self.cli_options.clone();
       let config_path = config_path.clone();
-      let config_url = deno_json.specifier.clone();
+      let config_url = oden_json.specifier.clone();
       let has_license_field = package.license.is_some();
       let current_package_name = package.name.clone();
       move || {
@@ -604,7 +604,7 @@ impl PublishPreparer {
       package: name_no_scope.to_string(),
       version: version.to_string(),
       tarball,
-      exports: match &deno_json.json.exports {
+      exports: match &oden_json.json.exports {
         Some(Value::Object(exports)) => exports
           .into_iter()
           .map(|(k, v)| (k.to_string(), v.as_str().unwrap().to_string()))
@@ -1086,7 +1086,7 @@ fn combine_publish_errors(mut errors: Vec<AnyError>) -> AnyError {
     // "Failed to publish @scope/name: <cause>").
     message.push_str(&format!("\n\n* {:#}", err));
   }
-  deno_core::anyhow::anyhow!(message)
+  oden_core::anyhow::anyhow!(message)
 }
 
 async fn publish_package(
@@ -1114,7 +1114,7 @@ async fn publish_package(
     Some(&config_path),
   )?;
 
-  let body = deno_fetch::ReqBody::full(package.tarball.bytes.clone());
+  let body = oden_fetch::ReqBody::full(package.tarball.bytes.clone());
   let response = http_client
     .post(url, body)?
     .header(
@@ -1417,9 +1417,9 @@ async fn submit_provenance_bundle(
 
   // Carried into the error so that a report of this warning is traceable in the
   // registry's own logs, which is where the reason for a rejection lives.
-  let x_deno_ray = response
+  let x_oden_ray = response
     .headers()
-    .get("x-deno-ray")
+    .get("x-oden-ray")
     .and_then(|value| value.to_str().ok())
     .map(|s| s.to_string());
 
@@ -1429,7 +1429,7 @@ async fn submit_provenance_bundle(
   let body = response.collect().await?.to_bytes();
   match serde_json::from_slice::<registry::ApiError>(&body) {
     Ok(mut err) => {
-      err.x_deno_ray = x_deno_ray;
+      err.x_oden_ray = x_oden_ray;
       Err(err.into())
     }
     Err(_) => bail!("{}: {}", status, response_body_snippet(&body)),
@@ -1498,7 +1498,7 @@ fn verify_version_manifest(
 
   for (specifier, expected) in &manifest.exports {
     let actual = package.exports.get(specifier).ok_or_else(|| {
-      deno_core::anyhow::anyhow!(
+      oden_core::anyhow::anyhow!(
         "Export {} not found in the package",
         specifier
       )
@@ -1570,13 +1570,13 @@ fn has_license_file<'a>(
   })
 }
 
-fn error_missing_exports_field(deno_json: &ConfigFile) -> Result<(), AnyError> {
+fn error_missing_exports_field(oden_json: &ConfigFile) -> Result<(), AnyError> {
   static SUGGESTED_ENTRYPOINTS: [&str; 4] =
     ["mod.ts", "mod.js", "index.ts", "index.js"];
   let mut suggested_entrypoint = None;
 
   for entrypoint in SUGGESTED_ENTRYPOINTS {
-    if deno_json.dir_path().join(entrypoint).exists() {
+    if oden_json.dir_path().join(entrypoint).exists() {
       suggested_entrypoint = Some(entrypoint);
       break;
     }
@@ -1588,14 +1588,14 @@ fn error_missing_exports_field(deno_json: &ConfigFile) -> Result<(), AnyError> {
   "version": "{}",
   "exports": "{}"
 }}"#,
-    deno_json.json.name.as_deref().unwrap_or("@scope/name"),
-    deno_json.json.name.as_deref().unwrap_or("0.0.0"),
+    oden_json.json.name.as_deref().unwrap_or("@scope/name"),
+    oden_json.json.name.as_deref().unwrap_or("0.0.0"),
     suggested_entrypoint.unwrap_or("<path_to_entrypoint>")
   );
 
   bail!(
     "You did not specify an entrypoint in {}. Add `exports` mapping in the configuration file, eg:\n{}",
-    deno_json.specifier,
+    oden_json.specifier,
     exports_content
   );
 }
@@ -1643,7 +1643,7 @@ mod tests {
           size: 0,
         }],
       },
-      config: "deno.json".to_string(),
+      config: "oden.json".to_string(),
       exports: HashMap::new(),
     };
 
@@ -1674,7 +1674,7 @@ mod tests {
           size: 0,
         }],
       },
-      config: "deno.json".to_string(),
+      config: "oden.json".to_string(),
       exports: HashMap::new(),
     };
 
@@ -1707,7 +1707,7 @@ mod tests {
           size: 0,
         }],
       },
-      config: "deno.json".to_string(),
+      config: "oden.json".to_string(),
       exports: HashMap::new(),
     };
 

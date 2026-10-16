@@ -1,7 +1,7 @@
 {
-  "name": "@denotest/b",
+  "name": "@odentest/b",
   "version": "1.0.0",
   "dependencies": {
-    "@denotest/add": "1.0.0"
+    "@odentest/add": "1.0.0"
   }
 }

@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // @ts-check
 /// <reference path="../../core/internal.d.ts" />
-/// <reference path="../../core/lib.deno_core.d.ts" />
+/// <reference path="../../core/lib.oden_core.d.ts" />
 /// <reference path="../webidl/internal.d.ts" />
 
 (function () {
@@ -38,12 +38,12 @@ const {
   Uint32Array,
 } = primordials;
 
-const webidl = core.loadExtScript("ext:deno_webidl/00_webidl.js");
+const webidl = core.loadExtScript("ext:oden_webidl/00_webidl.js");
 const { createFilteredInspectProxy } = core.loadExtScript(
-  "ext:deno_web/01_console.js",
+  "ext:oden_web/01_console.js",
 );
 const { markNotSerializable } = core.loadExtScript(
-  "ext:deno_web/13_message_port.js",
+  "ext:oden_web/13_message_port.js",
 );
 
 const _list = Symbol("list");
@@ -147,7 +147,7 @@ class URLSearchParams {
         }
         // Sequence<sequence<USVString>>
         const pairs = [];
-        // deno-lint-ignore deno-internal/prefer-primordials
+        // deno-lint-ignore oden-internal/prefer-primordials
         const iter = method.call(init);
         if (iter == null || typeof iter.next !== "function") {
           const err = new TypeError(
@@ -157,7 +157,7 @@ class URLSearchParams {
           throw err;
         }
         while (true) {
-          // deno-lint-ignore deno-internal/prefer-primordials
+          // deno-lint-ignore oden-internal/prefer-primordials
           const res = iter.next();
           if (res == null) {
             const err = new TypeError(
@@ -244,7 +244,7 @@ class URLSearchParams {
     if (url === null) {
       return;
     }
-    // deno-lint-ignore deno-internal/prefer-primordials
+    // deno-lint-ignore oden-internal/prefer-primordials
     url[_updateUrlSearch](this.toString());
   }
 
@@ -420,17 +420,17 @@ class URLSearchParams {
   // Node exposes this as a method on URLSearchParams.prototype so that
   // `Object.getOwnPropertyDescriptor(URLSearchParams.prototype,
   // Symbol.for("nodejs.util.inspect.custom"))` is not undefined. We delegate
-  // to Deno's `privateCustomInspect` to preserve the Map-like formatting
+  // to Oden's `privateCustomInspect` to preserve the Map-like formatting
   // (`URLSearchParams { 'a' => 'b' }`) that node compat tests expect.
   [SymbolFor("nodejs.util.inspect.custom")](_depth, inspectOptions, inspect) {
     webidl.assertBranded(this, URLSearchParamsPrototype, "URLSearchParams");
-    return this[SymbolFor("Deno.privateCustomInspect")](
+    return this[SymbolFor("Oden.privateCustomInspect")](
       inspect,
       inspectOptions,
     );
   }
 
-  [SymbolFor("Deno.privateCustomInspect")](inspect, inspectOptions) {
+  [SymbolFor("Oden.privateCustomInspect")](inspect, inspectOptions) {
     webidl.assertBranded(this, URLSearchParamsPrototype, "URLSearchParams");
     if (
       typeof inspectOptions?.depth === "number" && inspectOptions.depth < 0
@@ -798,7 +798,7 @@ class URL {
     } = componentsBuf);
   }
 
-  [SymbolFor("Deno.privateCustomInspect")](inspect, inspectOptions) {
+  [SymbolFor("Oden.privateCustomInspect")](inspect, inspectOptions) {
     return inspect(
       createFilteredInspectProxy({
         object: this,
@@ -822,10 +822,10 @@ class URL {
   }
 
   // See URLSearchParams: Node exposes this as a method so that the descriptor
-  // lookup is not undefined. Deno's own inspector still prefers
-  // Deno.privateCustomInspect, so this is effectively the same code path.
+  // lookup is not undefined. Oden's own inspector still prefers
+  // Oden.privateCustomInspect, so this is effectively the same code path.
   [SymbolFor("nodejs.util.inspect.custom")](_depth, inspectOptions, inspect) {
-    return this[SymbolFor("Deno.privateCustomInspect")](
+    return this[SymbolFor("Oden.privateCustomInspect")](
       inspect,
       inspectOptions,
     );

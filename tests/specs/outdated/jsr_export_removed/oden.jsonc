@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "@odentest/multiple-exports": "jsr:@odentest/multiple-exports@^0.7.0"
+  }
+}

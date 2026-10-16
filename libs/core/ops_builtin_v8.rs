@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -1418,7 +1418,7 @@ pub fn wasm_streaming_callback<'a>(
   let Some(cb_handle) = maybe_cb_handle else {
     // The JS handler is registered while the runtime bootstraps, before any
     // user code can trigger wasm streaming. Reaching this without a handler
-    // means deno_core was misconfigured.
+    // means oden_core was misconfigured.
     panic!("wasm streaming callback invoked before the JS handler was set");
   };
 

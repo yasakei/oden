@@ -4,9 +4,9 @@ const {
   writableStreamForRid,
   readableStreamForRid,
   core: { close },
-} = Deno[Deno.internal];
+} = Oden[Oden.internal];
 
-const command = new Deno.Command(Deno.execPath(), {
+const command = new Oden.Command(Oden.execPath(), {
   args: [
     "repl",
     "--json",

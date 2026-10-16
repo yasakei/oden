@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 
 (function () {
@@ -28,7 +28,7 @@ const {
   validateString,
   validateStringArray,
   validateUnion,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
 
 const {
   findLongOptionForShort,
@@ -42,10 +42,10 @@ const {
   objectGetOwn,
   optionsGetOwn,
   useDefaultValueOption,
-} = core.loadExtScript("ext:deno_node/internal/util/parse_args/utils.js");
+} = core.loadExtScript("ext:oden_node/internal/util/parse_args/utils.js");
 
-const { codes } = core.loadExtScript("ext:deno_node/internal/error_codes.ts");
-const { kEmptyObject } = core.loadExtScript("ext:deno_node/internal/util.mjs");
+const { codes } = core.loadExtScript("ext:oden_node/internal/error_codes.ts");
+const { kEmptyObject } = core.loadExtScript("ext:oden_node/internal/util.mjs");
 const {
   ERR_INVALID_ARG_VALUE,
   ERR_PARSE_ARGS_INVALID_OPTION_VALUE,

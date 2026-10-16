@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::any::TypeId;
 use std::any::type_name;
@@ -539,8 +539,8 @@ inventory::collect!(InheritanceEdge);
 mod tests {
   use std::any::TypeId;
 
-  use deno_ops::CppgcBase;
-  use deno_ops::CppgcInherits;
+  use oden_ops::CppgcBase;
+  use oden_ops::CppgcInherits;
 
   use super::*;
 

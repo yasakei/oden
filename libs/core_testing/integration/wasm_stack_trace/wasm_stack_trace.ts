@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // A minimal wasm module with a single exported function that triggers `unreachable`.
 // WAT equivalent:

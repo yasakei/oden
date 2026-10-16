@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -22,10 +22,10 @@
 
 (function () {
 const { core, primordials } = __bootstrap;
-const { Buffer } = core.loadExtScript("ext:deno_node/internal/buffer.mjs");
-const { uvException } = core.loadExtScript("ext:deno_node/internal/errors.ts");
+const { Buffer } = core.loadExtScript("ext:oden_node/internal/buffer.mjs");
+const { uvException } = core.loadExtScript("ext:oden_node/internal/errors.ts");
 const { writeBuffer } = core.loadExtScript(
-  "ext:deno_node/internal_binding/node_file.ts",
+  "ext:oden_node/internal_binding/node_file.ts",
 );
 
 const { RegExpPrototypeTest, SafeRegExp, Symbol } = primordials;

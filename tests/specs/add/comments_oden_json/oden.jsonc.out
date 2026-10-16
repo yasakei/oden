@@ -1,0 +1,9 @@
+// Testing four space indents too
+// oden-fmt-ignore
+{
+    "imports": {
+        "@odentest/add": "jsr:@odentest/add@^1.0.0",
+        "@odentest/add2": "npm:@odentest/add", // some comment
+        "@odentest/esm-basic": "npm:@odentest/esm-basic@^1.0.0"
+    }
+}

@@ -1,13 +1,13 @@
-# Benching utility for `deno_core` op system
+# Benching utility for `oden_core` op system
 
 Example:
 
 ```rust
-use deno_bench_util::bench_js_sync;
-use deno_bench_util::bench_or_profile;
-use deno_bench_util::bencher::Bencher;
-use deno_bench_util::bencher::benchmark_group;
-use deno_core::Extension;
+use oden_bench_util::bench_js_sync;
+use oden_bench_util::bench_or_profile;
+use oden_bench_util::bencher::Bencher;
+use oden_bench_util::bencher::benchmark_group;
+use oden_core::Extension;
 
 #[op2]
 #[number]
@@ -23,7 +23,7 @@ fn setup() -> Vec<Extension> {
 }
 
 fn bench_op_nop(b: &mut Bencher) {
-  bench_js_sync(b, r#"Deno.core.ops.op_nop();"#, setup);
+  bench_js_sync(b, r#"Oden.core.ops.op_nop();"#, setup);
 }
 
 benchmark_group!(benches, bench_op_nop);

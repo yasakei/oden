@@ -1,16 +1,16 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::rc::Rc;
 
-use deno_core::AsyncMutFuture;
-use deno_core::AsyncRefCell;
-use deno_core::AsyncResult;
-use deno_core::CancelHandle;
-use deno_core::CancelTryFuture;
-use deno_core::RcRef;
-use deno_core::Resource;
-use deno_core::futures::TryFutureExt;
+use oden_core::AsyncMutFuture;
+use oden_core::AsyncRefCell;
+use oden_core::AsyncResult;
+use oden_core::CancelHandle;
+use oden_core::CancelTryFuture;
+use oden_core::RcRef;
+use oden_core::Resource;
+use oden_core::futures::TryFutureExt;
 use deno_error::JsErrorBox;
 use socket2::SockRef;
 use tokio::io::AsyncRead;
@@ -123,8 +123,8 @@ pub type TcpStreamResource =
   FullDuplexResource<tcp::OwnedReadHalf, tcp::OwnedWriteHalf>;
 
 impl Resource for TcpStreamResource {
-  deno_core::impl_readable_byob!();
-  deno_core::impl_writable!();
+  oden_core::impl_readable_byob!();
+  oden_core::impl_writable!();
 
   fn name(&self) -> Cow<'_, str> {
     "tcpStream".into()
@@ -222,8 +222,8 @@ impl UnixStreamResource {
 }
 
 impl Resource for UnixStreamResource {
-  deno_core::impl_readable_byob!();
-  deno_core::impl_writable!();
+  oden_core::impl_readable_byob!();
+  oden_core::impl_writable!();
 
   fn name(&self) -> Cow<'_, str> {
     "unixStream".into()
@@ -279,8 +279,8 @@ impl VsockStreamResource {
 }
 
 impl Resource for VsockStreamResource {
-  deno_core::impl_readable_byob!();
-  deno_core::impl_writable!();
+  oden_core::impl_readable_byob!();
+  oden_core::impl_writable!();
 
   fn name(&self) -> Cow<'_, str> {
     "vsockStream".into()

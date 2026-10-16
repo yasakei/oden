@@ -1,5 +1,5 @@
-#!/usr/bin/env -S deno run -A --lock=tools/deno.lock.json
-// Copyright 2018-2026 the Deno authors. MIT license.
+#!/usr/bin/env -S oden run -A --lock=tools/oden.lock.json
+// Copyright 2018-2026 the Oden authors. MIT license.
 // deno-lint-ignore-file no-console
 
 // Fetches the current versions.json from the bucket, inserts the given release
@@ -8,10 +8,10 @@
 
 import { greaterThan, parse } from "jsr:@std/semver@1";
 
-const version = Deno.args[0];
+const version = Oden.args[0];
 if (!version) {
   console.error("Usage: update_versions_json.ts <version-tag>");
-  Deno.exit(1);
+  Oden.exit(1);
 }
 
 interface Versions {
@@ -49,4 +49,4 @@ if (!versions.cli.includes(version)) {
 console.error("Adding version:", version);
 console.error("Total versions:", versions.cli.length);
 
-Deno.writeTextFileSync("versions.json", JSON.stringify(versions) + "\n");
+Oden.writeTextFileSync("versions.json", JSON.stringify(versions) + "\n");

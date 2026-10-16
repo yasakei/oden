@@ -1,9 +1,9 @@
 {
   "tests": {
-    "deno_exit_propagates": {
+    "oden_exit_propagates": {
       "args": [
         "eval",
-        "console.log('before'); Deno.exit(42); console.log('after')"
+        "console.log('before'); Oden.exit(42); console.log('after')"
       ],
       "output": "exit42.out",
       "exitCode": 42

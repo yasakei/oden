@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -24,11 +24,11 @@
 const { core, primordials } = __bootstrap;
 
 const { ownerSymbol } = core.loadExtScript(
-  "ext:deno_node/internal/async_hooks.ts",
+  "ext:oden_node/internal/async_hooks.ts",
 );
 // deno-lint-ignore no-unused-vars
 const { HandleWrap } = core.loadExtScript(
-  "ext:deno_node/internal_binding/handle_wrap.ts",
+  "ext:oden_node/internal_binding/handle_wrap.ts",
 );
 const {
   kArrayBufferOffset,
@@ -37,20 +37,20 @@ const {
   kReadBytesOrError,
   streamBaseState,
   WriteWrap,
-} = core.loadExtScript("ext:deno_node/internal_binding/stream_wrap.ts");
+} = core.loadExtScript("ext:oden_node/internal_binding/stream_wrap.ts");
 const { errnoException } = core.loadExtScript(
-  "ext:deno_node/internal/errors.ts",
+  "ext:oden_node/internal/errors.ts",
 );
 const lazyInternalTimers = () =>
-  core.loadExtScript("ext:deno_node/internal/timers.mjs");
+  core.loadExtScript("ext:oden_node/internal/timers.mjs");
 const lazyTimers = core.createLazyLoader("node:timers");
-const { codeMap } = core.loadExtScript("ext:deno_node/internal_binding/uv.ts");
-const { Buffer } = core.loadExtScript("ext:deno_node/internal/buffer.mjs");
+const { codeMap } = core.loadExtScript("ext:oden_node/internal_binding/uv.ts");
+const { Buffer } = core.loadExtScript("ext:oden_node/internal/buffer.mjs");
 const { isUint8Array } = core.loadExtScript(
-  "ext:deno_node/internal/util/types.ts",
+  "ext:oden_node/internal/util/types.ts",
 );
 const { validateFunction } = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
 
 const {
@@ -254,7 +254,7 @@ function afterWriteDispatched(
 
 // Here we differ from Node slightly. Node makes use of the `kReadBytesOrError`
 // entry of the `streamBaseState` array from the `stream_wrap` internal binding.
-// Here we pass the `nread` value directly to this method as async Deno APIs
+// Here we pass the `nread` value directly to this method as async Oden APIs
 // don't grant us the ability to rely on some mutable array entry setting.
 function onStreamRead(
   // deno-lint-ignore no-explicit-any
@@ -317,7 +317,7 @@ function onStreamRead(
       );
       // Ignore use of primordial here. The `push` method is from a `Readable`
       // stream instance.
-      // deno-lint-ignore deno-internal/prefer-primordials
+      // deno-lint-ignore oden-internal/prefer-primordials
       result = stream.push(buf);
     }
 
@@ -370,7 +370,7 @@ function onStreamRead(
     // `end` -> `close`
     // Ignore use of primordial. The `push` method is from a `Readable` stream
     // instance.
-    // deno-lint-ignore deno-internal/prefer-primordials
+    // deno-lint-ignore oden-internal/prefer-primordials
     stream.push(null);
     stream.read(0);
   }

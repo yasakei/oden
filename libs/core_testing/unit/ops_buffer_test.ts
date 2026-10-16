@@ -1,9 +1,9 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assertArrayEquals, test } from "checkin:testing";
 const {
   op_v8slice_store,
   op_v8slice_clone,
-} = Deno.core.ops;
+} = Oden.core.ops;
 
 // Cloning a buffer should result in the same buffer being returned
 test(function testBufferStore() {

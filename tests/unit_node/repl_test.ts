@@ -1,12 +1,12 @@
 // deno-lint-ignore-file no-undef
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import repl from "node:repl";
 import { PassThrough } from "node:stream";
 import { Buffer } from "node:buffer";
 import { assert, assertEquals } from "@std/assert";
 
-Deno.test({
+Oden.test({
   name: "repl module exports",
   fn() {
     assert(typeof repl.REPLServer !== "undefined");
@@ -26,7 +26,7 @@ Deno.test({
 // inspector's `Runtime.evaluate({ throwOnSideEffect: true })` (see
 // `_createPreviewSession` in ext/node/polyfills/repl.ts), which catches
 // side-effectful expressions before they execute.
-Deno.test({
+Oden.test({
   name: "node:repl custom eval + preview:true does not run input mid-keystroke",
   async fn() {
     // deno-lint-ignore no-explicit-any
@@ -97,7 +97,7 @@ Deno.test({
 // `preview: true` opt-in actually shows a preview for side-effect-free
 // expressions (matching Node). Custom-eval REPLs no longer silently
 // drop the explicit opt-in.
-Deno.test({
+Oden.test({
   name: "node:repl pure expression preview renders when preview:true",
   async fn() {
     // deno-lint-ignore no-explicit-any
@@ -146,7 +146,7 @@ Deno.test({
 // Follow-up to #34360: matches Node's default. Custom eval without an
 // explicit `preview` opt-in must NOT show a preview, even though the
 // inspector probe is wired up.
-Deno.test({
+Oden.test({
   name: "node:repl custom eval defaults to no preview",
   async fn() {
     // deno-lint-ignore no-explicit-any

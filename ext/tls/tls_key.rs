@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! These represent the various types of TLS keys we support for both client and server
 //! connections.
@@ -21,9 +21,9 @@ use std::io::ErrorKind;
 use std::rc::Rc;
 use std::sync::Arc;
 
-use deno_core::futures::FutureExt;
-use deno_core::futures::future::Either;
-use deno_core::unsync::spawn;
+use oden_core::futures::FutureExt;
+use oden_core::futures::future::Either;
+use oden_core::unsync::spawn;
 use rustls::ServerConfig;
 use rustls::pki_types::CertificateDer;
 use rustls::pki_types::PrivateKeyDer;
@@ -71,8 +71,8 @@ pub enum TlsKeys {
 pub struct TlsKeysHolder(RefCell<TlsKeys>);
 
 // SAFETY: we're sure `TlsKeysHolder` can be GCed
-unsafe impl deno_core::GarbageCollected for TlsKeysHolder {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+unsafe impl oden_core::GarbageCollected for TlsKeysHolder {
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"TlsKeyHolder"
@@ -256,8 +256,8 @@ pub struct TlsKeyLookup {
 }
 
 // SAFETY: we're sure `TlsKeyLookup` can be GCed
-unsafe impl deno_core::GarbageCollected for TlsKeyLookup {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+unsafe impl oden_core::GarbageCollected for TlsKeyLookup {
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"TlsKeyLookup"
@@ -292,7 +292,7 @@ impl TlsKeyLookup {
 pub mod tests {
   #![allow(clippy::disallowed_methods, reason = "tests")]
 
-  use deno_core::unsync::spawn;
+  use oden_core::unsync::spawn;
 
   use super::*;
 

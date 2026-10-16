@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cell::RefCell;
@@ -18,33 +18,33 @@ use std::task::Poll;
 use std::task::Waker;
 use std::time::Duration;
 
-use deno_core::AsyncRefCell;
-use deno_core::AsyncResult;
-use deno_core::BufMutView;
-use deno_core::BufView;
-use deno_core::FromV8;
-use deno_core::GarbageCollected;
-use deno_core::JsBuffer;
-use deno_core::OpState;
-use deno_core::RcRef;
-use deno_core::Resource;
-use deno_core::ResourceId;
-use deno_core::ToV8;
-use deno_core::WriteOutcome;
-use deno_core::convert::Uint8Array;
-use deno_core::error::ResourceError;
-use deno_core::op2;
+use oden_core::AsyncRefCell;
+use oden_core::AsyncResult;
+use oden_core::BufMutView;
+use oden_core::BufView;
+use oden_core::FromV8;
+use oden_core::GarbageCollected;
+use oden_core::JsBuffer;
+use oden_core::OpState;
+use oden_core::RcRef;
+use oden_core::Resource;
+use oden_core::ResourceId;
+use oden_core::ToV8;
+use oden_core::WriteOutcome;
+use oden_core::convert::Uint8Array;
+use oden_core::error::ResourceError;
+use oden_core::op2;
 use deno_error::JsError;
 use deno_error::JsErrorBox;
-use deno_permissions::PermissionCheckError;
-use deno_permissions::PermissionsContainer;
-use deno_tls::SocketUse;
-use deno_tls::TlsClientConfigOptions;
-use deno_tls::TlsError;
-use deno_tls::TlsKey;
-use deno_tls::TlsKeys;
-use deno_tls::TlsKeysHolder;
-use deno_tls::create_client_config;
+use oden_permissions::PermissionCheckError;
+use oden_permissions::PermissionsContainer;
+use oden_tls::SocketUse;
+use oden_tls::TlsClientConfigOptions;
+use oden_tls::TlsError;
+use oden_tls::TlsKey;
+use oden_tls::TlsKeys;
+use oden_tls::TlsKeysHolder;
+use oden_tls::create_client_config;
 use quinn::crypto::rustls::QuicClientConfig;
 use quinn::crypto::rustls::QuicServerConfig;
 use quinn::rustls::client::ClientSessionMemoryCache;
@@ -243,7 +243,7 @@ struct EndpointResource {
 
 // SAFETY: we're sure `EndpointResource` can be GCed
 unsafe impl GarbageCollected for EndpointResource {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"EndpointResource"
@@ -267,7 +267,7 @@ pub(crate) fn op_quic_endpoint_create(
       .borrow_mut::<PermissionsContainer>()
       .check_net(
         &(&addr.ip().to_string(), Some(addr.port())),
-        "new Deno.QuicEndpoint()",
+        "new Oden.QuicEndpoint()",
       )?
   } else {
     // If this is not a can-listen, assert that we will bind to an ephemeral port.
@@ -331,7 +331,7 @@ impl Drop for ListenerResource {
 
 // SAFETY: we're sure `ListenerResource` can be GCed
 unsafe impl GarbageCollected for ListenerResource {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"ListenerResource"
@@ -350,7 +350,7 @@ pub(crate) fn op_quic_endpoint_listen(
     return Err(QuicError::CannotListen);
   }
 
-  let TlsKeys::Static(deno_tls::TlsKey(cert, key)) = keys.take() else {
+  let TlsKeys::Static(oden_tls::TlsKey(cert, key)) = keys.take() else {
     return Err(QuicError::MissingTlsKey);
   };
 
@@ -389,7 +389,7 @@ struct ConnectionResource(
 
 // SAFETY: we're sure `ConnectionResource` can be GCed
 unsafe impl GarbageCollected for ConnectionResource {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"ConnectionResource"
@@ -403,7 +403,7 @@ struct IncomingResource(
 
 // SAFETY: we're sure `Incoming` can be GCed
 unsafe impl GarbageCollected for IncomingResource {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"IncomingResource"
@@ -536,7 +536,7 @@ struct ConnectingResource(RefCell<Option<quinn::Connecting>>);
 
 // SAFETY: we're sure `ConnectingResource` can be GCed
 unsafe impl GarbageCollected for ConnectingResource {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"ConnectingResource"
@@ -573,7 +573,7 @@ pub(crate) fn op_quic_endpoint_connect(
     .borrow_mut::<PermissionsContainer>()
     .check_net(
       &(&args.addr.hostname, Some(args.addr.port)),
-      "Deno.connectQuic()",
+      "Oden.connectQuic()",
     )?;
 
   let sock_addr = resolve_addr_sync(&args.addr.hostname, args.addr.port)?
@@ -585,7 +585,7 @@ pub(crate) fn op_quic_endpoint_connect(
     .check_net_resolved(
       &sock_addr.ip(),
       sock_addr.port(),
-      "Deno.connectQuic()",
+      "Oden.connectQuic()",
     )?;
 
   let root_cert_store = state
@@ -647,7 +647,7 @@ pub(crate) fn op_quic_endpoint_connect(
       _ => {
         let mut tls_config =
           if let Some(hashes) = server_certificate_hashes.clone() {
-            deno_tls::rustls::ClientConfig::builder()
+            oden_tls::rustls::ClientConfig::builder()
               .dangerous()
               .with_custom_certificate_verifier(Arc::new(
                 webtransport::ServerFingerprints::new(hashes),
@@ -1094,8 +1094,8 @@ pub(crate) mod webtransport {
   //
   // https://github.com/kixelated/web-transport-rs
 
-  use deno_core::futures::try_join;
-  use deno_tls::rustls;
+  use oden_core::futures::try_join;
+  use oden_tls::rustls;
   use rustls::client::danger::ServerCertVerifier;
   use rustls::crypto::CryptoProvider;
   use rustls::crypto::verify_tls12_signature;

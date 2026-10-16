@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Test for TC39 proposal: Deferred Module Evaluation
 // https://github.com/tc39/proposal-defer-import-eval

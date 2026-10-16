@@ -1,0 +1,9 @@
+{
+  "vendor": true,
+  "workspace": [
+    "package-a"
+  ],
+  "imports": {
+    "@odentest/add": "jsr:@odentest/add"
+  }
+}

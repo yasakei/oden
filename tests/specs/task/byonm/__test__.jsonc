@@ -1,7 +1,7 @@
 {
   "tempDir": true,
   "tests": {
-    "deno_json": {
+    "oden_json": {
       "steps": [{
         "commandName": "npm",
         "args": "install",
@@ -10,15 +10,15 @@
         "args": "task say",
         "output": "package_json_say.out"
       }, {
-        "args": "task deno-say",
-        "output": "deno_json_say.out"
+        "args": "task oden-say",
+        "output": "oden_json_say.out"
       }]
     },
-    "no_deno_json": {
+    "no_oden_json": {
       "steps": [{
         "args": [
           "eval",
-          "Deno.removeSync('deno.json')"
+          "Oden.removeSync('oden.json')"
         ],
         "output": ""
       }, {
@@ -35,7 +35,7 @@
       }, {
         "args": [
           "eval",
-          "try { Deno.statSync('node_modules/.deno'); } catch (e) { if (e instanceof Deno.errors.NotFound) { console.log('good'); } else { throw new Error('bad'); } }"
+          "try { Oden.statSync('node_modules/.oden'); } catch (e) { if (e instanceof Oden.errors.NotFound) { console.log('good'); } else { throw new Error('bad'); } }"
         ],
         "output": "good\n"
       }]

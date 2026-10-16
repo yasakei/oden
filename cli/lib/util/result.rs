@@ -1,14 +1,14 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::convert::Infallible;
 
 use deno_error::JsErrorBox;
 use deno_error::JsErrorClass;
-use deno_resolver::DenoResolveError;
-use deno_resolver::DenoResolveErrorKind;
-use deno_runtime::deno_core::error::AnyError;
-use deno_runtime::deno_core::error::CoreError;
-use deno_runtime::deno_core::error::CoreErrorKind;
+use oden_resolver::OdenResolveError;
+use oden_resolver::OdenResolveErrorKind;
+use oden_runtime::oden_core::error::AnyError;
+use oden_runtime::oden_core::error::CoreError;
+use oden_runtime::oden_core::error::CoreErrorKind;
 
 pub trait InfallibleResultExt<T> {
   fn unwrap_infallible(self) -> T;
@@ -25,7 +25,7 @@ impl<T> InfallibleResultExt<T> for Result<T, Infallible> {
 
 pub fn js_error_downcast_ref(
   err: &AnyError,
-) -> Option<&deno_runtime::deno_core::error::JsError> {
+) -> Option<&oden_runtime::oden_core::error::JsError> {
   any_and_jserrorbox_downcast_ref(err)
     .or_else(|| {
       err
@@ -60,12 +60,12 @@ pub fn any_and_jserrorbox_downcast_ref<
     })
 }
 
-pub fn downcast_ref_deno_resolve_error(
+pub fn downcast_ref_oden_resolve_error(
   err: &JsErrorBox,
-) -> Option<&DenoResolveErrorKind> {
+) -> Option<&OdenResolveErrorKind> {
   err
     .get_ref()
-    .downcast_ref::<DenoResolveError>()
+    .downcast_ref::<OdenResolveError>()
     .map(|e| e.as_kind())
-    .or_else(|| err.get_ref().downcast_ref::<DenoResolveErrorKind>())
+    .or_else(|| err.get_ref().downcast_ref::<OdenResolveErrorKind>())
 }

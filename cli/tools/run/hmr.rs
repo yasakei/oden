@@ -1,16 +1,16 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::atomic::AtomicI32;
 
-use deno_core::LocalInspectorSession;
-use deno_core::error::CoreError;
-use deno_core::parking_lot::Mutex;
-use deno_core::serde_json::json;
-use deno_core::serde_json::{self};
-use deno_core::url::Url;
+use oden_core::LocalInspectorSession;
+use oden_core::error::CoreError;
+use oden_core::parking_lot::Mutex;
+use oden_core::serde_json::json;
+use oden_core::serde_json::{self};
+use oden_core::url::Url;
 use deno_error::JsErrorBox;
 use deno_terminal::colors;
 use tokio::select;
@@ -107,8 +107,8 @@ impl HmrRunnerState {
     })))
   }
 
-  pub fn callback(&self, msg: deno_core::InspectorMsg) {
-    let deno_core::InspectorMsgKind::Message(msg_id) = msg.kind else {
+  pub fn callback(&self, msg: oden_core::InspectorMsg) {
+    let oden_core::InspectorMsgKind::Message(msg_id) = msg.kind else {
       let notification = serde_json::from_str(&msg.content).unwrap();
       self.handle_notification(notification);
       return;

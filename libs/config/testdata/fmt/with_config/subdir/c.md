@@ -1,8 +1,8 @@
 ## Permissions
 
-Deno is secure by default. Therefore,
+Oden is secure by default. Therefore,
 unless you specifically enable it, a
-program run with Deno has no file,
+program run with Oden has no file,
 network, or environment access. Access
 to security sensitive functionality
 requires that permissions have been

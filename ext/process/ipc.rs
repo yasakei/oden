@@ -1,18 +1,18 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::io;
 use std::rc::Rc;
 use std::sync::atomic::AtomicBool;
 use std::sync::atomic::AtomicUsize;
 
-use deno_core::AsyncRefCell;
-use deno_core::CancelHandle;
-use deno_core::ExternalOpsTracker;
-use deno_core::RcRef;
-use deno_core::serde_json;
-use deno_io::BiPipe;
-use deno_io::BiPipeRead;
-use deno_io::BiPipeWrite;
+use oden_core::AsyncRefCell;
+use oden_core::CancelHandle;
+use oden_core::ExternalOpsTracker;
+use oden_core::RcRef;
+use oden_core::serde_json;
+use oden_io::BiPipe;
+use oden_io::BiPipeRead;
+use oden_io::BiPipeWrite;
 use memchr::memchr;
 use tokio::io::AsyncWriteExt;
 
@@ -142,7 +142,7 @@ pub struct IpcJsonStreamResource {
   pub ref_tracker: IpcRefTracker,
 }
 
-impl deno_core::Resource for IpcJsonStreamResource {
+impl oden_core::Resource for IpcJsonStreamResource {
   fn close(self: Rc<Self>) {
     self.cancel.cancel();
   }
@@ -471,7 +471,7 @@ impl IpcAdvancedStreamResource {
   }
 }
 
-impl deno_core::Resource for IpcAdvancedStreamResource {
+impl oden_core::Resource for IpcAdvancedStreamResource {
   fn close(self: Rc<Self>) {
     self.cancel.cancel();
   }
@@ -579,8 +579,8 @@ impl IpcJsonStream {
 mod tests {
   use std::rc::Rc;
 
-  use deno_core::RcRef;
-  use deno_core::serde_json::json;
+  use oden_core::RcRef;
+  use oden_core::serde_json::json;
 
   use super::IpcJsonStreamResource;
 
@@ -606,7 +606,7 @@ mod tests {
     use tokio::net::windows::named_pipe::ServerOptions;
 
     let name =
-      format!(r"\\.\pipe\deno-named-pipe-test-{}", rand::random::<u32>());
+      format!(r"\\.\pipe\oden-named-pipe-test-{}", rand::random::<u32>());
 
     let server = ServerOptions::new().create(name.clone()).unwrap();
     let client = ClientOptions::new().open(name).unwrap();
@@ -625,7 +625,7 @@ mod tests {
     // A simple round trip benchmark for quick dev feedback.
     //
     // Only ran when the env var is set.
-    if std::env::var_os("BENCH_IPC_DENO").is_none() {
+    if std::env::var_os("BENCH_IPC_ODEN").is_none() {
       return Ok(());
     }
 
@@ -695,8 +695,8 @@ mod tests {
     Ok(())
   }
 
-  fn json_to_bytes(v: deno_core::serde_json::Value) -> Vec<u8> {
-    let mut buf = deno_core::serde_json::to_vec(&v).unwrap();
+  fn json_to_bytes(v: oden_core::serde_json::Value) -> Vec<u8> {
+    let mut buf = oden_core::serde_json::to_vec(&v).unwrap();
     buf.push(b'\n');
     buf
   }

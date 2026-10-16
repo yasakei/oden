@@ -1,25 +1,25 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
-use deno_core::GarbageCollected;
-use deno_core::WebIDL;
-use deno_core::cppgc::Ref;
-use deno_core::op2;
-use deno_core::v8;
-use deno_core::v8::cppgc::Visitor;
-use deno_core::webidl::Nullable;
-use deno_core::webidl::WebIdlConverter;
+// Copyright 2018-2026 the Oden authors. MIT license.
+use oden_core::GarbageCollected;
+use oden_core::WebIDL;
+use oden_core::cppgc::Ref;
+use oden_core::op2;
+use oden_core::v8;
+use oden_core::v8::cppgc::Visitor;
+use oden_core::webidl::Nullable;
+use oden_core::webidl::WebIdlConverter;
 use deno_error::JsErrorBox;
-use deno_image::bitmap::ImageBitmap;
-use deno_image::image;
-use deno_image::image::DynamicImage;
-use deno_image::image::GenericImageView;
-use deno_webgpu::canvas::ContextData;
-use deno_webgpu::error::GPUError;
-use deno_webgpu::wgpu_core;
-use deno_webgpu::wgpu_types;
+use oden_image::bitmap::ImageBitmap;
+use oden_image::image;
+use oden_image::image::DynamicImage;
+use oden_image::image::GenericImageView;
+use oden_webgpu::canvas::ContextData;
+use oden_webgpu::error::GPUError;
+use oden_webgpu::wgpu_core;
+use oden_webgpu::wgpu_types;
 
 #[derive(Clone)]
 pub struct SurfaceBitmap {
-  pub instance: deno_webgpu::Instance,
+  pub instance: oden_webgpu::Instance,
   pub adapter: wgpu_core::id::AdapterId,
   pub device: wgpu_core::id::DeviceId,
   pub queue: wgpu_core::id::QueueId,
@@ -398,7 +398,7 @@ impl ImageBitmapRenderingContext {
       unreachable!()
     };
 
-    let deno_webgpu::canvas::SurfaceData {
+    let oden_webgpu::canvas::SurfaceData {
       id, width, height, ..
     } = &*surface_data.borrow();
 
@@ -447,7 +447,7 @@ const INDICES: &[u16] = &[0, 1, 2, 0, 2, 3];
 pub const CONTEXT_ID: &str = "bitmaprenderer";
 
 pub fn create<'s>(
-  instance: Option<deno_webgpu::Instance>,
+  instance: Option<oden_webgpu::Instance>,
   canvas: v8::Global<v8::Object>,
   data: ContextData,
   scope: &mut v8::PinScope<'s, '_>,
@@ -465,11 +465,11 @@ pub fn create<'s>(
   .map_err(JsErrorBox::from_err)?;
 
   let surface_only = if let ContextData::Surface(surface_data) = &data {
-    let deno_webgpu::canvas::SurfaceData {
+    let oden_webgpu::canvas::SurfaceData {
       id, width, height, ..
     } = &*surface_data.borrow();
     let instance = instance.unwrap();
-    let backends = std::env::var("DENO_WEBGPU_BACKEND").map_or_else(
+    let backends = std::env::var("ODEN_WEBGPU_BACKEND").map_or_else(
       |_| wgpu_types::Backends::all(),
       |s| wgpu_types::Backends::from_comma_list(&s),
     );
@@ -742,7 +742,7 @@ pub fn create<'s>(
     None
   };
 
-  let obj = deno_core::cppgc::make_cppgc_object(
+  let obj = oden_core::cppgc::make_cppgc_object(
     scope,
     ImageBitmapRenderingContext {
       alpha: settings.alpha,

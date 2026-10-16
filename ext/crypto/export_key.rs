@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use base64::Engine;
 use base64::prelude::BASE64_URL_SAFE_NO_PAD;
 use const_oid::AssociatedOid;
 use const_oid::ObjectIdentifier;
-use deno_core::ToV8;
-use deno_core::convert::Uint8Array;
+use oden_core::ToV8;
+use oden_core::convert::Uint8Array;
 use elliptic_curve::sec1::ToEncodedPoint;
 use p256::pkcs8::DecodePrivateKey;
 use rsa::pkcs1::der::Decode;

@@ -1,67 +1,67 @@
 {
   "tempDir": true,
   "tests": {
-    // `deno add` accepts the full npm range grammar on the command line and
+    // `oden add` accepts the full npm range grammar on the command line and
     // resolves it to a concrete version before writing it (issue #26587).
     // Ranges containing spaces are passed as a single argument here, the same
     // way they would need to be quoted in a shell.
     "npm_comparator_range": {
       "steps": [
         {
-          "args": ["add", "npm:@denotest/has-patch-versions@>=0.1.0 <0.2.0"],
+          "args": ["add", "npm:@odentest/has-patch-versions@>=0.1.0 <0.2.0"],
           "output": "npm_add.out"
         },
         {
           "args": [
             "eval",
-            "console.log(Deno.readTextFileSync('deno.json').trim())"
+            "console.log(Oden.readTextFileSync('oden.json').trim())"
           ],
-          "output": "npm_deno.json.out"
+          "output": "npm_oden.json.out"
         }
       ]
     },
     "npm_or_range": {
       "steps": [
         {
-          "args": ["add", "npm:@denotest/has-patch-versions@0.1.0 || 0.1.1"],
+          "args": ["add", "npm:@odentest/has-patch-versions@0.1.0 || 0.1.1"],
           "output": "npm_add.out"
         },
         {
           "args": [
             "eval",
-            "console.log(Deno.readTextFileSync('deno.json').trim())"
+            "console.log(Oden.readTextFileSync('oden.json').trim())"
           ],
-          "output": "npm_deno.json.out"
+          "output": "npm_oden.json.out"
         }
       ]
     },
     "npm_hyphen_range": {
       "steps": [
         {
-          "args": ["add", "npm:@denotest/has-patch-versions@0.1.0 - 0.1.1"],
+          "args": ["add", "npm:@odentest/has-patch-versions@0.1.0 - 0.1.1"],
           "output": "npm_add.out"
         },
         {
           "args": [
             "eval",
-            "console.log(Deno.readTextFileSync('deno.json').trim())"
+            "console.log(Oden.readTextFileSync('oden.json').trim())"
           ],
-          "output": "npm_deno.json.out"
+          "output": "npm_oden.json.out"
         }
       ]
     },
     "jsr_comparator_range": {
       "steps": [
         {
-          "args": ["add", "jsr:@denotest/add@>=1.0.0 <2.0.0"],
+          "args": ["add", "jsr:@odentest/add@>=1.0.0 <2.0.0"],
           "output": "jsr_add.out"
         },
         {
           "args": [
             "eval",
-            "console.log(Deno.readTextFileSync('deno.json').trim())"
+            "console.log(Oden.readTextFileSync('oden.json').trim())"
           ],
-          "output": "jsr_deno.json.out"
+          "output": "jsr_oden.json.out"
         }
       ]
     }

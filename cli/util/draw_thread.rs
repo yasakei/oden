@@ -1,13 +1,13 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::io::IsTerminal;
 use std::sync::Arc;
 use std::time::Duration;
 
 use console_static_text::ConsoleStaticText;
-use deno_core::parking_lot::Mutex;
-use deno_core::unsync::spawn_blocking;
-use deno_runtime::ops::tty::ConsoleSize;
+use oden_core::parking_lot::Mutex;
+use oden_core::unsync::spawn_blocking;
+use oden_runtime::ops::tty::ConsoleSize;
 use once_cell::sync::Lazy;
 
 use super::console::new_console_static_text;

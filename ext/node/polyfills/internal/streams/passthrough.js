@@ -1,5 +1,5 @@
 // deno-lint-ignore-file
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -28,7 +28,7 @@
 (function () {
 const { core, primordials } = __bootstrap;
 const Transform = core.loadExtScript(
-  "ext:deno_node/internal/streams/transform.js",
+  "ext:oden_node/internal/streams/transform.js",
 ).default;
 
 const {

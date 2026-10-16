@@ -1,0 +1,8 @@
+{
+  "name": "@odentest/unicode-subpath",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    "./*.js": "./dist/*.js"
+  }
+}

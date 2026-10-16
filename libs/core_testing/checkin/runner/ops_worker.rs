@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::RefCell;
 use std::future::poll_fn;
@@ -8,14 +8,14 @@ use std::sync::mpsc::channel;
 use std::task::Poll;
 
 use anyhow::anyhow;
-use deno_core::GarbageCollected;
-use deno_core::JsRuntime;
-use deno_core::OpState;
-use deno_core::PollEventLoopOptions;
-use deno_core::op2;
-use deno_core::url::Url;
-use deno_core::v8;
-use deno_core::v8::IsolateHandle;
+use oden_core::GarbageCollected;
+use oden_core::JsRuntime;
+use oden_core::OpState;
+use oden_core::PollEventLoopOptions;
+use oden_core::op2;
+use oden_core::url::Url;
+use oden_core::v8;
+use oden_core::v8::IsolateHandle;
 use deno_error::JsErrorBox;
 use tokio::sync::Mutex;
 use tokio::sync::mpsc::UnboundedReceiver;

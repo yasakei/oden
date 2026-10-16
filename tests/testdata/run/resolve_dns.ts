@@ -3,18 +3,18 @@ const nameServer = { nameServer: { ipAddr: "127.0.0.1", port: 4553 } };
 const [a, aaaa, aname, caa, cname, mx, naptr, ns, ptr, soa, srv, txt] =
   await Promise
     .all([
-      Deno.resolveDns("www.example.com", "A", nameServer),
-      Deno.resolveDns("www.example.com", "AAAA", nameServer),
-      Deno.resolveDns("www.example.com", "ANAME", nameServer),
-      Deno.resolveDns("example.com", "CAA", nameServer),
-      Deno.resolveDns("alias.example.com", "CNAME", nameServer),
-      Deno.resolveDns("example.com", "MX", nameServer),
-      Deno.resolveDns("example.com", "NAPTR", nameServer),
-      Deno.resolveDns("example.com", "NS", nameServer),
-      Deno.resolveDns("1.2.3.4.IN-ADDR.ARPA.", "PTR", nameServer),
-      Deno.resolveDns("example.com", "SOA", nameServer),
-      Deno.resolveDns("_service._tcp.example.com", "SRV", nameServer),
-      Deno.resolveDns("example.com", "TXT", nameServer),
+      Oden.resolveDns("www.example.com", "A", nameServer),
+      Oden.resolveDns("www.example.com", "AAAA", nameServer),
+      Oden.resolveDns("www.example.com", "ANAME", nameServer),
+      Oden.resolveDns("example.com", "CAA", nameServer),
+      Oden.resolveDns("alias.example.com", "CNAME", nameServer),
+      Oden.resolveDns("example.com", "MX", nameServer),
+      Oden.resolveDns("example.com", "NAPTR", nameServer),
+      Oden.resolveDns("example.com", "NS", nameServer),
+      Oden.resolveDns("1.2.3.4.IN-ADDR.ARPA.", "PTR", nameServer),
+      Oden.resolveDns("example.com", "SOA", nameServer),
+      Oden.resolveDns("_service._tcp.example.com", "SRV", nameServer),
+      Oden.resolveDns("example.com", "TXT", nameServer),
     ]);
 
 console.log("A");
@@ -54,7 +54,7 @@ console.log("TXT");
 console.log(JSON.stringify(txt));
 
 try {
-  await Deno.resolveDns("not-found-example.com", "A", nameServer);
+  await Oden.resolveDns("not-found-example.com", "A", nameServer);
 } catch (e) {
   console.log(
     `Error ${
@@ -65,7 +65,7 @@ try {
 
 try {
   // @ts-ignore testing invalid overloads
-  await Deno.resolveDns("example.com", "SSHFP", nameServer);
+  await Oden.resolveDns("example.com", "SSHFP", nameServer);
 } catch (e) {
   console.log((e as Error).message);
 }
@@ -73,7 +73,7 @@ try {
 try {
   const ac = new AbortController();
   queueMicrotask(() => ac.abort());
-  await Deno.resolveDns("www.example.com", "A", {
+  await Oden.resolveDns("www.example.com", "A", {
     ...nameServer,
     signal: ac.signal,
   });
@@ -84,7 +84,7 @@ try {
 try {
   const ac = new AbortController();
   ac.abort();
-  await Deno.resolveDns("www.example.com", "A", {
+  await Oden.resolveDns("www.example.com", "A", {
     ...nameServer,
     signal: ac.signal,
   });

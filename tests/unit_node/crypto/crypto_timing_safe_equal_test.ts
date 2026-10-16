@@ -1,9 +1,9 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import * as crypto from "node:crypto";
 import { assertEquals, assertThrows } from "@std/assert";
 import { Buffer } from "node:buffer";
 
-Deno.test("timingSafeEqual ArrayBuffer and TypedArray", async () => {
+Oden.test("timingSafeEqual ArrayBuffer and TypedArray", async () => {
   const data = new TextEncoder().encode("foo"); // Uint8Array
 
   const hash = await crypto.subtle.digest("SHA-256", data); // ArrayBuffer
@@ -14,7 +14,7 @@ Deno.test("timingSafeEqual ArrayBuffer and TypedArray", async () => {
   assertEquals(eq, true);
 });
 
-Deno.test("timingSafeEqual rejects non ArrayBuffer/TypedArray", () => {
+Oden.test("timingSafeEqual rejects non ArrayBuffer/TypedArray", () => {
   const str = "foo";
   const buf = Buffer.from(str);
   const i = 123;

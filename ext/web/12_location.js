@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 /// <reference path="../../core/internal.d.ts" />
 
@@ -16,8 +16,8 @@ const {
   WeakMapPrototypeSet,
 } = primordials;
 
-const { URL } = core.loadExtScript("ext:deno_web/00_url.js");
-const { DOMException } = core.loadExtScript("ext:deno_web/01_dom_exception.js");
+const { URL } = core.loadExtScript("ext:oden_web/00_url.js");
+const { DOMException } = core.loadExtScript("ext:oden_web/01_dom_exception.js");
 
 const locationConstructorKey = Symbol("locationConstructorKey");
 
@@ -195,7 +195,7 @@ class Location {
         },
         enumerable: true,
       },
-      [SymbolFor("Deno.privateCustomInspect")]: {
+      [SymbolFor("Oden.privateCustomInspect")]: {
         __proto__: null,
         value: function (inspect, inspectOptions) {
           return `${this.constructor.name} ${
@@ -366,7 +366,7 @@ ObjectDefineProperties(WorkerLocation.prototype, {
     value: "WorkerLocation",
     configurable: true,
   },
-  [SymbolFor("Deno.privateCustomInspect")]: {
+  [SymbolFor("Oden.privateCustomInspect")]: {
     __proto__: null,
     value: function (inspect, inspectOptions) {
       return `${this.constructor.name} ${

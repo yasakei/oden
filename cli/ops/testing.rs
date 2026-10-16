@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::path::PathBuf;
@@ -6,15 +6,15 @@ use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
 use std::time::Duration;
 
-use deno_core::ModuleSpecifier;
-use deno_core::OpState;
-use deno_core::op2;
-use deno_core::v8;
+use oden_core::ModuleSpecifier;
+use oden_core::OpState;
+use oden_core::op2;
+use oden_core::v8;
 use deno_error::JsErrorBox;
 use deno_path_util::url_to_file_path;
-use deno_runtime::deno_permissions::ChildPermissionsArg;
-use deno_runtime::deno_permissions::OpenAccessKind;
-use deno_runtime::deno_permissions::PermissionsContainer;
+use oden_runtime::oden_permissions::ChildPermissionsArg;
+use oden_runtime::oden_permissions::OpenAccessKind;
+use oden_runtime::oden_permissions::PermissionsContainer;
 use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
@@ -29,7 +29,7 @@ use crate::tools::test::TestSnapshotSummary;
 use crate::tools::test::TestStepDescription;
 use crate::tools::test::TestStepResult;
 
-deno_core::extension!(deno_test,
+oden_core::extension!(oden_test,
   ops = [
     op_pledge_test_permissions,
     op_restore_test_permissions,
@@ -58,9 +58,9 @@ deno_core::extension!(deno_test,
 );
 
 /// Set by `op_test_isolate_exit` to record that the current test isolate
-/// asked to exit via `Deno.exit()` from outside any test function. The test
+/// asked to exit via `Oden.exit()` from outside any test function. The test
 /// runner reads this flag after each step to detect that the V8 termination
-/// it sees was caused by `Deno.exit()` (rather than, say, the watchdog) and
+/// it sees was caused by `Oden.exit()` (rather than, say, the watchdog) and
 /// can move on to the next specifier without killing the process.
 #[derive(Clone, Copy, Debug)]
 pub struct IsolateExitInfo {
@@ -84,7 +84,7 @@ struct PermissionsHolder(Uuid, PermissionsContainer);
 pub fn op_pledge_test_permissions(
   state: &mut OpState,
   #[serde] args: ChildPermissionsArg,
-) -> Result<Uuid, deno_runtime::deno_permissions::ChildPermissionError> {
+) -> Result<Uuid, oden_runtime::oden_permissions::ChildPermissionError> {
   let token = Uuid::new_v4();
   let parent_permissions = state.borrow_mut::<PermissionsContainer>();
   let worker_permissions = parent_permissions.create_child_permissions(args)?;
@@ -288,7 +288,7 @@ fn op_test_event_step_result_failed(
     .ok();
 }
 
-/// Called when a test calls `Deno.exit()` while the exit sanitizer is disabled
+/// Called when a test calls `Oden.exit()` while the exit sanitizer is disabled
 /// (`sanitizeExit: false`). Rather than letting the process terminate
 /// immediately - which can drop buffered test output - we hand the exit code
 /// off to the reporter (running on a separate thread) so it can print a
@@ -296,7 +296,7 @@ fn op_test_event_step_result_failed(
 ///
 /// This op does not return: once the `Exit` event has been queued, we park the
 /// worker so it doesn't keep executing user code (which would otherwise resume
-/// after `Deno.exit()` returned) while we wait for the process to be
+/// after `Oden.exit()` returned) while we wait for the process to be
 /// terminated.
 #[op2(fast)]
 fn op_test_event_exit(state: &mut OpState, #[smi] exit_code: i32) {
@@ -313,12 +313,12 @@ fn op_test_event_exit(state: &mut OpState, #[smi] exit_code: i32) {
   // nobody left to print a message or flush - just exit directly.
   #[allow(
     clippy::disallowed_methods,
-    reason = "a test called Deno.exit() with the exit sanitizer disabled"
+    reason = "a test called Oden.exit() with the exit sanitizer disabled"
   )]
   std::process::exit(exit_code);
 }
 
-/// Marker put into `OpState` by the test runner when `deno test` was invoked
+/// Marker put into `OpState` by the test runner when `oden test` was invoked
 /// with `--update-snapshots`. Its presence is what authorizes
 /// `op_test_snapshot_write` - JS cannot enable update mode on its own.
 pub struct SnapshotUpdateMode;
@@ -397,7 +397,7 @@ fn op_test_snapshot_read(
       .check_open(
         Cow::Owned(path),
         OpenAccessKind::Read,
-        Some("Deno.TestContext.assertSnapshot"),
+        Some("Oden.TestContext.assertSnapshot"),
       )
       .map_err(JsErrorBox::from_err)?
       .into_owned_path()
@@ -439,7 +439,7 @@ fn op_test_snapshot_write(
       .check_open(
         Cow::Owned(path),
         OpenAccessKind::Write,
-        Some("Deno.TestContext.assertSnapshot"),
+        Some("Oden.TestContext.assertSnapshot"),
       )
       .map_err(JsErrorBox::from_err)?
       .into_owned_path()
@@ -479,9 +479,9 @@ fn op_test_event_snapshot_summary(
     .ok();
 }
 
-/// Called when user code in a test isolate calls `Deno.exit()` outside of any
+/// Called when user code in a test isolate calls `Oden.exit()` outside of any
 /// running test function (top-level code, an unload listener, or in async
-/// code that the test left running). Instead of terminating the deno
+/// code that the test left running). Instead of terminating the oden
 /// process, we record the exit code, notify the reporter, and ask V8 to
 /// terminate the current isolate so the test runner can move on to the
 /// next specifier.

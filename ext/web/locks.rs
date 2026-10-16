@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cell::RefCell;
@@ -12,10 +12,10 @@ use std::sync::Mutex;
 use std::sync::atomic::AtomicU64;
 use std::sync::atomic::Ordering;
 
-use deno_core::OpState;
-use deno_core::Resource;
-use deno_core::ResourceId;
-use deno_core::op2;
+use oden_core::OpState;
+use oden_core::Resource;
+use oden_core::ResourceId;
+use oden_core::op2;
 use tokio::sync::oneshot;
 
 #[derive(

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::collections::BTreeSet;
@@ -116,7 +116,7 @@ pub type CjsModuleExportAnalyzerRc<
   TIsBuiltInNodeModuleChecker,
   TNpmPackageFolderResolver,
   TSys,
-> = deno_maybe_sync::MaybeArc<
+> = oden_maybe_sync::MaybeArc<
   CjsModuleExportAnalyzer<
     TCjsCodeAnalyzer,
     TInNpmPackageChecker,
@@ -294,7 +294,7 @@ impl<
           &entry.specifier,
           referrer,
           &[
-            Cow::Borrowed("deno"),
+            Cow::Borrowed("oden"),
             Cow::Borrowed("node"),
             Cow::Borrowed("require"),
             Cow::Borrowed("module-sync"),
@@ -387,9 +387,9 @@ impl<
               &reexport,
               &referrer,
               // FIXME(bartlomieju): check if these conditions are okay, probably
-              // should be `deno-require`, because `deno` is already used in `esm_resolver.rs`
+              // should be `oden-require`, because `oden` is already used in `esm_resolver.rs`
               &[
-                Cow::Borrowed("deno"),
+                Cow::Borrowed("oden"),
                 Cow::Borrowed("node"),
                 Cow::Borrowed("require"),
                 Cow::Borrowed("module-sync"),
@@ -724,7 +724,7 @@ pub type NodeCodeTranslatorRc<
   TIsBuiltInNodeModuleChecker,
   TNpmPackageFolderResolver,
   TSys,
-> = deno_maybe_sync::MaybeArc<
+> = oden_maybe_sync::MaybeArc<
   NodeCodeTranslator<
     TCjsCodeAnalyzer,
     TInNpmPackageChecker,
@@ -995,11 +995,11 @@ fn add_export<'a>(
     // we can't create an identifier with a reserved word or invalid identifier name,
     // so assign it to a temporary variable that won't have a conflict, then re-export
     // it as a string
-    builder.append("const __deno_export_");
+    builder.append("const __oden_export_");
     builder.append(*temp_var_count);
     builder.append("__ = ");
     build_initializer(builder);
-    builder.append(";\nexport { __deno_export_");
+    builder.append(";\nexport { __oden_export_");
     builder.append(*temp_var_count);
     builder.append("__ as ");
     builder.append(quoted_name);
@@ -1041,17 +1041,17 @@ if (import.meta.main) {
 } else {
   mod = require("/test/test.ts");
 }
-const __deno_export_1__ = mod["3d"];
-export { __deno_export_1__ as "3d" };
+const __oden_export_1__ = mod["3d"];
+export { __oden_export_1__ as "3d" };
 export const app = mod["app"];
-const __deno_export_2__ = mod["dashed-export"];
-export { __deno_export_2__ as "dashed-export" };
+const __oden_export_2__ = mod["dashed-export"];
+export { __oden_export_2__ as "dashed-export" };
 export const server = mod["server"];
-const __deno_export_3__ = mod["static"];
-export { __deno_export_3__ as "static" };
+const __oden_export_3__ = mod["static"];
+export { __oden_export_3__ as "static" };
 export default mod;
-const __deno_export_4__ = mod;
-export { __deno_export_4__ as "module.exports" };
+const __oden_export_4__ = mod;
+export { __oden_export_4__ as "module.exports" };
 "#
     );
   }

@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_core::anyhow::Context;
-use deno_core::anyhow::bail;
-use deno_core::error::AnyError;
-use deno_core::serde_json;
-use deno_core::url::Url;
-use deno_runtime::deno_fetch;
+use oden_core::anyhow::Context;
+use oden_core::anyhow::bail;
+use oden_core::error::AnyError;
+use oden_core::serde_json;
+use oden_core::url::Url;
+use oden_runtime::oden_fetch;
 use deno_semver::jsr::JsrPackageReqReference;
 use serde::de::DeserializeOwned;
 
@@ -65,7 +65,7 @@ pub struct ApiError {
   #[serde(flatten)]
   pub data: serde_json::Value,
   #[serde(skip)]
-  pub x_deno_ray: Option<String>,
+  pub x_oden_ray: Option<String>,
 }
 
 impl std::fmt::Display for ApiError {
@@ -76,11 +76,11 @@ impl std::fmt::Display for ApiError {
       escape_terminal_control_chars(&self.message),
       escape_terminal_control_chars(&self.code)
     )?;
-    if let Some(x_deno_ray) = &self.x_deno_ray {
+    if let Some(x_oden_ray) = &self.x_oden_ray {
       write!(
         f,
-        "[x-deno-ray: {}]",
-        escape_terminal_control_chars(x_deno_ray)
+        "[x-oden-ray: {}]",
+        escape_terminal_control_chars(x_oden_ray)
       )?;
     }
     Ok(())
@@ -96,12 +96,12 @@ impl std::fmt::Debug for ApiError {
 impl std::error::Error for ApiError {}
 
 pub async fn parse_response<T: DeserializeOwned>(
-  response: http::Response<deno_fetch::ResBody>,
+  response: http::Response<oden_fetch::ResBody>,
 ) -> Result<T, ApiError> {
   let status = response.status();
-  let x_deno_ray = response
+  let x_oden_ray = response
     .headers()
-    .get("x-deno-ray")
+    .get("x-oden-ray")
     .and_then(|value| value.to_str().ok())
     .map(|s| s.to_string());
   let text = http_util::body_to_string(response).await.unwrap();
@@ -109,14 +109,14 @@ pub async fn parse_response<T: DeserializeOwned>(
   if !status.is_success() {
     match serde_json::from_str::<ApiError>(&text) {
       Ok(mut err) => {
-        err.x_deno_ray = x_deno_ray;
+        err.x_oden_ray = x_oden_ray;
         return Err(err);
       }
       Err(_) => {
         let err = ApiError {
           code: "unknown".to_string(),
           message: format!("{}: {}", status, text),
-          x_deno_ray,
+          x_oden_ray,
           data: serde_json::json!({}),
         };
         return Err(err);
@@ -127,7 +127,7 @@ pub async fn parse_response<T: DeserializeOwned>(
   serde_json::from_str(&text).map_err(|err| ApiError {
     code: "unknown".to_string(),
     message: format!("Failed to parse response: {}, response: '{}'", err, text),
-    x_deno_ray,
+    x_oden_ray,
     data: serde_json::json!({}),
   })
 }
@@ -190,7 +190,7 @@ fn append_path_segments(
   url
     .path_segments_mut()
     .map_err(|_| {
-      deno_core::anyhow::anyhow!(
+      oden_core::anyhow::anyhow!(
         "Registry API URL cannot be used as a base URL"
       )
     })?
@@ -205,7 +205,7 @@ pub async fn get_package(
   scope: &str,
   package: &str,
   authorization: Option<&str>,
-) -> Result<http::Response<deno_fetch::ResBody>, AnyError> {
+) -> Result<http::Response<oden_fetch::ResBody>, AnyError> {
   let package_url = get_package_api_url(registry_api_url, scope, package)?;
   let mut request = client.get(package_url)?;
   // The registry responds with a 404 for private packages unless the request
@@ -228,7 +228,7 @@ pub fn parse_package_name(name: &str) -> Result<(&str, &str), AnyError> {
   // Keep the explicit path-safety checks below even if the JSR grammar changes.
   let reference = JsrPackageReqReference::from_str(&format!("jsr:{name}@*"))
     .map_err(|_| {
-      deno_core::anyhow::anyhow!(
+      oden_core::anyhow::anyhow!(
         "package name must use the '@<scope>/<package>' format"
       )
     })?;
@@ -342,7 +342,7 @@ mod test {
 
   #[test]
   fn test_parse_package_name() {
-    assert_eq!(parse_package_name("@deno/doc").unwrap(), ("deno", "doc"));
+    assert_eq!(parse_package_name("@oden/doc").unwrap(), ("oden", "doc"));
     assert_eq!(
       parse_package_name("@scope-1/package-2").unwrap(),
       ("scope-1", "package-2")
@@ -350,14 +350,14 @@ mod test {
     assert_eq!(parse_package_name("@a/b").unwrap(), ("a", "b"));
 
     for invalid_name in [
-      "deno/doc",
-      "@deno",
-      "@deno/../doc",
-      "@deno/doc/other",
-      "@deno/doc?other",
-      "@deno/doc#other",
-      "@deno/doc\\other",
-      "@deno/doc%2Fother",
+      "oden/doc",
+      "@oden",
+      "@oden/../doc",
+      "@oden/doc/other",
+      "@oden/doc?other",
+      "@oden/doc#other",
+      "@oden/doc\\other",
+      "@oden/doc%2Fother",
     ] {
       assert!(
         parse_package_name(invalid_name).is_err(),
@@ -380,7 +380,7 @@ mod test {
       "scope",
       "package",
       "1.2.3+build.1",
-      Some("/deno.json"),
+      Some("/oden.json"),
     )
     .unwrap();
     assert_eq!(
@@ -389,7 +389,7 @@ mod test {
     );
     assert_eq!(
       version_url.query_pairs().collect::<Vec<_>>(),
-      vec![("config".into(), "/deno.json".into())]
+      vec![("config".into(), "/oden.json".into())]
     );
 
     let provenance_url = get_package_version_provenance_api_url(
@@ -429,13 +429,13 @@ mod test {
       code: "bad\u{202e}code".to_string(),
       message: "failed\x1b[2J\nagain".to_string(),
       data: serde_json::json!({}),
-      x_deno_ray: Some("ray\u{009b}31m".to_string()),
+      x_oden_ray: Some("ray\u{009b}31m".to_string()),
     };
 
     let display = err.to_string();
     assert_eq!(
       display,
-      r"failed\u{1b}[2J\nagain (bad\u{202e}code)[x-deno-ray: ray\u{9b}31m]"
+      r"failed\u{1b}[2J\nagain (bad\u{202e}code)[x-oden-ray: ray\u{9b}31m]"
     );
     assert_eq!(format!("{err:?}"), display);
     assert_eq!(err.code, "bad\u{202e}code");

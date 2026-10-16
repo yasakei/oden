@@ -1,5 +1,5 @@
-# deno_npm
+# oden_npm
 
-[![](https://img.shields.io/crates/v/deno_npm.svg)](https://crates.io/crates/deno_npm)
+[![](https://img.shields.io/crates/v/oden_npm.svg)](https://crates.io/crates/oden_npm)
 
-npm registry client and dependency resolver used in the Deno CLI.
+npm registry client and dependency resolver used in the Oden CLI.

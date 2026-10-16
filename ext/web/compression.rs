@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::RefCell;
 use std::io::Write;
@@ -8,8 +8,8 @@ use brotli::enc::encode::BrotliEncoderOperation;
 use brotli::enc::encode::BrotliEncoderParameter;
 use brotli::enc::encode::BrotliEncoderStateStruct;
 use brotli::writer::StandardAlloc;
-use deno_core::convert::Uint8Array;
-use deno_core::op2;
+use oden_core::convert::Uint8Array;
+use oden_core::op2;
 use flate2::Compression;
 use flate2::write::DeflateDecoder;
 use flate2::write::DeflateEncoder;
@@ -144,8 +144,8 @@ impl RawBrotliEncoder {
 struct CompressionResource(RefCell<Option<Inner>>);
 
 // SAFETY: we're sure `CompressionResource` can be GCed
-unsafe impl deno_core::GarbageCollected for CompressionResource {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+unsafe impl oden_core::GarbageCollected for CompressionResource {
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"CompressionResource"

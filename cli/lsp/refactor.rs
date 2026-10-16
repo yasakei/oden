@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // The logic of this module is heavily influenced by
 // https://github.com/microsoft/vscode/blob/main/extensions/typescript-language-features/src/languageFeatures/refactor.ts
 
-use deno_core::serde::Deserialize;
-use deno_core::serde::Serialize;
+use oden_core::serde::Deserialize;
+use oden_core::serde::Serialize;
 use lsp_types::Uri;
 use once_cell::sync::Lazy;
 use tower_lsp::lsp_types as lsp;

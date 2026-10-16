@@ -1,18 +1,18 @@
 {
   "tempDir": true,
   "tests": {
-    "deno_install_arg": {
+    "oden_install_arg": {
       "steps": [{
-        "args": "install npm:@denotest3/basic",
+        "args": "install npm:@odentest3/basic",
         "output": "install.out"
       }, {
         "args": "run -A main.js",
         "output": "main.out"
       }]
     },
-    "deno_add_arg": {
+    "oden_add_arg": {
       "steps": [{
-        "args": "add npm:@denotest3/basic",
+        "args": "add npm:@odentest3/basic",
         "output": "add.out"
       }, {
         "args": "run -A main.js",

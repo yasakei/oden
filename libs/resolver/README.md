@@ -1,3 +1,3 @@
-# deno_resolver
+# oden_resolver
 
-Deno resolution algorithm.
+Oden resolution algorithm.

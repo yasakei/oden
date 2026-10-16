@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 pub mod config;
 pub mod dynamic;
@@ -17,24 +17,24 @@ use base64::prelude::BASE64_URL_SAFE;
 use boxed_error::Boxed;
 use chrono::DateTime;
 use chrono::Utc;
-use deno_core::AsyncRefCell;
-use deno_core::ByteString;
-use deno_core::CancelFuture;
-use deno_core::CancelHandle;
-use deno_core::JsBuffer;
-use deno_core::OpState;
-use deno_core::RcRef;
-use deno_core::Resource;
-use deno_core::ResourceId;
-use deno_core::ToJsBuffer;
-use deno_core::convert::Uint8Array;
-use deno_core::futures::StreamExt;
-use deno_core::op2;
-use deno_core::serde_v8::AnyValue;
-use deno_core::serde_v8::BigInt;
+use oden_core::AsyncRefCell;
+use oden_core::ByteString;
+use oden_core::CancelFuture;
+use oden_core::CancelHandle;
+use oden_core::JsBuffer;
+use oden_core::OpState;
+use oden_core::RcRef;
+use oden_core::Resource;
+use oden_core::ResourceId;
+use oden_core::ToJsBuffer;
+use oden_core::convert::Uint8Array;
+use oden_core::futures::StreamExt;
+use oden_core::op2;
+use oden_core::serde_v8::AnyValue;
+use oden_core::serde_v8::BigInt;
 use deno_error::JsErrorBox;
 use deno_error::JsErrorClass;
-use deno_features::FeatureChecker;
+use oden_features::FeatureChecker;
 use denokv_proto::AtomicWrite;
 use denokv_proto::Check;
 use denokv_proto::Consistency;
@@ -64,8 +64,8 @@ pub use crate::interface::*;
 
 pub const UNSTABLE_FEATURE_NAME: &str = "kv";
 
-deno_core::extension!(deno_kv,
-  deps = [ deno_web ],
+oden_core::extension!(oden_kv,
+  deps = [ oden_web ],
   ops = [
     op_kv_database_open,
     op_kv_snapshot_read,
@@ -129,7 +129,7 @@ pub enum KvErrorKind {
   DatabaseHandler(JsErrorBox),
   #[class(inherit)]
   #[error(transparent)]
-  Resource(#[from] deno_core::error::ResourceError),
+  Resource(#[from] oden_core::error::ResourceError),
   #[class(type)]
   #[error("Too many ranges (max {0})")]
   TooManyRanges(usize),
@@ -220,7 +220,7 @@ async fn op_kv_database_open(
     let state = state.borrow();
     state
       .borrow::<Arc<FeatureChecker>>()
-      .check_or_exit(UNSTABLE_FEATURE_NAME, "Deno.openKv");
+      .check_or_exit(UNSTABLE_FEATURE_NAME, "Oden.openKv");
     state.borrow::<Rc<dyn DynamicDbHandler>>().clone()
   };
   let db = handler

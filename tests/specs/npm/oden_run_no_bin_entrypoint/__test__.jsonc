@@ -1,0 +1,5 @@
+{
+  "args": "run -A --quiet npm:@odentest/esm-basic",
+  "output": "oden_run_no_bin_entrypoint.out",
+  "exitCode": 1
+}

@@ -1,2 +1,2 @@
 import { test } from "./mod.ts";
-Deno.test("test", () => void test());
+Oden.test("test", () => void test());

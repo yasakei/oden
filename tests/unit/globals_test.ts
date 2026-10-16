@@ -1,55 +1,55 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { join } from "@std/path";
 import { assert, assertEquals, assertRejects } from "./test_util.ts";
 
-Deno.test(function globalThisExists() {
+Oden.test(function globalThisExists() {
   assert(globalThis != null);
 });
 
-Deno.test(function noInternalGlobals() {
+Oden.test(function noInternalGlobals() {
   // globalThis.__bootstrap should not be there.
   for (const key of Object.keys(globalThis)) {
     assert(!key.startsWith("_"));
   }
 });
 
-Deno.test(function selfExists() {
+Oden.test(function selfExists() {
   assert(self != null);
 });
 
-Deno.test(function globalThisWindowEqualsUndefined() {
+Oden.test(function globalThisWindowEqualsUndefined() {
   assert(globalThis.window === undefined);
 });
 
-Deno.test(function globalThisEqualsSelf() {
+Oden.test(function globalThisEqualsSelf() {
   assert(globalThis === self);
 });
 
-Deno.test(function globalThisConstructorLength() {
+Oden.test(function globalThisConstructorLength() {
   assert(globalThis.constructor.length === 0);
 });
 
-Deno.test(function globalThisInstanceofEventTarget() {
+Oden.test(function globalThisInstanceofEventTarget() {
   assert(globalThis instanceof EventTarget);
 });
 
-Deno.test(function navigatorInstanceofNavigator() {
+Oden.test(function navigatorInstanceofNavigator() {
   // TODO(nayeemrmn): Add `Navigator` to deno_lint globals.
   // deno-lint-ignore no-undef
   assert(navigator instanceof Navigator);
 });
 
-Deno.test(function DenoNamespaceExists() {
-  assert(Deno != null);
+Oden.test(function OdenNamespaceExists() {
+  assert(Oden != null);
 });
 
-Deno.test(function DenoNamespaceIsNotFrozen() {
-  assert(!Object.isFrozen(Deno));
+Oden.test(function OdenNamespaceIsNotFrozen() {
+  assert(!Object.isFrozen(Oden));
 });
 
-Deno.test(function DenoNamespaceLazyPropertiesAreWritable() {
-  const deno = Deno as unknown as Record<string, unknown>;
+Oden.test(function OdenNamespaceLazyPropertiesAreWritable() {
+  const oden = Oden as unknown as Record<string, unknown>;
   const lazyProperties = [
     "serve",
     "serveHttp",
@@ -58,43 +58,43 @@ Deno.test(function DenoNamespaceLazyPropertiesAreWritable() {
   ];
 
   for (const name of lazyProperties) {
-    const descriptor = Object.getOwnPropertyDescriptor(Deno, name);
+    const descriptor = Object.getOwnPropertyDescriptor(Oden, name);
     assert(descriptor);
     try {
-      const original = deno[name];
+      const original = oden[name];
       assert(typeof original === "function");
       const replacement = new Proxy(original, {});
 
-      deno[name] = replacement;
+      oden[name] = replacement;
 
-      assertEquals(deno[name], replacement);
-      const replacementDescriptor = Object.getOwnPropertyDescriptor(Deno, name);
+      assertEquals(oden[name], replacement);
+      const replacementDescriptor = Object.getOwnPropertyDescriptor(Oden, name);
       assert(replacementDescriptor);
       assertEquals(replacementDescriptor.value, replacement);
       assert(replacementDescriptor.writable);
       assert(replacementDescriptor.enumerable);
       assert(replacementDescriptor.configurable);
     } finally {
-      Object.defineProperty(Deno, name, descriptor);
+      Object.defineProperty(Oden, name, descriptor);
     }
   }
 });
 
-Deno.test(function webAssemblyExists() {
+Oden.test(function webAssemblyExists() {
   assert(typeof WebAssembly.compile === "function");
 });
 
 // @ts-ignore This is not publicly typed namespace, but it's there for sure.
-const core = Deno[Deno.internal].core;
+const core = Oden[Oden.internal].core;
 
-Deno.test(function DenoNamespaceConfigurable() {
-  const desc = Object.getOwnPropertyDescriptor(globalThis, "Deno");
+Oden.test(function OdenNamespaceConfigurable() {
+  const desc = Object.getOwnPropertyDescriptor(globalThis, "Oden");
   assert(desc);
   assert(desc.configurable);
   assert(!desc.writable);
 });
 
-Deno.test(function DenoCoreNamespaceIsImmutable() {
+Oden.test(function OdenCoreNamespaceIsImmutable() {
   const { print } = core;
   try {
     core.print = 1;
@@ -110,7 +110,7 @@ Deno.test(function DenoCoreNamespaceIsImmutable() {
   assert(print === core.print);
 });
 
-Deno.test(async function windowQueueMicrotask() {
+Oden.test(async function windowQueueMicrotask() {
   let resolve1: () => void | undefined;
   let resolve2: () => void | undefined;
   let microtaskDone = false;
@@ -132,7 +132,7 @@ Deno.test(async function windowQueueMicrotask() {
   await p2;
 });
 
-Deno.test(function webApiGlobalThis() {
+Oden.test(function webApiGlobalThis() {
   assert(globalThis.FormData !== null);
   assert(globalThis.TextEncoder !== null);
   assert(globalThis.TextEncoderStream !== null);
@@ -142,7 +142,7 @@ Deno.test(function webApiGlobalThis() {
   assert(globalThis.ByteLengthQueuingStrategy !== null);
 });
 
-Deno.test(function windowNameIsDefined() {
+Oden.test(function windowNameIsDefined() {
   assertEquals(typeof globalThis.name, "string");
   assertEquals(name, "");
   name = "foobar";
@@ -151,7 +151,7 @@ Deno.test(function windowNameIsDefined() {
   assertEquals(name, "");
 });
 
-Deno.test(async function promiseWithResolvers() {
+Oden.test(async function promiseWithResolvers() {
   {
     const { promise, resolve } = Promise.withResolvers();
     resolve(true);
@@ -164,7 +164,7 @@ Deno.test(async function promiseWithResolvers() {
   }
 });
 
-Deno.test(async function arrayFromAsync() {
+Oden.test(async function arrayFromAsync() {
   // Taken from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fromAsync#examples
   // Thank you.
   const asyncIterable = (async function* () {
@@ -182,7 +182,7 @@ Deno.test(async function arrayFromAsync() {
 });
 
 // Taken from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/groupBy#examples
-Deno.test(function objectGroupBy() {
+Oden.test(function objectGroupBy() {
   const inventory = [
     { name: "asparagus", type: "vegetables", quantity: 5 },
     { name: "bananas", type: "fruit", quantity: 0 },
@@ -206,14 +206,14 @@ Deno.test(function objectGroupBy() {
   });
 });
 
-Deno.test(function objectGroupByEmpty() {
+Oden.test(function objectGroupByEmpty() {
   const empty: string[] = [];
   const result = Object.groupBy(empty, () => "abc");
   assertEquals(result.abc, undefined);
 });
 
 // Taken from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/groupBy#examples
-Deno.test(function mapGroupBy() {
+Oden.test(function mapGroupBy() {
   const inventory = [
     { name: "asparagus", type: "vegetables", quantity: 9 },
     { name: "bananas", type: "fruit", quantity: 5 },
@@ -235,26 +235,26 @@ Deno.test(function mapGroupBy() {
 });
 
 // Regression test for https://github.com/denoland/deno/issues/30012
-Deno.test(function globalGlobalIsWritable() {
+Oden.test(function globalGlobalIsWritable() {
   // @ts-ignore the typings here are wrong
   globalThis.global = "can write to `global`";
   // @ts-ignore the typings here are wrong
   globalThis.global = globalThis;
 });
 
-Deno.test(async function overwriteEventOnExternalModuleShouldNotCrash() {
-  const tmpDir = await Deno.makeTempDir();
+Oden.test(async function overwriteEventOnExternalModuleShouldNotCrash() {
+  const tmpDir = await Oden.makeTempDir();
 
   const externalModulePath = join(tmpDir, "overwrite_event.ts");
   const externalModuleContent =
     `globalThis.Event = class {}; export default {};`;
-  await Deno.writeTextFile(externalModulePath, externalModuleContent);
+  await Oden.writeTextFile(externalModulePath, externalModuleContent);
 
   const entrypointPath = join(tmpDir, "index.ts");
   const entrypointContent = `import("./overwrite_event.ts");`;
-  await Deno.writeTextFile(entrypointPath, entrypointContent);
+  await Oden.writeTextFile(entrypointPath, entrypointContent);
 
-  const command = new Deno.Command(Deno.execPath(), {
+  const command = new Oden.Command(Oden.execPath(), {
     args: ["run", "-A", entrypointPath],
     stdout: "null",
     stderr: "null",
@@ -263,13 +263,13 @@ Deno.test(async function overwriteEventOnExternalModuleShouldNotCrash() {
 
   const status = await child.status;
   assert(status.success);
-  await Deno.remove(tmpDir, { recursive: true });
+  await Oden.remove(tmpDir, { recursive: true });
 });
 
-Deno.test(function navigatorPlatformExists() {
-  switch (Deno.build.os) {
+Oden.test(function navigatorPlatformExists() {
+  switch (Oden.build.os) {
     case "linux": {
-      assertEquals(navigator.platform, `Linux ${Deno.build.arch}`);
+      assertEquals(navigator.platform, `Linux ${Oden.build.arch}`);
       break;
     }
     case "darwin": {

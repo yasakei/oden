@@ -1,13 +1,13 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::BTreeMap;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::sync::Arc;
 
-use deno_core::anyhow::bail;
-use deno_core::error::AnyError;
-use deno_package_json::PackageJsonDepValue;
+use oden_core::anyhow::bail;
+use oden_core::error::AnyError;
+use oden_package_json::PackageJsonDepValue;
 use deno_semver::jsr::JsrDepPackageReq;
 use deno_semver::package::PackageKind;
 
@@ -62,10 +62,10 @@ pub async fn why(
 ) -> Result<(), AnyError> {
   let factory = CliFactory::from_flags(flags);
   let lockfile = factory.maybe_lockfile().await?.cloned().ok_or_else(|| {
-    deno_core::anyhow::anyhow!("No lockfile found. Run `deno install` first.")
+    oden_core::anyhow::anyhow!("No lockfile found. Run `oden install` first.")
   })?;
 
-  // Workspace-declared root dependency requirements (from deno.json `imports`,
+  // Workspace-declared root dependency requirements (from oden.json `imports`,
   // `scopes`, `jsxImportSource`, etc., and from package.json
   // `dependencies`/`devDependencies`). These are matched against the lockfile's
   // `specifiers` map to decide which entries are user-imported roots vs.
@@ -73,8 +73,8 @@ pub async fn why(
   // (as JSR does for every dep req).
   let workspace = factory.cli_options()?.workspace();
   let mut root_reqs: HashSet<JsrDepPackageReq> = HashSet::new();
-  for deno_json in workspace.deno_jsons() {
-    root_reqs.extend(deno_json.dependencies(workspace.catalogs()));
+  for oden_json in workspace.oden_jsons() {
+    root_reqs.extend(oden_json.dependencies(workspace.catalogs()));
   }
   for pkg_json in workspace.package_jsons() {
     let deps = pkg_json.resolve_local_package_json_deps();
@@ -186,7 +186,7 @@ pub async fn why(
   }
 
   // A lockfile specifier is a root iff it matches a req the user declared in
-  // a deno.json or package.json. JSR transitive deps also appear in
+  // a oden.json or package.json. JSR transitive deps also appear in
   // `specifiers` (the lockfile normalizes JSR deps through the specifiers
   // map), so we can't treat every entry as a root the way the original
   // npm-only implementation did.
@@ -224,7 +224,7 @@ pub async fn why(
 
     if paths.is_empty() && !root_specifier_to_pkg.contains_key(*id) {
       log::info!(
-        "  (no dependency path found -- try running `deno install` to refresh the lockfile)"
+        "  (no dependency path found -- try running `oden install` to refresh the lockfile)"
       );
     }
 

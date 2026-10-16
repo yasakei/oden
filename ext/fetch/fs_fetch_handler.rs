@@ -1,18 +1,18 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::rc::Rc;
 
-use deno_core::CancelFuture;
-use deno_core::OpState;
-use deno_core::futures::FutureExt;
-use deno_core::url::Url;
-use deno_fs::FileSystemRc;
-use deno_fs::OpenOptions;
-use deno_io::fs::FileResource;
-use deno_permissions::CheckedPath;
-use deno_permissions::OpenAccessKind;
-use deno_permissions::PermissionsContainer;
+use oden_core::CancelFuture;
+use oden_core::OpState;
+use oden_core::futures::FutureExt;
+use oden_core::url::Url;
+use oden_fs::FileSystemRc;
+use oden_fs::OpenOptions;
+use oden_io::fs::FileResource;
+use oden_permissions::CheckedPath;
+use oden_permissions::OpenAccessKind;
+use oden_permissions::PermissionsContainer;
 use http_body_util::combinators::BoxBody;
 
 use crate::CancelHandle;
@@ -20,7 +20,7 @@ use crate::CancelableResponseFuture;
 use crate::FetchHandler;
 use crate::ResourceToBodyAdapter;
 
-/// An implementation which tries to read file URLs via `deno_fs::FileSystem`.
+/// An implementation which tries to read file URLs via `oden_fs::FileSystem`.
 #[derive(Clone)]
 pub struct FsFetchHandler;
 

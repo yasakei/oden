@@ -1,3 +1,3 @@
-console.log("worker1", Deno.env.get("DENO_HELLO"));
-console.log("worker2", Deno.env.get("DENO_BYE"));
-console.log("worker3", Deno.env.get("AWS_HELLO"));
+console.log("worker1", Oden.env.get("ODEN_HELLO"));
+console.log("worker2", Oden.env.get("ODEN_BYE"));
+console.log("worker3", Oden.env.get("AWS_HELLO"));

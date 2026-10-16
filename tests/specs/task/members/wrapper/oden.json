@@ -1,0 +1,9 @@
+{
+  "workspace": [
+    "./foo",
+    "./bar"
+  ],
+  "tasks": {
+    "dev": "oden task --members dev"
+  }
+}

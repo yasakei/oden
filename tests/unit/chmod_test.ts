@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   assert,
   assertEquals,
@@ -9,7 +9,7 @@ import {
 let modeAsync: number;
 let modeSync: number;
 // On Windows chmod is only able to manipulate write permission
-if (Deno.build.os === "windows") {
+if (Oden.build.os === "windows") {
   modeAsync = 0o444; // read-only
   modeSync = 0o666; // read-write
 } else {
@@ -17,179 +17,179 @@ if (Deno.build.os === "windows") {
   modeSync = 0o644;
 }
 
-Deno.test(
+Oden.test(
   {
     permissions: { read: true, write: true },
   },
   function chmodSyncSuccess() {
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const tempDir = Deno.makeTempDirSync();
+    const tempDir = Oden.makeTempDirSync();
     const filename = tempDir + "/test.txt";
-    Deno.writeFileSync(filename, data, { mode: 0o666 });
+    Oden.writeFileSync(filename, data, { mode: 0o666 });
 
-    Deno.chmodSync(filename, modeSync);
+    Oden.chmodSync(filename, modeSync);
 
-    const fileInfo = Deno.statSync(filename);
+    const fileInfo = Oden.statSync(filename);
     assert(fileInfo.mode);
     assertEquals(fileInfo.mode & 0o777, modeSync);
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { read: true, write: true },
   },
   function chmodSyncUrl() {
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const tempDir = Deno.makeTempDirSync();
+    const tempDir = Oden.makeTempDirSync();
     const fileUrl = new URL(`file://${tempDir}/test.txt`);
-    Deno.writeFileSync(fileUrl, data, { mode: 0o666 });
+    Oden.writeFileSync(fileUrl, data, { mode: 0o666 });
 
-    Deno.chmodSync(fileUrl, modeSync);
+    Oden.chmodSync(fileUrl, modeSync);
 
-    const fileInfo = Deno.statSync(fileUrl);
+    const fileInfo = Oden.statSync(fileUrl);
     assert(fileInfo.mode);
     assertEquals(fileInfo.mode & 0o777, modeSync);
 
-    Deno.removeSync(tempDir, { recursive: true });
+    Oden.removeSync(tempDir, { recursive: true });
   },
 );
 
 // Check symlink when not on windows
-Deno.test(
+Oden.test(
   {
     permissions: { read: true, write: true },
   },
   function chmodSyncSymlinkSuccess() {
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const tempDir = Deno.makeTempDirSync();
+    const tempDir = Oden.makeTempDirSync();
 
     const filename = tempDir + "/test.txt";
-    Deno.writeFileSync(filename, data, { mode: 0o666 });
+    Oden.writeFileSync(filename, data, { mode: 0o666 });
     const symlinkName = tempDir + "/test_symlink.txt";
-    Deno.symlinkSync(filename, symlinkName);
+    Oden.symlinkSync(filename, symlinkName);
 
-    let symlinkInfo = Deno.lstatSync(symlinkName);
+    let symlinkInfo = Oden.lstatSync(symlinkName);
     assert(symlinkInfo.mode);
     const symlinkMode = symlinkInfo.mode & 0o777; // platform dependent
 
-    Deno.chmodSync(symlinkName, modeSync);
+    Oden.chmodSync(symlinkName, modeSync);
 
     // Change actual file mode, not symlink
-    const fileInfo = Deno.statSync(filename);
+    const fileInfo = Oden.statSync(filename);
     assert(fileInfo.mode);
     assertEquals(fileInfo.mode & 0o777, modeSync);
 
-    symlinkInfo = Deno.lstatSync(symlinkName);
+    symlinkInfo = Oden.lstatSync(symlinkName);
     assert(symlinkInfo.mode);
     assertEquals(symlinkInfo.mode & 0o777, symlinkMode);
   },
 );
 
-Deno.test({ permissions: { write: true } }, function chmodSyncFailure() {
+Oden.test({ permissions: { write: true } }, function chmodSyncFailure() {
   const filename = "/badfile.txt";
   assertThrows(
     () => {
-      Deno.chmodSync(filename, 0o777);
+      Oden.chmodSync(filename, 0o777);
     },
-    Deno.errors.NotFound,
+    Oden.errors.NotFound,
     `chmod '${filename}'`,
   );
 });
 
-Deno.test({ permissions: { write: false } }, function chmodSyncPerm() {
+Oden.test({ permissions: { write: false } }, function chmodSyncPerm() {
   assertThrows(() => {
-    Deno.chmodSync("/somefile.txt", 0o777);
-  }, Deno.errors.NotCapable);
+    Oden.chmodSync("/somefile.txt", 0o777);
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test(
+Oden.test(
   {
     permissions: { read: true, write: true },
   },
   async function chmodSuccess() {
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const tempDir = Deno.makeTempDirSync();
+    const tempDir = Oden.makeTempDirSync();
     const filename = tempDir + "/test.txt";
-    Deno.writeFileSync(filename, data, { mode: 0o666 });
+    Oden.writeFileSync(filename, data, { mode: 0o666 });
 
-    await Deno.chmod(filename, modeAsync);
+    await Oden.chmod(filename, modeAsync);
 
-    const fileInfo = Deno.statSync(filename);
+    const fileInfo = Oden.statSync(filename);
     assert(fileInfo.mode);
     assertEquals(fileInfo.mode & 0o777, modeAsync);
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { read: true, write: true },
   },
   async function chmodUrl() {
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const tempDir = Deno.makeTempDirSync();
+    const tempDir = Oden.makeTempDirSync();
     const fileUrl = new URL(`file://${tempDir}/test.txt`);
-    Deno.writeFileSync(fileUrl, data, { mode: 0o666 });
+    Oden.writeFileSync(fileUrl, data, { mode: 0o666 });
 
-    await Deno.chmod(fileUrl, modeAsync);
+    await Oden.chmod(fileUrl, modeAsync);
 
-    const fileInfo = Deno.statSync(fileUrl);
+    const fileInfo = Oden.statSync(fileUrl);
     assert(fileInfo.mode);
     assertEquals(fileInfo.mode & 0o777, modeAsync);
 
-    Deno.removeSync(tempDir, { recursive: true });
+    Oden.removeSync(tempDir, { recursive: true });
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { read: true, write: true },
   },
   async function chmodSymlinkSuccess() {
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const tempDir = Deno.makeTempDirSync();
+    const tempDir = Oden.makeTempDirSync();
 
     const filename = tempDir + "/test.txt";
-    Deno.writeFileSync(filename, data, { mode: 0o666 });
+    Oden.writeFileSync(filename, data, { mode: 0o666 });
     const symlinkName = tempDir + "/test_symlink.txt";
-    Deno.symlinkSync(filename, symlinkName);
+    Oden.symlinkSync(filename, symlinkName);
 
-    let symlinkInfo = Deno.lstatSync(symlinkName);
+    let symlinkInfo = Oden.lstatSync(symlinkName);
     assert(symlinkInfo.mode);
     const symlinkMode = symlinkInfo.mode & 0o777; // platform dependent
 
-    await Deno.chmod(symlinkName, modeAsync);
+    await Oden.chmod(symlinkName, modeAsync);
 
     // Just change actual file mode, not symlink
-    const fileInfo = Deno.statSync(filename);
+    const fileInfo = Oden.statSync(filename);
     assert(fileInfo.mode);
     assertEquals(fileInfo.mode & 0o777, modeAsync);
 
-    symlinkInfo = Deno.lstatSync(symlinkName);
+    symlinkInfo = Oden.lstatSync(symlinkName);
     assert(symlinkInfo.mode);
     assertEquals(symlinkInfo.mode & 0o777, symlinkMode);
   },
 );
 
-Deno.test({ permissions: { write: true } }, async function chmodFailure() {
+Oden.test({ permissions: { write: true } }, async function chmodFailure() {
   const filename = "/badfile.txt";
   await assertRejects(
     async () => {
-      await Deno.chmod(filename, 0o777);
+      await Oden.chmod(filename, 0o777);
     },
-    Deno.errors.NotFound,
+    Oden.errors.NotFound,
     `chmod '${filename}'`,
   );
 });
 
-Deno.test({ permissions: { write: false } }, async function chmodPerm() {
+Oden.test({ permissions: { write: false } }, async function chmodPerm() {
   await assertRejects(async () => {
-    await Deno.chmod("/somefile.txt", 0o777);
-  }, Deno.errors.NotCapable);
+    await Oden.chmod("/somefile.txt", 0o777);
+  }, Oden.errors.NotCapable);
 });

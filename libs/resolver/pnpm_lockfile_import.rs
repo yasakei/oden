@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-//! Translation from pnpm's `pnpm-lock.yaml` to a deno.lock v5 JSON string.
+//! Translation from pnpm's `pnpm-lock.yaml` to a oden.lock v5 JSON string.
 //!
 //! Only the npm subset is translated. Targets pnpm lockfileVersion 6.x and
 //! 9.x (the formats produced by pnpm v8 and pnpm v9+ respectively).
 //!
-//! YAML is parsed with `yaml_parser` (the same parser `deno fmt` already
+//! YAML is parsed with `yaml_parser` (the same parser `oden fmt` already
 //! depends on) to avoid pulling a new YAML crate into the dependency tree.
 //! `yaml_parser` is a lossless CST parser, so the helpers below adapt its
 //! syntax tree into a small `Node`/`MapNode` value model that is convenient
@@ -37,8 +37,8 @@ pub enum PnpmLockfileImportError {
 }
 
 /// Convert a `pnpm-lock.yaml` (lockfileVersion 6 or 9) string into a
-/// deno.lock v5 JSON string. Only the npm subset is populated.
-pub fn pnpm_lock_to_deno_lock_v5(
+/// oden.lock v5 JSON string. Only the npm subset is populated.
+pub fn pnpm_lock_to_oden_lock_v5(
   yaml_text: &str,
 ) -> Result<String, PnpmLockfileImportError> {
   let syntax =
@@ -241,7 +241,7 @@ pub fn pnpm_lock_to_deno_lock_v5(
 
   Ok(
     serde_json::to_string(&Value::Object(output))
-      .expect("serializing deno.lock v5"),
+      .expect("serializing oden.lock v5"),
   )
 }
 
@@ -482,7 +482,7 @@ fn collect_importer_specifiers(
   keys
 }
 
-/// Build the deno.lock v5 `workspace` object from the root importer's deps and
+/// Build the oden.lock v5 `workspace` object from the root importer's deps and
 /// the per-member dep lists. Returns `None` when nothing was collected so the
 /// caller can omit the section entirely.
 fn build_workspace(
@@ -526,7 +526,7 @@ fn build_workspace(
 /// (e.g. `{ ansi-styles: 4.3.0, color-convert: 2.0.1 }`).
 ///
 /// Entries are usually `dep@version`, but an aliased dependency becomes
-/// `dep@npm:name@version`. A dependency that deno.lock has no spelling for —
+/// `dep@npm:name@version`. A dependency that oden.lock has no spelling for —
 /// a workspace link, a path, a tarball url — is **silently dropped**, so the
 /// package ends up described with fewer dependencies than it really has. That
 /// is the deliberate trade against emitting an id that cannot be parsed back
@@ -549,7 +549,7 @@ fn collect_deps(node: Option<MapNode>) -> Vec<String> {
   out
 }
 
-/// Build the deno.lock dependency entry for one pnpm dependency mapping.
+/// Build the oden.lock dependency entry for one pnpm dependency mapping.
 ///
 /// The value is normally a bare version (`ansi-styles: 4.3.0`), but an aliased
 /// dependency names the package it resolves to instead
@@ -559,7 +559,7 @@ fn collect_deps(node: Option<MapNode>) -> Vec<String> {
 /// `value` must already have its peer suffix stripped.
 fn dep_entry(name: &str, value: &str) -> Option<String> {
   // `link:`/`file:` paths, urls and the other non-registry schemes have no
-  // deno.lock spelling, so leave them out and let resolution handle them.
+  // oden.lock spelling, so leave them out and let resolution handle them.
   // This has to happen before `normalize_package_key`, whose `name/version`
   // -> `name@version` fallback would otherwise rewrite such a value into
   // something that reads as a valid alias: `file:vendor/1.0.0.tgz` would
@@ -574,7 +574,7 @@ fn dep_entry(name: &str, value: &str) -> Option<String> {
     return Some(format!("{}@{}", name, value));
   }
   match value.rfind('@') {
-    // A leading `@` is a scope, not a separator. deno.lock spells an alias
+    // A leading `@` is a scope, not a separator. oden.lock spells an alias
     // `key@npm:name@version`. Telling an alias apart from a path rests on npm
     // versions always starting with a digit, which semver guarantees.
     Some(idx) if idx > 0 && starts_with_digit(&value[idx + 1..]) => {
@@ -595,7 +595,7 @@ fn starts_with_digit(value: &str) -> bool {
   value.starts_with(|c: char| c.is_ascii_digit())
 }
 
-/// Whether a `packages`/`snapshots` key is a `name@version` deno.lock can
+/// Whether a `packages`/`snapshots` key is a `name@version` oden.lock can
 /// hold. A package installed from a path or a tarball is keyed by where it
 /// came from, e.g. `fake-data-pkg@file:packages/…/fake-data-pkg-1.0.0.tgz`,
 /// and has no npm id to record.
@@ -739,7 +739,7 @@ fn strip_peer_suffix(key: &str) -> &str {
 fn is_supported_spec(req: &str) -> bool {
   // `npm:` reqs are aliased dependencies (e.g. `foo: npm:bar@^1`). Building a
   // specifier from those would produce `npm:foo@npm:bar@^1`, which isn't a
-  // valid deno.lock specifier, so skip them and let resolution handle aliases.
+  // valid oden.lock specifier, so skip them and let resolution handle aliases.
   !req.starts_with("file:")
     && !req.starts_with("link:")
     && !req.starts_with("workspace:")
@@ -778,7 +778,7 @@ packages:
 snapshots:
   lodash@4.17.21: {}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["version"], "5");
     assert_eq!(v["specifiers"]["npm:lodash@^4.17.21"], "4.17.21");
@@ -809,7 +809,7 @@ snapshots:
       ansi-styles: 4.3.0
   ansi-styles@4.3.0: {}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["npm"]["chalk@4.1.2"]["integrity"], "sha512-CHALK");
     let chalk_deps =
@@ -842,7 +842,7 @@ snapshots:
       react: 18.3.1
   react@18.3.1: {}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["specifiers"]["npm:some-plugin@^1.0.0"], "1.0.0");
     let plugin_deps = v["npm"]["some-plugin@1.0.0"]["dependencies"]
@@ -870,7 +870,7 @@ packages:
 snapshots:
   '@scope/pkg@1.2.3': {}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["specifiers"]["npm:@scope/pkg@^1.0.0"], "1.2.3");
     assert!(
@@ -897,7 +897,7 @@ packages:
     resolution: {integrity: sha512-LODASH}
     dev: false
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["specifiers"]["npm:lodash@^4.17.21"], "4.17.21");
     assert_eq!(v["npm"]["lodash@4.17.21"]["integrity"], "sha512-LODASH");
@@ -934,7 +934,7 @@ packages:
   /typescript@5.0.4:
     resolution: {integrity: sha512-TS}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     // The peer suffix on the resolved version is dropped, as elsewhere.
     assert_eq!(v["specifiers"]["npm:@vueuse/core@^9.13.0"], "9.13.0");
@@ -964,7 +964,7 @@ packages:
 snapshots:
   lodash@4.17.21: {}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     // No specifier is emitted for the aliased dep.
     assert!(v.get("specifiers").is_none());
@@ -1006,16 +1006,16 @@ snapshots:
   string-width@4.2.3: {}
   '@scope/pkg@1.0.0': {}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
-    // Every entry has to survive the parsers that read a deno.lock back in.
-    let content = deno_lockfile::LockfileContent::from_json(
+    // Every entry has to survive the parsers that read a oden.lock back in.
+    let content = oden_lockfile::LockfileContent::from_json(
       serde_json::from_str(&out).unwrap(),
     )
     .unwrap();
     for pkg in content.packages.npm.values() {
       for dep in pkg.dependencies.values() {
-        deno_npm::NpmPackageId::from_serialized(dep).unwrap();
+        oden_npm::NpmPackageId::from_serialized(dep).unwrap();
       }
     }
 
@@ -1035,7 +1035,7 @@ snapshots:
   #[test]
   fn workspace_link_snapshot_dependency() {
     // A dependency satisfied by a workspace package is recorded as
-    // `vite: link:packages/vite`. That has no deno.lock spelling, so it must
+    // `vite: link:packages/vite`. That has no oden.lock spelling, so it must
     // be left out rather than turned into `vite@link:packages/vite`.
     let input = r#"
 lockfileVersion: '9.0'
@@ -1061,7 +1061,7 @@ snapshots:
       vite: link:packages/vite
   cac@7.0.0: {}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     let plugin = &v["npm"]["some-plugin@1.0.0"];
     assert_eq!(
@@ -1071,13 +1071,13 @@ snapshots:
     // The only optional dependency was the workspace link.
     assert!(plugin.get("optionalDependencies").is_none());
 
-    let content = deno_lockfile::LockfileContent::from_json(
+    let content = oden_lockfile::LockfileContent::from_json(
       serde_json::from_str(&out).unwrap(),
     )
     .unwrap();
     for pkg in content.packages.npm.values() {
       for dep in pkg.dependencies.values() {
-        deno_npm::NpmPackageId::from_serialized(dep).unwrap();
+        oden_npm::NpmPackageId::from_serialized(dep).unwrap();
       }
     }
   }
@@ -1116,9 +1116,9 @@ snapshots:
       git-dep: github:owner/repo#1.0.0
   cac@7.0.0: {}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
-    // Only the one dependency that has a deno.lock spelling survives.
+    // Only the one dependency that has a oden.lock spelling survives.
     assert_eq!(
       v["npm"]["some-plugin@1.0.0"]["dependencies"]
         .as_array()
@@ -1127,13 +1127,13 @@ snapshots:
       ["cac@7.0.0"]
     );
 
-    let content = deno_lockfile::LockfileContent::from_json(
+    let content = oden_lockfile::LockfileContent::from_json(
       serde_json::from_str(&out).unwrap(),
     )
     .unwrap();
     for pkg in content.packages.npm.values() {
       for dep in pkg.dependencies.values() {
-        deno_npm::NpmPackageId::from_serialized(dep).unwrap();
+        oden_npm::NpmPackageId::from_serialized(dep).unwrap();
       }
     }
   }
@@ -1167,7 +1167,7 @@ snapshots:
   string-width@4.2.3: {}
   emoji-regex@8.0.0: {}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(
       v["npm"]["wrap-ansi@8.1.0"]["dependencies"]
@@ -1177,13 +1177,13 @@ snapshots:
       ["string-width-cjs@npm:string-width@4.2.3"]
     );
 
-    let content = deno_lockfile::LockfileContent::from_json(
+    let content = oden_lockfile::LockfileContent::from_json(
       serde_json::from_str(&out).unwrap(),
     )
     .unwrap();
     for (key, pkg) in &content.packages.npm {
       for dep in pkg.dependencies.values() {
-        deno_npm::NpmPackageId::from_serialized(dep).unwrap();
+        oden_npm::NpmPackageId::from_serialized(dep).unwrap();
         assert!(
           content.packages.npm.contains_key(dep),
           "{key} depends on {dep}, which isn't in the lock"
@@ -1215,7 +1215,7 @@ packages:
   /bar/2.0.0:
     resolution: {integrity: sha512-BAR}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["npm"]["foo@1.0.0"]["integrity"], "sha512-FOO");
     assert_eq!(
@@ -1229,7 +1229,7 @@ packages:
 
     // Nothing dangles: every specifier and dependency names a package the
     // lock actually holds.
-    let content = deno_lockfile::LockfileContent::from_json(
+    let content = oden_lockfile::LockfileContent::from_json(
       serde_json::from_str(&out).unwrap(),
     )
     .unwrap();
@@ -1269,7 +1269,7 @@ packages:
   /registry.npmmirror.com/run-parallel@1.2.0:
     resolution: {integrity: sha512-PARALLEL}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(
       v["npm"]["@nodelib/fs.stat@2.0.5"]["integrity"],
@@ -1286,12 +1286,12 @@ packages:
     );
     assert_eq!(v["specifiers"]["npm:@nodelib/fs.stat@^2.0.5"], "2.0.5");
 
-    let content = deno_lockfile::LockfileContent::from_json(
+    let content = oden_lockfile::LockfileContent::from_json(
       serde_json::from_str(&out).unwrap(),
     )
     .unwrap();
     for (key, pkg) in &content.packages.npm {
-      deno_npm::NpmPackageId::from_serialized(key).unwrap();
+      oden_npm::NpmPackageId::from_serialized(key).unwrap();
       for dep in pkg.dependencies.values() {
         assert!(
           content.packages.npm.contains_key(dep),
@@ -1321,7 +1321,7 @@ packages:
   /registry.npmmirror.com/@nodelib/fs.stat/2.0.5:
     resolution: {integrity: sha512-STAT}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["npm"]["lodash@4.17.21"]["integrity"], "sha512-LODASH");
     assert_eq!(
@@ -1329,12 +1329,12 @@ packages:
       "sha512-STAT"
     );
 
-    let content = deno_lockfile::LockfileContent::from_json(
+    let content = oden_lockfile::LockfileContent::from_json(
       serde_json::from_str(&out).unwrap(),
     )
     .unwrap();
     for key in content.packages.npm.keys() {
-      deno_npm::NpmPackageId::from_serialized(key).unwrap();
+      oden_npm::NpmPackageId::from_serialized(key).unwrap();
     }
   }
 
@@ -1404,7 +1404,7 @@ snapshots:
       view-alias: '@types/3d-view@1.0.0'
   '@types/3d-view@1.0.0': {}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["npm"]["@types/3d-view@1.0.0"]["integrity"], "sha512-3D");
     assert_eq!(
@@ -1415,12 +1415,12 @@ snapshots:
       ["view-alias@npm:@types/3d-view@1.0.0"]
     );
 
-    let content = deno_lockfile::LockfileContent::from_json(
+    let content = oden_lockfile::LockfileContent::from_json(
       serde_json::from_str(&out).unwrap(),
     )
     .unwrap();
     for (key, pkg) in &content.packages.npm {
-      deno_npm::NpmPackageId::from_serialized(key).unwrap();
+      oden_npm::NpmPackageId::from_serialized(key).unwrap();
       for dep in pkg.dependencies.values() {
         assert!(
           content.packages.npm.contains_key(dep),
@@ -1455,7 +1455,7 @@ packages:
   /string-width@4.2.3:
     resolution: {integrity: sha512-W423}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(
       v["npm"]["@isaacs/cliui@8.0.2"]["dependencies"]
@@ -1469,7 +1469,7 @@ packages:
     );
 
     // Both point at packages the lock actually has.
-    let content = deno_lockfile::LockfileContent::from_json(
+    let content = oden_lockfile::LockfileContent::from_json(
       serde_json::from_str(&out).unwrap(),
     )
     .unwrap();
@@ -1515,17 +1515,17 @@ snapshots:
   fake-pkg@file:vendor/fake-pkg-1.0.0.tgz: {}
   other-pkg@file:vendor/pkg@1.0.0.tgz: {}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["npm"]["lodash@4.17.21"]["integrity"], "sha512-LODASH");
     assert_eq!(v["npm"].as_object().unwrap().len(), 1);
 
-    let content = deno_lockfile::LockfileContent::from_json(
+    let content = oden_lockfile::LockfileContent::from_json(
       serde_json::from_str(&out).unwrap(),
     )
     .unwrap();
     for key in content.packages.npm.keys() {
-      deno_npm::NpmPackageId::from_serialized(key).unwrap();
+      oden_npm::NpmPackageId::from_serialized(key).unwrap();
     }
   }
 
@@ -1574,7 +1574,7 @@ packages:
 snapshots:
   lodash@4.17.21: {}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["specifiers"]["npm:lodash@^4.17.21"], "4.17.21");
     assert_eq!(v["npm"]["lodash@4.17.21"]["integrity"], "sha512-LODASH");
@@ -1608,7 +1608,7 @@ snapshots:
       fsevents: 2.3.3
   fsevents@2.3.3: {}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     let opt = v["npm"]["pkg@1.0.0"]["optionalDependencies"]
       .as_array()
@@ -1646,7 +1646,7 @@ snapshots:
   is-number@7.0.0: {}
   is-odd@3.0.1: {}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["specifiers"]["npm:is-number@7.0.0"], "7.0.0");
     assert_eq!(v["specifiers"]["npm:is-odd@3.0.1"], "3.0.1");
@@ -1690,7 +1690,7 @@ packages:
 snapshots:
   is-odd@3.0.1: {}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["specifiers"]["npm:is-odd@3.0.1"], "3.0.1");
     assert_eq!(
@@ -1726,7 +1726,7 @@ packages:
 snapshots:
   react@18.3.1: {}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["specifiers"]["npm:react@^18.0.0"], "18.3.1");
   }
@@ -1766,7 +1766,7 @@ snapshots:
   is-number@7.0.0: {}
   is-odd@3.0.1: {}
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["specifiers"]["npm:is-odd@3.0.1"], "3.0.1");
     assert_eq!(
@@ -1790,7 +1790,7 @@ importers:
         specifier: 'catalog:'
         version: 3.0.1
 "#;
-    let out = pnpm_lock_to_deno_lock_v5(input).unwrap();
+    let out = pnpm_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert!(v.get("specifiers").is_none());
     assert!(v.get("workspace").is_none());
@@ -1801,7 +1801,7 @@ importers:
     let input = r#"lockfileVersion: '4.0'
 packages: {}
 "#;
-    let err = pnpm_lock_to_deno_lock_v5(input).unwrap_err();
+    let err = pnpm_lock_to_oden_lock_v5(input).unwrap_err();
     assert!(matches!(
       err,
       PnpmLockfileImportError::UnsupportedVersion(_)

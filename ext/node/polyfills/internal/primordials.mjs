@@ -1,6 +1,6 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-// deno-lint-ignore-file deno-internal/prefer-primordials
+// deno-lint-ignore-file oden-internal/prefer-primordials
 
 (function () {
 const ArrayIsArray = Array.isArray;

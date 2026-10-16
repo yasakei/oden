@@ -1,0 +1,8 @@
+{
+  "name": "@odentest/types-no-types-entry",
+  "version": "1.0.0",
+  "main": "./dist/main.js",
+  "dependencies": {
+    "@odentest/types-entry-value-not-exists": "^1.0"
+  }
+}

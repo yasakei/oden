@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -6,14 +6,14 @@ use std::sync::Arc;
 
 use dashmap::DashMap;
 use deno_ast::SourceRangedForSpanned;
-use deno_config::glob::FilePatterns;
-use deno_config::workspace::WorkspaceDirLintConfig;
-use deno_core::error::AnyError;
-use deno_core::serde_json;
-use deno_core::url::Url;
+use oden_config::glob::FilePatterns;
+use oden_config::workspace::WorkspaceDirLintConfig;
+use oden_core::error::AnyError;
+use oden_core::serde_json;
+use oden_core::url::Url;
 use deno_lint::linter::LintConfig;
-use deno_resolver::deno_json::CompilerOptionsKey;
-use deno_runtime::tokio_util::create_basic_runtime;
+use oden_resolver::oden_json::CompilerOptionsKey;
+use oden_runtime::tokio_util::create_basic_runtime;
 use once_cell::sync::Lazy;
 use tower_lsp::lsp_types as lsp;
 

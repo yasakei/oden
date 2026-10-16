@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core, primordials } = __bootstrap;
@@ -102,20 +102,20 @@ const {
 const EMPTY_OPTIONS = ObjectFreeze(ObjectSetPrototypeOf({}, null));
 
 const { read, readSync, write, writeSync } = core.loadExtScript(
-  "ext:deno_io/12_io.js",
+  "ext:oden_io/12_io.js",
 );
-const abortSignal = core.loadExtScript("ext:deno_web/03_abort_signal.js");
+const abortSignal = core.loadExtScript("ext:oden_web/03_abort_signal.js");
 // Defer loading the 208 KB `06_streams.js` polyfill: these helpers are only
 // used inside File class methods and writeFile-family functions, so pay
 // the parse cost on first use rather than at every startup.
 let _streamsImpl;
 function lazyStreams() {
   return _streamsImpl ??
-    (_streamsImpl = core.loadExtScript("ext:deno_web/06_streams.js"));
+    (_streamsImpl = core.loadExtScript("ext:oden_web/06_streams.js"));
 }
-const { pathFromURL } = core.loadExtScript("ext:deno_web/00_infra.js");
+const { pathFromURL } = core.loadExtScript("ext:oden_web/00_infra.js");
 
-const fsFileConstructorKey = Symbol("Deno.internal.FsFile");
+const fsFileConstructorKey = Symbol("Oden.internal.FsFile");
 
 function chmodSync(path, mode) {
   op_fs_chmod_sync(pathFromURL(path), mode);
@@ -360,7 +360,7 @@ function createByteStruct(types) {
   // types can be "date", "bool" or "u64".
   let offset = 0;
   let str =
-    'const unix = Deno.build.os === "darwin" || Deno.build.os === "linux" || Deno.build.os === "android" || Deno.build.os === "openbsd" || Deno.build.os === "freebsd";' +
+    'const unix = Oden.build.os === "darwin" || Oden.build.os === "linux" || Oden.build.os === "android" || Oden.build.os === "openbsd" || Oden.build.os === "freebsd";' +
     // Two's-complement inversion avoids float64 precision loss near 2^64.
     " const readI64Ms = (lo, hi) => hi < 2147483648 ? lo + hi * 4294967296 : -((~hi >>> 0) * 4294967296 + (~lo >>> 0) + 1);" +
     " return {";
@@ -654,7 +654,7 @@ class FsFile {
     this.#rid = rid;
     if (!symbol || symbol !== fsFileConstructorKey) {
       throw new TypeError(
-        "'Deno.FsFile' cannot be constructed, use 'Deno.open()' or 'Deno.openSync()' instead",
+        "'Oden.FsFile' cannot be constructed, use 'Oden.open()' or 'Oden.openSync()' instead",
       );
     }
   }

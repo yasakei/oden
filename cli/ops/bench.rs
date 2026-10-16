@@ -1,16 +1,16 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
 
-use deno_core::ModuleSpecifier;
-use deno_core::OpState;
-use deno_core::op2;
-use deno_core::v8;
+use oden_core::ModuleSpecifier;
+use oden_core::OpState;
+use oden_core::op2;
+use oden_core::v8;
 use deno_error::JsErrorBox;
-use deno_runtime::deno_permissions::ChildPermissionsArg;
-use deno_runtime::deno_permissions::PermissionsContainer;
-use deno_runtime::deno_web::StartTime;
+use oden_runtime::oden_permissions::ChildPermissionsArg;
+use oden_runtime::oden_permissions::PermissionsContainer;
+use oden_runtime::oden_web::StartTime;
 use tokio::sync::mpsc::UnboundedSender;
 use uuid::Uuid;
 
@@ -22,7 +22,7 @@ pub(crate) struct BenchContainer(
   pub Vec<(BenchDescription, v8::Global<v8::Function>)>,
 );
 
-deno_core::extension!(deno_bench,
+oden_core::extension!(oden_bench,
   ops = [
     op_pledge_test_permissions,
     op_restore_test_permissions,
@@ -54,7 +54,7 @@ struct PermissionsHolder(Uuid, PermissionsContainer);
 pub fn op_pledge_test_permissions(
   state: &mut OpState,
   #[serde] args: ChildPermissionsArg,
-) -> Result<Uuid, deno_runtime::deno_permissions::ChildPermissionError> {
+) -> Result<Uuid, oden_runtime::oden_permissions::ChildPermissionError> {
   let token = Uuid::new_v4();
   let parent_permissions = state.borrow_mut::<PermissionsContainer>();
   let worker_permissions = parent_permissions.create_child_permissions(args)?;

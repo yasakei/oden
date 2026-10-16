@@ -1,6 +1,6 @@
 import { test } from "./mod.js";
 
-Deno.test({
+Oden.test({
   name: "bugrepo b",
   fn: () => {
     test(false);

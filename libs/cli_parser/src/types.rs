@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 use crate::error::CliError;
 use crate::error::CliErrorKind;
 
@@ -24,8 +24,8 @@ pub struct CommandDef {
   pub passthrough: bool,
   /// If true, a `--` separator before the forwarded args is kept in the
   /// forwarded argv (clap's `.last(true)` / external-subcommand behavior, e.g.
-  /// `deno run x.ts -- -a` forwards `["--", "-a"]`). If false, the `--` is
-  /// stripped (clap's plain `trailing_var_arg`, e.g. `deno eval`/`serve`).
+  /// `oden run x.ts -- -a` forwards `["--", "-a"]`). If false, the `--` is
+  /// stripped (clap's plain `trailing_var_arg`, e.g. `oden eval`/`serve`).
   pub keep_double_dash: bool,
 }
 

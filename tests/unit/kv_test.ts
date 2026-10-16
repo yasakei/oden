@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   assert,
   assertEquals,
@@ -14,64 +14,64 @@ const sleep = (time: number) => new Promise((r) => setTimeout(r, time));
 
 let isCI: boolean;
 try {
-  isCI = Deno.env.get("CI") !== undefined;
+  isCI = Oden.env.get("CI") !== undefined;
 } catch {
   isCI = true;
 }
 
 // Defined in test_util/src/lib.rs
-Deno.env.set("DENO_KV_ACCESS_TOKEN", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+Oden.env.set("ODEN_KV_ACCESS_TOKEN", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
-Deno.test({
+Oden.test({
   name: "openKv :memory: no permissions",
   permissions: {},
   async fn() {
-    const db = await Deno.openKv(":memory:");
+    const db = await Oden.openKv(":memory:");
     await db.close();
   },
 });
 
-Deno.test({
+Oden.test({
   name: "openKv invalid filenames",
   permissions: {},
   async fn() {
     await assertRejects(
-      async () => await Deno.openKv(""),
+      async () => await Oden.openKv(""),
       TypeError,
       "Filename cannot be empty",
     );
     await assertRejects(
-      async () => await Deno.openKv(":foo"),
+      async () => await Oden.openKv(":foo"),
       TypeError,
       "Filename cannot start with ':' unless prefixed with './'",
     );
   },
 });
 
-Deno.test({
+Oden.test({
   name: "openKv does not follow a symlink outside permitted directories",
   permissions: {
     read: true,
     write: true,
-    run: [Deno.execPath()],
+    run: [Oden.execPath()],
   },
   async fn() {
-    const dir = await Deno.makeTempDir({ prefix: "open_kv_symlink" });
+    const dir = await Oden.makeTempDir({ prefix: "open_kv_symlink" });
     try {
       const allowedDir = `${dir}/allowed`;
       const outsideDir = `${dir}/outside`;
       const target = `${outsideDir}/target.sqlite3`;
       const link = `${allowedDir}/link.sqlite3`;
       const runner = `${allowedDir}/runner.ts`;
-      await Deno.mkdir(allowedDir);
-      await Deno.mkdir(outsideDir);
-      await Deno.writeTextFile(
+      await Oden.mkdir(allowedDir);
+      await Oden.mkdir(outsideDir);
+      await Oden.writeTextFile(
         runner,
-        "const db = await Deno.openKv(Deno.args[0]); db.close();",
+        "const db = await Oden.openKv(Oden.args[0]); db.close();",
       );
 
       const open = (path: string) =>
-        new Deno.Command(Deno.execPath(), {
+        new Oden.Command(Oden.execPath(), {
           clearEnv: true,
           args: [
             "run",
@@ -108,33 +108,33 @@ Deno.test({
         0,
         new TextDecoder().decode(regularResult.stderr),
       );
-      assert((await Deno.stat(regularPath)).isFile);
+      assert((await Oden.stat(regularPath)).isFile);
 
-      await Deno.symlink(target, link, { type: "file" });
+      await Oden.symlink(target, link, { type: "file" });
       await assertRefused(link);
-      await assertRejects(() => Deno.stat(target), Deno.errors.NotFound);
+      await assertRejects(() => Oden.stat(target), Oden.errors.NotFound);
 
       const directoryLink = `${allowedDir}/directory-link`;
       const nestedTarget = `${outsideDir}/nested.sqlite3`;
-      await Deno.symlink(outsideDir, directoryLink, { type: "dir" });
+      await Oden.symlink(outsideDir, directoryLink, { type: "dir" });
       await assertRefused(`${directoryLink}/nested.sqlite3`);
       await assertRejects(
-        () => Deno.stat(nestedTarget),
-        Deno.errors.NotFound,
+        () => Oden.stat(nestedTarget),
+        Oden.errors.NotFound,
       );
     } finally {
-      await Deno.remove(dir, { recursive: true });
+      await Oden.remove(dir, { recursive: true });
     }
   },
 });
 
-function dbTest(name: string, fn: (db: Deno.Kv) => Promise<void> | void) {
-  Deno.test({
+function dbTest(name: string, fn: (db: Oden.Kv) => Promise<void> | void) {
+  Oden.test({
     name,
     // https://github.com/denoland/deno/issues/18363
-    ignore: Deno.build.os === "darwin" && isCI,
+    ignore: Oden.build.os === "darwin" && isCI,
     async fn() {
-      const db: Deno.Kv = await Deno.openKv(":memory:");
+      const db: Oden.Kv = await Oden.openKv(":memory:");
       try {
         await fn(db);
       } finally {
@@ -144,13 +144,13 @@ function dbTest(name: string, fn: (db: Deno.Kv) => Promise<void> | void) {
   });
 }
 
-function queueTest(name: string, fn: (db: Deno.Kv) => Promise<void>) {
-  Deno.test({
+function queueTest(name: string, fn: (db: Oden.Kv) => Promise<void>) {
+  Oden.test({
     name,
     // https://github.com/denoland/deno/issues/18363
-    ignore: Deno.build.os === "darwin" && isCI,
+    ignore: Oden.build.os === "darwin" && isCI,
     async fn() {
-      const db: Deno.Kv = await Deno.openKv(":memory:");
+      const db: Oden.Kv = await Oden.openKv(":memory:");
       await fn(db);
     },
   });
@@ -321,7 +321,7 @@ const keys = [
 ];
 
 for (const key of keys) {
-  dbTest(`set and get ${Deno.inspect(key)} key`, async (db) => {
+  dbTest(`set and get ${Oden.inspect(key)} key`, async (db) => {
     await db.set(key, "b");
     const result = await db.get(key);
     assertEquals(result.key, key);
@@ -341,7 +341,7 @@ const INVALID_KEYS = [
 ];
 
 for (const key of INVALID_KEYS) {
-  dbTest(`set and get invalid key ${Deno.inspect(key)}`, async (db) => {
+  dbTest(`set and get invalid key ${Oden.inspect(key)}`, async (db) => {
     await assertRejects(
       async () => {
         // @ts-ignore - we are testing invalid keys
@@ -401,33 +401,33 @@ dbTest("compare and mutate not exists", async (db) => {
 });
 
 dbTest("atomic mutation helper (sum)", async (db) => {
-  await db.set(["t"], new Deno.KvU64(42n));
-  assertEquals((await db.get(["t"])).value, new Deno.KvU64(42n));
+  await db.set(["t"], new Oden.KvU64(42n));
+  assertEquals((await db.get(["t"])).value, new Oden.KvU64(42n));
 
   await db.atomic().sum(["t"], 1n).commit();
-  assertEquals((await db.get(["t"])).value, new Deno.KvU64(43n));
+  assertEquals((await db.get(["t"])).value, new Oden.KvU64(43n));
 });
 
 dbTest("atomic mutation helper (min)", async (db) => {
-  await db.set(["t"], new Deno.KvU64(42n));
-  assertEquals((await db.get(["t"])).value, new Deno.KvU64(42n));
+  await db.set(["t"], new Oden.KvU64(42n));
+  assertEquals((await db.get(["t"])).value, new Oden.KvU64(42n));
 
   await db.atomic().min(["t"], 1n).commit();
-  assertEquals((await db.get(["t"])).value, new Deno.KvU64(1n));
+  assertEquals((await db.get(["t"])).value, new Oden.KvU64(1n));
 
   await db.atomic().min(["t"], 2n).commit();
-  assertEquals((await db.get(["t"])).value, new Deno.KvU64(1n));
+  assertEquals((await db.get(["t"])).value, new Oden.KvU64(1n));
 });
 
 dbTest("atomic mutation helper (max)", async (db) => {
-  await db.set(["t"], new Deno.KvU64(42n));
-  assertEquals((await db.get(["t"])).value, new Deno.KvU64(42n));
+  await db.set(["t"], new Oden.KvU64(42n));
+  assertEquals((await db.get(["t"])).value, new Oden.KvU64(42n));
 
   await db.atomic().max(["t"], 41n).commit();
-  assertEquals((await db.get(["t"])).value, new Deno.KvU64(42n));
+  assertEquals((await db.get(["t"])).value, new Oden.KvU64(42n));
 
   await db.atomic().max(["t"], 43n).commit();
-  assertEquals((await db.get(["t"])).value, new Deno.KvU64(43n));
+  assertEquals((await db.get(["t"])).value, new Oden.KvU64(43n));
 });
 
 dbTest("compare multiple and mutate", async (db) => {
@@ -537,44 +537,44 @@ dbTest("atomic mutation type=delete no exists", async (db) => {
 });
 
 dbTest("atomic mutation type=sum", async (db) => {
-  await db.set(["a"], new Deno.KvU64(10n));
+  await db.set(["a"], new Oden.KvU64(10n));
   const res = await db.atomic()
-    .mutate({ key: ["a"], value: new Deno.KvU64(1n), type: "sum" })
+    .mutate({ key: ["a"], value: new Oden.KvU64(1n), type: "sum" })
     .commit();
   assert(res.ok);
   const result = await db.get(["a"]);
-  assertEquals(result.value, new Deno.KvU64(11n));
+  assertEquals(result.value, new Oden.KvU64(11n));
 });
 
 dbTest("atomic mutation type=sum no exists", async (db) => {
   const res = await db.atomic()
-    .mutate({ key: ["a"], value: new Deno.KvU64(1n), type: "sum" })
+    .mutate({ key: ["a"], value: new Oden.KvU64(1n), type: "sum" })
     .commit();
   assert(res.ok);
   const result = await db.get(["a"]);
   assert(result.value);
-  assertEquals(result.value, new Deno.KvU64(1n));
+  assertEquals(result.value, new Oden.KvU64(1n));
 });
 
 dbTest("atomic mutation type=sum wrap around", async (db) => {
-  await db.set(["a"], new Deno.KvU64(0xffffffffffffffffn));
+  await db.set(["a"], new Oden.KvU64(0xffffffffffffffffn));
   const res = await db.atomic()
-    .mutate({ key: ["a"], value: new Deno.KvU64(10n), type: "sum" })
+    .mutate({ key: ["a"], value: new Oden.KvU64(10n), type: "sum" })
     .commit();
   assert(res.ok);
   const result = await db.get(["a"]);
-  assertEquals(result.value, new Deno.KvU64(9n));
+  assertEquals(result.value, new Oden.KvU64(9n));
 
   const res2 = await db.atomic()
     .mutate({
       key: ["a"],
-      value: new Deno.KvU64(0xffffffffffffffffn),
+      value: new Oden.KvU64(0xffffffffffffffffn),
       type: "sum",
     })
     .commit();
   assert(res2);
   const result2 = await db.get(["a"]);
-  assertEquals(result2.value, new Deno.KvU64(8n));
+  assertEquals(result2.value, new Oden.KvU64(8n));
 });
 
 dbTest("atomic mutation type=sum wrong type in db", async (db) => {
@@ -582,7 +582,7 @@ dbTest("atomic mutation type=sum wrong type in db", async (db) => {
   await assertRejects(
     async () => {
       await db.atomic()
-        .mutate({ key: ["a"], value: new Deno.KvU64(1n), type: "sum" })
+        .mutate({ key: ["a"], value: new Oden.KvU64(1n), type: "sum" })
         .commit();
     },
     TypeError,
@@ -591,7 +591,7 @@ dbTest("atomic mutation type=sum wrong type in db", async (db) => {
 });
 
 dbTest("atomic mutation type=sum wrong type in mutation", async (db) => {
-  await db.set(["a"], new Deno.KvU64(1n));
+  await db.set(["a"], new Oden.KvU64(1n));
   await assertRejects(
     async () => {
       await db.atomic()
@@ -605,30 +605,30 @@ dbTest("atomic mutation type=sum wrong type in mutation", async (db) => {
 });
 
 dbTest("atomic mutation type=min", async (db) => {
-  await db.set(["a"], new Deno.KvU64(10n));
+  await db.set(["a"], new Oden.KvU64(10n));
   const res = await db.atomic()
-    .mutate({ key: ["a"], value: new Deno.KvU64(5n), type: "min" })
+    .mutate({ key: ["a"], value: new Oden.KvU64(5n), type: "min" })
     .commit();
   assert(res.ok);
   const result = await db.get(["a"]);
-  assertEquals(result.value, new Deno.KvU64(5n));
+  assertEquals(result.value, new Oden.KvU64(5n));
 
   const res2 = await db.atomic()
-    .mutate({ key: ["a"], value: new Deno.KvU64(15n), type: "min" })
+    .mutate({ key: ["a"], value: new Oden.KvU64(15n), type: "min" })
     .commit();
   assert(res2);
   const result2 = await db.get(["a"]);
-  assertEquals(result2.value, new Deno.KvU64(5n));
+  assertEquals(result2.value, new Oden.KvU64(5n));
 });
 
 dbTest("atomic mutation type=min no exists", async (db) => {
   const res = await db.atomic()
-    .mutate({ key: ["a"], value: new Deno.KvU64(1n), type: "min" })
+    .mutate({ key: ["a"], value: new Oden.KvU64(1n), type: "min" })
     .commit();
   assert(res.ok);
   const result = await db.get(["a"]);
   assert(result.value);
-  assertEquals(result.value, new Deno.KvU64(1n));
+  assertEquals(result.value, new Oden.KvU64(1n));
 });
 
 dbTest("atomic mutation type=min wrong type in db", async (db) => {
@@ -636,7 +636,7 @@ dbTest("atomic mutation type=min wrong type in db", async (db) => {
   await assertRejects(
     async () => {
       await db.atomic()
-        .mutate({ key: ["a"], value: new Deno.KvU64(1n), type: "min" })
+        .mutate({ key: ["a"], value: new Oden.KvU64(1n), type: "min" })
         .commit();
     },
     TypeError,
@@ -645,7 +645,7 @@ dbTest("atomic mutation type=min wrong type in db", async (db) => {
 });
 
 dbTest("atomic mutation type=min wrong type in mutation", async (db) => {
-  await db.set(["a"], new Deno.KvU64(1n));
+  await db.set(["a"], new Oden.KvU64(1n));
   await assertRejects(
     async () => {
       await db.atomic()
@@ -659,30 +659,30 @@ dbTest("atomic mutation type=min wrong type in mutation", async (db) => {
 });
 
 dbTest("atomic mutation type=max", async (db) => {
-  await db.set(["a"], new Deno.KvU64(10n));
+  await db.set(["a"], new Oden.KvU64(10n));
   const res = await db.atomic()
-    .mutate({ key: ["a"], value: new Deno.KvU64(5n), type: "max" })
+    .mutate({ key: ["a"], value: new Oden.KvU64(5n), type: "max" })
     .commit();
   assert(res.ok);
   const result = await db.get(["a"]);
-  assertEquals(result.value, new Deno.KvU64(10n));
+  assertEquals(result.value, new Oden.KvU64(10n));
 
   const res2 = await db.atomic()
-    .mutate({ key: ["a"], value: new Deno.KvU64(15n), type: "max" })
+    .mutate({ key: ["a"], value: new Oden.KvU64(15n), type: "max" })
     .commit();
   assert(res2);
   const result2 = await db.get(["a"]);
-  assertEquals(result2.value, new Deno.KvU64(15n));
+  assertEquals(result2.value, new Oden.KvU64(15n));
 });
 
 dbTest("atomic mutation type=max no exists", async (db) => {
   const res = await db.atomic()
-    .mutate({ key: ["a"], value: new Deno.KvU64(1n), type: "max" })
+    .mutate({ key: ["a"], value: new Oden.KvU64(1n), type: "max" })
     .commit();
   assert(res.ok);
   const result = await db.get(["a"]);
   assert(result.value);
-  assertEquals(result.value, new Deno.KvU64(1n));
+  assertEquals(result.value, new Oden.KvU64(1n));
 });
 
 dbTest("atomic mutation type=max wrong type in db", async (db) => {
@@ -690,7 +690,7 @@ dbTest("atomic mutation type=max wrong type in db", async (db) => {
   await assertRejects(
     async () => {
       await db.atomic()
-        .mutate({ key: ["a"], value: new Deno.KvU64(1n), type: "max" })
+        .mutate({ key: ["a"], value: new Oden.KvU64(1n), type: "max" })
         .commit();
     },
     TypeError,
@@ -699,7 +699,7 @@ dbTest("atomic mutation type=max wrong type in db", async (db) => {
 });
 
 dbTest("atomic mutation type=max wrong type in mutation", async (db) => {
-  await db.set(["a"], new Deno.KvU64(1n));
+  await db.set(["a"], new Oden.KvU64(1n));
   await assertRejects(
     async () => {
       await db.atomic()
@@ -712,63 +712,63 @@ dbTest("atomic mutation type=max wrong type in mutation", async (db) => {
   );
 });
 
-Deno.test("KvU64 comparison", () => {
-  const a = new Deno.KvU64(1n);
-  const b = new Deno.KvU64(1n);
+Oden.test("KvU64 comparison", () => {
+  const a = new Oden.KvU64(1n);
+  const b = new Oden.KvU64(1n);
   assertEquals(a, b);
   assertThrows(() => {
-    assertEquals(a, new Deno.KvU64(2n));
+    assertEquals(a, new Oden.KvU64(2n));
   }, AssertionError);
 });
 
-Deno.test("KvU64 overflow", () => {
+Oden.test("KvU64 overflow", () => {
   assertThrows(() => {
-    new Deno.KvU64(2n ** 64n);
+    new Oden.KvU64(2n ** 64n);
   }, RangeError);
 });
 
-Deno.test("KvU64 underflow", () => {
+Oden.test("KvU64 underflow", () => {
   assertThrows(() => {
-    new Deno.KvU64(-1n);
+    new Oden.KvU64(-1n);
   }, RangeError);
 });
 
-Deno.test("KvU64 unbox", () => {
-  const a = new Deno.KvU64(1n);
+Oden.test("KvU64 unbox", () => {
+  const a = new Oden.KvU64(1n);
   assertEquals(a.value, 1n);
 });
 
-Deno.test("KvU64 unbox with valueOf", () => {
-  const a = new Deno.KvU64(1n);
+Oden.test("KvU64 unbox with valueOf", () => {
+  const a = new Oden.KvU64(1n);
   assertEquals(a.valueOf(), 1n);
 });
 
-Deno.test("KvU64 auto-unbox", () => {
-  const a = new Deno.KvU64(1n);
+Oden.test("KvU64 auto-unbox", () => {
+  const a = new Oden.KvU64(1n);
   assertEquals(a as unknown as bigint + 1n, 2n);
 });
 
-Deno.test("KvU64 toString", () => {
-  const a = new Deno.KvU64(1n);
+Oden.test("KvU64 toString", () => {
+  const a = new Oden.KvU64(1n);
   assertEquals(a.toString(), "1");
 });
 
-Deno.test("KvU64 inspect", () => {
-  const a = new Deno.KvU64(1n);
-  assertEquals(Deno.inspect(a), "[Deno.KvU64: 1n]");
+Oden.test("KvU64 inspect", () => {
+  const a = new Oden.KvU64(1n);
+  assertEquals(Oden.inspect(a), "[Oden.KvU64: 1n]");
 });
 
 async function collect<T>(
-  iter: Deno.KvListIterator<T>,
-): Promise<Deno.KvEntry<T>[]> {
-  const entries: Deno.KvEntry<T>[] = [];
+  iter: Oden.KvListIterator<T>,
+): Promise<Oden.KvEntry<T>[]> {
+  const entries: Oden.KvEntry<T>[] = [];
   for await (const entry of iter) {
     entries.push(entry);
   }
   return entries;
 }
 
-async function setupData(db: Deno.Kv): Promise<string> {
+async function setupData(db: Oden.Kv): Promise<string> {
   const res = await db.atomic()
     .set(["a"], -1)
     .set(["a", "a"], 0)
@@ -1398,15 +1398,15 @@ dbTest("value size limit", async (db) => {
 });
 
 dbTest("operation size limit", async (db) => {
-  const lastValidKeys: Deno.KvKey[] = new Array(10).fill(0).map((
+  const lastValidKeys: Oden.KvKey[] = new Array(10).fill(0).map((
     _,
     i,
   ) => ["a", i]);
-  const firstInvalidKeys: Deno.KvKey[] = new Array(11).fill(0).map((
+  const firstInvalidKeys: Oden.KvKey[] = new Array(11).fill(0).map((
     _,
     i,
   ) => ["a", i]);
-  const invalidCheckKeys: Deno.KvKey[] = new Array(101).fill(0).map((
+  const invalidCheckKeys: Oden.KvKey[] = new Array(101).fill(0).map((
     _,
     i,
   ) => ["a", i]);
@@ -1444,7 +1444,7 @@ dbTest("operation size limit", async (db) => {
       key,
       type: "set",
       value: 1,
-    } satisfies Deno.KvMutation)))
+    } satisfies Oden.KvMutation)))
     .commit();
   assert(res3);
 
@@ -1459,18 +1459,18 @@ dbTest("operation size limit", async (db) => {
           key,
           type: "set",
           value: 1,
-        } satisfies Deno.KvMutation)))
+        } satisfies Oden.KvMutation)))
         .commit();
     },
     TypeError,
     "Too many checks (max 100)",
   );
 
-  const validMutateKeys: Deno.KvKey[] = new Array(1000).fill(0).map((
+  const validMutateKeys: Oden.KvKey[] = new Array(1000).fill(0).map((
     _,
     i,
   ) => ["a", i]);
-  const invalidMutateKeys: Deno.KvKey[] = new Array(1001).fill(0).map((
+  const invalidMutateKeys: Oden.KvKey[] = new Array(1001).fill(0).map((
     _,
     i,
   ) => ["a", i]);
@@ -1484,7 +1484,7 @@ dbTest("operation size limit", async (db) => {
       key,
       type: "set",
       value: 1,
-    } satisfies Deno.KvMutation)))
+    } satisfies Oden.KvMutation)))
     .commit();
   assert(res4);
 
@@ -1499,7 +1499,7 @@ dbTest("operation size limit", async (db) => {
           key,
           type: "set",
           value: 1,
-        } satisfies Deno.KvMutation)))
+        } satisfies Oden.KvMutation)))
         .commit();
     },
     TypeError,
@@ -1508,7 +1508,7 @@ dbTest("operation size limit", async (db) => {
 });
 
 dbTest("total mutation size limit", async (db) => {
-  const keys: Deno.KvKey[] = new Array(1000).fill(0).map((
+  const keys: Oden.KvKey[] = new Array(1000).fill(0).map((
     _,
     i,
   ) => ["a", i]);
@@ -1537,7 +1537,7 @@ dbTest("total mutation size limit", async (db) => {
 
 dbTest("total key size limit", async (db) => {
   const longString = new Array(1100).fill("a").join("");
-  const keys: Deno.KvKey[] = new Array(80).fill(0).map(() => [longString]);
+  const keys: Oden.KvKey[] = new Array(80).fill(0).map(() => [longString]);
 
   const atomic = db.atomic();
   for (const key of keys) {
@@ -1579,7 +1579,7 @@ dbTest("keys must be arrays", async (db) => {
     async () =>
       await db.atomic()
         // @ts-expect-error invalid type
-        .mutate({ key: "a", type: "set", value: 1 } satisfies Deno.KvMutation)
+        .mutate({ key: "a", type: "set", value: 1 } satisfies Oden.KvMutation)
         .commit(),
     TypeError,
   );
@@ -1595,53 +1595,53 @@ dbTest("keys must be arrays", async (db) => {
   );
 });
 
-Deno.test("Deno.Kv constructor throws", () => {
+Oden.test("Oden.Kv constructor throws", () => {
   assertThrows(() => {
-    new Deno.Kv();
+    new Oden.Kv();
   });
 });
 
 // This function is never called, it is just used to check that all the types
 // are behaving as expected.
 async function _typeCheckingTests() {
-  const kv = new Deno.Kv();
+  const kv = new Oden.Kv();
 
   const a = await kv.get(["a"]);
-  assertType<IsExact<typeof a, Deno.KvEntryMaybe<unknown>>>(true);
+  assertType<IsExact<typeof a, Oden.KvEntryMaybe<unknown>>>(true);
 
   const b = await kv.get<string>(["b"]);
-  assertType<IsExact<typeof b, Deno.KvEntryMaybe<string>>>(true);
+  assertType<IsExact<typeof b, Oden.KvEntryMaybe<string>>>(true);
 
   const c = await kv.getMany([["a"], ["b"]]);
   assertType<
-    IsExact<typeof c, [Deno.KvEntryMaybe<unknown>, Deno.KvEntryMaybe<unknown>]>
+    IsExact<typeof c, [Oden.KvEntryMaybe<unknown>, Oden.KvEntryMaybe<unknown>]>
   >(true);
 
   const d = await kv.getMany([["a"], ["b"]] as const);
   assertType<
-    IsExact<typeof d, [Deno.KvEntryMaybe<unknown>, Deno.KvEntryMaybe<unknown>]>
+    IsExact<typeof d, [Oden.KvEntryMaybe<unknown>, Oden.KvEntryMaybe<unknown>]>
   >(true);
 
   const e = await kv.getMany<[string, number]>([["a"], ["b"]]);
   assertType<
-    IsExact<typeof e, [Deno.KvEntryMaybe<string>, Deno.KvEntryMaybe<number>]>
+    IsExact<typeof e, [Oden.KvEntryMaybe<string>, Oden.KvEntryMaybe<number>]>
   >(true);
 
-  const keys: Deno.KvKey[] = [["a"], ["b"]];
+  const keys: Oden.KvKey[] = [["a"], ["b"]];
   const f = await kv.getMany(keys);
-  assertType<IsExact<typeof f, Deno.KvEntryMaybe<unknown>[]>>(true);
+  assertType<IsExact<typeof f, Oden.KvEntryMaybe<unknown>[]>>(true);
 
   const g = kv.list({ prefix: ["a"] });
-  assertType<IsExact<typeof g, Deno.KvListIterator<unknown>>>(true);
+  assertType<IsExact<typeof g, Oden.KvListIterator<unknown>>>(true);
   const h = await g.next();
   assert(!h.done);
-  assertType<IsExact<typeof h.value, Deno.KvEntry<unknown>>>(true);
+  assertType<IsExact<typeof h.value, Oden.KvEntry<unknown>>>(true);
 
   const i = kv.list<string>({ prefix: ["a"] });
-  assertType<IsExact<typeof i, Deno.KvListIterator<string>>>(true);
+  assertType<IsExact<typeof i, Oden.KvListIterator<string>>>(true);
   const j = await i.next();
   assert(!j.done);
-  assertType<IsExact<typeof j.value, Deno.KvEntry<string>>>(true);
+  assertType<IsExact<typeof j.value, Oden.KvEntry<string>>>(true);
 }
 
 queueTest("basic listenQueue and enqueue", async (db) => {
@@ -1971,14 +1971,14 @@ queueTest("enqueue with atomic nonce", async (db) => {
   }
 });
 
-Deno.test({
+Oden.test({
   name: "queue persistence with inflight messages",
   sanitizeOps: false,
   sanitizeResources: false,
   async fn() {
-    const filename = await Deno.makeTempFile({ prefix: "queue_db" });
+    const filename = await Oden.makeTempFile({ prefix: "queue_db" });
     try {
-      let db: Deno.Kv = await Deno.openKv(filename);
+      let db: Oden.Kv = await Oden.openKv(filename);
 
       let count = 0;
       let deferred = Promise.withResolvers<void>();
@@ -2009,7 +2009,7 @@ Deno.test({
       await sleep(6000);
 
       // Now reopen the database.
-      db = await Deno.openKv(filename);
+      db = await Oden.openKv(filename);
 
       count = 0;
       deferred = Promise.withResolvers<void>();
@@ -2029,7 +2029,7 @@ Deno.test({
       await listener;
     } finally {
       try {
-        await Deno.remove(filename);
+        await Oden.remove(filename);
       } catch {
         // pass
       }
@@ -2037,17 +2037,17 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "queue persistence with delay messages",
   async fn() {
-    const filename = await Deno.makeTempFile({ prefix: "queue_db" });
+    const filename = await Oden.makeTempFile({ prefix: "queue_db" });
     try {
-      await Deno.remove(filename);
+      await Oden.remove(filename);
     } catch {
       // pass
     }
     try {
-      let db: Deno.Kv = await Deno.openKv(filename);
+      let db: Oden.Kv = await Oden.openKv(filename);
 
       let count = 0;
       let deferred = Promise.withResolvers<void>();
@@ -2065,7 +2065,7 @@ Deno.test({
       await listener;
 
       // Now reopen the database.
-      db = await Deno.openKv(filename);
+      db = await Oden.openKv(filename);
 
       count = 0;
       deferred = Promise.withResolvers<void>();
@@ -2085,7 +2085,7 @@ Deno.test({
       await listener;
     } finally {
       try {
-        await Deno.remove(filename);
+        await Oden.remove(filename);
       } catch {
         // pass
       }
@@ -2093,13 +2093,13 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "different kv instances for enqueue and queueListen",
   async fn() {
-    const filename = await Deno.makeTempFile({ prefix: "queue_db" });
+    const filename = await Oden.makeTempFile({ prefix: "queue_db" });
     try {
-      const db0 = await Deno.openKv(filename);
-      const db1 = await Deno.openKv(filename);
+      const db0 = await Oden.openKv(filename);
+      const db1 = await Oden.openKv(filename);
       const { promise, resolve } = Promise.withResolvers<void>();
       let dequeuedMessage: unknown = null;
       const listener = db0.listenQueue((msg) => {
@@ -2119,7 +2119,7 @@ Deno.test({
       }
     } finally {
       try {
-        await Deno.remove(filename);
+        await Oden.remove(filename);
       } catch {
         // pass
       }
@@ -2127,10 +2127,10 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "queue graceful close",
   async fn() {
-    const db: Deno.Kv = await Deno.openKv(":memory:");
+    const db: Oden.Kv = await Oden.openKv(":memory:");
     const listener = db.listenQueue((_msg) => {});
     db.close();
     await listener;
@@ -2155,41 +2155,41 @@ dbTest("Invalid backoffSchedule", async (db) => {
 });
 
 dbTest("atomic operation is exposed", (db) => {
-  assert(Deno.AtomicOperation);
+  assert(Oden.AtomicOperation);
   const ao = db.atomic();
-  assert(ao instanceof Deno.AtomicOperation);
+  assert(ao instanceof Oden.AtomicOperation);
 });
 
-Deno.test({
+Oden.test({
   name: "racy open",
   async fn() {
     for (let i = 0; i < 100; i++) {
-      const filename = await Deno.makeTempFile({ prefix: "racy_open_db" });
+      const filename = await Oden.makeTempFile({ prefix: "racy_open_db" });
       try {
         const [db1, db2, db3] = await Promise.all([
-          Deno.openKv(filename),
-          Deno.openKv(filename),
-          Deno.openKv(filename),
+          Oden.openKv(filename),
+          Oden.openKv(filename),
+          Oden.openKv(filename),
         ]);
         db1.close();
         db2.close();
         db3.close();
       } finally {
-        await Deno.remove(filename);
+        await Oden.remove(filename);
       }
     }
   },
 });
 
-Deno.test({
+Oden.test({
   name: "racy write",
   async fn() {
-    const filename = await Deno.makeTempFile({ prefix: "racy_write_db" });
+    const filename = await Oden.makeTempFile({ prefix: "racy_write_db" });
     const concurrency = 20;
     const iterations = 5;
     try {
       const dbs = await Promise.all(
-        Array(concurrency).fill(0).map(() => Deno.openKv(filename)),
+        Array(concurrency).fill(0).map(() => Oden.openKv(filename)),
       );
       try {
         for (let i = 0; i < iterations; i++) {
@@ -2198,31 +2198,31 @@ Deno.test({
           );
         }
         assertEquals(
-          ((await dbs[0].get(["counter"])).value as Deno.KvU64).value,
+          ((await dbs[0].get(["counter"])).value as Oden.KvU64).value,
           BigInt(concurrency * iterations),
         );
       } finally {
         dbs.forEach((db) => db.close());
       }
     } finally {
-      await Deno.remove(filename);
+      await Oden.remove(filename);
     }
   },
 });
 
-Deno.test({
+Oden.test({
   name: "kv expiration",
   async fn() {
-    const filename = await Deno.makeTempFile({ prefix: "kv_expiration_db" });
+    const filename = await Oden.makeTempFile({ prefix: "kv_expiration_db" });
     try {
-      await Deno.remove(filename);
+      await Oden.remove(filename);
     } catch {
       // pass
     }
-    let db: Deno.Kv | null = null;
+    let db: Oden.Kv | null = null;
 
     try {
-      db = await Deno.openKv(filename);
+      db = await Oden.openKv(filename);
 
       await db.set(["a"], 1, { expireIn: 1000 });
       await db.set(["b"], 2, { expireIn: 1000 });
@@ -2238,7 +2238,7 @@ Deno.test({
       // Re-open to trigger immediate cleanup
       db.close();
       db = null;
-      db = await Deno.openKv(filename);
+      db = await Oden.openKv(filename);
 
       let ok = false;
       for (let i = 0; i < 50; i++) {
@@ -2265,7 +2265,7 @@ Deno.test({
         }
       }
       try {
-        await Deno.remove(filename);
+        await Oden.remove(filename);
       } catch {
         // pass
       }
@@ -2273,19 +2273,19 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "kv expiration with atomic",
   async fn() {
-    const filename = await Deno.makeTempFile({ prefix: "kv_expiration_db" });
+    const filename = await Oden.makeTempFile({ prefix: "kv_expiration_db" });
     try {
-      await Deno.remove(filename);
+      await Oden.remove(filename);
     } catch {
       // pass
     }
-    let db: Deno.Kv | null = null;
+    let db: Oden.Kv | null = null;
 
     try {
-      db = await Deno.openKv(filename);
+      db = await Oden.openKv(filename);
 
       await db.atomic().set(["a"], 1, { expireIn: 1000 }).set(["b"], 2, {
         expireIn: 1000,
@@ -2301,7 +2301,7 @@ Deno.test({
       // Re-open to trigger immediate cleanup
       db.close();
       db = null;
-      db = await Deno.openKv(filename);
+      db = await Oden.openKv(filename);
 
       let ok = false;
       for (let i = 0; i < 50; i++) {
@@ -2328,7 +2328,7 @@ Deno.test({
         }
       }
       try {
-        await Deno.remove(filename);
+        await Oden.remove(filename);
       } catch {
         // pass
       }
@@ -2336,10 +2336,10 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "remote backend",
   async fn() {
-    const db = await Deno.openKv("http://localhost:4545/kv_remote_authorize");
+    const db = await Oden.openKv("http://localhost:4545/kv_remote_authorize");
     try {
       await db.set(["some-key"], 1);
       const entry = await db.get(["some-key"]);
@@ -2351,7 +2351,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "remote backend invalid format",
   async fn() {
     // The connection is validated when it is opened, so an endpoint that does
@@ -2360,22 +2360,22 @@ Deno.test({
     // See https://github.com/denoland/deno/issues/22248.
     await assertRejects(
       async () => {
-        await Deno.openKv(
+        await Oden.openKv(
           "http://localhost:4545/kv_remote_authorize_invalid_format",
         );
       },
       Error,
-      "Could not open Deno KV database",
+      "Could not open Oden KV database",
     );
   },
 });
 
-Deno.test({
+Oden.test({
   name: "remote backend invalid version",
   async fn() {
     await assertRejects(
       async () => {
-        await Deno.openKv(
+        await Oden.openKv(
           "http://localhost:4545/kv_remote_authorize_invalid_version",
         );
       },
@@ -2385,7 +2385,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "remote backend invalid url",
   async fn() {
     // A URL that does not point at a KV Connect endpoint at all (here a 404)
@@ -2394,7 +2394,7 @@ Deno.test({
     // failure mode.
     await assertRejects(
       async () => {
-        await Deno.openKv("http://localhost:4545/not_a_kv_endpoint");
+        await Oden.openKv("http://localhost:4545/not_a_kv_endpoint");
       },
       Error,
       "responded with status 404",
@@ -2402,14 +2402,14 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "remote backend unreachable",
   async fn() {
     // A host that refuses the connection should fail fast at open time via the
     // network-error branch, rather than hanging or erroring on first use.
     await assertRejects(
       async () => {
-        await Deno.openKv("http://localhost:1");
+        await Oden.openKv("http://localhost:1");
       },
       Error,
       "failed to connect to",
@@ -2417,36 +2417,36 @@ Deno.test({
   },
 });
 
-Deno.test(
+Oden.test(
   { permissions: { read: true } },
   async function kvExplicitResourceManagement() {
-    let kv2: Deno.Kv;
+    let kv2: Oden.Kv;
 
     {
-      using kv = await Deno.openKv(":memory:");
+      using kv = await Oden.openKv(":memory:");
       kv2 = kv;
 
       const res = await kv.get(["a"]);
       assertEquals(res.versionstamp, null);
     }
 
-    await assertRejects(() => kv2.get(["a"]), Deno.errors.BadResource);
+    await assertRejects(() => kv2.get(["a"]), Oden.errors.BadResource);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true } },
   async function kvExplicitResourceManagementManualClose() {
-    using kv = await Deno.openKv(":memory:");
+    using kv = await Oden.openKv(":memory:");
     kv.close();
-    await assertRejects(() => kv.get(["a"]), Deno.errors.BadResource);
+    await assertRejects(() => kv.get(["a"]), Oden.errors.BadResource);
     // calling [Symbol.dispose] after manual close is a no-op
   },
 );
 
 dbTest("key watch", async (db) => {
-  const changeHistory: Deno.KvEntryMaybe<number>[] = [];
-  const watcher: ReadableStream<Deno.KvEntryMaybe<number>[]> = db.watch<
+  const changeHistory: Oden.KvEntryMaybe<number>[] = [];
+  const watcher: ReadableStream<Oden.KvEntryMaybe<number>[]> = db.watch<
     number[]
   >([["key"]]);
 
@@ -2520,10 +2520,10 @@ dbTest("set with key versionstamp suffix", async (db) => {
   );
 });
 
-Deno.test({
+Oden.test({
   name: "watch should stop when db closed",
   async fn() {
-    const db = await Deno.openKv(":memory:");
+    const db = await Oden.openKv(":memory:");
 
     const watch = db.watch([["a"]]);
     const completion = (async () => {
@@ -2543,7 +2543,7 @@ Deno.test({
 // AtomicOperation custom inspect tests
 dbTest("AtomicOperation custom inspect - empty operation", (db) => {
   const atomic = db.atomic();
-  const inspected = Deno.inspect(atomic);
+  const inspected = Oden.inspect(atomic);
   assertEquals(inspected, "AtomicOperation (empty)");
 });
 
@@ -2552,7 +2552,7 @@ dbTest("AtomicOperation custom inspect - with check operations", (db) => {
     .check({ key: ["users", "alice"], versionstamp: "version123" })
     .check({ key: ["posts", 42], versionstamp: null });
 
-  const inspected = Deno.inspect(atomic);
+  const inspected = Oden.inspect(atomic);
   assert(inspected.includes("AtomicOperation"));
   assert(
     inspected.includes(
@@ -2571,7 +2571,7 @@ dbTest("AtomicOperation custom inspect - with mutations", (db) => {
     .delete(["old", "record"])
     .sum(["counters", "visits"], 5n);
 
-  const inspected = Deno.inspect(atomic);
+  const inspected = Oden.inspect(atomic);
   assert(inspected.includes("AtomicOperation"));
   assert(
     inspected.includes('set([ "users", "bob" ], { name: "Bob", age: 30 })'),
@@ -2582,7 +2582,7 @@ dbTest("AtomicOperation custom inspect - with mutations", (db) => {
     ),
   );
   assert(inspected.includes('delete([ "old", "record" ])'));
-  assert(inspected.includes('sum([ "counters", "visits" ], [Deno.KvU64: 5n])'));
+  assert(inspected.includes('sum([ "counters", "visits" ], [Oden.KvU64: 5n])'));
 });
 
 dbTest("AtomicOperation custom inspect - with enqueue operations", (db) => {
@@ -2602,7 +2602,7 @@ dbTest("AtomicOperation custom inspect - with enqueue operations", (db) => {
       },
     );
 
-  const inspected = Deno.inspect(atomic);
+  const inspected = Oden.inspect(atomic);
   assert(inspected.includes("AtomicOperation"));
   assert(
     inspected.includes('enqueue({ type: "email", to: "user@example.com" })'),
@@ -2626,7 +2626,7 @@ dbTest("AtomicOperation custom inspect - complex operation", (db) => {
     .delete(["cache", "user_alice"])
     .enqueue({ type: "user_updated", userId: "alice" });
 
-  const inspected = Deno.inspect(atomic);
+  const inspected = Oden.inspect(atomic);
 
   // Verify the output contains all expected operations
   assert(inspected.includes("AtomicOperation"));
@@ -2648,7 +2648,7 @@ dbTest("AtomicOperation custom inspect - complex operation", (db) => {
     ),
   );
   assert(
-    inspected.includes('sum([ "stats", "user_updates" ], [Deno.KvU64: 1n])'),
+    inspected.includes('sum([ "stats", "user_updates" ], [Oden.KvU64: 1n])'),
   );
   assert(inspected.includes('delete([ "cache", "user_alice" ])'));
   assert(
@@ -2674,7 +2674,7 @@ dbTest("AtomicOperation custom inspect - handles special values", (db) => {
     .set(["undefined"], undefined)
     .set(["bigint"], 9007199254740991n);
 
-  const inspected = Deno.inspect(atomic);
+  const inspected = Oden.inspect(atomic);
   assert(inspected.includes("AtomicOperation"));
   assert(inspected.includes('set([ "bytes" ], Uint8Array(4) [ 1, 2, 3, 4 ])'));
   assert(inspected.includes('set([ "null" ], null)'));

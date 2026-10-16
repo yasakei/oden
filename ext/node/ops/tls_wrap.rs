@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![allow(
   clippy::undocumented_unsafe_blocks,
@@ -34,25 +34,25 @@ use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
 use std::sync::atomic::Ordering;
 
-use deno_core::CppgcInherits;
-use deno_core::GarbageCollected;
-use deno_core::OpState;
-use deno_core::ToJsBuffer;
-use deno_core::V8TaskSpawner;
-use deno_core::op2;
-use deno_core::uv_compat;
-use deno_core::uv_compat::UV_EBADF;
-use deno_core::uv_compat::UV_ECANCELED;
-use deno_core::uv_compat::UV_EOF;
-use deno_core::uv_compat::uv_buf_t;
-use deno_core::uv_compat::uv_stream_t;
-use deno_core::uv_compat::uv_write_t;
-use deno_core::v8;
-use deno_core::v8_static_strings;
-use deno_node_crypto::x509::Certificate;
-use deno_node_crypto::x509::CertificateObject;
-use deno_tls::rustls;
-use deno_tls::rustls_pemfile;
+use oden_core::CppgcInherits;
+use oden_core::GarbageCollected;
+use oden_core::OpState;
+use oden_core::ToJsBuffer;
+use oden_core::V8TaskSpawner;
+use oden_core::op2;
+use oden_core::uv_compat;
+use oden_core::uv_compat::UV_EBADF;
+use oden_core::uv_compat::UV_ECANCELED;
+use oden_core::uv_compat::UV_EOF;
+use oden_core::uv_compat::uv_buf_t;
+use oden_core::uv_compat::uv_stream_t;
+use oden_core::uv_compat::uv_write_t;
+use oden_core::v8;
+use oden_core::v8_static_strings;
+use oden_node_crypto::x509::Certificate;
+use oden_node_crypto::x509::CertificateObject;
+use oden_tls::rustls;
+use oden_tls::rustls_pemfile;
 
 use crate::ops::handle_wrap::AsyncWrap;
 use crate::ops::handle_wrap::HandleWrap;
@@ -3005,8 +3005,8 @@ impl TLSWrap {
     // export_keying_material produces the same value on both sides for
     // the same label, so we use the local role's label here.
     let label = match inner.kind {
-      Kind::Client => b"EXPORTER_DENO_TLS_FINISHED_CLIENT" as &[u8],
-      Kind::Server => b"EXPORTER_DENO_TLS_FINISHED_SERVER" as &[u8],
+      Kind::Client => b"EXPORTER_ODEN_TLS_FINISHED_CLIENT" as &[u8],
+      Kind::Server => b"EXPORTER_ODEN_TLS_FINISHED_SERVER" as &[u8],
     };
     conn.export_keying_material(&mut output, label, None).ok()?;
     Some(output.into_boxed_slice())
@@ -3022,8 +3022,8 @@ impl TLSWrap {
     let mut output = vec![0u8; 32];
     // Use the peer's role label so the values match across sides.
     let label = match inner.kind {
-      Kind::Client => b"EXPORTER_DENO_TLS_FINISHED_SERVER" as &[u8],
-      Kind::Server => b"EXPORTER_DENO_TLS_FINISHED_CLIENT" as &[u8],
+      Kind::Client => b"EXPORTER_ODEN_TLS_FINISHED_SERVER" as &[u8],
+      Kind::Server => b"EXPORTER_ODEN_TLS_FINISHED_CLIENT" as &[u8],
     };
     conn.export_keying_material(&mut output, label, None).ok()?;
     Some(output.into_boxed_slice())
@@ -3192,7 +3192,7 @@ impl TLSWrap {
     // We borrow op_state in a limited scope so it is released before
     // any reentrant V8 calls (cycle / do_emit_error) which may trigger
     // prepare_stack_trace_callback, which also borrows op_state.
-    let op_state_rc = deno_core::JsRuntime::op_state_from(scope);
+    let op_state_rc = oden_core::JsRuntime::op_state_from(scope);
     let (mut server_config, client_cert_verify_error) = {
       let mut op_state = op_state_rc.borrow_mut();
       match build_server_config(scope, context, &mut op_state) {
@@ -3409,7 +3409,7 @@ impl TLSWrap {
           &ctx,
           onread.as_ref(),
           state.as_ref(),
-          deno_core::uv_compat::UV_EOF as isize,
+          oden_core::uv_compat::UV_EOF as isize,
           None,
         );
       }
@@ -4898,9 +4898,9 @@ fn build_client_config(
   op_state: &mut OpState,
   allow_resumption: Arc<AtomicBool>,
 ) -> Option<(rustls::ClientConfig, VerifyErrorStore)> {
-  use deno_net::DefaultTlsOptions;
-  use deno_tls::TlsKeys;
-  use deno_tls::TlsKeysHolder;
+  use oden_net::DefaultTlsOptions;
+  use oden_tls::TlsKeys;
+  use oden_tls::TlsKeysHolder;
 
   let reject_unauthorized =
     get_js_bool(scope, context, "rejectUnauthorized", true);
@@ -4977,7 +4977,7 @@ fn build_client_config(
         .flatten();
 
     if let Some(private_key) = private_key {
-      TlsKeysHolder::from(TlsKeys::Static(deno_tls::TlsKey(certs, private_key)))
+      TlsKeysHolder::from(TlsKeys::Static(oden_tls::TlsKey(certs, private_key)))
     } else {
       TlsKeysHolder::from(TlsKeys::Null)
     }
@@ -4985,11 +4985,11 @@ fn build_client_config(
     TlsKeysHolder::from(TlsKeys::Null)
   };
 
-  // Fall back to the default Mozilla root cert store (same as deno_tls's
+  // Fall back to the default Mozilla root cert store (same as oden_tls's
   // own `create_client_config`).  The old `RootCertStore::empty()` caused
   // every TLS connection without explicit CA options to fail verification.
   let mut root_cert_store =
-    root_cert_store.unwrap_or_else(deno_tls::create_default_root_cert_store);
+    root_cert_store.unwrap_or_else(oden_tls::create_default_root_cert_store);
   let empty_explicit_ca = !use_default_ca && ca_certs.is_empty();
 
   // Collect raw DER bytes of root certs so NodeServerCertVerifier can
@@ -5041,7 +5041,7 @@ fn build_client_config(
       .with_root_certificates(root_cert_store.clone());
 
   let mut config = match maybe_cert_chain_and_key {
-    TlsKeys::Static(deno_tls::TlsKey(cert_chain, private_key)) => {
+    TlsKeys::Static(oden_tls::TlsKey(cert_chain, private_key)) => {
       // `with_client_auth_cert` internally calls `CertifiedKey::keys_match()`
       // which parses the end-entity cert via webpki and rejects X.509v1 certs
       // with `UnsupportedCertVersion`.  Node uses OpenSSL, which accepts v1
@@ -5145,7 +5145,7 @@ fn build_client_config(
   } else {
     let store: VerifyErrorStore = Default::default();
     let verifier_root_store = if empty_explicit_ca {
-      deno_tls::create_default_root_cert_store()
+      oden_tls::create_default_root_cert_store()
     } else {
       root_cert_store.clone()
     };

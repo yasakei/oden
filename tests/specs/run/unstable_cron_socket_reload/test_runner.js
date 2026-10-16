@@ -1,12 +1,12 @@
 import { join } from "@std/path";
 
 const testDir = new URL(".", import.meta.url).pathname;
-const tempDir = Deno.makeTempDirSync();
+const tempDir = Oden.makeTempDirSync();
 const cronSocketPath = join(tempDir, "cron.sock");
 const controlSocketPath = join(tempDir, "control.sock");
 
-// 1. Spawn main.js with NO DENO_UNSTABLE_CRON_SOCK initially
-const mainProcess = new Deno.Command(Deno.execPath(), {
+// 1. Spawn main.js with NO ODEN_UNSTABLE_CRON_SOCK initially
+const mainProcess = new Oden.Command(Oden.execPath(), {
   args: [
     "run",
     "--quiet",
@@ -15,19 +15,19 @@ const mainProcess = new Deno.Command(Deno.execPath(), {
     join(testDir, "main.js"),
   ],
   env: {
-    // NO DENO_UNSTABLE_CRON_SOCK here!
-    DENO_UNSTABLE_CONTROL_SOCK: `unix:${controlSocketPath}`,
+    // NO ODEN_UNSTABLE_CRON_SOCK here!
+    ODEN_UNSTABLE_CONTROL_SOCK: `unix:${controlSocketPath}`,
   },
   stderr: "inherit",
 }).spawn();
 console.error("[TEST] Main process spawned");
 
-// Give Deno a moment to start and create its control socket
+// Give Oden a moment to start and create its control socket
 await new Promise((resolve) => setTimeout(resolve, 500));
 
 // 2. Connect to control socket
 console.error("[TEST] Connecting to control socket");
-const controlConn = await Deno.connect({
+const controlConn = await Oden.connect({
   transport: "unix",
   path: controlSocketPath,
 });
@@ -36,14 +36,14 @@ console.error("[TEST] Connected to control socket");
 const controlWriter = controlConn.writable.getWriter();
 
 // 3. Start cron socket listener NOW (right before sending Start message)
-const cronListener = Deno.listen({ transport: "unix", path: cronSocketPath });
+const cronListener = Oden.listen({ transport: "unix", path: cronSocketPath });
 console.error("[TEST] Cron listener started");
 
-// 4. Send Start command WITH DENO_UNSTABLE_CRON_SOCK in env
+// 4. Send Start command WITH ODEN_UNSTABLE_CRON_SOCK in env
 const startCmd = JSON.stringify({
-  cwd: Deno.cwd(),
+  cwd: Oden.cwd(),
   args: ["run", "--unstable-cron", "--allow-net", join(testDir, "main.js")],
-  env: [["DENO_UNSTABLE_CRON_SOCK", `unix:${cronSocketPath}`]],
+  env: [["ODEN_UNSTABLE_CRON_SOCK", `unix:${cronSocketPath}`]],
 }) + "\n";
 console.error("[TEST] Sending Start command");
 await controlWriter.write(new TextEncoder().encode(startCmd));
@@ -67,7 +67,7 @@ const timeout = setTimeout(() => {
   controlConn.close();
   cronListener.close();
   mainProcess.kill();
-  Deno.exit(1);
+  Oden.exit(1);
 }, 5000);
 
 while (true) {
@@ -79,7 +79,7 @@ while (true) {
     controlConn.close();
     cronListener.close();
     mainProcess.kill();
-    Deno.exit(1);
+    Oden.exit(1);
   }
 
   buffer += chunk;
@@ -103,7 +103,7 @@ while (true) {
       controlConn.close();
       cronListener.close();
       mainProcess.kill();
-      Deno.exit(0);
+      Oden.exit(0);
     }
   }
 }

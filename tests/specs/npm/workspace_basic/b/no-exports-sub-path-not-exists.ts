@@ -1,2 +1,2 @@
-import * as c from "@denotest/c/non-existent";
+import * as c from "@odentest/c/non-existent";
 console.log(c);

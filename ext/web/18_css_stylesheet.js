@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // JS glue for the native `CSSStyleSheet` / `CSSRule` implementation in
 // css_stylesheet.rs (CSS module scripts, `with { type: "css" }`). The classes
@@ -14,9 +14,9 @@ const {
   SymbolFor,
 } = primordials;
 
-const webidl = core.loadExtScript("ext:deno_webidl/00_webidl.js");
+const webidl = core.loadExtScript("ext:oden_webidl/00_webidl.js");
 const { createFilteredInspectProxy } = core.loadExtScript(
-  "ext:deno_web/01_console.js",
+  "ext:oden_web/01_console.js",
 );
 
 const CSSRulePrototype = CSSRule.prototype;
@@ -25,7 +25,7 @@ const CSSStyleSheetPrototype = CSSStyleSheet.prototype;
 function defineCustomInspect(prototype, keys) {
   ObjectDefineProperty(
     prototype,
-    SymbolFor("Deno.privateCustomInspect"),
+    SymbolFor("Oden.privateCustomInspect"),
     {
       __proto__: null,
       value: function customInspect(inspect, inspectOptions) {

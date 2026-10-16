@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import {
   assert,
@@ -12,28 +12,28 @@ import utilDefault from "node:util";
 import { Buffer } from "node:buffer";
 import process from "node:process";
 
-Deno.test({
+Oden.test({
   name: "[util] format",
   fn() {
     assertEquals(util.format("%o", [10, 11]), "[ 10, 11, [length]: 2 ]");
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[util] inspect.custom",
   fn() {
     assertEquals(util.inspect.custom, Symbol.for("nodejs.util.inspect.custom"));
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[util] inspect",
   fn() {
     assertEquals(stripAnsiCode(util.inspect({ foo: 123 })), "{ foo: 123 }");
     assertEquals(stripAnsiCode(util.inspect("foo")), "'foo'");
     assertEquals(
-      stripAnsiCode(util.inspect("Deno's logo is so cute.")),
-      `"Deno's logo is so cute."`,
+      stripAnsiCode(util.inspect("Oden's logo is so cute.")),
+      `"Oden's logo is so cute."`,
     );
     assertEquals(
       stripAnsiCode(util.inspect([1, 2, 3, 4, 5, 6, 7])),
@@ -45,7 +45,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   // https://github.com/denoland/deno/issues/26355
   name: "[util] inspect on Proxy doesn't invoke traps",
   fn() {
@@ -69,7 +69,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[util] types.isTypedArray",
   fn() {
     assert(util.types.isTypedArray(new Buffer(4)));
@@ -78,7 +78,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[util] types.isNativeError",
   fn() {
     assert(util.types.isNativeError(new Error()));
@@ -87,7 +87,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[util] TextDecoder",
   fn() {
     assert(util.TextDecoder === TextDecoder);
@@ -96,7 +96,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[util] TextEncoder",
   fn() {
     assert(util.TextEncoder === TextEncoder);
@@ -105,7 +105,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[util] toUSVString",
   fn() {
     assertEquals(util.toUSVString("foo"), "foo");
@@ -113,7 +113,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[util] getSystemErrorName()",
   fn() {
     type FnTestInvalidArg = (code?: unknown) => void;
@@ -129,7 +129,7 @@ Deno.test({
 
     assertStrictEquals(util.getSystemErrorName(-424242), undefined);
 
-    switch (Deno.build.os) {
+    switch (Oden.build.os) {
       case "windows":
         assertStrictEquals(util.getSystemErrorName(-4091), "EADDRINUSE");
         break;
@@ -145,7 +145,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[util] getSystemErrorMessage()",
   fn() {
     type FnTestInvalidArg = (code?: unknown) => void;
@@ -161,7 +161,7 @@ Deno.test({
 
     assertStrictEquals(util.getSystemErrorMessage(-424242), undefined);
 
-    switch (Deno.build.os) {
+    switch (Oden.build.os) {
       case "windows":
         assertStrictEquals(
           util.getSystemErrorMessage(-4091),
@@ -184,7 +184,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[util] deprecate() works",
   fn() {
     const fn = util.deprecate(() => {}, "foo");
@@ -192,7 +192,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[util] callbackify() works",
   fn() {
     const fn = util.callbackify(() => Promise.resolve("foo"));
@@ -203,7 +203,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[util] callbackify(undefined) throws",
   fn() {
     assertThrows(
@@ -215,21 +215,21 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[util] parseArgs() with no args works",
   fn() {
     util.parseArgs({});
   },
 });
 
-Deno.test("[util] debuglog() and debug()", () => {
+Oden.test("[util] debuglog() and debug()", () => {
   assert(typeof util.debug === "function");
   assert(typeof util.debuglog === "function");
   assertEquals(util.debuglog, util.debug);
   assertEquals(utilDefault.debuglog, utilDefault.debug);
 });
 
-Deno.test("[util] aborted()", async () => {
+Oden.test("[util] aborted()", async () => {
   const abortController = new AbortController();
   let done = false;
   const promise = util.aborted(
@@ -247,8 +247,8 @@ Deno.test("[util] aborted()", async () => {
   assertEquals(done, true);
 });
 
-Deno.test("[util] aborted() drops pending promise when resource is GCed", async () => {
-  const command = new Deno.Command(Deno.execPath(), {
+Oden.test("[util] aborted() drops pending promise when resource is GCed", async () => {
+  const command = new Oden.Command(Oden.execPath(), {
     args: [
       "run",
       "--quiet",
@@ -262,19 +262,19 @@ Deno.test("[util] aborted() drops pending promise when resource is GCed", async 
   assertEquals(code, 0, new TextDecoder().decode(stderr));
 });
 
-Deno.test("[util] styleText()", () => {
+Oden.test("[util] styleText()", () => {
   const redText = util.styleText("red", "error", { validateStream: false });
   assertEquals(redText, "\x1B[31merror\x1B[39m");
 });
 
-Deno.test("[util] styleText() with array of formats", () => {
+Oden.test("[util] styleText() with array of formats", () => {
   const colored = util.styleText(["red", "green"], "error", {
     validateStream: false,
   });
   assertEquals(colored, "\x1b[31m\x1b[32merror\x1b[39m\x1b[39m");
 });
 
-Deno.test("[util] styleText() respects stream.isTTY", () => {
+Oden.test("[util] styleText() respects stream.isTTY", () => {
   const streamTTY = {
     write() {},
     isTTY: true,
@@ -296,7 +296,7 @@ Deno.test("[util] styleText() respects stream.isTTY", () => {
   assertEquals(greenText, "\x1b[32mNo TTY\x1b[39m");
 });
 
-Deno.test("[util] styleText() falls back to process.stdout when no stream given", () => {
+Oden.test("[util] styleText() falls back to process.stdout when no stream given", () => {
   const orig = process.env.FORCE_COLOR;
   try {
     process.env.FORCE_COLOR = "0";
@@ -316,7 +316,7 @@ Deno.test("[util] styleText() falls back to process.stdout when no stream given"
   }
 });
 
-Deno.test("[util] styleText() validates stream type before format", () => {
+Oden.test("[util] styleText() validates stream type before format", () => {
   // When both the stream and the format are invalid, ERR_INVALID_ARG_TYPE
   // (bad stream) must be thrown before ERR_INVALID_ARG_VALUE (bad format),
   // matching Node's argument-validation order.
@@ -345,7 +345,7 @@ Deno.test("[util] styleText() validates stream type before format", () => {
   );
 });
 
-Deno.test("[util] stripVTControlCharacters() removes OSC 8 hyperlinks", () => {
+Oden.test("[util] stripVTControlCharacters() removes OSC 8 hyperlinks", () => {
   // OSC 8 hyperlink with ESC \ (ST) terminator
   const input =
     "\x1b]8;;http://example.com\x1b\\This is a link\x1b]8;;\x1b\\ hello";
@@ -357,7 +357,7 @@ Deno.test("[util] stripVTControlCharacters() removes OSC 8 hyperlinks", () => {
   assertEquals(util.stripVTControlCharacters(inputBel), "This is a link hello");
 });
 
-Deno.test("[util] queryObjects() counts instances", () => {
+Oden.test("[util] queryObjects() counts instances", () => {
   class UtilQueryObjectsFixture {}
   // util.queryObjects is not declared on the bundled @types/node yet, but the
   // runtime exposes it (mirroring v8.queryObjects).
@@ -375,7 +375,7 @@ Deno.test("[util] queryObjects() counts instances", () => {
   assertEquals(refs.length, 25);
 });
 
-Deno.test("[util] parseEnv()", () => {
+Oden.test("[util] parseEnv()", () => {
   const env =
     "KEY1=VALUE1\nKEY2='VALUE2'\nKEYÄ3=\"VALUE3\"\nKEY4=VALÜE4\nKEY5='VALUE6'INVALID_LINE\nKEY6=A";
   const parsed = util.parseEnv(env);
@@ -389,7 +389,7 @@ Deno.test("[util] parseEnv()", () => {
   });
 });
 
-Deno.test("[util] getSystemErrorMap()", () => {
+Oden.test("[util] getSystemErrorMap()", () => {
   const map = util.getSystemErrorMap();
   assert(map instanceof Map);
   // The map must agree with getSystemErrorName / getSystemErrorMessage on
@@ -399,15 +399,15 @@ Deno.test("[util] getSystemErrorMap()", () => {
     assertStrictEquals(util.getSystemErrorMessage(code), message);
   }
   // Smoke-check a couple of well-known platform-independent codes.
-  const eaddrinuse = Deno.build.os === "windows" ? -4091 : -98;
-  if (Deno.build.os === "darwin") {
+  const eaddrinuse = Oden.build.os === "windows" ? -4091 : -98;
+  if (Oden.build.os === "darwin") {
     assertStrictEquals(map.get(-48)?.[0], "EADDRINUSE");
   } else {
     assertStrictEquals(map.get(eaddrinuse)?.[0], "EADDRINUSE");
   }
 });
 
-Deno.test("[util] transferableAbortController() returns an AbortController", () => {
+Oden.test("[util] transferableAbortController() returns an AbortController", () => {
   const ac = util.transferableAbortController();
   assert(ac instanceof AbortController);
   assert(ac.signal instanceof AbortSignal);
@@ -417,7 +417,7 @@ Deno.test("[util] transferableAbortController() returns an AbortController", () 
   assertEquals(ac.signal.reason, "reason");
 });
 
-Deno.test("[util] transferableAbortSignal() returns the given signal", () => {
+Oden.test("[util] transferableAbortSignal() returns the given signal", () => {
   const ac = new AbortController();
   assertStrictEquals(util.transferableAbortSignal(ac.signal), ac.signal);
   // Also accepts already-aborted signals.
@@ -425,7 +425,7 @@ Deno.test("[util] transferableAbortSignal() returns the given signal", () => {
   assertStrictEquals(util.transferableAbortSignal(aborted), aborted);
 });
 
-Deno.test("[util] transferableAbortSignal() throws on non-AbortSignal", () => {
+Oden.test("[util] transferableAbortSignal() throws on non-AbortSignal", () => {
   // deno-lint-ignore no-explicit-any
   const fn = util.transferableAbortSignal as (signal: any) => unknown;
   assertThrows(() => fn(undefined), TypeError);

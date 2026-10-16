@@ -1,5 +1,5 @@
-#!/usr/bin/env -S deno run -A --quiet --lock=tools/deno.lock.json
-// Copyright 2018-2026 the Deno authors. MIT license.
+#!/usr/bin/env -S oden run -A --quiet --lock=tools/oden.lock.json
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // deno-lint-ignore-file no-console
 
@@ -12,13 +12,13 @@ const currentVersion = semver.parse(getCliVersion())!;
 const nextVersion = getNextVersion(semver.parse(getCliVersion())!);
 
 $.logStep("Creating gist with instructions...");
-const releaseInstructions = buildDenoReleaseInstructionsDoc();
-if (Deno.args.some((a) => a === "--dry-run")) {
+const releaseInstructions = buildOdenReleaseInstructionsDoc();
+if (Oden.args.some((a) => a === "--dry-run")) {
   console.log(releaseInstructions);
 } else {
   const octoKit = createOctoKit();
   const result = await octoKit.request("POST /gists", {
-    description: `Deno CLI v${semver.format(nextVersion)} release checklist`,
+    description: `Oden CLI v${semver.format(nextVersion)} release checklist`,
     public: false,
     files: {
       [`release_${semver.format(nextVersion)}.md`]: {
@@ -38,7 +38,7 @@ if (Deno.args.some((a) => a === "--dry-run")) {
 
 function getNextVersion(originalVersion: semver.SemVer) {
   const prereleaseKind = (["--alpha", "--beta", "--rc"] as const).find((a) =>
-    Deno.args.includes(a)
+    Oden.args.includes(a)
   );
   if (prereleaseKind) {
     const tag = prereleaseKind.slice(2);
@@ -49,11 +49,11 @@ function getNextVersion(originalVersion: semver.SemVer) {
       v = { ...v, prerelease: undefined };
     }
     return semver.increment(v, "prerelease", { prerelease: tag });
-  } else if (Deno.args.some((a) => a === "--patch")) {
+  } else if (Oden.args.some((a) => a === "--patch")) {
     return semver.increment(originalVersion, "patch");
-  } else if (Deno.args.some((a) => a === "--minor")) {
+  } else if (Oden.args.some((a) => a === "--minor")) {
     return semver.increment(originalVersion, "minor");
-  } else if (Deno.args.some((a) => a === "--major")) {
+  } else if (Oden.args.some((a) => a === "--major")) {
     return semver.increment(originalVersion, "major");
   } else {
     throw new Error("Missing argument");
@@ -61,10 +61,10 @@ function getNextVersion(originalVersion: semver.SemVer) {
 }
 
 function isPrerelease() {
-  return Deno.args.some((a) => ["--alpha", "--beta", "--rc"].includes(a));
+  return Oden.args.some((a) => ["--alpha", "--beta", "--rc"].includes(a));
 }
 
-function buildDenoReleaseInstructionsDoc() {
+function buildOdenReleaseInstructionsDoc() {
   function getMinorVersion(version: string) {
     return version.split(".").slice(0, 2).join(".");
   }
@@ -79,7 +79,7 @@ function buildDenoReleaseInstructionsDoc() {
     .replaceAll("$VERSION", semver.format(nextVersion))
     .replaceAll("$MINOR_VERSION", getMinorVersion(semver.format(nextVersion)))
     .replaceAll("$PAST_VERSION", semver.format(currentVersion));
-  return `# Deno CLI ${
+  return `# Oden CLI ${
     semver.format(nextVersion)
   } Release Checklist\n\n${templateText}`;
 }

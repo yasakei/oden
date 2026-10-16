@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 //
 // Shared TLS helpers used by both tls.ts and _tls_wrap.js.
@@ -6,13 +6,13 @@
 
 (function () {
 const { core, primordials } = __bootstrap;
-const { Buffer } = core.loadExtScript("ext:deno_node/internal/buffer.mjs");
-const { codes } = core.loadExtScript("ext:deno_node/internal/errors.ts");
+const { Buffer } = core.loadExtScript("ext:oden_node/internal/buffer.mjs");
+const { codes } = core.loadExtScript("ext:oden_node/internal/errors.ts");
 const {
   isArrayBufferView,
   isTypedArray,
   isUint8Array,
-} = core.loadExtScript("ext:deno_node/internal/util/types.ts");
+} = core.loadExtScript("ext:oden_node/internal/util/types.ts");
 
 const {
   Array,

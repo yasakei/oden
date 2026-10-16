@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Implements env-driven proxy support for node:http and node:https.
 //
@@ -41,11 +41,11 @@ const {
   TypeError,
   decodeURIComponent,
 } = primordials;
-const { Buffer } = core.loadExtScript("ext:deno_node/internal/buffer.mjs");
+const { Buffer } = core.loadExtScript("ext:oden_node/internal/buffer.mjs");
 const {
   ERR_INVALID_ARG_TYPE,
   ERR_PROXY_INVALID_CONFIG,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
 
 // Lowercase keys that we look for, in priority order (lowercase
 // first to match Node's `http_proxy` > `HTTP_PROXY` precedence).
@@ -152,7 +152,7 @@ function parseProxyUrl(raw, kind, mode) {
     username,
     password,
     auth: username
-      // deno-lint-ignore deno-internal/prefer-primordials -- Buffer.from()/.toString(encoding) are not primordials.
+      // deno-lint-ignore oden-internal/prefer-primordials -- Buffer.from()/.toString(encoding) are not primordials.
       ? "Basic " + Buffer.from(`${username}:${password}`).toString("base64")
       : undefined,
   };
@@ -364,7 +364,7 @@ function maybeInitFromEnv() {
   const env = readPrivilegedEnv();
   // CLI flags (parsed at startup) override the env var, but if the flag
   // wasn't set, fall back to NODE_USE_ENV_PROXY.
-  const cliOverride = globalThis[SymbolFor("Deno.internal.useEnvProxy")];
+  const cliOverride = globalThis[SymbolFor("Oden.internal.useEnvProxy")];
   let enabled;
   if (cliOverride === true || cliOverride === false) {
     enabled = cliOverride;

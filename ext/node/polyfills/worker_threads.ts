@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 
 (function () {
@@ -39,9 +39,9 @@ const {
   serializeMessageData,
   setMessagePortId,
   unrefParentPort,
-} = core.loadExtScript("ext:deno_web/13_message_port.js");
-const webidl = core.loadExtScript("ext:deno_webidl/00_webidl.js");
-const { notImplemented } = core.loadExtScript("ext:deno_node/_utils.ts");
+} = core.loadExtScript("ext:oden_web/13_message_port.js");
+const webidl = core.loadExtScript("ext:oden_webidl/00_webidl.js");
+const { notImplemented } = core.loadExtScript("ext:oden_node/_utils.ts");
 const {
   ERR_CLOSED_MESSAGE_PORT,
   ERR_CONSTRUCT_CALL_REQUIRED,
@@ -55,24 +55,24 @@ const {
   ERR_WORKER_MESSAGING_TIMEOUT,
   ERR_WORKER_NOT_RUNNING,
   ERR_WORKER_PATH,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
 const {
   validateArray,
   validateInteger,
   validateObject,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
-const { EventEmitter } = core.loadExtScript("ext:deno_node/_events.mjs");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
+const { EventEmitter } = core.loadExtScript("ext:oden_node/_events.mjs");
 const { channel: createDiagnosticsChannel } = core.loadExtScript(
-  "ext:deno_node/diagnostics_channel.js",
+  "ext:oden_node/diagnostics_channel.js",
 );
 const workerThreadsChannel = createDiagnosticsChannel("worker_threads");
 const lazyStream = core.createLazyLoader("node:stream");
 const {
   BroadcastChannel: WebBroadcastChannel,
   refBroadcastChannel,
-} = core.loadExtScript("ext:deno_web/01_broadcast_channel.js");
+} = core.loadExtScript("ext:oden_web/01_broadcast_channel.js");
 const { untransferableSymbol } = core.loadExtScript(
-  "ext:deno_node/internal_binding/util.ts",
+  "ext:oden_node/internal_binding/util.ts",
 );
 const lazyProcess = core.createLazyLoader("node:process");
 const lazyUrl = core.createLazyLoader("node:url");
@@ -147,7 +147,7 @@ const workerCpuUsageBuffer = new Float64Array(2);
 const debugWorkerThreads = false;
 function debugWT(...args) {
   if (debugWorkerThreads) {
-    // deno-lint-ignore deno-internal/prefer-primordials no-console
+    // deno-lint-ignore oden-internal/prefer-primordials no-console
     console.log(...args);
   }
 }
@@ -221,7 +221,7 @@ const workerDisallowedFlags = new SafeSet([
   "--report-uncaught-exception",
 ]);
 
-// V8 profiling flags Node accepts in worker execArgv. Deno doesn't wire up
+// V8 profiling flags Node accepts in worker execArgv. Oden doesn't wire up
 // the underlying profiling integration, but rejecting them with
 // ERR_WORKER_INVALID_EXEC_ARGV breaks scripts that pass them unconditionally,
 // so accept and ignore.
@@ -425,7 +425,7 @@ class NodeWorker extends EventEmitter {
         );
       }
       // Snapshot the provided env, coercing values to strings like Node.js.
-      // This also handles passing `lazyProcess().default.env` (a Proxy in Deno) by
+      // This also handles passing `lazyProcess().default.env` (a Proxy in Oden) by
       // producing a plain object that can be structured-cloned.
       const envObj = {};
       const keys = ObjectKeys(envOpt);
@@ -437,7 +437,7 @@ class NodeWorker extends EventEmitter {
       // Default: snapshot current lazyProcess().default.env so the worker gets an
       // isolated copy, not a live reference to the OS environment.
       // Wrap in try/catch because accessing lazyProcess().default.env requires
-      // --allow-env permission in Deno. If unavailable, fall back to
+      // --allow-env permission in Oden. If unavailable, fall back to
       // shared OS env (env_ stays undefined).
       try {
         const envObj = {};
@@ -451,7 +451,7 @@ class NodeWorker extends EventEmitter {
       }
     }
     // When envOpt === SHARE_ENV, env_ stays undefined and the worker
-    // will use the default lazyProcess().default.env backed by Deno.env (shared OS env).
+    // will use the default lazyProcess().default.env backed by Oden.env (shared OS env).
 
     // Handle the `argv` option: must be an array or undefined.
     // Values are coerced to strings like Node.js does.
@@ -500,10 +500,10 @@ class NodeWorker extends EventEmitter {
       // `require` is already available from the Node worker bootstrap.
       // See: https://github.com/denoland/deno/issues/26739
       sourceCode = `var __filename = ${
-        // deno-lint-ignore deno-internal/prefer-primordials
+        // deno-lint-ignore oden-internal/prefer-primordials
         JSON.stringify(lazyProcess().default.cwd() + "/[worker eval]")};\n` +
         `var __dirname = ${
-          // deno-lint-ignore deno-internal/prefer-primordials
+          // deno-lint-ignore oden-internal/prefer-primordials
           JSON.stringify(lazyProcess().default.cwd())};\n` +
         `var module = { exports: {} };\n` +
         `var exports = module.exports;\n` +
@@ -513,7 +513,7 @@ class NodeWorker extends EventEmitter {
     } else if (
       !(typeof specifier === "object" && specifier.protocol === "data:")
     ) {
-      // deno-lint-ignore deno-internal/prefer-primordials
+      // deno-lint-ignore oden-internal/prefer-primordials
       specifier = specifier.toString();
       specifier = op_worker_threads_filename(specifier) ?? specifier;
     }
@@ -528,7 +528,7 @@ class NodeWorker extends EventEmitter {
 
     const id = op_create_worker(
       {
-        // deno-lint-ignore deno-internal/prefer-primordials
+        // deno-lint-ignore oden-internal/prefer-primordials
         specifier: specifier.toString(),
         hasSourceCode,
         sourceCode,
@@ -1003,7 +1003,7 @@ internals.__initWorkerThreads = (
     if (moduleSpecifier) {
       globalThis.require = lazyModule().createRequire(
         StringPrototypeStartsWith(moduleSpecifier, "data:")
-          ? `${Deno.cwd()}/[worker eval]`
+          ? `${Oden.cwd()}/[worker eval]`
           : moduleSpecifier,
       );
     }
@@ -1083,7 +1083,7 @@ internals.__initWorkerThreads = (
     });
 
     // Only intercept globalThis.onmessage for Node worker threads
-    // (not plain Deno web workers) to prevent double message delivery
+    // (not plain Oden web workers) to prevent double message delivery
     // when both parentPort.on('message') and self.onmessage are set.
     if (maybeWorkerMetadata) {
       let storedOnmessage: ((ev: Event) => void) | null = null;
@@ -1170,7 +1170,7 @@ internals.__initWorkerThreads = (
         if (metadata.execArgv) {
           lazyProcess().default.execArgv = metadata.execArgv;
           core.loadExtScript(
-            "ext:deno_node/internal_binding/node_options.ts",
+            "ext:oden_node/internal_binding/node_options.ts",
           ).setOptionSourceExecArgv(metadata.execArgv);
           for (let i = 0; i < metadata.execArgv.length; i++) {
             if (metadata.execArgv[i] === "--trace-warnings") {
@@ -1191,11 +1191,11 @@ internals.__initWorkerThreads = (
           const stdinHandler = (ev) => {
             const msg = ev.data;
             if (isWorkerStdinMsg(msg)) {
-              // deno-lint-ignore deno-internal/prefer-primordials
+              // deno-lint-ignore oden-internal/prefer-primordials
               workerStdin.push(msg.data);
               ev.stopImmediatePropagation();
             } else if (isWorkerStdinEndMsg(msg)) {
-              // deno-lint-ignore deno-internal/prefer-primordials
+              // deno-lint-ignore oden-internal/prefer-primordials
               workerStdin.push(null);
               parentPort.removeEventListener("message", stdinHandler);
               ev.stopImmediatePropagation();
@@ -1727,7 +1727,7 @@ function isMarkedAsUntransferable(obj: unknown): boolean {
 function markAsUncloneable(obj: unknown) {
   return webMarkAsUncloneable(obj);
 }
-const lazyVm = () => core.loadExtScript("ext:deno_node/vm.js");
+const lazyVm = () => core.loadExtScript("ext:oden_node/vm.js");
 
 // Move a MessagePort into a vm.Context. The returned object lives in the
 // target context (so its prototype chain is in that realm and it is *not*
@@ -2244,7 +2244,7 @@ class BroadcastChannel extends WebBroadcastChannel {
   }
 }
 
-const { locks } = core.createLazyLoader("ext:deno_web/locks.js")();
+const { locks } = core.createLazyLoader("ext:oden_web/locks.js")();
 
 // Node's `worker_threads.MessagePort` is a function (not a class) that throws
 // `ERR_CONSTRUCT_CALL_INVALID` whether called as `MessagePort()` or
@@ -2286,7 +2286,7 @@ ObjectAssign(exportsObj, {
   threadId: 0,
   workerData: null,
   isMainThread: true,
-  // Deno has no internal Node worker threads (e.g. module loader threads),
+  // Oden has no internal Node worker threads (e.g. module loader threads),
   // so this is always false in the main thread and user-created workers.
   isInternalThread: false,
   // Main-thread default ({}). `__initWorkerThreads` overwrites it (with the

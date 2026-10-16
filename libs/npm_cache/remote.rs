@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use base64::Engine;
 use base64::prelude::BASE64_STANDARD;
-use deno_npmrc::RegistryConfig;
+use oden_npmrc::RegistryConfig;
 
 #[derive(Debug, thiserror::Error, deno_error::JsError)]
 pub enum AuthHeaderForNpmRegistryError {

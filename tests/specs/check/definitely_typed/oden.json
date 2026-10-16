@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "@odentest/index-export-no-types": "npm:@odentest/index-export-no-types@1.0.0",
+    "@types/odentest__index-export-no-types": "npm:@types/odentest__index-export-no-types@1.0.0",
+    "oldtypes": "npm:@types/odentest__index-export-no-types@0.5.0"
+  }
+}

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core, internals, primordials } = __bootstrap;
@@ -34,8 +34,8 @@ const {
   TypedArrayPrototypeGetSymbolToStringTag,
 } = primordials;
 
-const webidl = core.loadExtScript("ext:deno_webidl/00_webidl.js");
-const { byteLowerCase } = core.loadExtScript("ext:deno_web/00_infra.js");
+const webidl = core.loadExtScript("ext:oden_webidl/00_webidl.js");
+const { byteLowerCase } = core.loadExtScript("ext:oden_web/00_infra.js");
 const {
   acquireReadableStreamDefaultReader,
   errorReadableStream,
@@ -47,12 +47,12 @@ const {
   readableStreamForRid,
   ReadableStreamPrototype,
   resourceForReadableStream,
-} = core.loadExtScript("ext:deno_web/06_streams.js");
+} = core.loadExtScript("ext:oden_web/06_streams.js");
 const { extractBody, InnerBody } = core.loadExtScript(
-  "ext:deno_fetch/22_body.js",
+  "ext:oden_fetch/22_body.js",
 );
 const { processUrlList, Request, toInnerRequest } = core.loadExtScript(
-  "ext:deno_fetch/23_request.js",
+  "ext:oden_fetch/23_request.js",
 );
 const {
   abortedNetworkError,
@@ -61,18 +61,18 @@ const {
   nullBodyStatus,
   redirectStatus,
   toInnerResponse,
-} = core.loadExtScript("ext:deno_fetch/23_response.js");
-const abortSignal = core.loadExtScript("ext:deno_web/03_abort_signal.js");
+} = core.loadExtScript("ext:oden_fetch/23_response.js");
+const abortSignal = core.loadExtScript("ext:oden_web/03_abort_signal.js");
 // Make sure both telemetry modules are loaded before destructuring their
-// `internals` slots. 99_main.js / 90_deno_ns.js used to load `telemetry.ts`
+// `internals` slots. 99_main.js / 90_oden_ns.js used to load `telemetry.ts`
 // unconditionally at snapshot time, but now defer it to actual telemetry
 // use. Fetch is the one always-on caller that depends on `__telemetry` and
 // `__telemetryUtil`, so it loads both modules on first use.
 if (!internals.__telemetry) {
-  core.loadExtScript("ext:deno_telemetry/telemetry.ts");
+  core.loadExtScript("ext:oden_telemetry/telemetry.ts");
 }
 if (!internals.__telemetryUtil) {
-  core.loadExtScript("ext:deno_telemetry/util.ts");
+  core.loadExtScript("ext:oden_telemetry/util.ts");
 }
 const {
   builtinTracer,
@@ -997,7 +997,7 @@ function abortFetch(request, responseObject, error) {
 /**
  * Handle the Response argument to the WebAssembly streaming APIs, after
  * resolving if it was passed as a promise. This function should be registered
- * through `Deno.core.setWasmStreamingCallback`.
+ * through `Oden.core.setWasmStreamingCallback`.
  *
  * @param {any} source The source parameter that the WebAssembly streaming API
  * was called with. If it was called with a Promise, `source` is the resolved

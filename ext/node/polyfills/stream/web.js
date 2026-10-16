@@ -1,5 +1,5 @@
 // deno-lint-ignore-file
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core } = __bootstrap;
@@ -17,15 +17,15 @@ const {
   ReadableStreamDefaultReader,
   ByteLengthQueuingStrategy,
   CountQueuingStrategy,
-} = core.loadExtScript("ext:deno_web/06_streams.js");
+} = core.loadExtScript("ext:oden_web/06_streams.js");
 const {
   TextDecoderStream,
   TextEncoderStream,
-} = core.loadExtScript("ext:deno_web/08_text_encoding.js");
+} = core.loadExtScript("ext:oden_web/08_text_encoding.js");
 const {
   CompressionStream,
   DecompressionStream,
-} = core.loadExtScript("ext:deno_web/14_compression.js");
+} = core.loadExtScript("ext:oden_web/14_compression.js");
 
 return {
   ReadableStream,

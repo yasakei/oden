@@ -18,7 +18,7 @@ function walk(
     if (maxLevel > 0 && level > maxLevel) {
       return;
     }
-    const files = Deno.readDirSync(dir).toArray();
+    const files = Oden.readDirSync(dir).toArray();
     files.sort((a, b) => a.name.localeCompare(b.name));
     for (const file of files) {
       if (file.isDirectory) {
@@ -40,15 +40,15 @@ function printDir(dir: string, maxLevel = 0) {
   }, { maxLevel });
 }
 let maxLevel = 0;
-for (let i = 0; i < Deno.args.length; i++) {
-  const arg = Deno.args[i];
+for (let i = 0; i < Oden.args.length; i++) {
+  const arg = Oden.args[i];
   if (arg.startsWith("--max-level=")) {
     maxLevel = parseInt(arg.split("=")[1]) - 1;
     maxLevel = Math.max(0, maxLevel);
   } else {
     console.log(arg);
     printDir(arg, maxLevel);
-    if (i < Deno.args.length - 1) {
+    if (i < Oden.args.length - 1) {
       console.log("");
       maxLevel = 0;
     }

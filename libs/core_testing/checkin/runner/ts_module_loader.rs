@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cell::RefCell;
@@ -11,23 +11,23 @@ use std::rc::Rc;
 use deno_ast::MediaType;
 use deno_ast::ParseParams;
 use deno_ast::SourceMapOption;
-use deno_core::ModuleCodeBytes;
-use deno_core::ModuleCodeString;
-use deno_core::ModuleLoadOptions;
-use deno_core::ModuleLoadReferrer;
-use deno_core::ModuleLoadResponse;
-use deno_core::ModuleLoader;
-use deno_core::ModuleName;
-use deno_core::ModuleSource;
-use deno_core::ModuleSourceCode;
-use deno_core::ModuleSpecifier;
-use deno_core::ModuleType;
-use deno_core::RequestedModuleType;
-use deno_core::ResolutionKind;
-use deno_core::SourceMapData;
-use deno_core::error::ModuleLoaderError;
-use deno_core::resolve_import;
-use deno_core::url::Url;
+use oden_core::ModuleCodeBytes;
+use oden_core::ModuleCodeString;
+use oden_core::ModuleLoadOptions;
+use oden_core::ModuleLoadReferrer;
+use oden_core::ModuleLoadResponse;
+use oden_core::ModuleLoader;
+use oden_core::ModuleName;
+use oden_core::ModuleSource;
+use oden_core::ModuleSourceCode;
+use oden_core::ModuleSpecifier;
+use oden_core::ModuleType;
+use oden_core::RequestedModuleType;
+use oden_core::ResolutionKind;
+use oden_core::SourceMapData;
+use oden_core::error::ModuleLoaderError;
+use oden_core::resolve_import;
+use oden_core::url::Url;
 use deno_error::JsErrorBox;
 
 // TODO(bartlomieju): this is duplicated in `core/examples/ts_modules_loader.rs`.

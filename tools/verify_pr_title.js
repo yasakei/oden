@@ -1,35 +1,35 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // deno-lint-ignore-file no-console
 
-const prTitle = Deno.args[0];
+const prTitle = Oden.args[0];
 
 if (prTitle == null) {
-  Deno.exit(0); // not a PR
+  Oden.exit(0); // not a PR
 }
 
 console.log("PR title:", prTitle);
 
 if (
   prTitle.startsWith("chore:") &&
-  (prTitle.includes("deno_core") || prTitle.includes("v8")) &&
+  (prTitle.includes("oden_core") || prTitle.includes("v8")) &&
   (prTitle.includes("upgrade") || prTitle.includes("update"))
 ) {
   console.error([
-    "Please categorize this deno_core/v8 upgrade as a 'feat:', 'fix:' or a ",
+    "Please categorize this oden_core/v8 upgrade as a 'feat:', 'fix:' or a ",
     "'refactor:'. If your upgrade does not fall into either of these ",
-    "categories, wait until the next deno_core release.\n\n",
+    "categories, wait until the next oden_core release.\n\n",
     "For feats and fixes, please title your PR outlining the fixed issue ",
-    "rather than just `fix: upgrade deno_core` so that users understand the ",
+    "rather than just `fix: upgrade oden_core` so that users understand the ",
     "change that was made in the changelog.",
   ].join(""));
-  Deno.exit(1);
+  Oden.exit(1);
 }
 
 // This is a release PR, so it's valid.
 if (/^[^\s]+\.[^\s]+\.[^\s]+$/.test(prTitle)) {
   console.log("Valid.");
-  Deno.exit(0);
+  Oden.exit(0);
 }
 
 const validPrefixes = [
@@ -66,5 +66,5 @@ if (validPrefixes.some((prefix) => prTitle.startsWith(prefix))) {
   console.error(
     "\nPlease fix the PR title according to https://www.conventionalcommits.org",
   );
-  Deno.exit(1);
+  Oden.exit(1);
 }

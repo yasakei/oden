@@ -1,8 +1,8 @@
 /// <reference no-default-lib="true" />
-/// <reference lib="deno.ns" />
+/// <reference lib="oden.ns" />
 
 // unstable apis removed here, so should error
-Deno.listenDatagram({
+Oden.listenDatagram({
   port: 3000,
   transport: "udp",
 });

@@ -144,16 +144,16 @@ async function testNumericArgs() {
   console.log("numeric args:", result.stdout);
 }
 
-async function testDenoSubcommandPassthrough() {
-  // When first arg is a Deno subcommand, it should pass through unchanged
-  // We can't actually test this easily without spawning deno directly,
+async function testOdenSubcommandPassthrough() {
+  // When first arg is a Oden subcommand, it should pass through unchanged
+  // We can't actually test this easily without spawning oden directly,
   // but we can verify the behavior doesn't break
   const result = await runChild(["-e", "console.log('passthrough-ok')"]);
   console.log("passthrough:", result.stdout);
 }
 
 async function testPermissionPassthrough() {
-  // Regression test for #35441: spawning `deno run <script>` (deno-style args)
+  // Regression test for #35441: spawning `oden run <script>` (oden-style args)
   // without permission flags must still grant the Node-compat child full
   // permissions, instead of dropping to no permissions and prompting/erroring.
   const path = require("path");
@@ -194,8 +194,8 @@ async function main() {
     case "numeric":
       await testNumericArgs();
       break;
-    case "deno_subcommand":
-      await testDenoSubcommandPassthrough();
+    case "oden_subcommand":
+      await testOdenSubcommandPassthrough();
       break;
     case "permission_passthrough":
       await testPermissionPassthrough();

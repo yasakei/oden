@@ -1,5 +1,5 @@
-import { getValue, setValue } from "@denotest/basic";
-import * as test from "@denotest2/basic";
+import { getValue, setValue } from "@odentest/basic";
+import * as test from "@odentest2/basic";
 
 console.log(getValue());
 setValue(42);

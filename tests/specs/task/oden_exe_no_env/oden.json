@@ -1,0 +1,5 @@
+{
+  "tasks": {
+    "oden_echo": "oden eval 'console.log(5)'"
+  }
+}

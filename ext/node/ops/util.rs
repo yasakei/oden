@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::path::Path;
 
-use deno_core::OpState;
-use deno_core::op2;
-use deno_core::v8;
-use deno_dotenv::parse_env_content_hook;
+use oden_core::OpState;
+use oden_core::op2;
+use oden_core::v8;
+use oden_dotenv::parse_env_content_hook;
 use deno_error::JsErrorBox;
 use node_resolver::InNpmPackageChecker;
 use node_resolver::NpmPackageFolderResolver;
@@ -32,7 +32,7 @@ pub fn op_node_guess_handle_type(_state: &mut OpState, fd: u32) -> u32 {
 
 #[cfg(unix)]
 fn guess_handle_type(fd: i32) -> HandleType {
-  use deno_core::uv_compat;
+  use oden_core::uv_compat;
   match uv_compat::uv_guess_handle(fd) {
     uv_compat::uv_handle_type::UV_TCP => HandleType::Tcp,
     uv_compat::uv_handle_type::UV_TTY => HandleType::Tty,

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { primordials } = __bootstrap;
@@ -16,7 +16,7 @@ function hideStackFrames<T extends GenericFunction = GenericFunction>(
   // re-captured at the call site via Error.captureStackTrace. For callers that
   // RETURN an Error rather than throwing, the V8-captured stack still includes
   // the wrapper and the inner function -- so also rename both to
-  // `__node_internal_<name>`, which Deno's stack formatter
+  // `__node_internal_<name>`, which Oden's stack formatter
   // (`runtime/fmt_errors.rs`) elides from user-visible output.
   const hidden = "__node_internal_" + fn.name;
   // deno-lint-ignore no-explicit-any
@@ -24,7 +24,7 @@ function hideStackFrames<T extends GenericFunction = GenericFunction>(
     try {
       return ReflectApply(fn, this, args);
     } catch (error) {
-      // deno-lint-ignore deno-internal/prefer-primordials
+      // deno-lint-ignore oden-internal/prefer-primordials
       if (Error.stackTraceLimit) {
         ErrorCaptureStackTrace(error, wrappedFn);
       }

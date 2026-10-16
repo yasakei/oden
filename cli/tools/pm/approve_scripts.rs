@@ -1,16 +1,16 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashSet;
 use std::fmt::Write as _;
 use std::sync::Arc;
 
 use console_static_text::TextItem;
-use deno_config::deno_json::AllowScriptsConfig;
-use deno_config::deno_json::AllowScriptsValueConfig;
-use deno_core::anyhow;
-use deno_core::anyhow::Context;
-use deno_core::anyhow::bail;
-use deno_core::error::AnyError;
+use oden_config::oden_json::AllowScriptsConfig;
+use oden_config::oden_json::AllowScriptsValueConfig;
+use oden_core::anyhow;
+use oden_core::anyhow::Context;
+use oden_core::anyhow::bail;
+use oden_core::error::AnyError;
 use deno_path_util::url_to_file_path;
 use deno_semver::jsr::JsrDepPackageReq;
 use deno_semver::jsr::JsrDepPackageReqParseError;
@@ -28,7 +28,7 @@ use crate::factory::CliFactory;
 use crate::npm::CliNpmResolver;
 use crate::tools::pm::ConfigKind;
 use crate::tools::pm::ConfigUpdater;
-use crate::tools::pm::create_deno_json;
+use crate::tools::pm::create_oden_json;
 use crate::tools::pm::interactive_picker;
 use crate::util::console::escape_terminal_control_chars;
 
@@ -44,20 +44,20 @@ pub async fn approve_scripts(
 ) -> Result<(), AnyError> {
   let mut factory = CliFactory::from_flags(flags.clone());
   let mut options = factory.cli_options()?;
-  if options.start_dir.member_or_root_deno_json().is_none() {
-    factory = create_deno_json(&flags, options)?;
+  if options.start_dir.member_or_root_oden_json().is_none() {
+    factory = create_oden_json(&flags, options)?;
     options = factory.cli_options()?;
   }
-  let deno_json = options.workspace().root_deno_json().ok_or_else(|| {
-    anyhow::anyhow!("A deno.json file could not be found or created")
+  let oden_json = options.workspace().root_oden_json().ok_or_else(|| {
+    anyhow::anyhow!("A oden.json file could not be found or created")
   })?;
 
-  let deno_json_path = url_to_file_path(&deno_json.specifier)?;
+  let oden_json_path = url_to_file_path(&oden_json.specifier)?;
 
   let mut config_updater =
-    ConfigUpdater::new(ConfigKind::DenoJson, deno_json_path.clone())?;
+    ConfigUpdater::new(ConfigKind::OdenJson, oden_json_path.clone())?;
 
-  let allow_scripts_config = deno_json.to_allow_scripts_config()?;
+  let allow_scripts_config = oden_json.to_allow_scripts_config()?;
 
   let (mut allow_list, mut deny_list) = match allow_scripts_config.allow {
     AllowScriptsValueConfig::All => {
@@ -188,12 +188,12 @@ fn parse_user_packages(
 
 fn find_script_candidates(
   npm_resolver: &CliNpmResolver,
-  system_info: &deno_npm::NpmSystemInfo,
+  system_info: &oden_npm::NpmSystemInfo,
   allow_list: &[JsrDepPackageReq],
   deny_list: &[PackageReq],
 ) -> Result<Vec<ScriptCandidate>, AnyError> {
   let managed_resolver = npm_resolver.as_managed().with_context(|| {
-    "Lifecycle script approval requires an npm resolution. Run `deno install` first to create one."
+    "Lifecycle script approval requires an npm resolution. Run `oden install` first to create one."
   })?;
   let snapshot = managed_resolver.resolution().snapshot();
   let mut candidates = Vec::new();

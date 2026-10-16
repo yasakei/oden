@@ -1,5 +1,5 @@
-#!/usr/bin/env -S deno run --allow-all --config=tests/config/deno.json
-// Copyright 2018-2026 the Deno authors. MIT license.
+#!/usr/bin/env -S oden run --allow-all --config=tests/config/oden.json
+// Copyright 2018-2026 the Oden authors. MIT license.
 import $ from "jsr:@david/dax@^0.42.0";
 import { join } from "./util.js";
 
@@ -15,7 +15,7 @@ async function teardownTestRepo() {
 async function runPackageManager(pm: string, cmd: string) {
   const state = Date.now();
   const result =
-    await $`cd nextjs-demo ; rm -rf node_modules ; ${Deno.execPath()} run -A --no-config npm:${pm} ${cmd}`
+    await $`cd nextjs-demo ; rm -rf node_modules ; ${Oden.execPath()} run -A --no-config npm:${pm} ${cmd}`
       .stdout("inheritPiped").stderr("inheritPiped").noThrow().timeout(
         "120s",
       );
@@ -85,7 +85,7 @@ async function main() {
 
   $.logStep("Final report:");
   $.log(reports);
-  await Deno.writeTextFile(
+  await Oden.writeTextFile(
     join(import.meta.dirname!, "ecosystem_report.json"),
     JSON.stringify(reports),
   );

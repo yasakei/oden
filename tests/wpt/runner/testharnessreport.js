@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 window.add_result_callback(({ message, name, stack, status }) => {
   const data = new TextEncoder().encode(
@@ -6,7 +6,7 @@ window.add_result_callback(({ message, name, stack, status }) => {
   );
   let bytesWritten = 0;
   while (bytesWritten < data.byteLength) {
-    bytesWritten += Deno.stderr.writeSync(data.subarray(bytesWritten));
+    bytesWritten += Oden.stderr.writeSync(data.subarray(bytesWritten));
   }
 });
 
@@ -16,7 +16,7 @@ window.add_completion_callback((_tests, harnessStatus) => {
   );
   let bytesWritten = 0;
   while (bytesWritten < data.byteLength) {
-    bytesWritten += Deno.stderr.writeSync(data.subarray(bytesWritten));
+    bytesWritten += Oden.stderr.writeSync(data.subarray(bytesWritten));
   }
 
   // TODO(cjihrig): Restore the prototype of globalThis to be an EventTarget
@@ -25,5 +25,5 @@ window.add_completion_callback((_tests, harnessStatus) => {
   // line can be removed.
   Object.setPrototypeOf(globalThis, EventTarget.prototype);
 
-  Deno.exit(harnessStatus.status === 0 ? 0 : 1);
+  Oden.exit(harnessStatus.status === 0 ? 0 : 1);
 });

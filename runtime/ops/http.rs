@@ -1,18 +1,18 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::rc::Rc;
 
-use deno_core::OpState;
-use deno_core::ResourceId;
-use deno_core::error::ResourceError;
-use deno_core::op2;
-use deno_http::http_create_conn_resource;
-use deno_net::io::TcpStreamResource;
-use deno_net::ops_tls::TlsStreamResource;
+use oden_core::OpState;
+use oden_core::ResourceId;
+use oden_core::error::ResourceError;
+use oden_core::op2;
+use oden_http::http_create_conn_resource;
+use oden_net::io::TcpStreamResource;
+use oden_net::ops_tls::TlsStreamResource;
 
 pub const UNSTABLE_FEATURE_NAME: &str = "http";
 
-deno_core::extension!(deno_http_runtime, ops = [op_http_start],);
+oden_core::extension!(oden_http_runtime, ops = [op_http_start],);
 
 #[derive(Debug, thiserror::Error, deno_error::JsError)]
 pub enum HttpStartError {
@@ -82,7 +82,7 @@ fn op_http_start(
   #[cfg(unix)]
   if let Ok(resource_rc) = state
     .resource_table
-    .take::<deno_net::io::UnixStreamResource>(tcp_stream_rid)
+    .take::<oden_net::io::UnixStreamResource>(tcp_stream_rid)
   {
     // This UNIX socket might be used somewhere else. If it's the case, we cannot proceed with the
     // process of starting a HTTP server on top of this UNIX socket, so we just return a Busy error.

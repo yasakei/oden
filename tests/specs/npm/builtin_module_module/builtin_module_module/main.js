@@ -1,1 +1,1 @@
-import "npm:@denotest/builtin-module-module";
+import "npm:@odentest/builtin-module-module";

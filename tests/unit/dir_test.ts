@@ -1,52 +1,52 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assert, assertEquals, assertThrows } from "./test_util.ts";
 
-Deno.test({ permissions: { read: true } }, function dirCwdNotNull() {
-  assert(Deno.cwd() != null);
+Oden.test({ permissions: { read: true } }, function dirCwdNotNull() {
+  assert(Oden.cwd() != null);
 });
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function dirCwdChdirSuccess() {
-    const initialdir = Deno.cwd();
-    const path = Deno.makeTempDirSync();
-    Deno.chdir(path);
-    const current = Deno.cwd();
-    if (Deno.build.os === "darwin") {
+    const initialdir = Oden.cwd();
+    const path = Oden.makeTempDirSync();
+    Oden.chdir(path);
+    const current = Oden.cwd();
+    if (Oden.build.os === "darwin") {
       assertEquals(current, "/private" + path);
     } else {
       assertEquals(current, path);
     }
-    Deno.chdir(initialdir);
+    Oden.chdir(initialdir);
   },
 );
 
-Deno.test({ permissions: { read: true, write: true } }, function dirCwdError() {
+Oden.test({ permissions: { read: true, write: true } }, function dirCwdError() {
   // excluding windows since it throws resource busy, while removeSync
-  if (["linux", "darwin"].includes(Deno.build.os)) {
-    const initialdir = Deno.cwd();
-    const path = Deno.makeTempDirSync();
-    Deno.chdir(path);
-    Deno.removeSync(path);
+  if (["linux", "darwin"].includes(Oden.build.os)) {
+    const initialdir = Oden.cwd();
+    const path = Oden.makeTempDirSync();
+    Oden.chdir(path);
+    Oden.removeSync(path);
     try {
       assertThrows(() => {
-        Deno.cwd();
-      }, Deno.errors.NotFound);
+        Oden.cwd();
+      }, Oden.errors.NotFound);
     } finally {
-      Deno.chdir(initialdir);
+      Oden.chdir(initialdir);
     }
   }
 });
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function dirChdirError() {
-    const path = Deno.makeTempDirSync() + "test";
+    const path = Oden.makeTempDirSync() + "test";
     assertThrows(
       () => {
-        Deno.chdir(path);
+        Oden.chdir(path);
       },
-      Deno.errors.NotFound,
+      Oden.errors.NotFound,
       `chdir '${path}'`,
     );
   },

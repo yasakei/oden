@@ -1,14 +1,14 @@
-Deno.test(function foo() {
+Oden.test(function foo() {
 });
 
-Deno.test.beforeAll(() => {});
-Deno.test.beforeEach(() => {});
-Deno.test.afterEach(() => {});
-Deno.test.afterAll(() => {});
-Deno.test.ignore("ignored", () => {});
-Deno.test.only("only", () => {});
-Deno.test.sanitizer({ ops: false });
-Deno.test.each([1, 2])("each %d", () => {});
+Oden.test.beforeAll(() => {});
+Oden.test.beforeEach(() => {});
+Oden.test.afterEach(() => {});
+Oden.test.afterAll(() => {});
+Oden.test.ignore("ignored", () => {});
+Oden.test.only("only", () => {});
+Oden.test.sanitizer({ ops: false });
+Oden.test.each([1, 2])("each %d", () => {});
 
-Deno.bench(function bar() {
+Oden.bench(function bar() {
 });

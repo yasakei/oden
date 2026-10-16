@@ -1,13 +1,13 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process::Command;
 
-use deno_core::anyhow::Context;
-use deno_core::anyhow::bail;
-use deno_core::error::AnyError;
+use oden_core::anyhow::Context;
+use oden_core::anyhow::bail;
+use oden_core::error::AnyError;
 
 fn unzip_with_shell(
   archive_path: &Path,
@@ -73,7 +73,7 @@ fn unzip(
 
 pub struct UnpackArgs<'a> {
   /// The full file name of the file expected to be produced by unpacking the
-  /// archive (e.g. `deno`, `deno.exe`, `libdenort.dylib`).
+  /// archive (e.g. `oden`, `oden.exe`, `libodenrt.dylib`).
   pub exe_name: &'a str,
   pub archive_name: &'a str,
   pub archive_data: &'a [u8],
@@ -139,44 +139,44 @@ mod tests {
   #[test]
   fn unpacks_library_with_extension() {
     let temp_dir = tempfile::TempDir::new().unwrap();
-    let data = make_zip("libdenort.dylib", b"fake dylib");
+    let data = make_zip("libodenrt.dylib", b"fake dylib");
     let path = unpack_into_dir(UnpackArgs {
-      exe_name: "libdenort.dylib",
-      archive_name: "libdenort-aarch64-apple-darwin.zip",
+      exe_name: "libodenrt.dylib",
+      archive_name: "libodenrt-aarch64-apple-darwin.zip",
       archive_data: &data,
       dest_path: temp_dir.path(),
     })
     .unwrap();
-    assert_eq!(path, temp_dir.path().join("libdenort.dylib"));
+    assert_eq!(path, temp_dir.path().join("libodenrt.dylib"));
     assert_eq!(std::fs::read(&path).unwrap(), b"fake dylib");
   }
 
   #[test]
   fn unpacks_executable_without_extension() {
     let temp_dir = tempfile::TempDir::new().unwrap();
-    let data = make_zip("deno", b"fake exe");
+    let data = make_zip("oden", b"fake exe");
     let path = unpack_into_dir(UnpackArgs {
-      exe_name: "deno",
-      archive_name: "deno-aarch64-apple-darwin.zip",
+      exe_name: "oden",
+      archive_name: "oden-aarch64-apple-darwin.zip",
       archive_data: &data,
       dest_path: temp_dir.path(),
     })
     .unwrap();
-    assert_eq!(path, temp_dir.path().join("deno"));
+    assert_eq!(path, temp_dir.path().join("oden"));
     assert_eq!(std::fs::read(&path).unwrap(), b"fake exe");
   }
 
   #[test]
   fn unpacks_executable_with_exe_extension() {
     let temp_dir = tempfile::TempDir::new().unwrap();
-    let data = make_zip("deno.exe", b"fake exe");
+    let data = make_zip("oden.exe", b"fake exe");
     let path = unpack_into_dir(UnpackArgs {
-      exe_name: "deno.exe",
-      archive_name: "deno-x86_64-pc-windows-msvc.zip",
+      exe_name: "oden.exe",
+      archive_name: "oden-x86_64-pc-windows-msvc.zip",
       archive_data: &data,
       dest_path: temp_dir.path(),
     })
     .unwrap();
-    assert_eq!(path, temp_dir.path().join("deno.exe"));
+    assert_eq!(path, temp_dir.path().join("oden.exe"));
   }
 }

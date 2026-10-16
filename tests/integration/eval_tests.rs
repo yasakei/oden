@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use test_util as util;
 use test_util::assert_contains;
@@ -10,7 +10,7 @@ use test_util::test;
 fn eval_randomness() {
   let mut numbers = Vec::with_capacity(10);
   for _ in 0..10 {
-    let output = util::deno_cmd()
+    let output = util::oden_cmd()
       .arg("eval")
       .arg("-p")
       .arg("Math.random()")
@@ -31,7 +31,7 @@ fn eval_randomness() {
 
 #[test]
 fn eval_error_getter_does_not_panic() {
-  let output = util::deno_cmd()
+  let output = util::oden_cmd()
     .arg("eval")
     .arg(
       r#"Object.defineProperty(Error.prototype, "name", { get() { throw new Error("getter boom"); }, configurable: true }); throw new Error("outer");"#,
@@ -45,5 +45,5 @@ fn eval_error_getter_does_not_panic() {
   let stderr =
     util::strip_ansi_codes(std::str::from_utf8(&output.stderr).unwrap().trim());
   assert_contains!(stderr, "error: Uncaught");
-  assert_not_contains!(stderr, "Deno has panicked", "panicked at");
+  assert_not_contains!(stderr, "Oden has panicked", "panicked at");
 }

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   assertEquals,
   assertRejects,
@@ -6,94 +6,94 @@ import {
   pathToAbsoluteFileUrl,
 } from "./test_util.ts";
 
-Deno.test(
+Oden.test(
   { permissions: { write: true, read: true } },
   function readLinkSyncSuccess() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const target = testDir +
-      (Deno.build.os == "windows" ? "\\target" : "/target");
+      (Oden.build.os == "windows" ? "\\target" : "/target");
     const symlink = testDir +
-      (Deno.build.os == "windows" ? "\\symlink" : "/symlink");
-    Deno.mkdirSync(target);
-    Deno.symlinkSync(target, symlink);
-    const targetPath = Deno.readLinkSync(symlink);
+      (Oden.build.os == "windows" ? "\\symlink" : "/symlink");
+    Oden.mkdirSync(target);
+    Oden.symlinkSync(target, symlink);
+    const targetPath = Oden.readLinkSync(symlink);
     assertEquals(targetPath, target);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { write: true, read: true } },
   function readLinkSyncUrlSuccess() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const target = testDir +
-      (Deno.build.os == "windows" ? "\\target" : "/target");
+      (Oden.build.os == "windows" ? "\\target" : "/target");
     const symlink = testDir +
-      (Deno.build.os == "windows" ? "\\symlink" : "/symlink");
-    Deno.mkdirSync(target);
-    Deno.symlinkSync(target, symlink);
-    const targetPath = Deno.readLinkSync(pathToAbsoluteFileUrl(symlink));
+      (Oden.build.os == "windows" ? "\\symlink" : "/symlink");
+    Oden.mkdirSync(target);
+    Oden.symlinkSync(target, symlink);
+    const targetPath = Oden.readLinkSync(pathToAbsoluteFileUrl(symlink));
     assertEquals(targetPath, target);
   },
 );
 
-Deno.test({ permissions: { read: false } }, function readLinkSyncPerm() {
+Oden.test({ permissions: { read: false } }, function readLinkSyncPerm() {
   assertThrows(() => {
-    Deno.readLinkSync("/symlink");
-  }, Deno.errors.NotCapable);
+    Oden.readLinkSync("/symlink");
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test({ permissions: { read: true } }, function readLinkSyncNotFound() {
+Oden.test({ permissions: { read: true } }, function readLinkSyncNotFound() {
   assertThrows(
     () => {
-      Deno.readLinkSync("bad_filename");
+      Oden.readLinkSync("bad_filename");
     },
-    Deno.errors.NotFound,
+    Oden.errors.NotFound,
     `readlink 'bad_filename'`,
   );
 });
 
-Deno.test(
+Oden.test(
   { permissions: { write: true, read: true } },
   async function readLinkSuccess() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const target = testDir +
-      (Deno.build.os == "windows" ? "\\target" : "/target");
+      (Oden.build.os == "windows" ? "\\target" : "/target");
     const symlink = testDir +
-      (Deno.build.os == "windows" ? "\\symlink" : "/symlink");
-    Deno.mkdirSync(target);
-    Deno.symlinkSync(target, symlink);
-    const targetPath = await Deno.readLink(symlink);
+      (Oden.build.os == "windows" ? "\\symlink" : "/symlink");
+    Oden.mkdirSync(target);
+    Oden.symlinkSync(target, symlink);
+    const targetPath = await Oden.readLink(symlink);
     assertEquals(targetPath, target);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { write: true, read: true } },
   async function readLinkUrlSuccess() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const target = testDir +
-      (Deno.build.os == "windows" ? "\\target" : "/target");
+      (Oden.build.os == "windows" ? "\\target" : "/target");
     const symlink = testDir +
-      (Deno.build.os == "windows" ? "\\symlink" : "/symlink");
-    Deno.mkdirSync(target);
-    Deno.symlinkSync(target, symlink);
-    const targetPath = await Deno.readLink(pathToAbsoluteFileUrl(symlink));
+      (Oden.build.os == "windows" ? "\\symlink" : "/symlink");
+    Oden.mkdirSync(target);
+    Oden.symlinkSync(target, symlink);
+    const targetPath = await Oden.readLink(pathToAbsoluteFileUrl(symlink));
     assertEquals(targetPath, target);
   },
 );
 
-Deno.test({ permissions: { read: false } }, async function readLinkPerm() {
+Oden.test({ permissions: { read: false } }, async function readLinkPerm() {
   await assertRejects(async () => {
-    await Deno.readLink("/symlink");
-  }, Deno.errors.NotCapable);
+    await Oden.readLink("/symlink");
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test({ permissions: { read: true } }, async function readLinkNotFound() {
+Oden.test({ permissions: { read: true } }, async function readLinkNotFound() {
   await assertRejects(
     async () => {
-      await Deno.readLink("bad_filename");
+      await Oden.readLink("bad_filename");
     },
-    Deno.errors.NotFound,
+    Oden.errors.NotFound,
     `readlink 'bad_filename'`,
   );
 });

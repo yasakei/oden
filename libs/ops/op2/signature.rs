@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::BTreeMap;
 
@@ -452,19 +452,19 @@ impl Arg {
 
   /// Convert the [`Arg`] into a [`TokenStream`] representing the fully-qualified type.
   #[allow(unused, reason = "unused for now but keeping")]
-  pub fn type_token(&self, deno_core: &TokenStream) -> TokenStream {
+  pub fn type_token(&self, oden_core: &TokenStream) -> TokenStream {
     match self {
-      Arg::V8Ref(RefType::Ref, v8) => quote!(&deno_core::v8::#v8),
-      Arg::V8Ref(RefType::Mut, v8) => quote!(&mut deno_core::v8::#v8),
-      Arg::V8Local(v8) => quote!(deno_core::v8::Local<deno_core::v8::#v8>),
+      Arg::V8Ref(RefType::Ref, v8) => quote!(&oden_core::v8::#v8),
+      Arg::V8Ref(RefType::Mut, v8) => quote!(&mut oden_core::v8::#v8),
+      Arg::V8Local(v8) => quote!(oden_core::v8::Local<oden_core::v8::#v8>),
       Arg::OptionV8Ref(RefType::Ref, v8) => {
-        quote!(::std::option::Option<&deno_core::v8::#v8>)
+        quote!(::std::option::Option<&oden_core::v8::#v8>)
       }
       Arg::OptionV8Ref(RefType::Mut, v8) => {
-        quote!(::std::option::Option<&mut deno_core::v8::#v8>)
+        quote!(::std::option::Option<&mut oden_core::v8::#v8>)
       }
       Arg::OptionV8Local(v8) => {
-        quote!(::std::option::Option<deno_core::v8::Local<deno_core::v8::#v8>>)
+        quote!(::std::option::Option<oden_core::v8::Local<oden_core::v8::#v8>>)
       }
       _ => todo!(),
     }
@@ -498,7 +498,7 @@ impl Arg {
     })
   }
 
-  /// This must be kept in sync with the `RustToV8`/`RustToV8Fallible` implementations in `deno_core`. If
+  /// This must be kept in sync with the `RustToV8`/`RustToV8Fallible` implementations in `oden_core`. If
   /// this falls out of sync, you will see compile errors.
   pub fn slow_retval(&self) -> ArgSlowRetval {
     match self.some_type() {
@@ -943,9 +943,9 @@ pub enum ArgError {
   #[error("Type is not allowed in this position")]
   NotAllowedInThisPosition(Span),
   #[error(
-    "Invalid deno_core:: prefix for type. Try adding `use deno_core::{1}` at the top of the file and specifying `{2}` in this position."
+    "Invalid oden_core:: prefix for type. Try adding `use oden_core::{1}` at the top of the file and specifying `{2}` in this position."
   )]
-  InvalidDenoCorePrefix(Span, String, String),
+  InvalidOdenCorePrefix(Span, String, String),
   #[error("Expected a reference. Use '#[cppgc] &{1}' instead.")]
   ExpectedCppGcReference(Span, String),
   #[error("Invalid #[cppgc] type")]
@@ -972,7 +972,7 @@ impl From<ArgError> for syn::Error {
       ArgError::MissingAttribute(span, _) => span,
       ArgError::AttributeError(err) => return combine_err(err.into(), msg),
       ArgError::NotAllowedInThisPosition(span) => span,
-      ArgError::InvalidDenoCorePrefix(span, _, _) => span,
+      ArgError::InvalidOdenCorePrefix(span, _, _) => span,
       ArgError::ExpectedCppGcReference(span, _) => span,
       ArgError::InvalidCppGcType(span) => span,
       ArgError::InvalidAttributePosition(span, _, _) => span,
@@ -1537,12 +1537,12 @@ fn parse_type_path(
             _ => Ok(CUnknown(Type::Path(tp.clone()), matches!(attrs.primary, Some(AttributeModifier::Scoped)))),
           }
         }
-        deno_core::$next::$any? => {
-          // Stylistically it makes more sense just to import deno_core::v8 and other types at the top of the file
+        oden_core::$next::$any? => {
+          // Stylistically it makes more sense just to import oden_core::v8 and other types at the top of the file
           let next = stringify_token(next);
           let any = any.map(|any| format!("::{}", any.into_token_stream())).unwrap_or_default();
           let instead = format!("{next}{any}");
-          Err(ArgError::InvalidDenoCorePrefix(tp.span(), next, instead))
+          Err(ArgError::InvalidOdenCorePrefix(tp.span(), next, instead))
         }
         _ => Ok(CUnknown(Type::Path(tp.clone()), matches!(attrs.primary, Some(AttributeModifier::Scoped)))),
       )?
@@ -2322,28 +2322,28 @@ mod tests {
     fn f(s1: &JsRuntimeState, s2: &mut JsRuntimeState) {}
   );
   expect_fail!(
-    op_extra_deno_core_v8,
+    op_extra_oden_core_v8,
     ArgError(
       "a".into(),
-      InvalidDenoCorePrefix(
+      InvalidOdenCorePrefix(
         Span::call_site(),
         "v8".into(),
         "v8::Function".into()
       )
     ),
-    fn f(a: &deno_core::v8::Function) {}
+    fn f(a: &oden_core::v8::Function) {}
   );
   expect_fail!(
-    op_extra_deno_core_opstate,
+    op_extra_oden_core_opstate,
     ArgError(
       "a".into(),
-      InvalidDenoCorePrefix(
+      InvalidOdenCorePrefix(
         Span::call_site(),
         "OpState".into(),
         "OpState".into()
       )
     ),
-    fn f(a: &deno_core::OpState) {}
+    fn f(a: &oden_core::OpState) {}
   );
 
   // Generics

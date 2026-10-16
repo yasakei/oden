@@ -1,1 +1,1 @@
-import { add } from "jsr:@denotest/add@1";
+import { add } from "jsr:@odentest/add@1";

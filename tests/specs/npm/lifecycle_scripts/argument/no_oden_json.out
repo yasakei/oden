@@ -1,0 +1,19 @@
+[UNORDERED_START]
+Download http://localhost:4260/@odentest%2flifecycle-scripts-cjs
+Download http://localhost:4260/@odentest%2fbin
+Download http://localhost:4260/@odentest/lifecycle-scripts-cjs/1.0.0.tgz
+Download http://localhost:4260/@odentest/bin/1.0.0.tgz
+Initialize @odentest/lifecycle-scripts-cjs@1.0.0
+Initialize @odentest/bin@1.0.0
+Initialize @odentest/lifecycle-scripts-cjs@1.0.0: running 'preinstall' script
+Initialize @odentest/lifecycle-scripts-cjs@1.0.0: running 'install' script
+[UNORDERED_END]
+Installed 2 packages in [WILDCARD]
+Reused 0 packages from cache
+Downloaded 0 packages from JSR
+Downloaded 2 packages from npm
+++
+
+Dependencies:
++ npm:@odentest/lifecycle-scripts-cjs 1.0.0
+

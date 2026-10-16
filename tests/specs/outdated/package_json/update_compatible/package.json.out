@@ -1,9 +1,9 @@
 {
   "dependencies": {
-    "@denotest/has-patch-versions": "^0.1.1",
-    "@denotest/breaking-change-between-versions": "1.0.0"
+    "@odentest/has-patch-versions": "^0.1.1",
+    "@odentest/breaking-change-between-versions": "1.0.0"
   },
   "devDependencies": {
-    "aliased": "npm:@denotest/bin@^0.6.0"
+    "aliased": "npm:@odentest/bin@^0.6.0"
   }
 }

@@ -1,3 +1,3 @@
-import { version } from "npm:@denotest/min-release-age-old";
+import { version } from "npm:@odentest/min-release-age-old";
 
 console.log(version);

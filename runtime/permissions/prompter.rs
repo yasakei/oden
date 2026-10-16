@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use once_cell::sync::Lazy;
 use parking_lot::Mutex;
@@ -507,7 +507,7 @@ impl PermissionPrompter for TtyPrompter {
     let stack_lines_count = {
       let mut output = String::new();
       write!(&mut output, "┏ {PERMISSION_EMOJI}  ").unwrap();
-      write!(&mut output, "{}", colors::bold("Deno requests ")).unwrap();
+      write!(&mut output, "{}", colors::bold("Oden requests ")).unwrap();
       write!(&mut output, "{}", colors::bold(message.clone())).unwrap();
       writeln!(&mut output, "{}", colors::bold(".")).unwrap();
       if let Some(api_name) = api_name.clone() {
@@ -534,7 +534,7 @@ impl PermissionPrompter for TtyPrompter {
       } else {
         writeln!(
           &mut output,
-          "┠─ To see a stack trace for this prompt, set the DENO_TRACE_PERMISSIONS environmental variable.",
+          "┠─ To see a stack trace for this prompt, set the ODEN_TRACE_PERMISSIONS environmental variable.",
         ).unwrap();
         1
       };
@@ -548,7 +548,7 @@ impl PermissionPrompter for TtyPrompter {
       writeln!(&mut output, "┠─ {}", colors::italic(&msg)).unwrap();
       let msg = if crate::is_standalone() {
         format!(
-          "Specify the required permissions during compile time using `deno compile --allow-{name}`."
+          "Specify the required permissions during compile time using `oden compile --allow-{name}`."
         )
       } else {
         format!("Run again with --allow-{name} to bypass this prompt.")

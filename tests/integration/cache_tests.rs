@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use test_util::TestContext;
 use test_util::TestContextBuilder;
@@ -10,12 +10,12 @@ use test_util::test;
 #[test]
 fn xdg_cache_home_dir() {
   let context = TestContext::with_http_server();
-  let deno_dir = context.temp_dir();
-  let xdg_cache_home = deno_dir.path().join("cache");
+  let oden_dir = context.temp_dir();
+  let xdg_cache_home = oden_dir.path().join("cache");
   context
     .new_command()
     .env_remove("HOME")
-    .env_remove("DENO_DIR")
+    .env_remove("ODEN_DIR")
     .env_clear()
     .env("XDG_CACHE_HOME", &xdg_cache_home)
     .args(
@@ -35,7 +35,7 @@ fn cache_matching_package_json_dep_should_not_install_all() {
   let temp_dir = context.temp_dir();
   temp_dir.write(
     "package.json",
-    r#"{ "dependencies": { "@types/node": "22.12.0", "@denotest/esm-basic": "*" } }"#,
+    r#"{ "dependencies": { "@types/node": "22.12.0", "@odentest/esm-basic": "*" } }"#,
   );
   let output = context
     .new_command()
@@ -103,7 +103,7 @@ fn cache_put_overwrite() {
 }
 
 #[test]
-fn web_cache_is_stored_under_deno_dir() {
+fn web_cache_is_stored_under_oden_dir() {
   let test_context = TestContextBuilder::new().use_temp_cwd().build();
   test_context
     .temp_dir()
@@ -116,7 +116,7 @@ fn web_cache_is_stored_under_deno_dir() {
     .assert_exit_code(0);
 
   let web_cache_dir = test_context
-    .deno_dir()
+    .oden_dir()
     .path()
     .join("location_data")
     .join("web_cache");

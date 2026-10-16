@@ -1,18 +1,18 @@
-Deno.test("output", async () => {
-  await new Deno.Command(Deno.execPath(), {
+Oden.test("output", async () => {
+  await new Oden.Command(Oden.execPath(), {
     args: ["eval", "console.log(0); console.error(1);"],
   }).spawn().status;
-  new Deno.Command(Deno.execPath(), {
+  new Oden.Command(Oden.execPath(), {
     args: ["eval", "console.log(2); console.error(3);"],
     stdout: "inherit",
     stderr: "inherit",
   }).outputSync();
-  await new Deno.Command(Deno.execPath(), {
+  await new Oden.Command(Oden.execPath(), {
     args: ["eval", "console.log(4); console.error(5);"],
     stdout: "inherit",
     stderr: "inherit",
   }).output();
-  const c = new Deno.Command(Deno.execPath(), {
+  const c = new Oden.Command(Oden.execPath(), {
     args: ["eval", "console.log(6); console.error(7);"],
     stdout: "inherit",
     stderr: "inherit",

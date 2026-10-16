@@ -1,15 +1,15 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 export { assert, assertEquals, assertRejects, assertThrows } from "@std/assert";
 export { fromFileUrl } from "@std/path";
 import process from "node:process";
 
-const targetDir = Deno.execPath().replace(/[^\/\\]+$/, "");
+const targetDir = Oden.execPath().replace(/[^\/\\]+$/, "");
 export const [libPrefix, libSuffix] = {
   darwin: ["lib", "dylib"],
   linux: ["lib", "so"],
   windows: ["", "dll"],
-}[Deno.build.os];
+}[Oden.build.os];
 
 export function loadTestLibrary() {
   const specifier = `${targetDir}/${libPrefix}test_napi.${libSuffix}`;

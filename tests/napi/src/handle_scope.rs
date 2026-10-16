@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::ptr;
 
@@ -54,7 +54,7 @@ extern "C" fn test_escapable_scope(
 }
 
 /// Test that calling napi_escape_handle twice returns an error.
-/// NOTE: Currently panics in Deno instead of returning
+/// NOTE: Currently panics in Oden instead of returning
 /// napi_escape_called_twice. Test is marked ignore in JS.
 extern "C" fn test_escape_twice(
   env: napi_env,

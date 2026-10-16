@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 /// <reference path="../../core/internal.d.ts" />
 
@@ -32,20 +32,20 @@ const {
   TypedArrayPrototypeGetSymbolToStringTag,
 } = primordials;
 
-const webidl = core.loadExtScript("ext:deno_webidl/00_webidl.js");
+const webidl = core.loadExtScript("ext:oden_webidl/00_webidl.js");
 const { createFilteredInspectProxy } = core.loadExtScript(
-  "ext:deno_web/01_console.js",
+  "ext:oden_web/01_console.js",
 );
 const { Deferred, writableStreamClose } = core.loadExtScript(
-  "ext:deno_web/06_streams.js",
+  "ext:oden_web/06_streams.js",
 );
-const { DOMException } = core.loadExtScript("ext:deno_web/01_dom_exception.js");
-const { add, remove } = core.loadExtScript("ext:deno_web/03_abort_signal.js");
+const { DOMException } = core.loadExtScript("ext:oden_web/01_dom_exception.js");
+const { add, remove } = core.loadExtScript("ext:oden_web/03_abort_signal.js");
 const {
   fillHeaders,
   headerListFromHeaders,
   headersFromHeaderList,
-} = core.loadExtScript("ext:deno_fetch/20_headers.js");
+} = core.loadExtScript("ext:oden_fetch/20_headers.js");
 
 webidl.converters.WebSocketStreamOptions = webidl.createDictionaryConverter(
   "WebSocketStreamOptions",
@@ -430,7 +430,7 @@ class WebSocketStream {
     }
   }
 
-  [SymbolFor("Deno.privateCustomInspect")](inspect, inspectOptions) {
+  [SymbolFor("Oden.privateCustomInspect")](inspect, inspectOptions) {
     return inspect(
       createFilteredInspectProxy({
         object: this,
@@ -509,7 +509,7 @@ class WebSocketError extends DOMException {
     return this.#reason;
   }
 
-  [SymbolFor("Deno.privateCustomInspect")](inspect, inspectOptions) {
+  [SymbolFor("Oden.privateCustomInspect")](inspect, inspectOptions) {
     return inspect(
       createFilteredInspectProxy({
         object: this,

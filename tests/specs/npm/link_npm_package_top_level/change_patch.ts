@@ -1,6 +1,6 @@
 const filePath = "./cowsay/package.json";
-const packageJson = JSON.parse(Deno.readTextFileSync(filePath));
+const packageJson = JSON.parse(Oden.readTextFileSync(filePath));
 packageJson.dependencies = {
-  "@denotest/add": "1",
+  "@odentest/add": "1",
 };
-Deno.writeTextFileSync(filePath, JSON.stringify(packageJson));
+Oden.writeTextFileSync(filePath, JSON.stringify(packageJson));

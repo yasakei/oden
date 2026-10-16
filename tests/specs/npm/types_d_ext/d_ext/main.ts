@@ -1,3 +1,3 @@
-import { test } from "npm:@denotest/d-ext";
+import { test } from "npm:@odentest/d-ext";
 
 console.log(test);

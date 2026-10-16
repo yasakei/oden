@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -36,8 +36,8 @@ const {
   validateOneOf,
   validatePort,
   validateString,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
-const { isIP } = core.loadExtScript("ext:deno_node/internal/net.ts");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
+const { isIP } = core.loadExtScript("ext:oden_node/internal/net.ts");
 const {
   dnsOrderToNumber,
   getDefaultDnsOrder,
@@ -47,7 +47,7 @@ const {
   Resolver: CallbackResolver,
   validateHints,
   validDnsOrders,
-} = core.loadExtScript("ext:deno_node/internal/dns/utils.ts");
+} = core.loadExtScript("ext:oden_node/internal/dns/utils.ts");
 
 const {
   dnsException,
@@ -55,15 +55,15 @@ const {
   ERR_INVALID_ARG_VALUE,
   ERR_MISSING_ARGS,
   handleDnsError,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
 const {
   default: cares,
   GetAddrInfoReqWrap,
   GetNameInfoReqWrap,
   QueryReqWrap,
-} = core.loadExtScript("ext:deno_node/internal_binding/cares_wrap.ts");
+} = core.loadExtScript("ext:oden_node/internal_binding/cares_wrap.ts");
 const { toASCII } = core.loadExtScript(
-  "ext:deno_node/internal/idna.ts",
+  "ext:oden_node/internal/idna.ts",
 );
 
 function onlookup(

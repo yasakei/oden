@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![allow(
   clippy::too_many_arguments,
@@ -19,11 +19,11 @@
 
 use std::ffi::CStr;
 
-use deno_core::GarbageCollected;
-use deno_core::op2;
-use deno_core::unsync::spawn_blocking;
-use deno_core::v8;
-use deno_core::webidl::WebIdlInterfaceConverter;
+use oden_core::GarbageCollected;
+use oden_core::op2;
+use oden_core::unsync::spawn_blocking;
+use oden_core::v8;
+use oden_core::webidl::WebIdlInterfaceConverter;
 
 use crate::CryptoError;
 use crate::algorithm::check_support_for_algorithm;
@@ -294,7 +294,7 @@ impl SubtleCrypto {
     // CryptoKey (an internal invariant violation -- `run_import_key`
     // always returns a make_crypto_key result), surface a `TypeError`
     // rather than silently skipping the check.
-    let key_type = deno_core::cppgc::try_unwrap_cppgc_object::<
+    let key_type = oden_core::cppgc::try_unwrap_cppgc_object::<
       crate::crypto_key::CryptoKey,
     >(scope, key.into())
     .map(|p| p.key_type())

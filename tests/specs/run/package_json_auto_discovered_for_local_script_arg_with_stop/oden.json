@@ -1,0 +1,5 @@
+{
+  "tasks": {
+    "dev": "oden run main.ts"
+  }
+}

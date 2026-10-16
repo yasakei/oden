@@ -1,6 +1,6 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-//! This module provides feature to upgrade deno executable
+//! This module provides feature to upgrade oden executable
 
 use std::borrow::Cow;
 use std::env;
@@ -14,13 +14,13 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use async_trait::async_trait;
-use deno_core::anyhow::Context;
-use deno_core::anyhow::bail;
-use deno_core::error::AnyError;
-use deno_core::unsync::spawn;
-use deno_core::url::Url;
-use deno_lib::shared::ReleaseChannel;
-use deno_lib::version;
+use oden_core::anyhow::Context;
+use oden_core::anyhow::bail;
+use oden_core::error::AnyError;
+use oden_core::unsync::spawn;
+use oden_core::url::Url;
+use oden_lib::shared::ReleaseChannel;
+use oden_lib::version;
 use deno_semver::SmallStackString;
 use deno_semver::Version;
 use once_cell::sync::Lazy;
@@ -44,10 +44,10 @@ static CANARY_URL: &str = "https://dl.deno.land/canary";
 static DL_RELEASE_URL: &str = "https://dl.deno.land/release";
 
 pub static ARCHIVE_NAME: Lazy<String> =
-  Lazy::new(|| format!("deno-{}.zip", env!("TARGET")));
+  Lazy::new(|| format!("oden-{}.zip", env!("TARGET")));
 
 static DELTA_TARGET_NAME: Lazy<String> =
-  Lazy::new(|| format!("deno-{}", env!("TARGET")));
+  Lazy::new(|| format!("oden-{}", env!("TARGET")));
 
 // How often query server for new version. In hours.
 const UPGRADE_CHECK_INTERVAL: i64 = 24;
@@ -147,11 +147,11 @@ impl VersionProvider for RealVersionProvider {
   }
 
   fn current_version(&self) -> Cow<'_, str> {
-    Cow::Borrowed(version::DENO_VERSION_INFO.version_or_git_hash())
+    Cow::Borrowed(version::ODEN_VERSION_INFO.version_or_git_hash())
   }
 
   fn get_current_exe_release_channel(&self) -> ReleaseChannel {
-    version::DENO_VERSION_INFO.release_channel
+    version::ODEN_VERSION_INFO.release_channel
   }
 }
 
@@ -255,14 +255,14 @@ async fn print_release_notes(
     return;
   };
 
-  let is_switching_from_deno1_to_deno2 =
+  let is_switching_from_oden1_to_oden2 =
     new_semver.major == 2 && current_semver.major == 1;
-  let is_deno_2_rc = new_semver.major == 2
+  let is_oden_2_rc = new_semver.major == 2
     && new_semver.minor == 0
     && new_semver.patch == 0
     && new_semver.pre.first().map(|s| s.as_str()) == Some("rc");
 
-  if is_deno_2_rc || is_switching_from_deno1_to_deno2 {
+  if is_oden_2_rc || is_switching_from_oden1_to_oden2 {
     log::info!(
       "{}\n\n  {}\n",
       colors::gray("Migration guide:"),
@@ -272,7 +272,7 @@ async fn print_release_notes(
     );
   }
 
-  if is_deno_2_rc {
+  if is_oden_2_rc {
     log::info!(
       "{}\n\n  {}\n",
       colors::gray("If you find a bug, please report to:"),
@@ -316,7 +316,7 @@ async fn print_release_notes(
 
 pub fn upgrade_check_enabled() -> bool {
   matches!(
-    env::var("DENO_NO_UPDATE_CHECK"),
+    env::var("ODEN_NO_UPDATE_CHECK"),
     Err(env::VarError::NotPresent)
   )
 }
@@ -368,51 +368,51 @@ pub fn check_for_upgrades(
       ReleaseChannel::Stable => {
         log::info!(
           "{} {} → {} {}",
-          colors::green("A new release of Deno is available:"),
-          colors::cyan(version::DENO_VERSION_INFO.deno),
+          colors::green("A new release of Oden is available:"),
+          colors::cyan(version::ODEN_VERSION_INFO.oden),
           colors::cyan(&upgrade_version),
-          colors::italic_gray("Run `deno upgrade` to install it.")
+          colors::italic_gray("Run `oden upgrade` to install it.")
         );
       }
       ReleaseChannel::Canary => {
         log::info!(
           "{} {}",
-          colors::green("A new canary release of Deno is available."),
-          colors::italic_gray("Run `deno upgrade canary` to install it.")
+          colors::green("A new canary release of Oden is available."),
+          colors::italic_gray("Run `oden upgrade canary` to install it.")
         );
       }
       ReleaseChannel::Rc => {
         log::info!(
           "{} {}",
-          colors::green("A new release candidate of Deno is available."),
-          colors::italic_gray("Run `deno upgrade rc` to install it.")
+          colors::green("A new release candidate of Oden is available."),
+          colors::italic_gray("Run `oden upgrade rc` to install it.")
         );
       }
       ReleaseChannel::Lts => {
         log::info!(
           "{} {} → {} {}",
-          colors::green("A new LTS release of Deno is available:"),
-          colors::cyan(version::DENO_VERSION_INFO.deno),
+          colors::green("A new LTS release of Oden is available:"),
+          colors::cyan(version::ODEN_VERSION_INFO.oden),
           colors::cyan(&upgrade_version),
-          colors::italic_gray("Run `deno upgrade lts` to install it.")
+          colors::italic_gray("Run `oden upgrade lts` to install it.")
         );
       }
       ReleaseChannel::Alpha => {
         log::info!(
           "{} {} → {} {}",
-          colors::green("A new alpha release of Deno is available:"),
-          colors::cyan(version::DENO_VERSION_INFO.deno),
+          colors::green("A new alpha release of Oden is available:"),
+          colors::cyan(version::ODEN_VERSION_INFO.oden),
           colors::cyan(&upgrade_version),
-          colors::italic_gray("Run `deno upgrade alpha` to install it.")
+          colors::italic_gray("Run `oden upgrade alpha` to install it.")
         );
       }
       ReleaseChannel::Beta => {
         log::info!(
           "{} {} → {} {}",
-          colors::green("A new beta release of Deno is available:"),
-          colors::cyan(version::DENO_VERSION_INFO.deno),
+          colors::green("A new beta release of Oden is available:"),
+          colors::cyan(version::ODEN_VERSION_INFO.oden),
           colors::cyan(&upgrade_version),
-          colors::italic_gray("Run `deno upgrade beta` to install it.")
+          colors::italic_gray("Run `oden upgrade beta` to install it.")
         );
       }
     }
@@ -577,7 +577,7 @@ fn store_cached_binary(
 }
 
 /// Get the artifact name for the current platform.
-/// CI artifacts are named like `{profile}-{os}-{arch}-deno`.
+/// CI artifacts are named like `{profile}-{os}-{arch}-oden`.
 fn get_pr_artifact_name() -> Result<String, AnyError> {
   let target = env!("TARGET");
 
@@ -598,7 +598,7 @@ fn get_pr_artifact_name() -> Result<String, AnyError> {
   };
 
   // Prefer release builds, fall back to debug
-  Ok(format!("release-{os}-{arch}-deno"))
+  Ok(format!("release-{os}-{arch}-oden"))
 }
 
 fn get_pr_debug_artifact_name() -> Result<String, AnyError> {
@@ -766,7 +766,7 @@ fn upgrade_from_pr(
   }
 
   // Find the downloaded binary
-  let exe_name = if cfg!(windows) { "deno.exe" } else { "deno" };
+  let exe_name = if cfg!(windows) { "oden.exe" } else { "oden" };
   let new_exe_path = download_dir.join(exe_name);
 
   if !new_exe_path.exists() {
@@ -805,7 +805,7 @@ fn upgrade_from_pr(
   };
 
   #[cfg(windows)]
-  kill_running_deno_lsp_processes();
+  kill_running_oden_lsp_processes();
 
   let output_result = if *output_exe_path == current_exe_path {
     replace_exe(&new_exe_path, &output_exe_path)
@@ -933,7 +933,7 @@ fn upgrade_from_branch(
     );
   }
 
-  let exe_name = if cfg!(windows) { "deno.exe" } else { "deno" };
+  let exe_name = if cfg!(windows) { "oden.exe" } else { "oden" };
   let new_exe_path = download_dir.join(exe_name);
 
   if !new_exe_path.exists() {
@@ -963,7 +963,7 @@ fn upgrade_from_branch(
   };
 
   #[cfg(windows)]
-  kill_running_deno_lsp_processes();
+  kill_running_oden_lsp_processes();
 
   let output_result = if *output_exe_path == current_exe_path {
     replace_exe(&new_exe_path, &output_exe_path)
@@ -1014,7 +1014,7 @@ pub async fn upgrade(
   let requested_version =
     RequestedVersion::from_upgrade_flags(upgrade_flags.clone())?;
 
-  log::info!("Current Deno version: v{}", version::DENO_VERSION_INFO.deno);
+  log::info!("Current Oden version: v{}", version::ODEN_VERSION_INFO.oden);
 
   let maybe_selected_version_to_upgrade = match &requested_version {
     RequestedVersion::Latest(channel) => {
@@ -1045,7 +1045,7 @@ pub async fn upgrade(
     http_client_provider.get_or_create()?,
   );
 
-  let dl_dir = factory.deno_dir()?.dl_folder_path();
+  let dl_dir = factory.oden_dir()?.dl_folder_path();
   let cache_path = get_binary_cache_path(
     &dl_dir,
     &selected_version_to_upgrade.version_or_hash,
@@ -1062,7 +1062,7 @@ pub async fn upgrade(
     try_delta_upgrade(
       &client,
       &current_exe_path,
-      version::DENO_VERSION_INFO.deno,
+      version::ODEN_VERSION_INFO.oden,
       &selected_version_to_upgrade.version_or_hash,
     )
     .await
@@ -1078,12 +1078,12 @@ pub async fn upgrade(
     log::info!(
       "{}",
       colors::gray(format!(
-        "Deno is upgrading to version {}",
+        "Oden is upgrading to version {}",
         &selected_version_to_upgrade.version_or_hash
       ))
     );
 
-    let exe_name = if cfg!(windows) { "deno.exe" } else { "deno" };
+    let exe_name = if cfg!(windows) { "oden.exe" } else { "oden" };
     let new_exe_path = temp_dir.path().join(exe_name);
     std::fs::write(&new_exe_path, &delta_binary).with_context(|| {
       format!(
@@ -1116,7 +1116,7 @@ pub async fn upgrade(
         if requested_version.release_channel() == ReleaseChannel::Canary {
           log::error!("Note: canary releases are only kept for 30 days.");
         }
-        deno_runtime::exit(1)
+        oden_runtime::exit(1)
       };
 
       store_cached_binary(sys, &cache_path, &data);
@@ -1132,13 +1132,13 @@ pub async fn upgrade(
     log::info!(
       "{}",
       colors::gray(format!(
-        "Deno is upgrading to version {}",
+        "Oden is upgrading to version {}",
         &selected_version_to_upgrade.version_or_hash
       ))
     );
 
     archive::unpack_into_dir(archive::UnpackArgs {
-      exe_name: if cfg!(windows) { "deno.exe" } else { "deno" },
+      exe_name: if cfg!(windows) { "oden.exe" } else { "oden" },
       archive_name: &ARCHIVE_NAME,
       archive_data: &archive_data,
       dest_path: temp_dir.path(),
@@ -1157,7 +1157,7 @@ pub async fn upgrade(
     log::info!("Upgraded successfully (dry run)");
     if requested_version.release_channel() == ReleaseChannel::Stable {
       print_release_notes(
-        version::DENO_VERSION_INFO.deno,
+        version::ODEN_VERSION_INFO.oden,
         &selected_version_to_upgrade.version_or_hash,
         &client,
       )
@@ -1171,7 +1171,7 @@ pub async fn upgrade(
     full_path_output_flag.as_ref().unwrap_or(&current_exe_path);
 
   #[cfg(windows)]
-  kill_running_deno_lsp_processes();
+  kill_running_oden_lsp_processes();
 
   let output_result = if *output_exe_path == current_exe_path {
     replace_exe(&new_exe_path, output_exe_path)
@@ -1182,7 +1182,7 @@ pub async fn upgrade(
   check_windows_access_denied_error(output_result, output_exe_path)?;
 
   log::info!(
-    "\nUpgraded successfully to Deno {} {}\n",
+    "\nUpgraded successfully to Oden {} {}\n",
     colors::green(selected_version_to_upgrade.display()),
     colors::gray(&format!(
       "({})",
@@ -1191,7 +1191,7 @@ pub async fn upgrade(
   );
   if requested_version.release_channel() == ReleaseChannel::Stable {
     print_release_notes(
-      version::DENO_VERSION_INFO.deno,
+      version::ODEN_VERSION_INFO.oden,
       &selected_version_to_upgrade.version_or_hash,
       &client,
     )
@@ -1308,16 +1308,16 @@ fn select_specific_version_for_upgrade(
     | ReleaseChannel::Lts
     | ReleaseChannel::Alpha
     | ReleaseChannel::Beta => {
-      version::DENO_VERSION_INFO.release_channel == release_channel
-        && version::DENO_VERSION_INFO.deno == version
+      version::ODEN_VERSION_INFO.release_channel == release_channel
+        && version::ODEN_VERSION_INFO.oden == version
     }
-    ReleaseChannel::Canary => version::DENO_VERSION_INFO.git_hash == version,
+    ReleaseChannel::Canary => version::ODEN_VERSION_INFO.git_hash == version,
   };
 
   if !force && current_is_passed {
     log::info!(
       "Version {} is already installed",
-      version::DENO_VERSION_INFO.deno
+      version::ODEN_VERSION_INFO.oden
     );
     return Ok(None);
   }
@@ -1361,16 +1361,16 @@ async fn find_latest_version_to_upgrade(
   };
 
   let current_version = match release_channel {
-    ReleaseChannel::Canary => version::DENO_VERSION_INFO.git_hash,
+    ReleaseChannel::Canary => version::ODEN_VERSION_INFO.git_hash,
     ReleaseChannel::Stable
     | ReleaseChannel::Lts
     | ReleaseChannel::Rc
     | ReleaseChannel::Alpha
-    | ReleaseChannel::Beta => version::DENO_VERSION_INFO.deno,
+    | ReleaseChannel::Beta => version::ODEN_VERSION_INFO.oden,
   };
   let should_upgrade = force
     || current_version != latest_version_found.version_or_hash
-    || version::DENO_VERSION_INFO.release_channel != release_channel;
+    || version::ODEN_VERSION_INFO.release_channel != release_channel;
 
   log::info!("");
   if should_upgrade {
@@ -1381,7 +1381,7 @@ async fn find_latest_version_to_upgrade(
     );
   } else {
     log::info!(
-      "Local deno version {} is the most recent release",
+      "Local oden version {} is the most recent release",
       color_print::cformat!("<g>{}</>", current_version)
     );
   }
@@ -1466,7 +1466,7 @@ fn get_latest_version_url(
 
 fn base_upgrade_url() -> Cow<'static, str> {
   // this is used by the test suite
-  if let Ok(url) = env::var("DENO_DONT_USE_INTERNAL_BASE_UPGRADE_URL") {
+  if let Ok(url) = env::var("ODEN_DONT_USE_INTERNAL_BASE_UPGRADE_URL") {
     Cow::Owned(url)
   } else {
     Cow::Borrowed("https://dl.deno.land")
@@ -1479,8 +1479,8 @@ fn get_download_url(
 ) -> Result<Url, AnyError> {
   let download_url = match release_channel {
     ReleaseChannel::Stable | ReleaseChannel::Alpha | ReleaseChannel::Beta => {
-      let release_url = if std::env::var_os("DENO_TESTING_UPGRADE").is_some() {
-        "http://localhost:4545/deno-upgrade"
+      let release_url = if std::env::var_os("ODEN_TESTING_UPGRADE").is_some() {
+        "http://localhost:4545/oden-upgrade"
       } else {
         RELEASE_URL
       };
@@ -1580,8 +1580,8 @@ fn get_delta_download_url(
   current_version: &str,
   target_version: &str,
 ) -> Result<Url, AnyError> {
-  let release_url = if std::env::var_os("DENO_TESTING_UPGRADE").is_some() {
-    "http://localhost:4545/deno-upgrade"
+  let release_url = if std::env::var_os("ODEN_TESTING_UPGRADE").is_some() {
+    "http://localhost:4545/oden-upgrade"
   } else {
     RELEASE_URL
   };
@@ -1598,8 +1598,8 @@ fn get_delta_checksum_url(
   current_version: &str,
   target_version: &str,
 ) -> Result<Url, AnyError> {
-  let release_url = if std::env::var_os("DENO_TESTING_UPGRADE").is_some() {
-    "http://localhost:4545/deno-upgrade"
+  let release_url = if std::env::var_os("ODEN_TESTING_UPGRADE").is_some() {
+    "http://localhost:4545/oden-upgrade"
   } else {
     RELEASE_URL
   };
@@ -1613,8 +1613,8 @@ fn get_delta_checksum_url(
 
 /// Construct the URL for the uncompressed binary's SHA-256 checksum file.
 fn get_binary_checksum_url(target_version: &str) -> Result<Url, AnyError> {
-  let release_url = if std::env::var_os("DENO_TESTING_UPGRADE").is_some() {
-    "http://localhost:4545/deno-upgrade"
+  let release_url = if std::env::var_os("ODEN_TESTING_UPGRADE").is_some() {
+    "http://localhost:4545/oden-upgrade"
   } else {
     RELEASE_URL
   };
@@ -1848,9 +1848,9 @@ fn spawn_banner_task(
   version: &str,
   release_channel: ReleaseChannel,
   client: HttpClient,
-) -> deno_core::unsync::JoinHandle<Option<String>> {
+) -> oden_core::unsync::JoinHandle<Option<String>> {
   let banner_url = get_banner_url(version, release_channel);
-  deno_core::unsync::spawn(async move {
+  oden_core::unsync::spawn(async move {
     let banner_url = banner_url?;
     tokio::select! {
       result = client.download_text(banner_url) => {
@@ -1921,7 +1921,7 @@ fn verify_checksum(
 fn replace_exe(from: &Path, to: &Path) -> Result<(), std::io::Error> {
   if cfg!(windows) {
     // On windows you cannot replace the currently running executable.
-    // so first we rename it to deno.old.exe
+    // so first we rename it to oden.old.exe
     fs::rename(to, to.with_extension("old.exe"))?;
   } else {
     fs::remove_file(to)?;
@@ -1957,9 +1957,9 @@ fn check_windows_access_denied_error(
   Err(err).with_context(|| {
     format!(
       concat!(
-        "Could not replace the deno executable. This may be because an ",
-        "existing deno process is running. Please ensure there are no ",
-        "running deno processes (ex. Stop-Process -Name deno ; deno {}), ",
+        "Could not replace the oden executable. This may be because an ",
+        "existing oden process is running. Please ensure there are no ",
+        "running oden processes (ex. Stop-Process -Name oden ; oden {}), ",
         "close any editors before upgrading, and ensure you have ",
         "sufficient permission to '{}'."
       ),
@@ -1971,8 +1971,8 @@ fn check_windows_access_denied_error(
 }
 
 #[cfg(windows)]
-fn kill_running_deno_lsp_processes() {
-  // limit this to `deno lsp` invocations to avoid killing important programs someone might be running
+fn kill_running_oden_lsp_processes() {
+  // limit this to `oden lsp` invocations to avoid killing important programs someone might be running
   let is_debug = log::log_enabled!(log::Level::Debug);
   let get_pipe = || {
     if is_debug {
@@ -1985,7 +1985,7 @@ fn kill_running_deno_lsp_processes() {
     .args([
       "-Command",
       r#"Get-WmiObject Win32_Process | Where-Object {
-    $_.Name -eq 'deno.exe' -and
+    $_.Name -eq 'oden.exe' -and
     $_.CommandLine -match '^(?:\"[^\"]+\"|\S+)\s+lsp\b'
 } | ForEach-Object {
   if ($_.Terminate()) {
@@ -2026,8 +2026,8 @@ fn set_exe_permissions(
     bail!(
       concat!(
         "You don't have write permission to {} because it's owned by root.\n",
-        "Consider updating deno through your package manager if its installed from it.\n",
-        "Otherwise run `deno upgrade` as root.",
+        "Consider updating oden through your package manager if its installed from it.\n",
+        "Otherwise run `oden upgrade` as root.",
       ),
       output_exe_path.display()
     );
@@ -2043,7 +2043,7 @@ fn check_exe(exe_path: &Path) -> Result<(), AnyError> {
     .with_context(|| format!("failed to run '{}'", exe_path.display()))?;
   if !output.status.success() {
     bail!(
-      "Failed to validate Deno executable. This may be because your OS is unsupported or the executable is corrupted"
+      "Failed to validate Oden executable. This may be because your OS is unsupported or the executable is corrupted"
     )
   } else {
     Ok(())
@@ -2132,14 +2132,14 @@ mod test {
   #[test]
   fn test_get_pr_artifact_name() {
     let name = get_pr_artifact_name().unwrap();
-    // Should match the pattern "release-{os}-{arch}-deno"
+    // Should match the pattern "release-{os}-{arch}-oden"
     assert!(
       name.starts_with("release-"),
       "artifact name should start with 'release-': {name}"
     );
     assert!(
-      name.ends_with("-deno"),
-      "artifact name should end with '-deno': {name}"
+      name.ends_with("-oden"),
+      "artifact name should end with '-oden': {name}"
     );
     // Should contain a valid os
     assert!(
@@ -3121,11 +3121,11 @@ mod test {
 
     // Returns None when file doesn't exist
     let result =
-      try_read_cached_binary(&sys, Path::new("/dl/release/v1.0.0/deno.zip"));
+      try_read_cached_binary(&sys, Path::new("/dl/release/v1.0.0/oden.zip"));
     assert!(result.is_none());
 
     // Returns data when file exists
-    let cache_path = Path::new("/dl/release/v1.0.0/deno.zip");
+    let cache_path = Path::new("/dl/release/v1.0.0/oden.zip");
     sys.fs_create_dir_all(cache_path.parent().unwrap()).unwrap();
     sys.fs_write(cache_path, b"archive-data").unwrap();
 
@@ -3141,7 +3141,7 @@ mod test {
     let sys = InMemorySys::default();
     sys.set_seed(Some(42));
 
-    let cache_path = Path::new("/dl/release/v1.0.0/deno.zip");
+    let cache_path = Path::new("/dl/release/v1.0.0/oden.zip");
 
     // Should create parent dirs and write the file
     store_cached_binary(&sys, cache_path, b"archive-data");
@@ -3157,7 +3157,7 @@ mod test {
     let sys = InMemorySys::default();
     sys.set_seed(Some(42));
 
-    let cache_path = Path::new("/dl/canary/abc123/deno.zip");
+    let cache_path = Path::new("/dl/canary/abc123/oden.zip");
 
     // Initially no cache
     assert!(try_read_cached_binary(&sys, cache_path).is_none());
@@ -3325,7 +3325,7 @@ mod test {
       "URL should contain source version and bsdiff extension: {url_str}"
     );
     assert!(
-      url_str.contains("deno-"),
+      url_str.contains("oden-"),
       "URL should contain target name: {url_str}"
     );
   }
@@ -3337,7 +3337,7 @@ mod test {
     // uncompressed patches already published (e.g. v2.8.0's
     // `from-2.7.14.bsdiff`).
     let old_data = b"Hello, World!";
-    let new_data = b"Hello, Deno!";
+    let new_data = b"Hello, Oden!";
     let mut patch = Vec::new();
     bsdiff::diff(old_data, new_data, &mut patch).unwrap();
     assert!(
@@ -3354,7 +3354,7 @@ mod test {
     // Current format produced by `tools/bsdiff_helper`: bsdiff output wrapped
     // in zstd. Must round-trip identically to the raw form.
     let old_data = b"Hello, World!";
-    let new_data = b"Hello, Deno!";
+    let new_data = b"Hello, Oden!";
     let mut raw_patch = Vec::new();
     bsdiff::diff(old_data, new_data, &mut raw_patch).unwrap();
     let wrapped = zstd::bulk::compress(&raw_patch, 19).unwrap();
@@ -3375,7 +3375,7 @@ mod test {
     // pre-allocating MAX_PATCH_SIZE, so this must still round-trip.
     use std::io::Write;
     let old_data = b"Hello, World!";
-    let new_data = b"Hello, Deno!";
+    let new_data = b"Hello, Oden!";
     let mut raw_patch = Vec::new();
     bsdiff::diff(old_data, new_data, &mut raw_patch).unwrap();
 
@@ -3447,7 +3447,7 @@ mod test {
   fn test_chained_bsdiff_patches() {
     // Simulate a 3-step upgrade: 2.7.10 -> 2.7.11 -> 2.7.12 -> 2.7.13
     // Use realistic-ish binary content that differs slightly per version
-    let base = b"DENO_BINARY_v2.7.10_padding_to_simulate_real_binary_size_";
+    let base = b"ODEN_BINARY_v2.7.10_padding_to_simulate_real_binary_size_";
     let mut binary_v10 = base.to_vec();
     binary_v10.extend_from_slice(&[0u8; 1024]);
 

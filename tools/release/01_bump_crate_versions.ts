@@ -1,23 +1,23 @@
-#!/usr/bin/env -S deno run -A --lock=tools/deno.lock.json
-// Copyright 2018-2026 the Deno authors. MIT license.
-import { DenoWorkspace } from "./deno_workspace.ts";
+#!/usr/bin/env -S oden run -A --lock=tools/oden.lock.json
+// Copyright 2018-2026 the Oden authors. MIT license.
+import { OdenWorkspace } from "./oden_workspace.ts";
 import { $, type Crate, GitLogOutput, semver } from "./deps.ts";
 
 // Crates that the root Cargo.toml declares under a key that differs from the
-// crate name (ex. `v8 = { package = "deno_v8", ... }`). The release automation
+// crate name (ex. `v8 = { package = "oden_v8", ... }`). The release automation
 // finds dependency entries by matching the crate name at the start of a line,
 // so it can't see these and errors out. Bump them by hand instead.
-const renamedCrates = new Set(["deno_v8"]);
+const renamedCrates = new Set(["oden_v8"]);
 
-const workspace = await DenoWorkspace.load();
+const workspace = await OdenWorkspace.load();
 const repo = workspace.repo;
 const cliCrate = workspace.getCliCrate();
-const denoRtCrate = workspace.getDenoRtCrate();
-const denoLibCrate = workspace.getDenoLibCrate();
+const odenRtCrate = workspace.getOdenRtCrate();
+const odenLibCrate = workspace.getOdenLibCrate();
 const originalCliVersion = cliCrate.version;
 
 const prereleaseKind = (["--rc", "--alpha", "--beta"] as const).find((a) =>
-  Deno.args.includes(a)
+  Oden.args.includes(a)
 );
 if (prereleaseKind) {
   const tag = prereleaseKind.slice(2); // "rc", "alpha", or "beta"
@@ -35,31 +35,31 @@ if (prereleaseKind) {
   const version = cliVersion.toString();
 
   await cliCrate.setVersion(version);
-  await denoRtCrate.setVersion(version);
-  denoLibCrate.folderPath.join("version.txt").writeTextSync(version);
+  await odenRtCrate.setVersion(version);
+  odenLibCrate.folderPath.join("version.txt").writeTextSync(version);
   // Force lockfile update
   await workspace.getCliCrate().cargoUpdate("--workspace");
 
-  await assertDenoBinaryVersion(version);
+  await assertOdenBinaryVersion(version);
 
-  Deno.exit(0);
+  Oden.exit(0);
 }
 
 await bumpCiCacheVersion();
 
 // increment the cli version
-if (Deno.args.some((a) => a === "--patch")) {
+if (Oden.args.some((a) => a === "--patch")) {
   await cliCrate.increment("patch");
-} else if (Deno.args.some((a) => a === "--minor")) {
+} else if (Oden.args.some((a) => a === "--minor")) {
   await cliCrate.increment("minor");
-} else if (Deno.args.some((a) => a === "--major")) {
+} else if (Oden.args.some((a) => a === "--major")) {
   await cliCrate.increment("major");
 } else {
   await cliCrate.promptAndIncrement();
 }
 
-await denoRtCrate.setVersion(cliCrate.version);
-denoLibCrate.folderPath.join("version.txt").writeTextSync(cliCrate.version);
+await odenRtCrate.setVersion(cliCrate.version);
+odenLibCrate.folderPath.join("version.txt").writeTextSync(cliCrate.version);
 
 // increment the dependency crate versions
 for (const crate of workspace.getCliDependencyCrates()) {
@@ -72,7 +72,7 @@ for (const crate of workspace.getCliDependencyCrates()) {
 
 // update the lock file
 await workspace.getCliCrate().cargoUpdate("--workspace");
-await assertDenoBinaryVersion(cliCrate.version);
+await assertOdenBinaryVersion(cliCrate.version);
 
 // try to update the Releases.md markdown text
 try {
@@ -124,12 +124,12 @@ function updateFileEnsureChange(
   filePath: string,
   action: (fileText: string) => string,
 ) {
-  const originalText = Deno.readTextFileSync(filePath);
+  const originalText = Oden.readTextFileSync(filePath);
   const newText = action(originalText);
   if (originalText === newText) {
     throw new Error(`The file didn't change: ${filePath}`);
   }
-  Deno.writeTextFileSync(filePath, newText);
+  Oden.writeTextFileSync(filePath, newText);
 }
 
 async function updateReleasesMd() {
@@ -211,13 +211,13 @@ async function bumpCiCacheVersion() {
   await $`${generateScript}`;
 }
 
-async function assertDenoBinaryVersion(expectedVersion: string) {
-  $.logStep("Verifying Deno binary version.");
-  const text = (await $`cargo run -p deno -- -v`.text()).replace("deno ", "");
+async function assertOdenBinaryVersion(expectedVersion: string) {
+  $.logStep("Verifying Oden binary version.");
+  const text = (await $`cargo run -p oden -- -v`.text()).replace("oden ", "");
   $.logLight("Version:", text);
   if (text.trim() !== expectedVersion) {
     $.logError("Error: Expected", expectedVersion, "but found", text);
-    Deno.exit(1);
+    Oden.exit(1);
   }
 }
 

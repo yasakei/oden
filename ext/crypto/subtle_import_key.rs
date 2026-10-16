@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! `SubtleCrypto.importKey()` body in Rust.
 //!
@@ -33,11 +33,11 @@ const BASE64_JWK_FORGIVING: base64::engine::general_purpose::GeneralPurpose =
       .with_decode_allow_trailing_bits(true)
       .with_decode_padding_mode(base64::engine::DecodePaddingMode::Indifferent),
   );
-use deno_core::v8;
-use deno_core::webidl::ContextFn;
-use deno_core::webidl::WebIdlConverter;
-use deno_core::webidl::WebIdlError;
-use deno_core::webidl::WebIdlErrorKind;
+use oden_core::v8;
+use oden_core::webidl::ContextFn;
+use oden_core::webidl::WebIdlConverter;
+use oden_core::webidl::WebIdlError;
+use oden_core::webidl::WebIdlErrorKind;
 use deno_error::JsErrorBox;
 
 use crate::CryptoError;

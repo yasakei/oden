@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core, primordials } = __bootstrap;
@@ -12,13 +12,13 @@ const {
 } = primordials;
 
 const lazyStatUtils = core.createLazyLoader(
-  "ext:deno_node/internal/fs/stat_utils.ts",
+  "ext:oden_node/internal/fs/stat_utils.ts",
 );
 const lazyFsUtils = core.createLazyLoader(
-  "ext:deno_node/internal/fs/utils.mjs",
+  "ext:oden_node/internal/fs/utils.mjs",
 );
-const { denoErrorToNodeError } = core.loadExtScript(
-  "ext:deno_node/internal/errors.ts",
+const { odenErrorToNodeError } = core.loadExtScript(
+  "ext:oden_node/internal/errors.ts",
 );
 
 function nodeFsStatToFileInfo(stat) {
@@ -69,7 +69,7 @@ function fstat(
         null,
         lazyStatUtils().CFISBIS(nodeFsStatToFileInfo(stat), options.bigint),
       ),
-    (err) => callback(denoErrorToNodeError(err, { syscall: "fstat" })),
+    (err) => callback(odenErrorToNodeError(err, { syscall: "fstat" })),
   );
 }
 
@@ -85,7 +85,7 @@ function fstatSync(
       options?.bigint || false,
     );
   } catch (err) {
-    throw denoErrorToNodeError(err, { syscall: "fstat" });
+    throw odenErrorToNodeError(err, { syscall: "fstat" });
   }
 }
 

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::hash::Hash;
@@ -14,7 +14,7 @@ use super::DiskCache;
 use super::DiskCacheSys;
 
 #[allow(clippy::disallowed_types, reason = "definition")]
-pub type EmitCacheRc<TSys> = deno_maybe_sync::MaybeArc<EmitCache<TSys>>;
+pub type EmitCacheRc<TSys> = oden_maybe_sync::MaybeArc<EmitCache<TSys>>;
 
 #[sys_traits::auto_impl]
 pub trait EmitCacheSys: DiskCacheSys + sys_traits::EnvVar {}
@@ -40,12 +40,12 @@ impl<TSys: EmitCacheSys> EmitCache<TSys> {
     disk_cache: DiskCache<TSys>,
     cache_version: Cow<'static, str>,
   ) -> Self {
-    let emit_cache_mode = sys.env_var_os("DENO_EMIT_CACHE_MODE");
+    let emit_cache_mode = sys.env_var_os("ODEN_EMIT_CACHE_MODE");
     let mode = match emit_cache_mode.as_ref().and_then(|s| s.to_str()) {
       Some("normal") | Some("") | None => Mode::Normal,
       Some("disable") => Mode::Disable,
       _ => {
-        log::warn!("Unknown DENO_EMIT_CACHE_MODE value, defaulting to normal");
+        log::warn!("Unknown ODEN_EMIT_CACHE_MODE value, defaulting to normal");
         Mode::Normal
       }
     };
@@ -119,7 +119,7 @@ impl<TSys: EmitCacheSys> EmitCache<TSys> {
   }
 }
 
-const LAST_LINE_PREFIX: &str = "\n// denoCacheMetadata=";
+const LAST_LINE_PREFIX: &str = "\n// odenCacheMetadata=";
 
 #[derive(Debug)]
 struct EmitFileSerializer {

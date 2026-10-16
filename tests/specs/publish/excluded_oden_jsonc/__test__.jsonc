@@ -1,0 +1,14 @@
+{
+  "tempDir": true,
+  "steps": [{
+    "args": [
+      "eval",
+      "Oden.writeTextFileSync('.gitignore', 'oden.jsonc')"
+    ],
+    "output": "[WILDCARD]"
+  }, {
+    "args": "publish --dry-run",
+    "output": "mod.out",
+    "exitCode": 0
+  }]
+}

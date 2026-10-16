@@ -1,4 +1,4 @@
-import "npm:@denotest/esm-basic";
-import "npm:@denotest/add";
-import "npm:@denotest/subtract";
+import "npm:@odentest/esm-basic";
+import "npm:@odentest/add";
+import "npm:@odentest/subtract";
 import "npm:preact";

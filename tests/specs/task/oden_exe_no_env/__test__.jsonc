@@ -1,0 +1,4 @@
+{
+  "args": "task -q --config oden.json oden_echo",
+  "output": "task_oden_exe_no_env.out"
+}

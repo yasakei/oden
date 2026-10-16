@@ -1,39 +1,39 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import process from "node:process";
 import { assertEquals, assertThrows } from "./test_util.ts";
 
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
     permissions: { sys: ["umask"] },
   },
   function umaskSuccess() {
-    const prevMask = Deno.umask(0o020);
-    const newMask = Deno.umask(prevMask);
-    const finalMask = Deno.umask();
+    const prevMask = Oden.umask(0o020);
+    const newMask = Oden.umask(prevMask);
+    const finalMask = Oden.umask();
     assertEquals(newMask, 0o020);
     assertEquals(finalMask, prevMask);
   },
 );
 
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
     permissions: { sys: false },
   },
   function umaskRequiresSysPermission() {
     assertThrows(() => {
-      Deno.umask();
-    }, Deno.errors.NotCapable);
+      Oden.umask();
+    }, Oden.errors.NotCapable);
     assertThrows(() => {
-      Deno.umask(0);
-    }, Deno.errors.NotCapable);
+      Oden.umask(0);
+    }, Oden.errors.NotCapable);
   },
 );
 
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
     permissions: { sys: ["umask"] },
   },
   function processUmaskSuccess() {
@@ -45,38 +45,38 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
     permissions: { sys: false },
   },
   function processUmaskRequiresSysPermission() {
     assertThrows(() => {
       process.umask();
-    }, Deno.errors.NotCapable);
+    }, Oden.errors.NotCapable);
     assertThrows(() => {
       process.umask(0);
-    }, Deno.errors.NotCapable);
+    }, Oden.errors.NotCapable);
   },
 );
 
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
     permissions: { sys: ["umask"] },
   },
   async function workerWithoutSysPermissionCannotUseUmask() {
-    const prevMask = Deno.umask(0o022);
+    const prevMask = Oden.umask(0o022);
     const workerUrl = URL.createObjectURL(
       new Blob([
         `
 const results = [];
 try {
-  Deno.umask();
+  Oden.umask();
   results.push("read");
 } catch (err) {
   results.push(
-    err instanceof Deno.errors.NotCapable
+    err instanceof Oden.errors.NotCapable
       ? "read NotCapable"
       : err instanceof Error
       ? err.name
@@ -84,11 +84,11 @@ try {
   );
 }
 try {
-  Deno.umask(0);
+  Oden.umask(0);
   results.push("changed");
 } catch (err) {
   results.push(
-    err instanceof Deno.errors.NotCapable
+    err instanceof Oden.errors.NotCapable
       ? "set NotCapable"
       : err instanceof Error
       ? err.name
@@ -101,7 +101,7 @@ postMessage(results);
     );
     const worker = new Worker(workerUrl, {
       type: "module",
-      deno: { permissions: "none" },
+      oden: { permissions: "none" },
     });
 
     try {
@@ -109,11 +109,11 @@ postMessage(results);
         worker.onmessage = (event) => resolve(event.data);
       });
       assertEquals(result, ["read NotCapable", "set NotCapable"]);
-      assertEquals(Deno.umask(), 0o022);
+      assertEquals(Oden.umask(), 0o022);
     } finally {
       worker.terminate();
       URL.revokeObjectURL(workerUrl);
-      Deno.umask(prevMask);
+      Oden.umask(prevMask);
     }
   },
 );

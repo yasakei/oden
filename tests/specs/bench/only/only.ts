@@ -1,15 +1,15 @@
-Deno.bench({
+Oden.bench({
   name: "before",
   fn() {},
 });
 
-Deno.bench({
+Oden.bench({
   only: true,
   name: "only",
   fn() {},
 });
 
-Deno.bench({
+Oden.bench({
   name: "after",
   fn() {},
 });

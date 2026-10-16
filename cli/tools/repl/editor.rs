@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::path::PathBuf;
@@ -11,10 +11,10 @@ use deno_ast::swc::parser::token::BinOpToken;
 use deno_ast::swc::parser::token::Token;
 use deno_ast::swc::parser::token::Word;
 use deno_ast::view::AssignOp;
-use deno_core::anyhow::Context as _;
-use deno_core::error::AnyError;
-use deno_core::parking_lot::Mutex;
-use deno_core::serde_json;
+use oden_core::anyhow::Context as _;
+use oden_core::error::AnyError;
+use oden_core::parking_lot::Mutex;
+use oden_core::serde_json;
 use rustyline::Cmd;
 use rustyline::CompletionType;
 use rustyline::ConditionalEventHandler;

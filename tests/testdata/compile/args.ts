@@ -1,3 +1,3 @@
-Deno.args.forEach((arg) => {
+Oden.args.forEach((arg) => {
   console.log(arg);
 });

@@ -1,1 +1,1 @@
-import { add } from "@denotest/esm-basic";
+import { add } from "@odentest/esm-basic";

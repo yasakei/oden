@@ -1,0 +1,7 @@
+{
+  "lock": false,
+  "importMap": "../import_map.json",
+  "tasks": {
+    "regenerate-lockfile": "rm oden.lock.json ; oden install --lock=oden.lock.json -e release/deps.ts ../tests/wpt/wpt.ts"
+  }
+}

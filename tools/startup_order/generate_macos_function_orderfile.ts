@@ -1,5 +1,5 @@
-#!/usr/bin/env -S deno run --v8-flags=--jitless --allow-env --allow-read --allow-run --allow-write
-// Copyright 2018-2026 the Deno authors. MIT license.
+#!/usr/bin/env -S oden run --v8-flags=--jitless --allow-env --allow-read --allow-run --allow-write
+// Copyright 2018-2026 the Oden authors. MIT license.
 // deno-lint-ignore-file no-console camelcase
 /**
  * Generate a macOS arm64 linker order from exact first function entries.
@@ -40,7 +40,7 @@ function usage(): never {
       "[--tracer-source PATH] [--repeats N] " +
       "[--workload-profile run-first|timer-free-first]",
   );
-  Deno.exit(2);
+  Oden.exit(2);
 }
 
 function parseArgs(args: string[]): Options {
@@ -89,9 +89,9 @@ async function runCommand(
     env?: Record<string, string>;
     timeoutMs?: number;
   } = {},
-): Promise<Deno.CommandOutput> {
+): Promise<Oden.CommandOutput> {
   const [command, ...args] = argv;
-  const child = new Deno.Command(command, {
+  const child = new Oden.Command(command, {
     args,
     cwd: options.cwd,
     env: options.env,
@@ -136,21 +136,21 @@ async function writeFixtures(
   const node = join(root, "node.ts");
   const format = join(root, "format_me.ts");
   await Promise.all([
-    Deno.writeTextFile(empty, "void 0;\n"),
-    Deno.writeTextFile(timer, "setTimeout(() => {}, 0);\n"),
-    Deno.writeTextFile(
+    Oden.writeTextFile(empty, "void 0;\n"),
+    Oden.writeTextFile(timer, "setTimeout(() => {}, 0);\n"),
+    Oden.writeTextFile(
       timerFree,
       "Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1);\n",
     ),
-    Deno.writeTextFile(
+    Oden.writeTextFile(
       hello,
       "const greet = (name: string): string => `hello ${name}`;\n" +
         'console.log(greet("world"));\n',
     ),
-    Deno.writeTextFile(
+    Oden.writeTextFile(
       server,
       "const abort = new AbortController();\n" +
-        "const server = Deno.serve(\n" +
+        "const server = Oden.serve(\n" +
         "  { port: 0, signal: abort.signal },\n" +
         '  () => new Response("ok"),\n' +
         ");\n" +
@@ -158,52 +158,52 @@ async function writeFixtures(
         "abort.abort();\n" +
         "await server.finished;\n",
     ),
-    Deno.writeTextFile(
+    Oden.writeTextFile(
       test,
-      'Deno.test("passes", () => {\n' +
+      'Oden.test("passes", () => {\n' +
         '  if (1 + 1 !== 2) throw new Error("bad arithmetic");\n' +
         "});\n",
     ),
-    Deno.writeTextFile(
+    Oden.writeTextFile(
       node,
       'import { createHash } from "node:crypto";\n' +
         'console.log(createHash("sha256").update("x").digest("hex"));\n',
     ),
-    Deno.writeTextFile(
+    Oden.writeTextFile(
       format,
       "export const value = { nested: [1, 2, 3] };\n",
     ),
   ]);
 
   const runEmpty = {
-    name: "deno run empty",
+    name: "oden run empty",
     args: ["run", "--quiet", empty],
     cwd: root,
   };
   const runTimerFree = {
-    name: "deno run timer-free",
+    name: "oden run timer-free",
     args: ["run", "--quiet", timerFree],
     cwd: root,
   };
   const remaining: Workload[] = [
-    { name: "deno run hello", args: ["run", "--quiet", hello], cwd: root },
+    { name: "oden run hello", args: ["run", "--quiet", hello], cwd: root },
     {
-      name: "deno run timer",
+      name: "oden run timer",
       args: ["run", "--quiet", timer],
       cwd: root,
     },
     {
-      name: "deno serve",
+      name: "oden serve",
       args: ["run", "--quiet", "--allow-net", server],
       cwd: root,
     },
-    { name: "deno test", args: ["test", "--quiet", test], cwd: root },
+    { name: "oden test", args: ["test", "--quiet", test], cwd: root },
     {
-      name: "deno node:crypto",
+      name: "oden node:crypto",
       args: ["run", "--quiet", node],
       cwd: root,
     },
-    { name: "deno fmt", args: ["fmt", "--check", format], cwd: root },
+    { name: "oden fmt", args: ["fmt", "--check", format], cwd: root },
   ];
   return profile === "run-first"
     ? [runEmpty, ...remaining]
@@ -279,21 +279,21 @@ function intersectionSize(sets: Set<number>[]): number {
 }
 
 async function generate(options: Options) {
-  if (Deno.build.os !== "darwin" || Deno.build.arch !== "aarch64") {
+  if (Oden.build.os !== "darwin" || Oden.build.arch !== "aarch64") {
     throw new Error("exact function tracing requires arm64 macOS");
   }
-  const binary = await Deno.realPath(options.binary);
-  const tracerSource = await Deno.realPath(options.tracerSource);
-  const runnerSource = await Deno.realPath(
+  const binary = await Oden.realPath(options.binary);
+  const tracerSource = await Oden.realPath(options.tracerSource);
+  const runnerSource = await Oden.realPath(
     join(dirname(tracerSource), "orderfile_trace_runner.c"),
   );
-  await Deno.mkdir(dirname(options.output), { recursive: true });
+  await Oden.mkdir(dirname(options.output), { recursive: true });
 
-  const root = await Deno.makeTempDir({ prefix: "deno-function-order-" });
+  const root = await Oden.makeTempDir({ prefix: "oden-function-order-" });
   const tracer = join(root, "function_tracer.dylib");
   const runner = join(root, "trace_runner");
-  const denoDir = join(root, "deno-dir");
-  await Deno.mkdir(denoDir);
+  const odenDir = join(root, "oden-dir");
+  await Oden.mkdir(odenDir);
   try {
     await runCommand([
       "xcrun",
@@ -329,22 +329,22 @@ async function generate(options: Options) {
         );
         await runCommand([
           runner,
-          String(Deno.pid),
+          String(Oden.pid),
           binary,
           ...workload.args,
         ], {
           cwd: workload.cwd,
           env: {
-            ...Deno.env.toObject(),
-            DENO_ORDER_RUNNER_PRELOAD: tracer,
-            DENO_FUNCTION_TRACE_OUT: tracePath,
-            DENO_DIR: denoDir,
-            DENO_NO_UPDATE_CHECK: "1",
-            DENO_NO_PACKAGE_JSON: "1",
+            ...Oden.env.toObject(),
+            ODEN_ORDER_RUNNER_PRELOAD: tracer,
+            ODEN_FUNCTION_TRACE_OUT: tracePath,
+            ODEN_DIR: odenDir,
+            ODEN_NO_UPDATE_CHECK: "1",
+            ODEN_NO_PACKAGE_JSON: "1",
             NO_COLOR: "1",
           },
         });
-        const trace = parseTrace(await Deno.readFile(tracePath));
+        const trace = parseTrace(await Oden.readFile(tracePath));
         totalStarts ??= trace.totalStarts;
         if (trace.totalStarts !== totalStarts) {
           throw new Error("LC_FUNCTION_STARTS count changed between traces");
@@ -401,7 +401,7 @@ async function generate(options: Options) {
       `# Profile: ${options.workloadProfile}; ${options.repeats} traces per workload.`,
       `# ${seenAddresses.size} function addresses; ${orderedNames.length} symbol names.`,
     ];
-    await Deno.writeTextFile(
+    await Oden.writeTextFile(
       options.output,
       [...comments, ...orderedNames, ""].join("\n"),
     );
@@ -417,16 +417,16 @@ async function generate(options: Options) {
       symbol_names: orderedNames.length,
       workloads: workloadReports,
     };
-    await Deno.writeTextFile(
+    await Oden.writeTextFile(
       `${options.output}.json`,
       `${JSON.stringify(report, null, 2)}\n`,
     );
     console.log(JSON.stringify(report, null, 2));
   } finally {
-    await Deno.remove(root, { recursive: true });
+    await Oden.remove(root, { recursive: true });
   }
 }
 
 if (import.meta.main) {
-  await generate(parseArgs(Deno.args));
+  await generate(parseArgs(Oden.args));
 }

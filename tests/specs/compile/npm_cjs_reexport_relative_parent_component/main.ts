@@ -1,2 +1,2 @@
-import { hello } from "npm:@denotest/cjs-reexport-relative-parent";
+import { hello } from "npm:@odentest/cjs-reexport-relative-parent";
 hello.sayHello();

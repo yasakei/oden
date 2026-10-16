@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! WebCrypto `CryptoKey` as a cppgc-wrapped Rust object.
 //!
@@ -10,12 +10,12 @@
 
 use std::ffi::CStr;
 
-use deno_core::GarbageCollected;
-use deno_core::cppgc::UnsafePtr;
-use deno_core::cppgc::try_unwrap_cppgc_object;
-use deno_core::op2;
-use deno_core::v8;
-use deno_core::webidl::WebIdlInterfaceConverter;
+use oden_core::GarbageCollected;
+use oden_core::cppgc::UnsafePtr;
+use oden_core::cppgc::try_unwrap_cppgc_object;
+use oden_core::op2;
+use oden_core::v8;
+use oden_core::webidl::WebIdlInterfaceConverter;
 
 use crate::key_store::CryptoKeyHandle;
 use crate::shared::SharedError;

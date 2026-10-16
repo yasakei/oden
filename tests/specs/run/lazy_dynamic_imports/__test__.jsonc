@@ -8,7 +8,7 @@
       }, {
         "args": [
           "eval",
-          "console.log(Deno.readTextFileSync('deno.lock').trim());"
+          "console.log(Oden.readTextFileSync('oden.lock').trim());"
         ],
         "output": "lock.out"
       }]
@@ -20,7 +20,7 @@
       "output": "check.out"
     },
     "enabled_config": {
-      "args": "run --no-lock --config=deno.enabled.json main.ts",
+      "args": "run --no-lock --config=oden.enabled.json main.ts",
       "output": "enabled.out"
     },
     "disabled": {

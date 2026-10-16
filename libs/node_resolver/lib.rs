@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![deny(clippy::print_stderr)]
 #![deny(clippy::print_stdout)]
@@ -12,12 +12,12 @@ mod package_json;
 mod path;
 mod resolution;
 
-pub use builtin_modules::DENO_SUPPORTED_BUILTIN_NODE_MODULES;
-pub use builtin_modules::DenoIsBuiltInNodeModuleChecker;
+pub use builtin_modules::ODEN_SUPPORTED_BUILTIN_NODE_MODULES;
+pub use builtin_modules::OdenIsBuiltInNodeModuleChecker;
 pub use builtin_modules::IsBuiltInNodeModuleChecker;
 pub use cache::NodeResolutionCache;
 pub use cache::NodeResolutionCacheRc;
-pub use deno_package_json::PackageJson;
+pub use oden_package_json::PackageJson;
 pub use npm::InNpmPackageChecker;
 pub use npm::NpmPackageFolderResolver;
 pub use package_json::PackageJsonCacheRc;

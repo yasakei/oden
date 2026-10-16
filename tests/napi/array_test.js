@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { assertEquals, loadTestLibrary } from "./common.js";
 
 const array = loadTestLibrary();
 
-Deno.test("napi array new", function () {
+Oden.test("napi array new", function () {
   const e = [0, "Hello", {}];
   const r = array.test_array_new(e);
   assertEquals(typeof r, "object");
@@ -12,7 +12,7 @@ Deno.test("napi array new", function () {
   assertEquals(e, r);
 });
 
-Deno.test("napi array new with length", function () {
+Oden.test("napi array new with length", function () {
   const r = array.test_array_new_with_length(100);
   assertEquals(typeof r, "object");
   assertEquals(r.length, 100);

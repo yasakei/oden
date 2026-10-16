@@ -1,0 +1,16 @@
+{
+  "tempDir": true,
+  "steps": [
+    {
+      "args": "add jsr:@odentest/add",
+      "output": "add.out"
+    },
+    {
+      "args": [
+        "eval",
+        "console.log(Oden.readTextFileSync('./oden.json').trim())"
+      ],
+      "output": "oden.json.out"
+    }
+  ]
+}

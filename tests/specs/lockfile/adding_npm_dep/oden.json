@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "cat": "cat"
+  },
+  "imports": {
+    "add": "npm:@odentest/add@1",
+    "subtract": "npm:@odentest/subtract@1"
+  }
+}

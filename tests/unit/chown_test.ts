@@ -1,14 +1,14 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assertEquals, assertRejects, assertThrows } from "./test_util.ts";
 
 // chown on Windows is noop for now, so ignore its testing on Windows
 
 async function getUidAndGid(): Promise<{ uid: number; gid: number }> {
   // get the user ID and group ID of the current process
-  const uidProc = await new Deno.Command("id", {
+  const uidProc = await new Oden.Command("id", {
     args: ["-u"],
   }).output();
-  const gidProc = await new Deno.Command("id", {
+  const gidProc = await new Oden.Command("id", {
     args: ["-g"],
   }).output();
 
@@ -20,88 +20,88 @@ async function getUidAndGid(): Promise<{ uid: number; gid: number }> {
   return { uid, gid };
 }
 
-Deno.test(
-  { ignore: Deno.build.os == "windows", permissions: { write: false } },
+Oden.test(
+  { ignore: Oden.build.os == "windows", permissions: { write: false } },
   async function chownNoWritePermission() {
     const filePath = "chown_test_file.txt";
     await assertRejects(async () => {
-      await Deno.chown(filePath, 1000, 1000);
-    }, Deno.errors.NotCapable);
+      await Oden.chown(filePath, 1000, 1000);
+    }, Oden.errors.NotCapable);
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { run: true, write: true },
-    ignore: Deno.build.os == "windows",
+    ignore: Oden.build.os == "windows",
   },
   async function chownSyncFileNotExist() {
     const { uid, gid } = await getUidAndGid();
-    const filePath = Deno.makeTempDirSync() + "/chown_test_file.txt";
+    const filePath = Oden.makeTempDirSync() + "/chown_test_file.txt";
 
     assertThrows(
       () => {
-        Deno.chownSync(filePath, uid, gid);
+        Oden.chownSync(filePath, uid, gid);
       },
-      Deno.errors.NotFound,
+      Oden.errors.NotFound,
       `chown '${filePath}'`,
     );
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { run: true, write: true },
-    ignore: Deno.build.os == "windows",
+    ignore: Oden.build.os == "windows",
   },
   async function chownFileNotExist() {
     const { uid, gid } = await getUidAndGid();
-    const filePath = (await Deno.makeTempDir()) + "/chown_test_file.txt";
+    const filePath = (await Oden.makeTempDir()) + "/chown_test_file.txt";
 
     await assertRejects(
       async () => {
-        await Deno.chown(filePath, uid, gid);
+        await Oden.chown(filePath, uid, gid);
       },
-      Deno.errors.NotFound,
+      Oden.errors.NotFound,
       `chown '${filePath}'`,
     );
   },
 );
 
-Deno.test(
-  { permissions: { write: true }, ignore: Deno.build.os == "windows" },
+Oden.test(
+  { permissions: { write: true }, ignore: Oden.build.os == "windows" },
   function chownSyncPermissionDenied() {
-    const dirPath = Deno.makeTempDirSync();
+    const dirPath = Oden.makeTempDirSync();
     const filePath = dirPath + "/chown_test_file.txt";
-    Deno.writeTextFileSync(filePath, "Hello");
+    Oden.writeTextFileSync(filePath, "Hello");
 
     assertThrows(() => {
       // try changing the file's owner to root
-      Deno.chownSync(filePath, 0, 0);
-    }, Deno.errors.PermissionDenied);
-    Deno.removeSync(dirPath, { recursive: true });
+      Oden.chownSync(filePath, 0, 0);
+    }, Oden.errors.PermissionDenied);
+    Oden.removeSync(dirPath, { recursive: true });
   },
 );
 
-Deno.test(
-  { permissions: { write: true }, ignore: Deno.build.os == "windows" },
+Oden.test(
+  { permissions: { write: true }, ignore: Oden.build.os == "windows" },
   async function chownPermissionDenied() {
-    const dirPath = await Deno.makeTempDir();
+    const dirPath = await Oden.makeTempDir();
     const filePath = dirPath + "/chown_test_file.txt";
-    await Deno.writeTextFile(filePath, "Hello");
+    await Oden.writeTextFile(filePath, "Hello");
 
     await assertRejects(async () => {
       // try changing the file's owner to root
-      await Deno.chown(filePath, 0, 0);
-    }, Deno.errors.PermissionDenied);
-    await Deno.remove(dirPath, { recursive: true });
+      await Oden.chown(filePath, 0, 0);
+    }, Oden.errors.PermissionDenied);
+    await Oden.remove(dirPath, { recursive: true });
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { run: true, write: true },
-    ignore: Deno.build.os == "windows",
+    ignore: Oden.build.os == "windows",
   },
   async function chownSyncSucceed() {
     // TODO(bartlomieju): when a file's owner is actually being changed,
@@ -109,82 +109,82 @@ Deno.test(
     // The test script has no such privilege, so need to find a better way to test this case
     const { uid, gid } = await getUidAndGid();
 
-    const dirPath = Deno.makeTempDirSync();
+    const dirPath = Oden.makeTempDirSync();
     const filePath = dirPath + "/chown_test_file.txt";
-    Deno.writeTextFileSync(filePath, "Hello");
+    Oden.writeTextFileSync(filePath, "Hello");
 
     // the test script creates this file with the same uid and gid,
     // here chown is a noop so it succeeds under non-privileged user
-    Deno.chownSync(filePath, uid, gid);
+    Oden.chownSync(filePath, uid, gid);
 
-    Deno.removeSync(dirPath, { recursive: true });
+    Oden.removeSync(dirPath, { recursive: true });
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { run: true, write: true },
-    ignore: Deno.build.os == "windows",
+    ignore: Oden.build.os == "windows",
   },
   async function chownSyncWithUrl() {
     const { uid, gid } = await getUidAndGid();
-    const dirPath = Deno.makeTempDirSync();
+    const dirPath = Oden.makeTempDirSync();
     const fileUrl = new URL(`file://${dirPath}/chown_test_file.txt`);
-    Deno.writeTextFileSync(fileUrl, "Hello");
-    Deno.chownSync(fileUrl, uid, gid);
-    Deno.removeSync(dirPath, { recursive: true });
+    Oden.writeTextFileSync(fileUrl, "Hello");
+    Oden.chownSync(fileUrl, uid, gid);
+    Oden.removeSync(dirPath, { recursive: true });
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { run: true, write: true },
-    ignore: Deno.build.os == "windows",
+    ignore: Oden.build.os == "windows",
   },
   async function chownSucceed() {
     const { uid, gid } = await getUidAndGid();
-    const dirPath = await Deno.makeTempDir();
+    const dirPath = await Oden.makeTempDir();
     const filePath = dirPath + "/chown_test_file.txt";
-    await Deno.writeTextFile(filePath, "Hello");
-    await Deno.chown(filePath, uid, gid);
-    Deno.removeSync(dirPath, { recursive: true });
+    await Oden.writeTextFile(filePath, "Hello");
+    await Oden.chown(filePath, uid, gid);
+    Oden.removeSync(dirPath, { recursive: true });
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { run: true, write: true },
-    ignore: Deno.build.os == "windows",
+    ignore: Oden.build.os == "windows",
   },
   async function chownUidOnly() {
     const { uid } = await getUidAndGid();
-    const dirPath = await Deno.makeTempDir();
+    const dirPath = await Oden.makeTempDir();
     const filePath = dirPath + "/chown_test_file.txt";
-    await Deno.writeTextFile(filePath, "Foo");
-    await Deno.chown(filePath, uid, null);
-    Deno.removeSync(dirPath, { recursive: true });
+    await Oden.writeTextFile(filePath, "Foo");
+    await Oden.chown(filePath, uid, null);
+    Oden.removeSync(dirPath, { recursive: true });
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { run: true, write: true },
-    ignore: Deno.build.os == "windows",
+    ignore: Oden.build.os == "windows",
   },
   async function chownWithUrl() {
     // TODO(bartlomieju): same as chownSyncSucceed
     const { uid, gid } = await getUidAndGid();
 
     const enc = new TextEncoder();
-    const dirPath = await Deno.makeTempDir();
+    const dirPath = await Oden.makeTempDir();
     const fileUrl = new URL(`file://${dirPath}/chown_test_file.txt`);
     const fileData = enc.encode("Hello");
-    await Deno.writeFile(fileUrl, fileData);
+    await Oden.writeFile(fileUrl, fileData);
 
     // the test script creates this file with the same uid and gid,
     // here chown is a noop so it succeeds under non-privileged user
-    await Deno.chown(fileUrl, uid, gid);
+    await Oden.chown(fileUrl, uid, gid);
 
-    Deno.removeSync(dirPath, { recursive: true });
+    Oden.removeSync(dirPath, { recursive: true });
   },
 );

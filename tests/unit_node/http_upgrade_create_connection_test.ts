@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { once } from "node:events";
 import https from "node:https";
@@ -8,7 +8,7 @@ import type { Duplex } from "node:stream";
 
 import { assert, assertStrictEquals } from "@std/assert";
 
-Deno.test({
+Oden.test({
   name: "[node/https] client upgrade reuses TLSSocket from createConnection",
   // TODO(bartlomieju): temporarily disabled during migration from resources to native handles
   ignore: true,
@@ -20,8 +20,8 @@ Deno.test({
     ],
   },
 }, async () => {
-  const cert = Deno.readTextFileSync("tests/testdata/tls/localhost.crt");
-  const key = Deno.readTextFileSync("tests/testdata/tls/localhost.key");
+  const cert = Oden.readTextFileSync("tests/testdata/tls/localhost.crt");
+  const key = Oden.readTextFileSync("tests/testdata/tls/localhost.key");
   let serverSocket: Duplex | undefined;
 
   const server = https.createServer({ cert, key });

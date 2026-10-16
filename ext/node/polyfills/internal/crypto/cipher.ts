@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and Node.js contributors. All rights reserved. MIT license.
 
 // deno-lint-ignore-file no-explicit-any
@@ -57,7 +57,7 @@ const {
   op_node_validate_oaep_hash,
 } = core.ops;
 
-const { Buffer } = core.loadExtScript("ext:deno_node/internal/buffer.mjs");
+const { Buffer } = core.loadExtScript("ext:oden_node/internal/buffer.mjs");
 
 const lazyStream = core.createLazyLoader("node:stream");
 
@@ -65,38 +65,38 @@ const {
   createPrivateKey,
   createPublicKey,
   getArrayBufferOrView,
-} = core.loadExtScript("ext:deno_node/internal/crypto/keys.ts");
+} = core.loadExtScript("ext:oden_node/internal/crypto/keys.ts");
 const { isKeyObject } = core.loadExtScript(
-  "ext:deno_node/internal/crypto/_keys.ts",
+  "ext:oden_node/internal/crypto/_keys.ts",
 );
 const { kHandle } = core.loadExtScript(
-  "ext:deno_node/internal/crypto/constants.ts",
+  "ext:oden_node/internal/crypto/constants.ts",
 );
 const { getDefaultEncoding } = core.loadExtScript(
-  "ext:deno_node/internal/crypto/util.ts",
+  "ext:oden_node/internal/crypto/util.ts",
 );
 const {
   ERR_INVALID_ARG_TYPE,
   ERR_INVALID_ARG_VALUE,
   ERR_UNKNOWN_ENCODING,
   NodeError,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
 
 const {
   isAnyArrayBuffer,
   isArrayBufferView,
   isTypedArray,
-} = core.loadExtScript("ext:deno_node/internal/util/types.ts");
+} = core.loadExtScript("ext:oden_node/internal/util/types.ts");
 const { ERR_CRYPTO_INVALID_STATE, ERR_CRYPTO_UNKNOWN_CIPHER } = core
   .loadExtScript(
-    "ext:deno_node/internal/errors.ts",
+    "ext:oden_node/internal/errors.ts",
   );
 const { StringDecoder } = core.loadExtScript(
-  "ext:deno_node/string_decoder.ts",
+  "ext:oden_node/string_decoder.ts",
 );
-const { default: assert } = core.loadExtScript("ext:deno_node/assert.ts");
+const { default: assert } = core.loadExtScript("ext:oden_node/assert.ts");
 const { normalizeEncoding } = core.loadExtScript(
-  "ext:deno_node/internal/util.mjs",
+  "ext:oden_node/internal/util.mjs",
 );
 
 let Transform;
@@ -196,12 +196,12 @@ function Cipheriv(
 
   FunctionPrototypeCall(getTransform(), this, {
     transform(chunk, encoding, cb) {
-      // deno-lint-ignore deno-internal/prefer-primordials -- `this` is a Transform stream
+      // deno-lint-ignore oden-internal/prefer-primordials -- `this` is a Transform stream
       this.push(this.update(chunk, encoding));
       cb();
     },
     final(cb) {
-      // deno-lint-ignore deno-internal/prefer-primordials -- `this` is a Transform stream
+      // deno-lint-ignore oden-internal/prefer-primordials -- `this` is a Transform stream
       this.push(this.final());
       cb();
     },
@@ -507,12 +507,12 @@ function Decipheriv(
 
   FunctionPrototypeCall(getTransform(), this, {
     transform(chunk, encoding, cb) {
-      // deno-lint-ignore deno-internal/prefer-primordials -- `this` is a Transform stream
+      // deno-lint-ignore oden-internal/prefer-primordials -- `this` is a Transform stream
       this.push(this.update(chunk, encoding));
       cb();
     },
     final(cb) {
-      // deno-lint-ignore deno-internal/prefer-primordials -- `this` is a Transform stream
+      // deno-lint-ignore oden-internal/prefer-primordials -- `this` is a Transform stream
       this.push(this.final());
       cb();
     },
@@ -649,7 +649,7 @@ Decipheriv.prototype.setAuthTag = function (
   // GCM authentication tag must be the full 128 bits (16 bytes); shorter tags
   // are only accepted when `authTagLength` is set. This used to be the DEP0182
   // deprecation warning and is now a hard error (matching Node.js).
-  // deno-lint-ignore deno-internal/prefer-primordials -- `buffer` may be Buffer/TypedArray/DataView
+  // deno-lint-ignore oden-internal/prefer-primordials -- `buffer` may be Buffer/TypedArray/DataView
   const tagByteLength = buffer.byteLength;
   if (
     this._isGcmMode && this._authTagLength === -1 &&
@@ -659,7 +659,7 @@ Decipheriv.prototype.setAuthTag = function (
       `Invalid authentication tag length: ${tagByteLength}`,
     );
   }
-  // deno-lint-ignore deno-internal/prefer-primordials -- `buffer` may be Buffer/TypedArray/DataView
+  // deno-lint-ignore oden-internal/prefer-primordials -- `buffer` may be Buffer/TypedArray/DataView
   op_node_decipheriv_auth_tag(this._context, buffer.byteLength);
   this._authTag = buffer;
   return this;

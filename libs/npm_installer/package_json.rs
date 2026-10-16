@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use deno_config::workspace::Workspace;
-use deno_package_json::PackageJsonDepValue;
-use deno_package_json::PackageJsonDepValueParseError;
-use deno_package_json::PackageJsonDepWorkspaceReq;
+use oden_config::workspace::Workspace;
+use oden_package_json::PackageJsonDepValue;
+use oden_package_json::PackageJsonDepValueParseError;
+use oden_package_json::PackageJsonDepWorkspaceReq;
 use deno_semver::SmallStackString;
 use deno_semver::StackString;
 use deno_semver::Version;
@@ -78,7 +78,7 @@ pub struct PackageJsonDepValueParseWithLocationError {
 /// name, but the member's version did not satisfy the requested constraint.
 /// Like pnpm, this is a hard error rather than silently linking the member or
 /// falling back to the registry. The message mirrors the equivalent
-/// `deno run` resolver error (`VersionNotSatisfied`).
+/// `oden run` resolver error (`VersionNotSatisfied`).
 #[derive(Debug, Error, Clone)]
 #[error(
   "Failed to install '{alias}'{}: found package.json in workspace, but version '{version}' didn't satisfy constraint '{version_req}'\n    at {location}",
@@ -130,7 +130,7 @@ pub struct NpmInstallDepsProvider {
 }
 
 fn package_json_to_lifecycle_nv(
-  pkg_json: &deno_package_json::PackageJson,
+  pkg_json: &oden_package_json::PackageJson,
 ) -> PackageNv {
   let name = pkg_json
     .name
@@ -174,11 +174,11 @@ impl NpmInstallDepsProvider {
 
     for (folder_url, folder) in workspace.config_folders() {
       let is_root = folder_url == workspace.root_dir_url();
-      // deal with the deno.json first because it takes precedence during resolution
-      if let Some(deno_json) = &folder.deno_json {
+      // deal with the oden.json first because it takes precedence during resolution
+      if let Some(oden_json) = &folder.oden_json {
         // don't bother with externally referenced import maps as users
         // should inline their import map to get this behaviour
-        if let Some(serde_json::Value::Object(obj)) = &deno_json.json.imports {
+        if let Some(serde_json::Value::Object(obj)) = &oden_json.json.imports {
           let mut pkg_pkgs = Vec::with_capacity(obj.len());
           for (alias, value) in obj {
             let serde_json::Value::String(specifier) = value else {
@@ -234,7 +234,7 @@ impl NpmInstallDepsProvider {
             } else {
               pkg_pkgs.push(InstallNpmRemotePkg {
                 alias: None,
-                base_dir: deno_json.dir_path(),
+                base_dir: oden_json.dir_path(),
                 req: pkg_req,
               });
             }

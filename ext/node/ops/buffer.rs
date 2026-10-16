@@ -1,9 +1,9 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_core::convert::Uint8Array;
-use deno_core::op2;
-use deno_core::v8;
-use deno_core::v8_static_strings;
+use oden_core::convert::Uint8Array;
+use oden_core::op2;
+use oden_core::v8;
+use oden_core::v8_static_strings;
 use deno_error::JsErrorBox;
 
 #[op2(fast)]

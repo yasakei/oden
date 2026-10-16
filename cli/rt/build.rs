@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 fn main() {
   // Skip building from docs.rs.
@@ -6,6 +6,6 @@ fn main() {
     return;
   }
 
-  deno_runtime::deno_napi::print_linker_flags("denort");
-  deno_runtime::deno_webgpu::print_linker_flags("denort");
+  oden_runtime::oden_napi::print_linker_flags("odenrt");
+  oden_runtime::oden_webgpu::print_linker_flags("odenrt");
 }

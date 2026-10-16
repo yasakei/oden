@@ -19,7 +19,7 @@ land until the release is finished.**
 
 @here
 
-Deno v$VERSION is now getting released.
+Oden v$VERSION is now getting released.
 
 `denoland/deno` is now locked.
 
@@ -28,7 +28,7 @@ Deno v$VERSION is now getting released.
 Release checklist: <LINK TO THIS FORKED GIST GOES HERE>
 ```
 
-## Updating `deno`
+## Updating `oden`
 
 ### Phase 1: Bumping versions
 
@@ -84,7 +84,7 @@ Release checklist: <LINK TO THIS FORKED GIST GOES HERE>
   - [ ] There are 46 assets on the v$VERSION
         [GitHub release draft](https://github.com/denoland/deno/releases/).
   - [ ] There are 48 zip files for this version on
-        [dl.deno.land](https://dash.cloudflare.com/895762025d37fc687ecd72d7cc80204a/r2/default/buckets/dl-deno-land?prefix=release%2Fv$VERSION).
+        [dl.deno.land](https://dash.cloudflare.com/895762025d37fc687ecd72d7cc80204a/r2/default/buckets/dl-oden-land?prefix=release%2Fv$VERSION).
 
 - [ ] Publish the release on Github
 
@@ -110,7 +110,7 @@ Release checklist: <LINK TO THIS FORKED GIST GOES HERE>
 - [ ] Create a `$VERSION` tag (_without_ `v` prefix).
 - [ ] This will trigger a publish CI run. Verify that it completes sucessfully.
 
-## Updating `deno_pypi`
+## Updating `oden_pypi`
 
 - [ ] Run the version bump workflow:
       https://github.com/denoland/deno_pypi/actions/workflows/version-bump.yml
@@ -118,7 +118,7 @@ Release checklist: <LINK TO THIS FORKED GIST GOES HERE>
 - [ ] Run the release workflow:
       https://github.com/denoland/deno_pypi/actions/workflows/release.yml
 - [ ] This will trigger a publish CI run. Verify that it completes sucessfully
-      and new version is available at https://pypi.org/project/deno/.
+      and new version is available at https://pypi.org/project/oden/.
 
 ## Update MDN
 
@@ -127,17 +127,17 @@ Release checklist: <LINK TO THIS FORKED GIST GOES HERE>
       changes in this release. If in doubt message @bartlomieju and skip this
       step.
 
-## Add `deno upgrade` banner
+## Add `oden upgrade` banner
 
 - [ ] You can optionally add a banner that will be printed when users run
-      `deno
+      `oden
       upgrade`. This is useful in situation when you want to inform
       users about a need to run a command to enjoy a new feature or a breaking
       change.
   - Create `banner.txt` file with the content you want to print - _it must be
     plaintext_.
   - Upload the file in
-    https://dash.cloudflare.com/895762025d37fc687ecd72d7cc80204a/r2/default/buckets/dl-deno-land?prefix=release%2Fv$VERSION/banner.txt.
+    https://dash.cloudflare.com/895762025d37fc687ecd72d7cc80204a/r2/default/buckets/dl-oden-land?prefix=release%2Fv$VERSION/banner.txt.
 
 ## All done!
 
@@ -152,7 +152,7 @@ Release checklist: <LINK TO THIS FORKED GIST GOES HERE>
 
 *You can land PRs now*
 
-Deno v$VERSION has been released.
+Oden v$VERSION has been released.
 ```
 
 ## Downgrading
@@ -161,5 +161,5 @@ In case something went wrong:
 
 1. Update https://dl.deno.land/release-latest.txt to the previous release.
 1. Revert the PR to the [dotcom repo](https://github.com/denoland/dotcom/) in
-   order to prevent the [`setup-deno`](https://github.com/denoland/setup-deno)
+   order to prevent the [`setup-oden`](https://github.com/denoland/setup-deno)
    GH action from pulling it in.

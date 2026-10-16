@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use deno_core::OpState;
-use deno_core::error::AnyError;
-use deno_core::op2;
-use deno_core::serde_json;
+use oden_core::OpState;
+use oden_core::error::AnyError;
+use oden_core::op2;
+use oden_core::serde_json;
 use deno_error::JsErrorBox;
 use tokio::sync::mpsc;
 use tokio::sync::oneshot;
@@ -67,7 +67,7 @@ pub struct KernelIopubReceiver {
 }
 
 pub struct KernelIsolateHandle {
-  pub handle: deno_core::v8::IsolateHandle,
+  pub handle: oden_core::v8::IsolateHandle,
 }
 
 pub struct KernelConnectionInfo {
@@ -108,8 +108,8 @@ pub struct ReplInputSender {
 // Extension declarations
 // ------------------------------------------------------------------
 
-deno_core::extension!(
-  deno_jupyter_kernel,
+oden_core::extension!(
+  oden_jupyter_kernel,
   ops = [
     op_jupyter_get_connection_info,
     op_jupyter_repl_evaluate,
@@ -122,13 +122,13 @@ deno_core::extension!(
     op_jupyter_recv_iopub,
     op_jupyter_recv_input,
     op_jupyter_send_input_reply,
-    op_jupyter_deno_version,
+    op_jupyter_oden_version,
     op_jupyter_typescript_version,
   ],
 );
 
-deno_core::extension!(
-  deno_jupyter_repl,
+oden_core::extension!(
+  oden_jupyter_repl,
   ops = [
     op_jupyter_broadcast,
     op_jupyter_input,
@@ -150,8 +150,8 @@ deno_core::extension!(
 );
 
 // Variant used when running tests (no middleware so stdout/stderr pass through).
-deno_core::extension!(
-  deno_jupyter_repl_for_test,
+oden_core::extension!(
+  oden_jupyter_repl_for_test,
   ops = [
     op_jupyter_broadcast,
     op_jupyter_input,
@@ -169,7 +169,7 @@ deno_core::extension!(
 );
 
 // Backward-compat alias used by cli/tools/test/mod.rs
-pub use deno_jupyter_repl_for_test as deno_jupyter_for_test;
+pub use oden_jupyter_repl_for_test as oden_jupyter_for_test;
 
 // ------------------------------------------------------------------
 // Kernel-side ops
@@ -367,14 +367,14 @@ pub fn op_jupyter_send_input_reply(
 
 #[op2]
 #[string]
-pub fn op_jupyter_deno_version(_state: &mut OpState) -> String {
-  deno_lib::version::DENO_VERSION_INFO.deno.to_string()
+pub fn op_jupyter_oden_version(_state: &mut OpState) -> String {
+  oden_lib::version::ODEN_VERSION_INFO.oden.to_string()
 }
 
 #[op2]
 #[string]
 pub fn op_jupyter_typescript_version(_state: &mut OpState) -> String {
-  deno_lib::version::DENO_VERSION_INFO.typescript.to_string()
+  oden_lib::version::ODEN_VERSION_INFO.typescript.to_string()
 }
 
 // ------------------------------------------------------------------
@@ -430,7 +430,7 @@ pub fn op_jupyter_broadcast(
   #[string] message_type: String,
   #[serde] content: serde_json::Value,
   #[serde] metadata: serde_json::Value,
-  #[serde] buffers: Vec<deno_core::JsBuffer>,
+  #[serde] buffers: Vec<oden_core::JsBuffer>,
 ) -> Result<(), JupyterBroadcastError> {
   let sender = state.borrow::<ReplIopubSender>();
   sender.tx.send(IopubMessage {
@@ -461,12 +461,12 @@ pub fn op_print(state: &mut OpState, #[string] msg: &str, is_err: bool) {
 #[op2]
 #[string]
 pub fn op_jupyter_create_png_from_texture(
-  #[cppgc] texture: &deno_runtime::deno_webgpu::texture::GPUTexture,
+  #[cppgc] texture: &oden_runtime::oden_webgpu::texture::GPUTexture,
 ) -> Result<String, JsErrorBox> {
-  use deno_runtime::deno_image::image::ExtendedColorType;
-  use deno_runtime::deno_image::image::ImageEncoder;
-  use deno_runtime::deno_webgpu::error::GPUError;
-  use deno_runtime::deno_webgpu::*;
+  use oden_runtime::oden_image::image::ExtendedColorType;
+  use oden_runtime::oden_image::image::ImageEncoder;
+  use oden_runtime::oden_webgpu::error::GPUError;
+  use oden_runtime::oden_webgpu::*;
   use texture::GPUTextureFormat;
 
   let (command_encoder, maybe_err) =
@@ -507,19 +507,19 @@ pub fn op_jupyter_create_png_from_texture(
   let mut out: Vec<u8> = vec![];
 
   let img =
-    deno_runtime::deno_image::image::codecs::png::PngEncoder::new(&mut out);
+    oden_runtime::oden_image::image::codecs::png::PngEncoder::new(&mut out);
   img
     .write_image(&data, texture.size.width, texture.size.height, color_type)
     .map_err(|e| JsErrorBox::type_error(e.to_string()))?;
 
-  Ok(deno_runtime::deno_web::forgiving_base64_encode(&out))
+  Ok(oden_runtime::oden_web::forgiving_base64_encode(&out))
 }
 
 #[op2]
 pub fn op_jupyter_get_buffer(
-  #[cppgc] buffer: &deno_runtime::deno_webgpu::buffer::GPUBuffer,
-) -> Result<Vec<u8>, deno_runtime::deno_webgpu::error::GPUError> {
-  use deno_runtime::deno_webgpu::*;
+  #[cppgc] buffer: &oden_runtime::oden_webgpu::buffer::GPUBuffer,
+) -> Result<Vec<u8>, oden_runtime::oden_webgpu::error::GPUError> {
+  use oden_runtime::oden_webgpu::*;
   let index = buffer.instance.buffer_map_async(
     buffer.id,
     0,

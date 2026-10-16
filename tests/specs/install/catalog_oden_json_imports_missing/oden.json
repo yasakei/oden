@@ -1,0 +1,8 @@
+{
+  "catalog": {
+    "@odentest/esm-basic": "^1.0.0"
+  },
+  "imports": {
+    "@odentest/add": "catalog:"
+  }
+}

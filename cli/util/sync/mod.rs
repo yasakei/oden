@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
@@ -6,7 +6,7 @@ use std::sync::atomic::Ordering;
 mod async_flag;
 
 pub use async_flag::AsyncFlag;
-pub use deno_core::unsync::sync::AtomicFlag;
+pub use oden_core::unsync::sync::AtomicFlag;
 
 #[derive(Debug, Default)]
 pub struct RelaxedAtomicCounter {

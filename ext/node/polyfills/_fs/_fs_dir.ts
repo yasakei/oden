@@ -1,15 +1,15 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { core, primordials } from "ext:core/mod.js";
 import {
   type Dirent,
-  direntFromDeno,
-} from "ext:deno_node/internal/fs/utils.mjs";
-const { default: assert } = core.loadExtScript("ext:deno_node/assert.ts");
+  direntFromOden,
+} from "ext:oden_node/internal/fs/utils.mjs";
+const { default: assert } = core.loadExtScript("ext:oden_node/assert.ts");
 const { ERR_MISSING_ARGS, ERR_DIR_CLOSED } = core.loadExtScript(
-  "ext:deno_node/internal/errors.ts",
+  "ext:oden_node/internal/errors.ts",
 );
-const { TextDecoder } = core.loadExtScript("ext:deno_web/08_text_encoding.js");
+const { TextDecoder } = core.loadExtScript("ext:oden_web/08_text_encoding.js");
 
 const {
   Promise,
@@ -29,8 +29,8 @@ const {
 // opposed to `uv_fs_scandir` which backs `readdir`). Do not add sorting here.
 export default class Dir {
   #dirPath: string | Uint8Array;
-  #syncIterator!: Iterator<Deno.DirEntry, undefined> | null;
-  #asyncIterator!: AsyncIterator<Deno.DirEntry, undefined> | null;
+  #syncIterator!: Iterator<Oden.DirEntry, undefined> | null;
+  #asyncIterator!: AsyncIterator<Oden.DirEntry, undefined> | null;
   #closed = false;
 
   constructor(path: string | Uint8Array) {
@@ -61,7 +61,7 @@ export default class Dir {
         return;
       }
       if (!this.#asyncIterator) {
-        this.#asyncIterator = Deno.readDir(this.path)[SymbolAsyncIterator]();
+        this.#asyncIterator = Oden.readDir(this.path)[SymbolAsyncIterator]();
       }
       assert(this.#asyncIterator);
       PromisePrototypeThen(
@@ -70,14 +70,14 @@ export default class Dir {
           resolve(
             iteratorResult.done
               ? null
-              : direntFromDeno(iteratorResult.value, this.#dirPath),
+              : direntFromOden(iteratorResult.value, this.#dirPath),
           );
           if (callback) {
             callback(
               null,
               iteratorResult.done
                 ? null
-                : direntFromDeno(iteratorResult.value, this.#dirPath),
+                : direntFromOden(iteratorResult.value, this.#dirPath),
             );
           }
         },
@@ -96,19 +96,19 @@ export default class Dir {
       throw new ERR_DIR_CLOSED();
     }
     if (!this.#syncIterator) {
-      this.#syncIterator = Deno.readDirSync(this.path)![SymbolIterator]();
+      this.#syncIterator = Oden.readDirSync(this.path)![SymbolIterator]();
     }
 
     const iteratorResult = ArrayIteratorPrototypeNext(this.#syncIterator);
     if (iteratorResult.done) {
       return null;
     } else {
-      return direntFromDeno(iteratorResult.value, this.#dirPath);
+      return direntFromOden(iteratorResult.value, this.#dirPath);
     }
   }
 
   /**
-   * Unlike Node, Deno does not require managing resource ids for reading
+   * Unlike Node, Oden does not require managing resource ids for reading
    * directories, and therefore does not need to close directories when
    * finished reading.
    */
@@ -124,7 +124,7 @@ export default class Dir {
   }
 
   /**
-   * Unlike Node, Deno does not require managing resource ids for reading
+   * Unlike Node, Oden does not require managing resource ids for reading
    * directories, and therefore does not need to close directories when
    * finished reading
    */

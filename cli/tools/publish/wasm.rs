@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::ops::Range;
 
-use deno_core::anyhow::Context;
-use deno_core::anyhow::bail;
-use deno_core::error::AnyError;
+use oden_core::anyhow::Context;
+use oden_core::anyhow::bail;
+use oden_core::error::AnyError;
 
 /// The Wasm import section has a section id of `2`.
 const WASM_IMPORT_SECTION_ID: u8 = 0x02;
@@ -12,7 +12,7 @@ const WASM_IMPORT_SECTION_ID: u8 = 0x02;
 /// Rewrites the module specifiers found in the import section of a Wasm binary
 /// using the provided `unfurl` callback.
 ///
-/// A WebAssembly module's imports each reference a "module name" which Deno
+/// A WebAssembly module's imports each reference a "module name" which Oden
 /// treats as an ES module specifier (e.g. `import ... from "./other.js"`). When
 /// publishing to JSR these specifiers need to be unfurled the same way they are
 /// in JavaScript and TypeScript source files.

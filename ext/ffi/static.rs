@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::ptr;
 
-use deno_core::OpState;
-use deno_core::ResourceId;
-use deno_core::op2;
-use deno_core::v8;
+use oden_core::OpState;
+use oden_core::ResourceId;
+use oden_core::op2;
+use oden_core::v8;
 
 use crate::dlfcn::DynamicLibraryResource;
 use crate::symbol::NativeType;
@@ -23,7 +23,7 @@ pub enum StaticError {
   InvalidTypeStruct,
   #[class(inherit)]
   #[error(transparent)]
-  Resource(#[from] deno_core::error::ResourceError),
+  Resource(#[from] oden_core::error::ResourceError),
 }
 
 #[op2]

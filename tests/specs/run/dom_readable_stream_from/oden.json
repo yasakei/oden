@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "oden.ns",
+      "dom"
+    ]
+  }
+}

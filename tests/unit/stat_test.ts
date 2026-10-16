@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import {
   assert,
@@ -8,246 +8,246 @@ import {
   pathToAbsoluteFileUrl,
 } from "./test_util.ts";
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function statSyncSuccess() {
-    const readmeInfo = Deno.statSync("README.md");
+    const readmeInfo = Oden.statSync("README.md");
     assert(readmeInfo.isFile);
     assert(!readmeInfo.isSymlink);
 
-    const modulesInfo = Deno.statSync("tests/testdata/symlink_to_subdir");
+    const modulesInfo = Oden.statSync("tests/testdata/symlink_to_subdir");
     assert(modulesInfo.isDirectory);
     assert(!modulesInfo.isSymlink);
 
-    const testsInfo = Deno.statSync("tests");
+    const testsInfo = Oden.statSync("tests");
     assert(testsInfo.isDirectory);
     assert(!testsInfo.isSymlink);
 
-    const tempFile = Deno.makeTempFileSync();
-    const tempInfo = Deno.statSync(tempFile);
+    const tempFile = Oden.makeTempFileSync();
+    const tempInfo = Oden.statSync(tempFile);
     const now = Date.now();
     assert(tempInfo.atime !== null && now - tempInfo.atime.valueOf() < 60_000);
     assert(tempInfo.mtime !== null && now - tempInfo.mtime.valueOf() < 60_000);
     assert(tempInfo.ctime !== null && now - tempInfo.ctime.valueOf() < 60_000);
     const mode = tempInfo.mode! & 0o777;
-    if (Deno.build.os === "windows") {
+    if (Oden.build.os === "windows") {
       assertEquals(mode, 0o666);
     } else {
       assertEquals(mode, 0o600);
     }
 
-    const readmeInfoByUrl = Deno.statSync(pathToAbsoluteFileUrl("README.md"));
+    const readmeInfoByUrl = Oden.statSync(pathToAbsoluteFileUrl("README.md"));
     assert(readmeInfoByUrl.isFile);
     assert(!readmeInfoByUrl.isSymlink);
 
-    const modulesInfoByUrl = Deno.statSync(
+    const modulesInfoByUrl = Oden.statSync(
       pathToAbsoluteFileUrl("tests/testdata/symlink_to_subdir"),
     );
     assert(modulesInfoByUrl.isDirectory);
     assert(!modulesInfoByUrl.isSymlink);
 
-    const testsInfoByUrl = Deno.statSync(pathToAbsoluteFileUrl("tests"));
+    const testsInfoByUrl = Oden.statSync(pathToAbsoluteFileUrl("tests"));
     assert(testsInfoByUrl.isDirectory);
     assert(!testsInfoByUrl.isSymlink);
 
-    const tempFileForUrl = Deno.makeTempFileSync();
-    const tempInfoByUrl = Deno.statSync(
+    const tempFileForUrl = Oden.makeTempFileSync();
+    const tempInfoByUrl = Oden.statSync(
       new URL(
-        `file://${Deno.build.os === "windows" ? "/" : ""}${tempFileForUrl}`,
+        `file://${Oden.build.os === "windows" ? "/" : ""}${tempFileForUrl}`,
       ),
     );
     assert(tempInfoByUrl.atime !== null);
     assert(tempInfoByUrl.mtime !== null);
     assert(tempInfoByUrl.ctime !== null);
 
-    Deno.removeSync(tempFile, { recursive: true });
-    Deno.removeSync(tempFileForUrl, { recursive: true });
+    Oden.removeSync(tempFile, { recursive: true });
+    Oden.removeSync(tempFileForUrl, { recursive: true });
   },
 );
 
-Deno.test({ permissions: { read: false } }, function statSyncPerm() {
+Oden.test({ permissions: { read: false } }, function statSyncPerm() {
   assertThrows(() => {
-    Deno.statSync("README.md");
-  }, Deno.errors.NotCapable);
+    Oden.statSync("README.md");
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test({ permissions: { read: true } }, function statSyncNotFound() {
+Oden.test({ permissions: { read: true } }, function statSyncNotFound() {
   assertThrows(
     () => {
-      Deno.statSync("bad_file_name");
+      Oden.statSync("bad_file_name");
     },
-    Deno.errors.NotFound,
+    Oden.errors.NotFound,
     `stat 'bad_file_name'`,
   );
 });
 
-Deno.test({ permissions: { read: true } }, function lstatSyncSuccess() {
-  const packageInfo = Deno.lstatSync("README.md");
+Oden.test({ permissions: { read: true } }, function lstatSyncSuccess() {
+  const packageInfo = Oden.lstatSync("README.md");
   assert(packageInfo.isFile);
   assert(!packageInfo.isSymlink);
 
-  const packageInfoByUrl = Deno.lstatSync(pathToAbsoluteFileUrl("README.md"));
+  const packageInfoByUrl = Oden.lstatSync(pathToAbsoluteFileUrl("README.md"));
   assert(packageInfoByUrl.isFile);
   assert(!packageInfoByUrl.isSymlink);
 
-  const modulesInfo = Deno.lstatSync("tests/testdata/symlink_to_subdir");
+  const modulesInfo = Oden.lstatSync("tests/testdata/symlink_to_subdir");
   assert(!modulesInfo.isDirectory);
   assert(modulesInfo.isSymlink);
 
-  const modulesInfoByUrl = Deno.lstatSync(
+  const modulesInfoByUrl = Oden.lstatSync(
     pathToAbsoluteFileUrl("tests/testdata/symlink_to_subdir"),
   );
   assert(!modulesInfoByUrl.isDirectory);
   assert(modulesInfoByUrl.isSymlink);
 
-  const coreInfo = Deno.lstatSync("cli");
+  const coreInfo = Oden.lstatSync("cli");
   assert(coreInfo.isDirectory);
   assert(!coreInfo.isSymlink);
 
-  const coreInfoByUrl = Deno.lstatSync(pathToAbsoluteFileUrl("cli"));
+  const coreInfoByUrl = Oden.lstatSync(pathToAbsoluteFileUrl("cli"));
   assert(coreInfoByUrl.isDirectory);
   assert(!coreInfoByUrl.isSymlink);
 });
 
-Deno.test({ permissions: { read: false } }, function lstatSyncPerm() {
+Oden.test({ permissions: { read: false } }, function lstatSyncPerm() {
   assertThrows(() => {
-    Deno.lstatSync("assets/hello.txt");
-  }, Deno.errors.NotCapable);
+    Oden.lstatSync("assets/hello.txt");
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test({ permissions: { read: true } }, function lstatSyncNotFound() {
+Oden.test({ permissions: { read: true } }, function lstatSyncNotFound() {
   assertThrows(
     () => {
-      Deno.lstatSync("bad_file_name");
+      Oden.lstatSync("bad_file_name");
     },
-    Deno.errors.NotFound,
+    Oden.errors.NotFound,
     `stat 'bad_file_name'`,
   );
 });
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function statSuccess() {
-    const readmeInfo = await Deno.stat("README.md");
+    const readmeInfo = await Oden.stat("README.md");
     assert(readmeInfo.isFile);
     assert(!readmeInfo.isSymlink);
 
-    const readmeInfoByUrl = await Deno.stat(
+    const readmeInfoByUrl = await Oden.stat(
       pathToAbsoluteFileUrl("README.md"),
     );
     assert(readmeInfoByUrl.isFile);
     assert(!readmeInfoByUrl.isSymlink);
 
-    const modulesInfo = await Deno.stat("tests/testdata/symlink_to_subdir");
+    const modulesInfo = await Oden.stat("tests/testdata/symlink_to_subdir");
     assert(modulesInfo.isDirectory);
     assert(!modulesInfo.isSymlink);
 
-    const modulesInfoByUrl = await Deno.stat(
+    const modulesInfoByUrl = await Oden.stat(
       pathToAbsoluteFileUrl("tests/testdata/symlink_to_subdir"),
     );
     assert(modulesInfoByUrl.isDirectory);
     assert(!modulesInfoByUrl.isSymlink);
 
-    const testsInfo = await Deno.stat("tests");
+    const testsInfo = await Oden.stat("tests");
     assert(testsInfo.isDirectory);
     assert(!testsInfo.isSymlink);
 
-    const testsInfoByUrl = await Deno.stat(pathToAbsoluteFileUrl("tests"));
+    const testsInfoByUrl = await Oden.stat(pathToAbsoluteFileUrl("tests"));
     assert(testsInfoByUrl.isDirectory);
     assert(!testsInfoByUrl.isSymlink);
 
-    const tempFile = await Deno.makeTempFile();
-    const tempInfo = await Deno.stat(tempFile);
+    const tempFile = await Oden.makeTempFile();
+    const tempInfo = await Oden.stat(tempFile);
     assert(tempInfo.atime !== null);
     assert(tempInfo.mtime !== null);
     assert(tempInfo.ctime !== null);
 
-    const tempFileForUrl = await Deno.makeTempFile();
-    const tempInfoByUrl = await Deno.stat(
+    const tempFileForUrl = await Oden.makeTempFile();
+    const tempInfoByUrl = await Oden.stat(
       new URL(
-        `file://${Deno.build.os === "windows" ? "/" : ""}${tempFileForUrl}`,
+        `file://${Oden.build.os === "windows" ? "/" : ""}${tempFileForUrl}`,
       ),
     );
     assert(tempInfoByUrl.atime !== null);
     assert(tempInfoByUrl.mtime !== null);
     assert(tempInfoByUrl.ctime !== null);
-    Deno.removeSync(tempFile, { recursive: true });
-    Deno.removeSync(tempFileForUrl, { recursive: true });
+    Oden.removeSync(tempFile, { recursive: true });
+    Oden.removeSync(tempFileForUrl, { recursive: true });
   },
 );
 
-Deno.test({ permissions: { read: false } }, async function statPerm() {
+Oden.test({ permissions: { read: false } }, async function statPerm() {
   await assertRejects(async () => {
-    await Deno.stat("README.md");
-  }, Deno.errors.NotCapable);
+    await Oden.stat("README.md");
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test({ permissions: { read: true } }, async function statNotFound() {
+Oden.test({ permissions: { read: true } }, async function statNotFound() {
   await assertRejects(
     async () => {
-      await Deno.stat("bad_file_name");
+      await Oden.stat("bad_file_name");
     },
-    Deno.errors.NotFound,
+    Oden.errors.NotFound,
     `stat 'bad_file_name'`,
   );
 });
 
-Deno.test({ permissions: { read: true } }, async function lstatSuccess() {
-  const readmeInfo = await Deno.lstat("README.md");
+Oden.test({ permissions: { read: true } }, async function lstatSuccess() {
+  const readmeInfo = await Oden.lstat("README.md");
   assert(readmeInfo.isFile);
   assert(!readmeInfo.isSymlink);
 
-  const readmeInfoByUrl = await Deno.lstat(pathToAbsoluteFileUrl("README.md"));
+  const readmeInfoByUrl = await Oden.lstat(pathToAbsoluteFileUrl("README.md"));
   assert(readmeInfoByUrl.isFile);
   assert(!readmeInfoByUrl.isSymlink);
 
-  const modulesInfo = await Deno.lstat("tests/testdata/symlink_to_subdir");
+  const modulesInfo = await Oden.lstat("tests/testdata/symlink_to_subdir");
   assert(!modulesInfo.isDirectory);
   assert(modulesInfo.isSymlink);
 
-  const modulesInfoByUrl = await Deno.lstat(
+  const modulesInfoByUrl = await Oden.lstat(
     pathToAbsoluteFileUrl("tests/testdata/symlink_to_subdir"),
   );
   assert(!modulesInfoByUrl.isDirectory);
   assert(modulesInfoByUrl.isSymlink);
 
-  const coreInfo = await Deno.lstat("cli");
+  const coreInfo = await Oden.lstat("cli");
   assert(coreInfo.isDirectory);
   assert(!coreInfo.isSymlink);
 
-  const coreInfoByUrl = await Deno.lstat(pathToAbsoluteFileUrl("cli"));
+  const coreInfoByUrl = await Oden.lstat(pathToAbsoluteFileUrl("cli"));
   assert(coreInfoByUrl.isDirectory);
   assert(!coreInfoByUrl.isSymlink);
 });
 
-Deno.test({ permissions: { read: false } }, async function lstatPerm() {
+Oden.test({ permissions: { read: false } }, async function lstatPerm() {
   await assertRejects(async () => {
-    await Deno.lstat("README.md");
-  }, Deno.errors.NotCapable);
+    await Oden.lstat("README.md");
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test({ permissions: { read: true } }, async function lstatNotFound() {
+Oden.test({ permissions: { read: true } }, async function lstatNotFound() {
   await assertRejects(
     async () => {
-      await Deno.lstat("bad_file_name");
+      await Oden.lstat("bad_file_name");
     },
-    Deno.errors.NotFound,
+    Oden.errors.NotFound,
     `stat 'bad_file_name'`,
   );
 });
 
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os !== "windows",
+    ignore: Oden.build.os !== "windows",
     permissions: { read: true, write: true },
   },
   function statNoUnixFields() {
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const tempDir = Deno.makeTempDirSync();
+    const tempDir = Oden.makeTempDirSync();
     const filename = tempDir + "/test.txt";
-    Deno.writeFileSync(filename, data, { mode: 0o666 });
-    const s = Deno.statSync(filename);
+    Oden.writeFileSync(filename, data, { mode: 0o666 });
+    const s = Oden.statSync(filename);
     assert(s.dev !== 0);
     assert(s.ino !== null);
     assert(s.nlink !== null);
@@ -263,21 +263,21 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
     permissions: { read: true, write: true },
   },
   function statUnixFields() {
     const enc = new TextEncoder();
     const data = enc.encode("Hello");
-    const tempDir = Deno.makeTempDirSync();
+    const tempDir = Oden.makeTempDirSync();
     const filename = tempDir + "/test.txt";
     const filename2 = tempDir + "/test2.txt";
-    Deno.writeFileSync(filename, data, { mode: 0o666 });
+    Oden.writeFileSync(filename, data, { mode: 0o666 });
     // Create a link
-    Deno.linkSync(filename, filename2);
-    const s = Deno.statSync(filename);
+    Oden.linkSync(filename, filename2);
+    const s = Oden.statSync(filename);
     assert(s.dev !== null);
     assert(s.ino !== null);
     assertEquals(s.mode! & 0o666, 0o666);
@@ -294,12 +294,12 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: false, write: true } },
   async function fsFileStatFailPermissions() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const filename = testDir + "/file.txt";
-    using file = await Deno.open(filename, {
+    using file = await Oden.open(filename, {
       read: false,
       write: true,
       create: true,
@@ -307,12 +307,12 @@ Deno.test(
 
     await assertRejects(
       () => file.stat(),
-      Deno.errors.NotCapable,
+      Oden.errors.NotCapable,
       "Requires read access to",
     );
     assertThrows(
       () => file.statSync(),
-      Deno.errors.NotCapable,
+      Oden.errors.NotCapable,
       "Requires read access to",
     );
   },

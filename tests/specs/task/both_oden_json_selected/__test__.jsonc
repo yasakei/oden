@@ -1,0 +1,5 @@
+{
+  "args": "task --config oden.json other",
+  "output": "oden_selected.out",
+  "exitCode": 0
+}

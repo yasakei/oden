@@ -1,16 +1,16 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::io::Write;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use deno_core::Extension;
-use deno_core::ExtensionFileSource;
-use deno_core::ExtensionFileSourceCode;
-use deno_core::snapshot::*;
-use deno_core::v8;
-use deno_resolver::npm::DenoInNpmPackageChecker;
-use deno_resolver::npm::NpmResolver;
+use oden_core::Extension;
+use oden_core::ExtensionFileSource;
+use oden_core::ExtensionFileSourceCode;
+use oden_core::snapshot::*;
+use oden_core::v8;
+use oden_resolver::npm::OdenInNpmPackageChecker;
+use oden_resolver::npm::NpmResolver;
 
 use crate::ops;
 use crate::ops::bootstrap::SnapshotOptions;
@@ -31,7 +31,7 @@ pub enum LazyExtensionFileKind {
   /// `lazy_loaded_js` — loaded on demand via `core.loadExtScript()`.
   Js,
   /// `lazy_loaded_esm` — loaded on demand via `op_lazy_load_esm` (i.e. the
-  /// `createLazyLoader` factory exposed by `Deno.core`).
+  /// `createLazyLoader` factory exposed by `Oden.core`).
   Esm,
 }
 
@@ -57,54 +57,54 @@ pub fn create_runtime_snapshot(
   // `runtime/worker.rs`, `runtime/web_worker.rs`, `runtime/snapshot_info.rs`
   // and `runtime/snapshot.rs`!
   let mut extensions: Vec<Extension> = vec![
-    deno_telemetry::deno_telemetry::lazy_init(),
-    deno_webidl::deno_webidl::lazy_init(),
-    deno_web::deno_web::lazy_init(),
-    deno_webgpu::deno_webgpu::lazy_init(),
-    deno_image::deno_image::lazy_init(),
-    deno_canvas::deno_canvas::lazy_init(),
-    deno_fetch::deno_fetch::lazy_init(),
-    deno_cache::deno_cache::lazy_init(),
-    deno_websocket::deno_websocket::lazy_init(),
-    deno_webstorage::deno_webstorage::lazy_init(),
-    deno_crypto::deno_crypto::lazy_init(),
-    deno_ffi::deno_ffi::lazy_init(),
-    deno_net::deno_net::lazy_init(),
-    deno_tls::deno_tls::lazy_init(),
-    deno_kv::deno_kv::lazy_init(),
-    deno_cron::deno_cron::init(Box::new(
-      deno_cron::local::LocalCronHandler::new(),
+    oden_telemetry::oden_telemetry::lazy_init(),
+    oden_webidl::oden_webidl::lazy_init(),
+    oden_web::oden_web::lazy_init(),
+    oden_webgpu::oden_webgpu::lazy_init(),
+    oden_image::oden_image::lazy_init(),
+    oden_canvas::oden_canvas::lazy_init(),
+    oden_fetch::oden_fetch::lazy_init(),
+    oden_cache::oden_cache::lazy_init(),
+    oden_websocket::oden_websocket::lazy_init(),
+    oden_webstorage::oden_webstorage::lazy_init(),
+    oden_crypto::oden_crypto::lazy_init(),
+    oden_ffi::oden_ffi::lazy_init(),
+    oden_net::oden_net::lazy_init(),
+    oden_tls::oden_tls::lazy_init(),
+    oden_kv::oden_kv::lazy_init(),
+    oden_cron::oden_cron::init(Box::new(
+      oden_cron::local::LocalCronHandler::new(),
     )),
-    deno_napi::deno_napi::lazy_init(),
-    deno_http::deno_http::lazy_init(),
-    deno_io::deno_io::lazy_init(),
-    deno_fs::deno_fs::lazy_init(),
-    deno_os::deno_os::lazy_init(),
-    deno_process::deno_process::lazy_init(),
-    deno_node_crypto::deno_node_crypto::lazy_init(),
-    deno_node_sqlite::deno_node_sqlite::lazy_init(),
-    deno_node::deno_node::lazy_init::<
-      DenoInNpmPackageChecker,
+    oden_napi::oden_napi::lazy_init(),
+    oden_http::oden_http::lazy_init(),
+    oden_io::oden_io::lazy_init(),
+    oden_fs::oden_fs::lazy_init(),
+    oden_os::oden_os::lazy_init(),
+    oden_process::oden_process::lazy_init(),
+    oden_node_crypto::oden_node_crypto::lazy_init(),
+    oden_node_sqlite::oden_node_sqlite::lazy_init(),
+    oden_node::oden_node::lazy_init::<
+      OdenInNpmPackageChecker,
       NpmResolver<sys_traits::impls::RealSys>,
       sys_traits::impls::RealSys,
     >(),
-    ops::runtime::deno_runtime::lazy_init(),
-    ops::worker_host::deno_worker_host::lazy_init(),
-    ops::fs_events::deno_fs_events::lazy_init(),
-    ops::permissions::deno_permissions::lazy_init(),
-    ops::tty::deno_tty::lazy_init(),
-    ops::http::deno_http_runtime::lazy_init(),
-    deno_bundle_runtime::deno_bundle_runtime::lazy_init(),
-    ops::desktop::deno_desktop::lazy_init(),
-    ops::bootstrap::deno_bootstrap::init(Some(snapshot_options), false),
+    ops::runtime::oden_runtime::lazy_init(),
+    ops::worker_host::oden_worker_host::lazy_init(),
+    ops::fs_events::oden_fs_events::lazy_init(),
+    ops::permissions::oden_permissions::lazy_init(),
+    ops::tty::oden_tty::lazy_init(),
+    ops::http::oden_http_runtime::lazy_init(),
+    oden_bundle_runtime::oden_bundle_runtime::lazy_init(),
+    ops::desktop::oden_desktop::lazy_init(),
+    ops::bootstrap::oden_bootstrap::init(Some(snapshot_options), false),
     runtime::lazy_init(),
-    ops::web_worker::deno_web_worker::lazy_init(),
+    ops::web_worker::oden_web_worker::lazy_init(),
   ];
   extensions.extend(custom_extensions);
 
   let lazy_extension_files = collect_lazy_extension_files(&extensions);
   let minify_sources =
-    std::env::var_os("DENO_SNAPSHOT_MINIFY_SOURCES").is_some();
+    std::env::var_os("ODEN_SNAPSHOT_MINIFY_SOURCES").is_some();
 
   let output = create_snapshot(
     CreateSnapshotOptions {
@@ -122,17 +122,17 @@ pub fn create_runtime_snapshot(
         let isolate = rt.v8_isolate();
         v8::scope!(scope, isolate);
 
-        let tmpl = deno_node::init_global_template(
+        let tmpl = oden_node::init_global_template(
           scope,
-          deno_node::ContextInitMode::ForSnapshot,
+          oden_node::ContextInitMode::ForSnapshot,
         );
-        let ctx = deno_node::create_v8_context(
+        let ctx = oden_node::create_v8_context(
           scope,
           tmpl,
-          deno_node::ContextInitMode::ForSnapshot,
+          oden_node::ContextInitMode::ForSnapshot,
           std::ptr::null_mut(),
         );
-        assert_eq!(scope.add_context(ctx), deno_node::VM_CONTEXT_INDEX);
+        assert_eq!(scope.add_context(ctx), oden_node::VM_CONTEXT_INDEX);
       })),
       skip_op_registration: false,
     },

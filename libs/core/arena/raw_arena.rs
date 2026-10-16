@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::alloc::Layout;
 use std::cell::Cell;
@@ -29,7 +29,7 @@ const SIGNATURE: usize = 0x1234567812345678;
 /// # Example
 ///
 /// ```rust
-/// # use deno_core::arena::RawArena;
+/// # use oden_core::arena::RawArena;
 /// // Create a RawArena with a capacity of 10 elements
 /// let arena = RawArena::<usize>::with_capacity(10);
 ///

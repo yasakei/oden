@@ -1,8 +1,8 @@
-import defaultImport, { getValue } from "npm:@denotest/cjs-this-in-exports";
-import * as namespaceImport from "npm:@denotest/cjs-this-in-exports";
+import defaultImport, { getValue } from "npm:@odentest/cjs-this-in-exports";
+import * as namespaceImport from "npm:@odentest/cjs-this-in-exports";
 
 console.log(defaultImport.getValue());
-// In Node this actually fails, but it seems to work in Deno
+// In Node this actually fails, but it seems to work in Oden
 // so I guess there's no harm in that.
 console.log(namespaceImport.getValue());
 

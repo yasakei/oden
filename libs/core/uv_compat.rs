@@ -1,6 +1,6 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-// Drop-in replacement for libuv integrated with deno_core's event loop.
+// Drop-in replacement for libuv integrated with oden_core's event loop.
 
 mod pipe;
 mod stream;

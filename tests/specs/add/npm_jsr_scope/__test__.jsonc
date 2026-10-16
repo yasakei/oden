@@ -1,5 +1,5 @@
 {
   "tempDir": true,
-  "args": "add --npm @jsr/denotest__add",
+  "args": "add --npm @jsr/odentest__add",
   "output": "npm.out"
 }

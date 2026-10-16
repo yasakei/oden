@@ -4,8 +4,8 @@
     "node_gyp": {
       "steps": [
         {
-          "args": "cache --allow-scripts=npm:@denotest/node-addon main.js",
-          "output": "[WILDCARD]Initialize @denotest/node-addon@1.0.0: running 'install' script\n[WILDCARD]"
+          "args": "cache --allow-scripts=npm:@odentest/node-addon main.js",
+          "output": "[WILDCARD]Initialize @odentest/node-addon@1.0.0: running 'install' script\n[WILDCARD]"
         },
         {
           "args": "run -A main.js",
@@ -51,7 +51,7 @@
         }
       ]
     },
-    "deno_run_lifecycle_scripts": {
+    "oden_run_lifecycle_scripts": {
       "steps": [
         {
           // without running scripts (should warn)
@@ -64,14 +64,14 @@
           // this test package covers running preinstall, install, and postinstall scripts
           // it also exercises running bin packages (esbuild in this case), using `node` in a script
           // (with and without node-only CLI flags), and using `npx` in a script
-          "output": "all_lifecycles_deno_run.out"
+          "output": "all_lifecycles_oden_run.out"
         }
       ]
     },
     "global_lifecycle_scripts": {
       "steps": [
         {
-          "args": ["eval", "Deno.removeSync('deno.json')"],
+          "args": ["eval", "Oden.removeSync('oden.json')"],
           "output": ""
         },
         {
@@ -116,14 +116,14 @@
         {
           "args": [
             "eval",
-            "Deno.removeSync('./deno.json')"
+            "Oden.removeSync('./oden.json')"
           ],
           "output": "[WILDCARD]"
         },
         {
           "args": [
             "eval",
-            "Deno.writeTextFileSync('package.json', '{\"dependencies\":{ \"@denotest/node-lifecycle-scripts\": \"*\" } }')"
+            "Oden.writeTextFileSync('package.json', '{\"dependencies\":{ \"@odentest/node-lifecycle-scripts\": \"*\" } }')"
           ],
           "output": ""
         },
@@ -136,9 +136,9 @@
     "lifecycle_scripts_conflicting_bin": {
       "steps": [
         {
-          // we import @denotest/says-hello-on-install, which executes `say-hello` from `@denotest/say-hello` in its
-          // install script. we also import `@denotest/better-say-hello`, which provides a
-          // bin called `say-hello` as well. `@denotest/says-hello-on-install` wins (gets put into
+          // we import @odentest/says-hello-on-install, which executes `say-hello` from `@odentest/say-hello` in its
+          // install script. we also import `@odentest/better-say-hello`, which provides a
+          // bin called `say-hello` as well. `@odentest/says-hello-on-install` wins (gets put into
           // node_modules/.bin/say-hello) because it's closer in the dependency tree, but when
           // we run the install script, we should use the correct binary (relative to the package)
           "args": "cache --allow-scripts conflicting_bin.js",
@@ -147,7 +147,7 @@
         {
           "args": [
             "eval",
-            "console.log(Deno.readTextFileSync('./say-hello-output.txt'))"
+            "console.log(Oden.readTextFileSync('./say-hello-output.txt'))"
           ],
           "output": "conflicting_bin2.out"
         }
@@ -167,22 +167,22 @@
         }
       ]
     },
-    "lifecycle_scripts_no_deno_json": {
+    "lifecycle_scripts_no_oden_json": {
       "steps": [
         {
-          "args": ["eval", "Deno.removeSync('deno.json')"],
+          "args": ["eval", "Oden.removeSync('oden.json')"],
           "output": ""
         },
         {
-          "args": "cache --allow-scripts --node-modules-dir=auto no_deno_json.js",
-          "output": "no_deno_json.out"
+          "args": "cache --allow-scripts --node-modules-dir=auto no_oden_json.js",
+          "output": "no_oden_json.out"
         }
       ]
     },
-    "lifecycle_scripts_no_deno_json_conflicting_bin": {
+    "lifecycle_scripts_no_oden_json_conflicting_bin": {
       "steps": [
         {
-          "args": ["eval", "Deno.removeSync('deno.json')"],
+          "args": ["eval", "Oden.removeSync('oden.json')"],
           "output": ""
         },
         {

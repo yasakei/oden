@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 (function () {
 const { primordials } = __bootstrap;
 const {
@@ -168,7 +168,7 @@ function getOptions() {
   }
 
   const options = createDefaultOptions();
-  const nodeOptions = Deno.env.get("NODE_OPTIONS");
+  const nodeOptions = Oden.env.get("NODE_OPTIONS");
   const envArgs = nodeOptions ? splitNodeOptions(nodeOptions) : [];
   const execArgv = getExecArgv();
   const args = ArrayPrototypeConcat(envArgs, execArgv);

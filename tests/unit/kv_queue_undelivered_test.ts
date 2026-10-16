@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assertEquals } from "./test_util.ts";
 
 const sleep = (time: number) => new Promise((r) => setTimeout(r, time));
@@ -6,19 +6,19 @@ const sleep = (time: number) => new Promise((r) => setTimeout(r, time));
 // TODO(igorzi): https://github.com/denoland/deno/issues/21437
 // let isCI: boolean;
 // try {
-//   isCI = Deno.env.get("CI") !== undefined;
+//   isCI = Oden.env.get("CI") !== undefined;
 // } catch {
 //   isCI = true;
 // }
 
-function queueTest(name: string, fn: (db: Deno.Kv) => Promise<void>) {
+function queueTest(name: string, fn: (db: Oden.Kv) => Promise<void>) {
   // TODO(igorzi): https://github.com/denoland/deno/issues/21437
-  Deno.test.ignore({
+  Oden.test.ignore({
     name,
     // https://github.com/denoland/deno/issues/18363
-    // ignore: Deno.build.os === "darwin" && isCI,
+    // ignore: Oden.build.os === "darwin" && isCI,
     async fn() {
-      const db: Deno.Kv = await Deno.openKv(
+      const db: Oden.Kv = await Oden.openKv(
         ":memory:",
       );
       await fn(db);
@@ -27,9 +27,9 @@ function queueTest(name: string, fn: (db: Deno.Kv) => Promise<void>) {
 }
 
 async function collect<T>(
-  iter: Deno.KvListIterator<T>,
-): Promise<Deno.KvEntry<T>[]> {
-  const entries: Deno.KvEntry<T>[] = [];
+  iter: Oden.KvListIterator<T>,
+): Promise<Oden.KvEntry<T>[]> {
+  const entries: Oden.KvEntry<T>[] = [];
   for await (const entry of iter) {
     entries.push(entry);
   }

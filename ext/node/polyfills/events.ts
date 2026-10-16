@@ -1,5 +1,5 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
-// @deno-types="./_events.d.ts"
+// Copyright 2018-2026 the Oden authors. MIT license.
+// @oden-types="./_events.d.ts"
 export {
   addAbortListener,
   captureRejectionSymbol,
@@ -14,4 +14,4 @@ export {
   on,
   once,
   setMaxListeners,
-} from "ext:deno_node/_events.mjs";
+} from "ext:oden_node/_events.mjs";

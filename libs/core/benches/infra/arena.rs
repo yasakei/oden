@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![allow(clippy::needless_range_loop, reason = "bench code")]
 #![allow(clippy::undocumented_unsafe_blocks, reason = "bench code")]
@@ -13,10 +13,10 @@ use std::sync::Arc;
 use bencher::Bencher;
 use bencher::benchmark_group;
 use bencher::benchmark_main;
-use deno_core::arena::ArenaShared;
-use deno_core::arena::ArenaSharedAtomic;
-use deno_core::arena::ArenaUnique;
-use deno_core::arena::RawArena;
+use oden_core::arena::ArenaShared;
+use oden_core::arena::ArenaSharedAtomic;
+use oden_core::arena::ArenaUnique;
+use oden_core::arena::RawArena;
 
 const COUNT: usize = 10_000;
 type TestType = RefCell<usize>;

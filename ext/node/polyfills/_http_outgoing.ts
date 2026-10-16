@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 
 // deno-lint-ignore-file no-explicit-any
@@ -33,21 +33,21 @@ const {
   TypedArrayPrototypeGetByteLength,
 } = primordials;
 const { getDefaultHighWaterMark } = core.loadExtScript(
-  "ext:deno_node/internal/streams/state.js",
+  "ext:oden_node/internal/streams/state.js",
 );
 const assert = core.loadExtScript(
-  "ext:deno_node/internal/assert.mjs",
+  "ext:oden_node/internal/assert.mjs",
 );
-const { EventEmitter: EE } = core.loadExtScript("ext:deno_node/_events.mjs");
+const { EventEmitter: EE } = core.loadExtScript("ext:oden_node/_events.mjs");
 import { Stream } from "node:stream";
-const { deprecate } = core.loadExtScript("ext:deno_node/util.ts");
+const { deprecate } = core.loadExtScript("ext:oden_node/util.ts");
 import type { Socket } from "node:net";
 const {
   kNeedDrain,
   kOutHeaders,
   utcDate,
-} = core.loadExtScript("ext:deno_node/internal/http.ts");
-const { Buffer } = core.loadExtScript("ext:deno_node/internal/buffer.mjs");
+} = core.loadExtScript("ext:oden_node/internal/http.ts");
+const { Buffer } = core.loadExtScript("ext:oden_node/internal/buffer.mjs");
 import {
   _checkInvalidHeaderChar as checkInvalidHeaderChar,
   _checkIsHttpToken as checkIsHttpToken,
@@ -56,7 +56,7 @@ import {
 const {
   defaultTriggerAsyncIdScope,
   symbols,
-} = core.loadExtScript("ext:deno_node/internal/async_hooks.ts");
+} = core.loadExtScript("ext:oden_node/internal/async_hooks.ts");
 const { async_id_symbol } = symbols;
 const {
   ERR_HTTP_BODY_NOT_ALLOWED,
@@ -75,20 +75,20 @@ const {
   ERR_STREAM_WRITE_AFTER_END,
   errnoException,
   hideStackFrames,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
 const {
   kLastWriteWasAsync,
   streamBaseState,
-} = core.loadExtScript("ext:deno_node/internal_binding/stream_wrap.ts");
+} = core.loadExtScript("ext:oden_node/internal_binding/stream_wrap.ts");
 const { validateString } = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
 const { isUint8Array } = core.loadExtScript(
-  "ext:deno_node/internal/util/types.ts",
+  "ext:oden_node/internal/util/types.ts",
 );
 
 const { debuglog } = core.loadExtScript(
-  "ext:deno_node/internal/util/debuglog.ts",
+  "ext:oden_node/internal/util/debuglog.ts",
 );
 let debug = debuglog("http", (fn) => {
   debug = fn;
@@ -1194,7 +1194,7 @@ ObjectDefineProperties(OutgoingMessage.prototype, {
       let cookies = null;
       const iterator = headers[SymbolIterator]();
       while (true) {
-        // deno-lint-ignore deno-internal/prefer-primordials
+        // deno-lint-ignore oden-internal/prefer-primordials
         const { done, value: entry } = iterator.next();
         if (done) {
           break;

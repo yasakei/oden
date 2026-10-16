@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cell::RefCell;
@@ -19,7 +19,7 @@ use sys_traits::FsRead;
 use sys_traits::FsReadDir;
 
 pub trait NodeResolutionCache:
-  std::fmt::Debug + deno_maybe_sync::MaybeSend + deno_maybe_sync::MaybeSync
+  std::fmt::Debug + oden_maybe_sync::MaybeSend + oden_maybe_sync::MaybeSync
 {
   fn get_canonicalized(
     &self,
@@ -90,7 +90,7 @@ impl NodeResolutionCache for NodeResolutionThreadLocalCache {
 
 #[allow(clippy::disallowed_types, reason = "definition")]
 pub type NodeResolutionCacheRc =
-  deno_maybe_sync::MaybeArc<dyn NodeResolutionCache>;
+  oden_maybe_sync::MaybeArc<dyn NodeResolutionCache>;
 
 #[derive(Debug, Default)]
 pub struct NodeResolutionSys<TSys> {

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 use std::future::Future;
@@ -6,7 +6,7 @@ use std::rc::Rc;
 use std::task::Context;
 use std::task::Poll;
 
-use deno_core::error::CoreError;
+use oden_core::error::CoreError;
 use futures::StreamExt;
 use futures::future::FutureExt;
 use v8::Function;

@@ -1,3 +1,3 @@
-const buf: Uint8Array = await Deno.readFile("./hello.txt");
-const n: number = await Deno.stdout.write(buf);
+const buf: Uint8Array = await Oden.readFile("./hello.txt");
+const n: number = await Oden.stdout.write(buf);
 console.log(`\n\nwrite ${n}`);

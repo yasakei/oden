@@ -8,13 +8,13 @@
       }, {
         "args": [
           "eval",
-          "console.log(Deno.statSync('./custom-name.tgz').isFile);"
+          "console.log(Oden.statSync('./custom-name.tgz').isFile);"
         ],
         "output": "true\n"
       }, {
         "args": [
           "eval",
-          "try { Deno.statSync('./test-output-flag-1.0.0.tgz'); console.log('default exists'); } catch { console.log('default absent'); }"
+          "try { Oden.statSync('./test-output-flag-1.0.0.tgz'); console.log('default exists'); } catch { console.log('default absent'); }"
         ],
         "output": "default absent\n"
       }]

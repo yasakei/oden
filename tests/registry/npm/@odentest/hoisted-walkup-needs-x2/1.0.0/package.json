@@ -1,0 +1,8 @@
+{
+  "name": "@odentest/hoisted-walkup-needs-x2",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@odentest/hoisted-walkup-x": "2.0.0"
+  }
+}

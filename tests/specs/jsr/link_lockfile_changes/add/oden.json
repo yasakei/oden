@@ -1,0 +1,7 @@
+{
+  "name": "@odentest/add",
+  "exports": "./mod.ts",
+  "imports": {
+    "@odentest/subtract": "jsr:@odentest/subtract"
+  }
+}

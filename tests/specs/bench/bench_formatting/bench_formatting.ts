@@ -1,3 +1,3 @@
-Deno.bench("Date.now", () => {
+Oden.bench("Date.now", () => {
   Date.now();
 });

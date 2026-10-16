@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   assert,
   assertEquals,
@@ -6,84 +6,84 @@ import {
   assertThrows,
 } from "./test_util.ts";
 
-Deno.test({ permissions: { env: true } }, function envSuccess() {
-  Deno.env.set("TEST_VAR", "A");
-  const env = Deno.env.toObject();
-  Deno.env.set("TEST_VAR", "B");
+Oden.test({ permissions: { env: true } }, function envSuccess() {
+  Oden.env.set("TEST_VAR", "A");
+  const env = Oden.env.toObject();
+  Oden.env.set("TEST_VAR", "B");
   assertEquals(env["TEST_VAR"], "A");
-  assertNotEquals(Deno.env.get("TEST_VAR"), env["TEST_VAR"]);
+  assertNotEquals(Oden.env.get("TEST_VAR"), env["TEST_VAR"]);
 });
 
-Deno.test({ permissions: { env: true } }, function envNotFound() {
-  const r = Deno.env.get("env_var_does_not_exist!");
+Oden.test({ permissions: { env: true } }, function envNotFound() {
+  const r = Oden.env.get("env_var_does_not_exist!");
   assertEquals(r, undefined);
 });
 
-Deno.test({ permissions: { env: true } }, function deleteEnv() {
-  Deno.env.set("TEST_VAR", "A");
-  assertEquals(Deno.env.get("TEST_VAR"), "A");
-  assertEquals(Deno.env.delete("TEST_VAR"), undefined);
-  assertEquals(Deno.env.get("TEST_VAR"), undefined);
+Oden.test({ permissions: { env: true } }, function deleteEnv() {
+  Oden.env.set("TEST_VAR", "A");
+  assertEquals(Oden.env.get("TEST_VAR"), "A");
+  assertEquals(Oden.env.delete("TEST_VAR"), undefined);
+  assertEquals(Oden.env.get("TEST_VAR"), undefined);
 });
 
-Deno.test({ permissions: { env: true } }, function hasEnv() {
-  Deno.env.set("TEST_VAR", "A");
-  assert(Deno.env.has("TEST_VAR"));
-  Deno.env.delete("TEST_VAR");
-  assert(!Deno.env.has("TEST_VAR"));
+Oden.test({ permissions: { env: true } }, function hasEnv() {
+  Oden.env.set("TEST_VAR", "A");
+  assert(Oden.env.has("TEST_VAR"));
+  Oden.env.delete("TEST_VAR");
+  assert(!Oden.env.has("TEST_VAR"));
 });
 
-Deno.test({ permissions: { env: true } }, function avoidEmptyNamedEnv() {
-  assertThrows(() => Deno.env.set("", "v"), TypeError);
-  assertThrows(() => Deno.env.set("a=a", "v"), TypeError);
-  assertThrows(() => Deno.env.set("a\0a", "v"), TypeError);
-  assertThrows(() => Deno.env.set("TEST_VAR", "v\0v"), TypeError);
+Oden.test({ permissions: { env: true } }, function avoidEmptyNamedEnv() {
+  assertThrows(() => Oden.env.set("", "v"), TypeError);
+  assertThrows(() => Oden.env.set("a=a", "v"), TypeError);
+  assertThrows(() => Oden.env.set("a\0a", "v"), TypeError);
+  assertThrows(() => Oden.env.set("TEST_VAR", "v\0v"), TypeError);
 
-  assertThrows(() => Deno.env.get(""), TypeError);
-  assertThrows(() => Deno.env.get("a=a"), TypeError);
-  assertThrows(() => Deno.env.get("a\0a"), TypeError);
+  assertThrows(() => Oden.env.get(""), TypeError);
+  assertThrows(() => Oden.env.get("a=a"), TypeError);
+  assertThrows(() => Oden.env.get("a\0a"), TypeError);
 
-  assertThrows(() => Deno.env.delete(""), TypeError);
-  assertThrows(() => Deno.env.delete("a=a"), TypeError);
-  assertThrows(() => Deno.env.delete("a\0a"), TypeError);
+  assertThrows(() => Oden.env.delete(""), TypeError);
+  assertThrows(() => Oden.env.delete("a=a"), TypeError);
+  assertThrows(() => Oden.env.delete("a\0a"), TypeError);
 });
 
 // Regression test for https://github.com/denoland/deno/issues/23443
 // Every key returned by `toObject()` must be one that `get()` accepts.
 // On Windows, cmd.exe injects hidden per-drive cwd variables such as `=C:`
 // that contain `=`, which used to be enumerated but were not gettable.
-Deno.test({ permissions: { env: true } }, function envToObjectKeysAreValid() {
-  for (const key of Object.keys(Deno.env.toObject())) {
+Oden.test({ permissions: { env: true } }, function envToObjectKeysAreValid() {
+  for (const key of Object.keys(Oden.env.toObject())) {
     assert(key.length > 0, "toObject() returned an empty key");
     assert(!key.includes("="), `toObject() returned an invalid key: ${key}`);
     assert(!key.includes("\0"), `toObject() returned an invalid key: ${key}`);
     // Must not throw.
-    Deno.env.get(key);
+    Oden.env.get(key);
   }
 });
 
-Deno.test({ permissions: { env: false } }, function envPerm1() {
+Oden.test({ permissions: { env: false } }, function envPerm1() {
   assertThrows(() => {
-    Deno.env.toObject();
-  }, Deno.errors.NotCapable);
+    Oden.env.toObject();
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test({ permissions: { env: false } }, function envPerm2() {
+Oden.test({ permissions: { env: false } }, function envPerm2() {
   assertThrows(() => {
-    Deno.env.get("PATH");
-  }, Deno.errors.NotCapable);
+    Oden.env.get("PATH");
+  }, Oden.errors.NotCapable);
 });
 
 // This test verifies that on Windows, environment variables are
 // case-insensitive. Case normalization needs be done using the collation
 // that Windows uses, rather than naively using String.toLowerCase().
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os !== "windows",
+    ignore: Oden.build.os !== "windows",
     permissions: { read: true, env: true, run: true },
   },
   async function envCaseInsensitive() {
-    // Utility function that runs a Deno subprocess with the environment
+    // Utility function that runs a Oden subprocess with the environment
     // specified in `inputEnv`. The subprocess reads the environment variables
     // which are in the keys of `expectedEnv` and writes them to stdout as JSON.
     // It is then verified that these match with the values of `expectedEnv`.
@@ -95,9 +95,9 @@ Deno.test(
       console.log(
         ${
         JSON.stringify(Object.keys(expectedEnv))
-      }.map(k => Deno.env.get(k) ?? null)
+      }.map(k => Oden.env.get(k) ?? null)
       )`;
-      const { success, stdout } = await new Deno.Command(Deno.execPath(), {
+      const { success, stdout } = await new Oden.Command(Oden.execPath(), {
         args: ["eval", src],
         env: { ...inputEnv, NO_COLOR: "1" },
       }).output();
@@ -107,8 +107,8 @@ Deno.test(
       assertEquals(actualValues, expectedValues);
     };
 
-    assertEquals(Deno.env.get("path"), Deno.env.get("PATH"));
-    assertEquals(Deno.env.get("Path"), Deno.env.get("PATH"));
+    assertEquals(Oden.env.get("path"), Oden.env.get("PATH"));
+    assertEquals(Oden.env.get("Path"), Oden.env.get("PATH"));
 
     // Check 'foo', 'Foo' and 'Foo' are case folded.
     await checkChildEnv({ foo: "X" }, { foo: "X", Foo: "X", FOO: "X" });
@@ -139,112 +139,112 @@ Deno.test(
   },
 );
 
-Deno.test({ permissions: { env: true } }, function envInvalidChars() {
-  assertThrows(() => Deno.env.get(""), TypeError, "Key is an empty string");
+Oden.test({ permissions: { env: true } }, function envInvalidChars() {
+  assertThrows(() => Oden.env.get(""), TypeError, "Key is an empty string");
   assertThrows(
-    () => Deno.env.get("\0"),
+    () => Oden.env.get("\0"),
     TypeError,
     'Key contains invalid characters: "\\0"',
   );
   assertThrows(
-    () => Deno.env.get("="),
+    () => Oden.env.get("="),
     TypeError,
     'Key contains invalid characters: "="',
   );
   assertThrows(
-    () => Deno.env.set("", "foo"),
+    () => Oden.env.set("", "foo"),
     TypeError,
     "Key is an empty string",
   );
   assertThrows(
-    () => Deno.env.set("\0", "foo"),
+    () => Oden.env.set("\0", "foo"),
     TypeError,
     'Key contains invalid characters: "\\0"',
   );
   assertThrows(
-    () => Deno.env.set("=", "foo"),
+    () => Oden.env.set("=", "foo"),
     TypeError,
     'Key contains invalid characters: "="',
   );
   assertThrows(
-    () => Deno.env.set("foo", "\0"),
+    () => Oden.env.set("foo", "\0"),
     TypeError,
     'Value contains invalid characters: "\\0"',
   );
 });
 
-Deno.test(function osPid() {
-  assertEquals(typeof Deno.pid, "number");
-  assert(Deno.pid > 0);
+Oden.test(function osPid() {
+  assertEquals(typeof Oden.pid, "number");
+  assert(Oden.pid > 0);
 });
 
-Deno.test(function osPpid() {
-  assertEquals(typeof Deno.ppid, "number");
-  assert(Deno.ppid > 0);
+Oden.test(function osPpid() {
+  assertEquals(typeof Oden.ppid, "number");
+  assert(Oden.ppid > 0);
 });
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
   async function osPpidIsEqualToPidOfParentProcess() {
     const decoder = new TextDecoder();
-    const { stdout } = await new Deno.Command(Deno.execPath(), {
-      args: ["eval", "-p", "Deno.ppid"],
+    const { stdout } = await new Oden.Command(Oden.execPath(), {
+      args: ["eval", "-p", "Oden.ppid"],
       env: { NO_COLOR: "true" },
     }).output();
 
-    const expected = Deno.pid;
+    const expected = Oden.pid;
     const actual = parseInt(decoder.decode(stdout));
     assertEquals(actual, expected);
   },
 );
 
-Deno.test({ permissions: { read: false } }, function execPath() {
-  assertNotEquals(Deno.execPath(), "");
+Oden.test({ permissions: { read: false } }, function execPath() {
+  assertNotEquals(Oden.execPath(), "");
 });
 
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os !== "linux",
+    ignore: Oden.build.os !== "linux",
     permissions: { read: true, run: false },
   },
   function procRequiresAllowAll() {
     assertThrows(
       () => {
-        Deno.readTextFileSync("/proc/net/dev");
+        Oden.readTextFileSync("/proc/net/dev");
       },
-      Deno.errors.NotCapable,
+      Oden.errors.NotCapable,
       `Requires all access to "/proc/net/dev", run again with the --allow-all flag`,
     );
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { sys: ["loadavg"] } },
   function loadavgSuccess() {
-    const load = Deno.loadavg();
+    const load = Oden.loadavg();
     assertEquals(load.length, 3);
   },
 );
 
-Deno.test({ permissions: { sys: false } }, function loadavgPerm() {
+Oden.test({ permissions: { sys: false } }, function loadavgPerm() {
   assertThrows(() => {
-    Deno.loadavg();
-  }, Deno.errors.NotCapable);
+    Oden.loadavg();
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test(
+Oden.test(
   { permissions: { sys: ["hostname"] } },
   function hostnameDir() {
-    assertNotEquals(Deno.hostname(), "");
+    assertNotEquals(Oden.hostname(), "");
   },
 );
 
-Deno.test(
-  { permissions: { run: [Deno.execPath()], read: true } },
+Oden.test(
+  { permissions: { run: [Oden.execPath()], read: true } },
   // See https://github.com/denoland/deno/issues/16527
   async function hostnameWithoutOtherNetworkUsages() {
-    const { stdout } = await new Deno.Command(Deno.execPath(), {
-      args: ["eval", "-p", "Deno.hostname()"],
+    const { stdout } = await new Oden.Command(Oden.execPath(), {
+      args: ["eval", "-p", "Oden.hostname()"],
       env: {
         LD_PRELOAD: "",
         LD_LIBRARY_PATH: "",
@@ -256,41 +256,41 @@ Deno.test(
   },
 );
 
-Deno.test({ permissions: { sys: false } }, function hostnamePerm() {
+Oden.test({ permissions: { sys: false } }, function hostnamePerm() {
   assertThrows(() => {
-    Deno.hostname();
-  }, Deno.errors.NotCapable);
+    Oden.hostname();
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test(
+Oden.test(
   { permissions: { sys: ["osRelease"] } },
   function releaseDir() {
-    assertNotEquals(Deno.osRelease(), "");
+    assertNotEquals(Oden.osRelease(), "");
   },
 );
 
-Deno.test({ permissions: { sys: false } }, function releasePerm() {
+Oden.test({ permissions: { sys: false } }, function releasePerm() {
   assertThrows(() => {
-    Deno.osRelease();
-  }, Deno.errors.NotCapable);
+    Oden.osRelease();
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test({ permissions: { sys: ["osUptime"] } }, function osUptime() {
-  const uptime = Deno.osUptime();
+Oden.test({ permissions: { sys: ["osUptime"] } }, function osUptime() {
+  const uptime = Oden.osUptime();
   assert(typeof uptime === "number");
   assert(uptime > 0);
 });
 
-Deno.test({ permissions: { sys: false } }, function osUptimePerm() {
+Oden.test({ permissions: { sys: false } }, function osUptimePerm() {
   assertThrows(() => {
-    Deno.osUptime();
-  }, Deno.errors.NotCapable);
+    Oden.osUptime();
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test(
+Oden.test(
   { permissions: { sys: ["systemMemoryInfo"] } },
   function systemMemoryInfo() {
-    const info = Deno.systemMemoryInfo();
+    const info = Oden.systemMemoryInfo();
     assert(info.total >= 0);
     assert(info.free >= 0);
     assert(info.available >= 0);
@@ -301,28 +301,28 @@ Deno.test(
   },
 );
 
-Deno.test({ permissions: { sys: ["uid"] } }, function getUid() {
-  if (Deno.build.os === "windows") {
-    assertEquals(Deno.uid(), null);
+Oden.test({ permissions: { sys: ["uid"] } }, function getUid() {
+  if (Oden.build.os === "windows") {
+    assertEquals(Oden.uid(), null);
   } else {
-    const uid = Deno.uid();
+    const uid = Oden.uid();
     assert(typeof uid === "number");
     assert(uid > 0);
   }
 });
 
-Deno.test({ permissions: { sys: ["gid"] } }, function getGid() {
-  if (Deno.build.os === "windows") {
-    assertEquals(Deno.gid(), null);
+Oden.test({ permissions: { sys: ["gid"] } }, function getGid() {
+  if (Oden.build.os === "windows") {
+    assertEquals(Oden.gid(), null);
   } else {
-    const gid = Deno.gid();
+    const gid = Oden.gid();
     assert(typeof gid === "number");
     assert(gid > 0);
   }
 });
 
-Deno.test(function memoryUsage() {
-  const mem = Deno.memoryUsage();
+Oden.test(function memoryUsage() {
+  const mem = Oden.memoryUsage();
   assert(typeof mem.rss === "number");
   assert(typeof mem.heapTotal === "number");
   assert(typeof mem.heapUsed === "number");
@@ -330,28 +330,28 @@ Deno.test(function memoryUsage() {
   assert(mem.rss >= mem.heapTotal);
 });
 
-Deno.test("Deno.exitCode getter and setter", () => {
+Oden.test("Oden.exitCode getter and setter", () => {
   // Initial value is 0
-  assertEquals(Deno.exitCode, 0);
+  assertEquals(Oden.exitCode, 0);
 
   try {
     // Set a new value
-    Deno.exitCode = 5;
-    assertEquals(Deno.exitCode, 5);
+    Oden.exitCode = 5;
+    assertEquals(Oden.exitCode, 5);
   } finally {
     // Reset to initial value
-    Deno.exitCode = 0;
+    Oden.exitCode = 0;
   }
 
-  assertEquals(Deno.exitCode, 0);
+  assertEquals(Oden.exitCode, 0);
 });
 
-Deno.test("Setting Deno.exitCode to non-number throws TypeError", () => {
+Oden.test("Setting Oden.exitCode to non-number throws TypeError", () => {
   // Throws on non-number values
   assertThrows(
     () => {
       // @ts-expect-error Testing for runtime error
-      Deno.exitCode = "123";
+      Oden.exitCode = "123";
     },
     TypeError,
     "Exit code must be a number, got: 123 (string)",
@@ -361,38 +361,38 @@ Deno.test("Setting Deno.exitCode to non-number throws TypeError", () => {
   assertThrows(
     () => {
       // @ts-expect-error Testing for runtime error
-      Deno.exitCode = 1n;
+      Oden.exitCode = 1n;
     },
     TypeError,
     "Exit code must be a number, got: 1 (bigint)",
   );
 });
 
-Deno.test("Setting Deno.exitCode to non-integer throws RangeError", () => {
+Oden.test("Setting Oden.exitCode to non-integer throws RangeError", () => {
   // Throws on non-integer values
   assertThrows(
     () => {
-      Deno.exitCode = 3.14;
+      Oden.exitCode = 3.14;
     },
     RangeError,
     "Exit code must be an integer, got: 3.14",
   );
 });
 
-Deno.test("Setting Deno.exitCode does not cause an immediate exit", () => {
+Oden.test("Setting Oden.exitCode does not cause an immediate exit", () => {
   let exited = false;
 
-  const originalExit = Deno.exit;
+  const originalExit = Oden.exit;
   // @ts-expect-error; read-only
-  Deno.exit = () => {
+  Oden.exit = () => {
     exited = true;
   };
 
   try {
-    Deno.exitCode = 1;
+    Oden.exitCode = 1;
     assertEquals(exited, false);
   } finally {
-    Deno.exit = originalExit;
-    Deno.exitCode = 0;
+    Oden.exit = originalExit;
+    Oden.exitCode = 0;
   }
 });

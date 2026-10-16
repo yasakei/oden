@@ -1,20 +1,20 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_bench_util::bench_js_sync;
-use deno_bench_util::bench_or_profile;
-use deno_bench_util::bencher::Bencher;
-use deno_bench_util::bencher::benchmark_group;
-use deno_core::Extension;
+use oden_bench_util::bench_js_sync;
+use oden_bench_util::bench_or_profile;
+use oden_bench_util::bencher::Bencher;
+use oden_bench_util::bencher::benchmark_group;
+use oden_core::Extension;
 
 fn setup() -> Vec<Extension> {
-  deno_core::extension!(
+  oden_core::extension!(
     bench_setup,
     esm_entry_point = "ext:bench_setup/setup",
     esm = [
-      "ext:deno_fetch/20_headers.js" = "20_headers.js",
+      "ext:oden_fetch/20_headers.js" = "20_headers.js",
       "ext:bench_setup/setup" = {
         source = r#"
-          import { Headers } from "ext:deno_fetch/20_headers.js";
+          import { Headers } from "ext:oden_fetch/20_headers.js";
           globalThis.Headers = Headers;
           globalThis.makeHeaders = () => new Headers({
             "content-type": "application/json",
@@ -23,7 +23,7 @@ fn setup() -> Vec<Extension> {
             "x-request-id": "abc-123",
             "accept-encoding": "gzip",
             "x-forwarded-for": "10.0.0.1",
-            "user-agent": "deno-bench/1.0",
+            "user-agent": "oden-bench/1.0",
           });
           globalThis.h7 = makeHeaders();
         "#
@@ -32,9 +32,9 @@ fn setup() -> Vec<Extension> {
   );
 
   vec![
-    deno_webidl::deno_webidl::init(),
-    deno_web::deno_web::init(
-      deno_web::BlobStore::default_arc(),
+    oden_webidl::oden_webidl::init(),
+    oden_web::oden_web::init(
+      oden_web::BlobStore::default_arc(),
       None,
       Default::default(),
       Default::default(),

@@ -1,9 +1,9 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 let total = 5;
 let current = "";
 const values = {};
-const runtime = typeof Deno !== "undefined" ? "deno" : "node";
+const runtime = typeof Oden !== "undefined" ? "oden" : "node";
 
 function bench(fun, count = 100000) {
   if (total === 5) console.log(fun.toString());
@@ -23,10 +23,10 @@ if (runtime === "node") {
   fs = await import("fs");
 }
 
-const getFunction = runtime === "deno"
+const getFunction = runtime === "oden"
   ? (name) => {
     current = name;
-    return Deno[name];
+    return Oden[name];
   }
   : (name) => {
     current = name;

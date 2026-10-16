@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use deno_core::serde_json;
-use deno_core::unsync::spawn;
+use oden_core::serde_json;
+use oden_core::unsync::spawn;
 use once_cell::unsync::OnceCell;
 use serde::Deserialize;
 use serde::Serialize;
@@ -25,7 +25,7 @@ use crate::cron::Schedule;
 pub struct SocketCronHandler {
   socket_addr: String,
   socket_task_tx: mpsc::Sender<SocketTaskCommand>,
-  socket_task_handle: deno_core::unsync::JoinHandle<()>,
+  socket_task_handle: oden_core::unsync::JoinHandle<()>,
   socket_task_exit_error: Rc<OnceCell<CronError>>,
   reject_reason: Rc<OnceCell<String>>,
 }

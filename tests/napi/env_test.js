@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { assert, loadTestLibrary } from "./common.js";
 
 const env = loadTestLibrary();
 
-Deno.test("napi get global", function () {
+Oden.test("napi get global", function () {
   const g = env.testNodeGlobal();
   assert(g === globalThis);
 });

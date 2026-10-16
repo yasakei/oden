@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "@odentest/peer-dep-base": "npm:@odentest/peer-dep-base@~1.0.0",
+    "@odentest/peer-dep-consumer": "npm:@odentest/peer-dep-consumer@^1.0.0",
+    "@odentest/peer-dep-consumer-2": "npm:@odentest/peer-dep-consumer-2@^1.0.0"
+  }
+}

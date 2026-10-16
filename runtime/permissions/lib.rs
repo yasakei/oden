@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cmp::Ordering;
@@ -79,7 +79,7 @@ pub struct PermissionDeniedError {
 fn format_permission_error(name: &'static str) -> String {
   if is_standalone() {
     format!(
-      "specify the required permissions during compilation using `deno compile --allow-{name}`"
+      "specify the required permissions during compilation using `oden compile --allow-{name}`"
     )
   } else {
     format!("run again with the --allow-{name} flag")
@@ -601,7 +601,7 @@ impl UnitPermission {
         == permission_prompt(
           &format!("access to {}", self.description),
           self.name,
-          Some("Deno.permissions.query()"),
+          Some("Oden.permissions.query()"),
           false,
         )
       {
@@ -1138,7 +1138,7 @@ impl<
     match permission_prompt(
       &message,
       TAllowDesc::QueryDesc::flag_name(),
-      Some("Deno.permissions.request()"),
+      Some("Oden.permissions.request()"),
       true,
     ) {
       PromptResponse::Allow => {
@@ -1826,7 +1826,7 @@ pub enum HostParseError {
 /// `--allow-net=unix:<path>` rules.
 ///
 /// A leading `/` is an absolute POSIX path on every host, including
-/// `deno compile --target=<unix>` from Windows (`Path::is_absolute()` on
+/// `oden compile --target=<unix>` from Windows (`Path::is_absolute()` on
 /// Windows requires a drive letter, so `/var/run/docker.sock` would be
 /// rejected). Otherwise fall back to host semantics so Windows named pipes
 /// (`\\.\pipe\foo`) remain expressible as a scoped rule.
@@ -2805,7 +2805,7 @@ pub enum RunDescriptorArg {
 
 pub enum AllowRunDescriptorParseResult {
   /// An error occurred getting the descriptor that should
-  /// be surfaced as a warning when launching deno, but should
+  /// be surfaced as a warning when launching oden, but should
   /// be ignored when creating a worker.
   Unresolved(Box<which::Error>),
   Descriptor(AllowRunDescriptor),
@@ -2941,7 +2941,7 @@ fn denies_run_name(name: &str, cmd_path: &Path) -> bool {
   if !prefix.eq_ignore_ascii_case(name) {
     return false;
   }
-  // be broad and consider anything like `deno.something` as matching deny perms
+  // be broad and consider anything like `oden.something` as matching deny perms
   suffix.is_empty() || suffix.starts_with('.')
 }
 
@@ -5673,42 +5673,42 @@ impl<'de> Deserialize<'de> for ChildPermissionsArg {
           if key == "env" {
             let arg = serde_json::from_value::<ChildUnaryPermissionArg>(value);
             child_permissions_arg.env = arg.map_err(|e| {
-              de::Error::custom(format!("(deno.permissions.env) {e}"))
+              de::Error::custom(format!("(oden.permissions.env) {e}"))
             })?;
           } else if key == "net" {
             let arg = serde_json::from_value::<ChildUnaryPermissionArg>(value);
             child_permissions_arg.net = arg.map_err(|e| {
-              de::Error::custom(format!("(deno.permissions.net) {e}"))
+              de::Error::custom(format!("(oden.permissions.net) {e}"))
             })?;
           } else if key == "ffi" {
             let arg = serde_json::from_value::<ChildUnaryPermissionArg>(value);
             child_permissions_arg.ffi = arg.map_err(|e| {
-              de::Error::custom(format!("(deno.permissions.ffi) {e}"))
+              de::Error::custom(format!("(oden.permissions.ffi) {e}"))
             })?;
           } else if key == "import" {
             let arg = serde_json::from_value::<ChildUnaryPermissionArg>(value);
             child_permissions_arg.import = arg.map_err(|e| {
-              de::Error::custom(format!("(deno.permissions.import) {e}"))
+              de::Error::custom(format!("(oden.permissions.import) {e}"))
             })?;
           } else if key == "read" {
             let arg = serde_json::from_value::<ChildUnaryPermissionArg>(value);
             child_permissions_arg.read = arg.map_err(|e| {
-              de::Error::custom(format!("(deno.permissions.read) {e}"))
+              de::Error::custom(format!("(oden.permissions.read) {e}"))
             })?;
           } else if key == "run" {
             let arg = serde_json::from_value::<ChildUnaryPermissionArg>(value);
             child_permissions_arg.run = arg.map_err(|e| {
-              de::Error::custom(format!("(deno.permissions.run) {e}"))
+              de::Error::custom(format!("(oden.permissions.run) {e}"))
             })?;
           } else if key == "sys" {
             let arg = serde_json::from_value::<ChildUnaryPermissionArg>(value);
             child_permissions_arg.sys = arg.map_err(|e| {
-              de::Error::custom(format!("(deno.permissions.sys) {e}"))
+              de::Error::custom(format!("(oden.permissions.sys) {e}"))
             })?;
           } else if key == "write" {
             let arg = serde_json::from_value::<ChildUnaryPermissionArg>(value);
             child_permissions_arg.write = arg.map_err(|e| {
-              de::Error::custom(format!("(deno.permissions.write) {e}"))
+              de::Error::custom(format!("(oden.permissions.write) {e}"))
             })?;
           } else {
             return Err(de::Error::custom("unknown permission name"));
@@ -6238,8 +6238,8 @@ mod tests {
       ("localhost", 1234, true),
       ("deno.land", 0, true),
       ("deno.land", 3000, true),
-      ("deno.lands", 0, false),
-      ("deno.lands", 3000, false),
+      ("oden.lands", 0, false),
+      ("oden.lands", 3000, false),
       ("github.com", 3000, true),
       ("github.com", 0, false),
       ("github.com", 2000, false),
@@ -6290,8 +6290,8 @@ mod tests {
       ("localhost", 1234),
       ("deno.land", 0),
       ("deno.land", 3000),
-      ("deno.lands", 0),
-      ("deno.lands", 3000),
+      ("oden.lands", 0),
+      ("oden.lands", 3000),
       ("github.com", 3000),
       ("github.com", 0),
       ("github.com", 2000),
@@ -6335,8 +6335,8 @@ mod tests {
       ("localhost", 1234),
       ("deno.land", 0),
       ("deno.land", 3000),
-      ("deno.lands", 0),
-      ("deno.lands", 3000),
+      ("oden.lands", 0),
+      ("oden.lands", 3000),
       ("github.com", 3000),
       ("github.com", 0),
       ("github.com", 2000),
@@ -6592,7 +6592,7 @@ mod tests {
         false,
       ),
       (
-        Url::parse("data:text/plain,Hello%2C%20Deno!").unwrap(),
+        Url::parse("data:text/plain,Hello%2C%20Oden!").unwrap(),
         CheckSpecifierKind::Dynamic,
         true,
       ),
@@ -6691,7 +6691,7 @@ mod tests {
         allow_net: Some(svec!["127.0.0.1:8000"]),
         allow_env: Some(svec!["HOME"]),
         allow_sys: Some(svec!["hostname"]),
-        allow_run: Some(svec!["/deno"]),
+        allow_run: Some(svec!["/oden"]),
         ..Default::default()
       },
     )
@@ -6705,7 +6705,7 @@ mod tests {
         deny_net: Some(svec!["127.0.0.1:8000"]),
         deny_env: Some(svec!["HOME"]),
         deny_sys: Some(svec!["hostname"]),
-        deny_run: Some(svec!["deno"]),
+        deny_run: Some(svec!["oden"]),
         deny_import: Some(svec!["example.com:443"]),
         ..Default::default()
       },
@@ -6727,7 +6727,7 @@ mod tests {
         allow_sys: Some(vec![]),
         deny_sys: Some(svec!["hostname"]),
         allow_run: Some(vec![]),
-        deny_run: Some(svec!["deno"]),
+        deny_run: Some(svec!["oden"]),
         allow_import: Some(vec![]),
         deny_import: Some(svec!["example.com:443"]),
         ..Default::default()
@@ -6819,19 +6819,19 @@ mod tests {
       assert_eq!(perms4.sys.query(Some(&sys_desc("hostname"))), PermissionState::Denied);
       assert_eq!(perms4.sys.query(Some(&sys_desc("uid"))), PermissionState::Granted);
       assert_eq!(perms1.run.query(None), PermissionState::Granted);
-      let deno_run_query = RunQueryDescriptor::Path(PathQueryDescriptor::new_known_absolute(Cow::Owned(PathBuf::from("/deno"))).with_requested("deno".to_string()));
+      let oden_run_query = RunQueryDescriptor::Path(PathQueryDescriptor::new_known_absolute(Cow::Owned(PathBuf::from("/oden"))).with_requested("oden".to_string()));
       let node_run_query = RunQueryDescriptor::Path(
         PathQueryDescriptor::new_known_absolute(Cow::Owned(PathBuf::from("/node"))).with_requested("node".to_string())
       );
-      assert_eq!(perms1.run.query(Some(&deno_run_query)), PermissionState::Granted);
-      assert_eq!(perms1.write.query(Some(&write_query("/deno"))), PermissionState::Granted);
+      assert_eq!(perms1.run.query(Some(&oden_run_query)), PermissionState::Granted);
+      assert_eq!(perms1.write.query(Some(&write_query("/oden"))), PermissionState::Granted);
       assert_eq!(perms2.run.query(None), PermissionState::Prompt);
-      assert_eq!(perms2.run.query(Some(&deno_run_query)), PermissionState::Granted);
-      assert_eq!(perms2.write.query(Some(&write_query("/deno"))), PermissionState::Denied);
+      assert_eq!(perms2.run.query(Some(&oden_run_query)), PermissionState::Granted);
+      assert_eq!(perms2.write.query(Some(&write_query("/oden"))), PermissionState::Denied);
       assert_eq!(perms3.run.query(None), PermissionState::Prompt);
-      assert_eq!(perms3.run.query(Some(&deno_run_query)), PermissionState::Denied);
+      assert_eq!(perms3.run.query(Some(&oden_run_query)), PermissionState::Denied);
       assert_eq!(perms4.run.query(None), PermissionState::GrantedPartial);
-      assert_eq!(perms4.run.query(Some(&deno_run_query)), PermissionState::Denied);
+      assert_eq!(perms4.run.query(Some(&oden_run_query)), PermissionState::Denied);
       assert_eq!(perms4.run.query(Some(&node_run_query)), PermissionState::Granted);
       assert_eq!(perms3.import.query(None), PermissionState::Prompt);
       assert_eq!(perms3.import.query(Some(&ImportDescriptor(NetDescriptor(Host::must_parse("example.com"), Some(443))))), PermissionState::Denied);
@@ -6951,7 +6951,7 @@ mod tests {
       prompt_value.set(false);
       assert_eq!(perms.sys.request(Some(&sys_desc("hostname"))), PermissionState::Granted);
       prompt_value.set(true);
-      let run_query = RunQueryDescriptor::Path(PathQueryDescriptor::new_known_absolute(Cow::Owned(PathBuf::from("/deno"))).with_requested("deno".to_string()));
+      let run_query = RunQueryDescriptor::Path(PathQueryDescriptor::new_known_absolute(Cow::Owned(PathBuf::from("/oden"))).with_requested("oden".to_string()));
       assert_eq!(perms.run.request(Some(&run_query)), PermissionState::Granted);
       assert_eq!(perms.run.query(None), PermissionState::Prompt);
       prompt_value.set(false);
@@ -6973,7 +6973,7 @@ mod tests {
         allow_net: Some(svec!["127.0.0.1", "127.0.0.1:8000"]),
         allow_env: Some(svec!["HOME"]),
         allow_sys: Some(svec!["hostname"]),
-        allow_run: Some(svec!["/deno"]),
+        allow_run: Some(svec!["/oden"]),
         ..Default::default()
       },
     )
@@ -7012,7 +7012,7 @@ mod tests {
       assert_eq!(perms.net.query(Some(&NetDescriptor(Host::must_parse("127.0.0.1"), Some(8000)))), PermissionState::Granted);
       assert_eq!(perms.env.revoke(Some("HOME")), PermissionState::Prompt);
       assert_eq!(perms.env.revoke(Some("hostname")), PermissionState::Prompt);
-      let run_query = RunQueryDescriptor::Path(PathQueryDescriptor::new_known_absolute(Cow::Owned(PathBuf::from("/deno"))).with_requested("deno".to_string()));
+      let run_query = RunQueryDescriptor::Path(PathQueryDescriptor::new_known_absolute(Cow::Owned(PathBuf::from("/oden"))).with_requested("oden".to_string()));
       assert_eq!(perms.run.revoke(Some(&run_query)), PermissionState::Prompt);
     };
   }
@@ -7677,7 +7677,7 @@ mod tests {
   // Recursive remove must keep strict deny semantics: `check_write` rejects an
   // ancestor of a denied path, while the partial checks used by single-path ops
   // (`check_write_partial`, `check_open`) allow it. Without this, a recursive
-  // `Deno.remove("/foo", { recursive: true })` under `--deny-write=/foo/bar`
+  // `Oden.remove("/foo", { recursive: true })` under `--deny-write=/foo/bar`
   // would delete the denied descendant.
   #[test]
   fn test_check_write_strict_for_recursive_remove() {
@@ -7696,7 +7696,7 @@ mod tests {
     // Strict write check (used by recursive remove) rejects the ancestor.
     assert!(
       perms
-        .check_write(Cow::Borrowed(Path::new("/foo")), "Deno.removeSync()")
+        .check_write(Cow::Borrowed(Path::new("/foo")), "Oden.removeSync()")
         .is_err(),
       "recursive remove of an ancestor of a denied path must be blocked"
     );
@@ -7706,7 +7706,7 @@ mod tests {
     perms
       .check_write_partial(
         Cow::Borrowed(Path::new("/foo")),
-        "Deno.removeSync()",
+        "Oden.removeSync()",
       )
       .unwrap();
     perms
@@ -7720,14 +7720,14 @@ mod tests {
     // The denied path itself is rejected by every variant.
     assert!(
       perms
-        .check_write(Cow::Borrowed(Path::new("/foo/bar")), "Deno.removeSync()")
+        .check_write(Cow::Borrowed(Path::new("/foo/bar")), "Oden.removeSync()")
         .is_err()
     );
     assert!(
       perms
         .check_write_partial(
           Cow::Borrowed(Path::new("/foo/bar")),
-          "Deno.removeSync()"
+          "Oden.removeSync()"
         )
         .is_err()
     );
@@ -8213,7 +8213,7 @@ mod tests {
       ),
       ("[::1", None),
       ("::1]", None),
-      ("deno. land", None),
+      ("oden. land", None),
       ("1. 1.1.1", None),
       ("1.1.1.1.", None),
       ("1::1.", None),
@@ -8289,7 +8289,7 @@ mod tests {
       ),
       ("[::1", None),
       ("::1]", None),
-      ("deno. land", None),
+      ("oden. land", None),
       ("1. 1.1.1", None),
       ("1.1.1.1.", None),
       ("1::1.", None),
@@ -8354,7 +8354,7 @@ mod tests {
       ("*.deno.land", None),
       ("deno.land:", None),
       ("deno.land:a", None),
-      ("deno. land:a", None),
+      ("oden. land:a", None),
       ("deno.land.: a", None),
       (
         "1.1.1.1",
@@ -8446,7 +8446,7 @@ mod tests {
       ),
       ("deno.land:", None),
       ("deno.land:a", None),
-      ("deno. land:a", None),
+      ("oden. land:a", None),
       ("deno.land.: a", None),
       (
         "1.1.1.1",
@@ -8504,7 +8504,7 @@ mod tests {
         )),
       ),
       // Unix socket rules are POSIX paths on every host (including Windows
-      // `deno compile --target=linux`). Lexically normalize `.`/`..` at parse
+      // `oden compile --target=linux`). Lexically normalize `.`/`..` at parse
       // time so the rule matches the call-side path.
       (
         "unix:/var/run/docker.sock",
@@ -8585,21 +8585,21 @@ mod tests {
   fn test_denies_run_name() {
     let cases = [
       #[cfg(windows)]
-      ("deno", "C:\\deno.exe", true),
+      ("oden", "C:\\oden.exe", true),
       #[cfg(windows)]
-      ("deno", "C:\\sub\\deno.cmd", true),
+      ("oden", "C:\\sub\\oden.cmd", true),
       #[cfg(windows)]
-      ("deno", "C:\\sub\\DeNO.cmd", true),
+      ("oden", "C:\\sub\\DeNO.cmd", true),
       #[cfg(windows)]
-      ("DEno", "C:\\sub\\deno.cmd", true),
+      ("DEno", "C:\\sub\\oden.cmd", true),
       #[cfg(windows)]
-      ("deno", "C:\\other\\sub\\deno.batch", true),
+      ("oden", "C:\\other\\sub\\oden.batch", true),
       #[cfg(windows)]
-      ("deno", "C:\\other\\sub\\deno", true),
+      ("oden", "C:\\other\\sub\\oden", true),
       #[cfg(windows)]
-      ("denort", "C:\\other\\sub\\deno.exe", false),
-      ("deno", "/home/test/deno", true),
-      ("deno", "/home/test/denot", false),
+      ("odenrt", "C:\\other\\sub\\oden.exe", false),
+      ("oden", "/home/test/oden", true),
+      ("oden", "/home/test/odent", false),
     ];
     for (name, cmd_path, denies) in cases {
       assert_eq!(
@@ -8739,11 +8739,11 @@ mod tests {
         Some(Vec::from([
           EnvDescriptor::new(Cow::Borrowed("NODE_ENV")),
           EnvDescriptor::new(Cow::Borrowed("NODE_DEBUG_*")),
-          EnvDescriptor::new(Cow::Borrowed("DENO_*")),
+          EnvDescriptor::new(Cow::Borrowed("ODEN_*")),
         ])),
         Some(Vec::from([
           EnvDescriptor::new(Cow::Borrowed("NODE_*")),
-          EnvDescriptor::new(Cow::Borrowed("DENO_SECRET")),
+          EnvDescriptor::new(Cow::Borrowed("ODEN_SECRET")),
         ])),
         true,
       )
@@ -8765,12 +8765,12 @@ mod tests {
       PermissionState::Denied
     );
 
-    // DENO_* allow works for most vars
-    assert_eq!(perms.env.query(Some("DENO_DIR")), PermissionState::Granted);
+    // ODEN_* allow works for most vars
+    assert_eq!(perms.env.query(Some("ODEN_DIR")), PermissionState::Granted);
 
-    // But DENO_SECRET exact deny overrides DENO_* allow
+    // But ODEN_SECRET exact deny overrides ODEN_* allow
     assert_eq!(
-      perms.env.query(Some("DENO_SECRET")),
+      perms.env.query(Some("ODEN_SECRET")),
       PermissionState::Denied
     );
 

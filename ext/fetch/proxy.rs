@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! Parts of this module should be able to be replaced with other crates
 //! eventually, once generic versions appear in hyper-util, et al.
@@ -17,11 +17,11 @@ use std::sync::Arc;
 use std::task::Context;
 use std::task::Poll;
 
-use deno_core::futures::TryFutureExt;
+use oden_core::futures::TryFutureExt;
 #[cfg(not(windows))]
-use deno_permissions::OpenAccessKind;
-use deno_permissions::PermissionsContainer;
-use deno_tls::rustls::ClientConfig as TlsConfig;
+use oden_permissions::OpenAccessKind;
+use oden_permissions::PermissionsContainer;
+use oden_tls::rustls::ClientConfig as TlsConfig;
 use http::Uri;
 use http::header::HeaderValue;
 use http::uri::Scheme;

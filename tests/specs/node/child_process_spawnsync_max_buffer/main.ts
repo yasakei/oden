@@ -7,12 +7,12 @@ const child = `
 // Write much more than the maxBuffer below so the limit is hit quickly.
 const chunk = "x".repeat(64 * 1024);
 while (true) {
-  Deno.stdout.writeSync(new TextEncoder().encode(chunk));
+  Oden.stdout.writeSync(new TextEncoder().encode(chunk));
 }
 `;
 
 const start = Date.now();
-const result = spawnSync(Deno.execPath(), ["eval", child], {
+const result = spawnSync(Oden.execPath(), ["eval", child], {
   maxBuffer: 32 * 1024,
   // Enforce an upper bound so the test fails loudly rather than hanging if
   // the maxBuffer enforcement regresses.

@@ -1,5 +1,5 @@
-#!/usr/bin/env -S deno run --check --allow-write=. --allow-read=. --lock=./tools/deno.lock.json
-// Copyright 2018-2026 the Deno authors. MIT license.
+#!/usr/bin/env -S oden run --check --allow-write=. --allow-read=. --lock=./tools/oden.lock.json
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { parse as parseToml } from "jsr:@std/toml@1";
 import {
   Condition,
@@ -96,7 +96,7 @@ const Runners = {
   },
 } as const;
 
-const denoCorePackageDirs = [
+const odenCorePackageDirs = [
   "libs/core_testing",
   "libs/core",
   "libs/core/examples/snapshot",
@@ -291,10 +291,10 @@ const cloneSubmodule = (path: string) =>
     run: `git submodule update --init --recursive --depth=1 -- ${path}`,
   });
 const cloneStdSubmoduleStep = cloneSubmodule("./tests/util/std");
-const installDenoStep = step({
-  name: "Install Deno",
-  uses: "denoland/setup-deno@v2",
-  with: { "deno-version": "v2.x" },
+const installOdenStep = step({
+  name: "Install Oden",
+  uses: "denoland/setup-oden@v2",
+  with: { "oden-version": "v2.x" },
 });
 const installNodeStep = step({
   name: "Install Node",
@@ -479,7 +479,7 @@ function getOsSpecificSteps({
   const installLldStep = step
     .dependsOn(
       cloneStdSubmoduleStep,
-      installDenoStep,
+      installOdenStep,
       setupPrebuiltMacStep,
     )({
       name: "Install macOS aarch64 lld",
@@ -511,24 +511,24 @@ const preBuildCheckStep = step({
   outputs: ["skip_build"] as const,
 });
 
-const denoCoreChangesCheckStep = step({
-  id: "deno_core_changes",
+const odenCoreChangesCheckStep = step({
+  id: "oden_core_changes",
   run: [
     // Fetch the base SHA so it's available even in shallow clones
     `git fetch --depth=1 origin \${{ github.event.pull_request.base.sha }}`,
-    `deno run -A tools/check_deno_core_changes.js \${{ github.event.pull_request.base.sha }}`,
+    `oden run -A tools/check_oden_core_changes.js \${{ github.event.pull_request.base.sha }}`,
   ],
-  outputs: ["skip_deno_core_test"] as const,
+  outputs: ["skip_oden_core_test"] as const,
 });
 
 // Detects PRs that only touch the `doc/` directory. Such PRs run the `lint`
 // job alone (markdown is still formatted/linted) and skip the build, test,
-// bench and deno_core jobs. The base SHA is already fetched by the deno_core
+// bench and oden_core jobs. The base SHA is already fetched by the oden_core
 // changes step above.
 const docsOnlyChangesCheckStep = step({
   id: "docs_only_changes",
   run: [
-    `deno run -A tools/check_docs_only_changes.js \${{ github.event.pull_request.base.sha }}`,
+    `oden run -A tools/check_docs_only_changes.js \${{ github.event.pull_request.base.sha }}`,
   ],
   outputs: ["docs_only"] as const,
 });
@@ -538,14 +538,14 @@ const preBuildJob = job("pre_build", {
   runsOn: "ubuntu-latest",
   steps: step.if(isPr)(
     cloneRepoStep,
-    installDenoStep,
+    installOdenStep,
     step.if(conditions.isDraftPr())(preBuildCheckStep),
-    denoCoreChangesCheckStep,
+    odenCoreChangesCheckStep,
     docsOnlyChangesCheckStep,
   ),
   outputs: {
     skip_build: preBuildCheckStep.outputs.skip_build,
-    skip_deno_core_test: denoCoreChangesCheckStep.outputs.skip_deno_core_test,
+    skip_oden_core_test: odenCoreChangesCheckStep.outputs.skip_oden_core_test,
     docs_only: docsOnlyChangesCheckStep.outputs.docs_only,
   },
 });
@@ -615,8 +615,8 @@ const buildJobs = buildItems.map((rawBuildItem) => {
     ? " -Zbuild-std=core,alloc,std,proc_macro,panic_abort"
     : "";
   const panicTraceFeatures = usesFramePointerPanicTrace
-    ? "deno/panic-trace-frame-pointer"
-    : "deno/panic-trace";
+    ? "oden/panic-trace-frame-pointer"
+    : "oden/panic-trace";
   const usesStartupOrder = rawBuildItem.profile === "release" &&
     ((rawBuildItem.os === "linux" &&
       (rawBuildItem.arch === "x86_64" || rawBuildItem.arch === "aarch64")) ||
@@ -672,8 +672,8 @@ const buildJobs = buildItems.map((rawBuildItem) => {
     };
   };
 
-  const denoArtifact = createBinaryArtifact("deno");
-  const denortArtifact = createBinaryArtifact("denort");
+  const odenArtifact = createBinaryArtifact("oden");
+  const odenrtArtifact = createBinaryArtifact("odenrt");
   const testServerArtifact = createBinaryArtifact("test_server");
   const env = {
     CARGO_TERM_COLOR: "always",
@@ -734,7 +734,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
           run: [
             "mkdir -p target/release",
             'tar --exclude=".git*" --exclude=target --exclude=third_party/prebuilt \\',
-            "    -czvf target/release/deno_src.tar.gz -C .. deno",
+            "    -czvf target/release/oden_src.tar.gz -C .. oden",
           ],
         });
 
@@ -744,54 +744,54 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             if: isLinux.and(isDenoland),
             run: [
               "cd target/release",
-              `./deno -A ../../tools/release/create_symcache.ts deno-${buildItem.arch}-unknown-linux-gnu.symcache`,
-              "strip --remove-section=.eh_frame --remove-section=.eh_frame_hdr ./deno",
-              "if readelf -SW ./deno | grep -Eq '\\.eh_frame(_hdr)?'; then echo 'unwind sections remain in deno'; exit 1; fi",
-              "if readelf -lW ./deno | grep -q GNU_EH_FRAME; then echo 'PT_GNU_EH_FRAME remains in deno'; exit 1; fi",
-              `shasum -a 256 deno > deno-${buildItem.arch}-unknown-linux-gnu.sha256sum`,
-              `zip -r deno-${buildItem.arch}-unknown-linux-gnu.zip deno`,
-              `shasum -a 256 deno-${buildItem.arch}-unknown-linux-gnu.zip > deno-${buildItem.arch}-unknown-linux-gnu.zip.sha256sum`,
-              // denort is the `deno compile` base binary: libsui rewrites its
+              `./oden -A ../../tools/release/create_symcache.ts oden-${buildItem.arch}-unknown-linux-gnu.symcache`,
+              "strip --remove-section=.eh_frame --remove-section=.eh_frame_hdr ./oden",
+              "if readelf -SW ./oden | grep -Eq '\\.eh_frame(_hdr)?'; then echo 'unwind sections remain in oden'; exit 1; fi",
+              "if readelf -lW ./oden | grep -q GNU_EH_FRAME; then echo 'PT_GNU_EH_FRAME remains in oden'; exit 1; fi",
+              `shasum -a 256 oden > oden-${buildItem.arch}-unknown-linux-gnu.sha256sum`,
+              `zip -r oden-${buildItem.arch}-unknown-linux-gnu.zip oden`,
+              `shasum -a 256 oden-${buildItem.arch}-unknown-linux-gnu.zip > oden-${buildItem.arch}-unknown-linux-gnu.zip.sha256sum`,
+              // odenrt is the `oden compile` base binary: libsui rewrites its
               // ELF to embed user code, and that rewrite drops `.relr.dyn`
               // relative relocations when the symbol table is gone, producing a
               // compiled binary whose C++ static-init guards deadlock
               // (`__cxa_guard_acquire failed to acquire mutex`). Keep .symtab
               // (strip only debug info) so the relocations survive.
-              "strip --strip-debug --remove-section=.eh_frame --remove-section=.eh_frame_hdr ./denort",
-              "if readelf -SW ./denort | grep -Eq '\\.eh_frame(_hdr)?'; then echo 'unwind sections remain in denort'; exit 1; fi",
-              "if readelf -lW ./denort | grep -q GNU_EH_FRAME; then echo 'PT_GNU_EH_FRAME remains in denort'; exit 1; fi",
-              `zip -r denort-${buildItem.arch}-unknown-linux-gnu.zip denort`,
-              `shasum -a 256 denort-${buildItem.arch}-unknown-linux-gnu.zip > denort-${buildItem.arch}-unknown-linux-gnu.zip.sha256sum`,
-              "strip --remove-section=.eh_frame --remove-section=.eh_frame_hdr ./libdenort.so",
-              "if readelf -SW ./libdenort.so | grep -Eq '\\.eh_frame(_hdr)?'; then echo 'unwind sections remain in libdenort.so'; exit 1; fi",
-              "if readelf -lW ./libdenort.so | grep -q GNU_EH_FRAME; then echo 'PT_GNU_EH_FRAME remains in libdenort.so'; exit 1; fi",
-              `zip -r libdenort-${buildItem.arch}-unknown-linux-gnu.zip libdenort.so`,
-              `shasum -a 256 libdenort-${buildItem.arch}-unknown-linux-gnu.zip > libdenort-${buildItem.arch}-unknown-linux-gnu.zip.sha256sum`,
-              // QuickJS denort/libdenort for `deno compile --engine quickjs`.
+              "strip --strip-debug --remove-section=.eh_frame --remove-section=.eh_frame_hdr ./odenrt",
+              "if readelf -SW ./odenrt | grep -Eq '\\.eh_frame(_hdr)?'; then echo 'unwind sections remain in odenrt'; exit 1; fi",
+              "if readelf -lW ./odenrt | grep -q GNU_EH_FRAME; then echo 'PT_GNU_EH_FRAME remains in odenrt'; exit 1; fi",
+              `zip -r odenrt-${buildItem.arch}-unknown-linux-gnu.zip odenrt`,
+              `shasum -a 256 odenrt-${buildItem.arch}-unknown-linux-gnu.zip > odenrt-${buildItem.arch}-unknown-linux-gnu.zip.sha256sum`,
+              "strip --remove-section=.eh_frame --remove-section=.eh_frame_hdr ./libodenrt.so",
+              "if readelf -SW ./libodenrt.so | grep -Eq '\\.eh_frame(_hdr)?'; then echo 'unwind sections remain in libodenrt.so'; exit 1; fi",
+              "if readelf -lW ./libodenrt.so | grep -q GNU_EH_FRAME; then echo 'PT_GNU_EH_FRAME remains in libodenrt.so'; exit 1; fi",
+              `zip -r libodenrt-${buildItem.arch}-unknown-linux-gnu.zip libodenrt.so`,
+              `shasum -a 256 libodenrt-${buildItem.arch}-unknown-linux-gnu.zip > libodenrt-${buildItem.arch}-unknown-linux-gnu.zip.sha256sum`,
+              // QuickJS odenrt/libodenrt for `oden compile --engine quickjs`.
               // Reuse the same target dir (a second one would exceed runner
               // disk). Back up the v8 binaries and restore them even if the
               // QuickJS build fails so later release steps never see a partial
               // or wrong-engine runtime.
               "restore_v8_runtimes() {",
-              "  test ! -e denort.v8 || mv -f denort.v8 denort",
-              "  test ! -e libdenort.v8.so || mv -f libdenort.v8.so libdenort.so",
+              "  test ! -e odenrt.v8 || mv -f odenrt.v8 odenrt",
+              "  test ! -e libodenrt.v8.so || mv -f libodenrt.v8.so libodenrt.so",
               "}",
               "trap restore_v8_runtimes EXIT",
-              "mv denort denort.v8",
-              "mv libdenort.so libdenort.v8.so",
-              `(cd ../.. && cargo build --release --locked -p denort -p denort_desktop --no-default-features --features quickjs)`,
-              "strip --strip-debug ./denort",
-              `zip -r denort-quickjs-${buildItem.arch}-unknown-linux-gnu.zip denort`,
-              `shasum -a 256 denort-quickjs-${buildItem.arch}-unknown-linux-gnu.zip > denort-quickjs-${buildItem.arch}-unknown-linux-gnu.zip.sha256sum`,
-              "strip ./libdenort.so",
-              `zip -r libdenort-quickjs-${buildItem.arch}-unknown-linux-gnu.zip libdenort.so`,
-              `shasum -a 256 libdenort-quickjs-${buildItem.arch}-unknown-linux-gnu.zip > libdenort-quickjs-${buildItem.arch}-unknown-linux-gnu.zip.sha256sum`,
+              "mv odenrt odenrt.v8",
+              "mv libodenrt.so libodenrt.v8.so",
+              `(cd ../.. && cargo build --release --locked -p odenrt -p odenrt_desktop --no-default-features --features quickjs)`,
+              "strip --strip-debug ./odenrt",
+              `zip -r odenrt-quickjs-${buildItem.arch}-unknown-linux-gnu.zip odenrt`,
+              `shasum -a 256 odenrt-quickjs-${buildItem.arch}-unknown-linux-gnu.zip > odenrt-quickjs-${buildItem.arch}-unknown-linux-gnu.zip.sha256sum`,
+              "strip ./libodenrt.so",
+              `zip -r libodenrt-quickjs-${buildItem.arch}-unknown-linux-gnu.zip libodenrt.so`,
+              `shasum -a 256 libodenrt-quickjs-${buildItem.arch}-unknown-linux-gnu.zip > libodenrt-quickjs-${buildItem.arch}-unknown-linux-gnu.zip.sha256sum`,
               "restore_v8_runtimes",
               "trap - EXIT",
-              "./deno types > lib.deno.d.ts",
+              "./oden types > lib.oden.d.ts",
             ],
           },
-          step.dependsOn(setupPrebuiltMacStep, installDenoStep)({
+          step.dependsOn(setupPrebuiltMacStep, installOdenStep)({
             name: "Install rust-codesign",
             if: buildItem.os.equals("macos").and(isDenoland),
             env: {
@@ -808,42 +808,42 @@ const buildJobs = buildItems.map((rawBuildItem) => {
                 "${{ secrets.APPLE_CODESIGN_PASSWORD }}",
             },
             run: [
-              `target/release/deno -A tools/release/create_symcache.ts target/release/deno-${buildItem.arch}-apple-darwin.symcache`,
-              "strip -x -S target/release/deno",
+              `target/release/oden -A tools/release/create_symcache.ts target/release/oden-${buildItem.arch}-apple-darwin.symcache`,
+              "strip -x -S target/release/oden",
               'if [[ "$GITHUB_REF" == "refs/heads/main" || "$GITHUB_REF" == refs/tags/* ]]; then',
               '  echo "Key is $(echo $APPLE_CODESIGN_KEY | base64 -d | wc -c) bytes"',
-              "  rcodesign sign target/release/deno " +
+              "  rcodesign sign target/release/oden " +
               "--code-signature-flags=runtime " +
               '--p12-password="$APPLE_CODESIGN_PASSWORD" ' +
               "--p12-file=<(echo $APPLE_CODESIGN_KEY | base64 -d) " +
               "--entitlements-xml-file=cli/entitlements.plist",
               "fi",
               "cd target/release",
-              `shasum -a 256 deno > deno-${buildItem.arch}-apple-darwin.sha256sum`,
-              `zip -r deno-${buildItem.arch}-apple-darwin.zip deno`,
-              `shasum -a 256 deno-${buildItem.arch}-apple-darwin.zip > deno-${buildItem.arch}-apple-darwin.zip.sha256sum`,
-              "strip -x -S ./denort",
-              `zip -r denort-${buildItem.arch}-apple-darwin.zip denort`,
-              `shasum -a 256 denort-${buildItem.arch}-apple-darwin.zip > denort-${buildItem.arch}-apple-darwin.zip.sha256sum`,
-              "strip -x -S ./libdenort.dylib",
-              `zip -r libdenort-${buildItem.arch}-apple-darwin.zip libdenort.dylib`,
-              `shasum -a 256 libdenort-${buildItem.arch}-apple-darwin.zip > libdenort-${buildItem.arch}-apple-darwin.zip.sha256sum`,
-              // QuickJS denort/libdenort for `deno compile --engine quickjs`
+              `shasum -a 256 oden > oden-${buildItem.arch}-apple-darwin.sha256sum`,
+              `zip -r oden-${buildItem.arch}-apple-darwin.zip oden`,
+              `shasum -a 256 oden-${buildItem.arch}-apple-darwin.zip > oden-${buildItem.arch}-apple-darwin.zip.sha256sum`,
+              "strip -x -S ./odenrt",
+              `zip -r odenrt-${buildItem.arch}-apple-darwin.zip odenrt`,
+              `shasum -a 256 odenrt-${buildItem.arch}-apple-darwin.zip > odenrt-${buildItem.arch}-apple-darwin.zip.sha256sum`,
+              "strip -x -S ./libodenrt.dylib",
+              `zip -r libodenrt-${buildItem.arch}-apple-darwin.zip libodenrt.dylib`,
+              `shasum -a 256 libodenrt-${buildItem.arch}-apple-darwin.zip > libodenrt-${buildItem.arch}-apple-darwin.zip.sha256sum`,
+              // QuickJS odenrt/libodenrt for `oden compile --engine quickjs`
               // (see the linux note).
               "restore_v8_runtimes() {",
-              "  test ! -e denort.v8 || mv -f denort.v8 denort",
-              "  test ! -e libdenort.v8.dylib || mv -f libdenort.v8.dylib libdenort.dylib",
+              "  test ! -e odenrt.v8 || mv -f odenrt.v8 odenrt",
+              "  test ! -e libodenrt.v8.dylib || mv -f libodenrt.v8.dylib libodenrt.dylib",
               "}",
               "trap restore_v8_runtimes EXIT",
-              "mv denort denort.v8",
-              "mv libdenort.dylib libdenort.v8.dylib",
-              `(cd ../.. && cargo build --release --locked -p denort -p denort_desktop --no-default-features --features quickjs)`,
-              "strip -x -S ./denort",
-              `zip -r denort-quickjs-${buildItem.arch}-apple-darwin.zip denort`,
-              `shasum -a 256 denort-quickjs-${buildItem.arch}-apple-darwin.zip > denort-quickjs-${buildItem.arch}-apple-darwin.zip.sha256sum`,
-              "strip -x -S ./libdenort.dylib",
-              `zip -r libdenort-quickjs-${buildItem.arch}-apple-darwin.zip libdenort.dylib`,
-              `shasum -a 256 libdenort-quickjs-${buildItem.arch}-apple-darwin.zip > libdenort-quickjs-${buildItem.arch}-apple-darwin.zip.sha256sum`,
+              "mv odenrt odenrt.v8",
+              "mv libodenrt.dylib libodenrt.v8.dylib",
+              `(cd ../.. && cargo build --release --locked -p odenrt -p odenrt_desktop --no-default-features --features quickjs)`,
+              "strip -x -S ./odenrt",
+              `zip -r odenrt-quickjs-${buildItem.arch}-apple-darwin.zip odenrt`,
+              `shasum -a 256 odenrt-quickjs-${buildItem.arch}-apple-darwin.zip > odenrt-quickjs-${buildItem.arch}-apple-darwin.zip.sha256sum`,
+              "strip -x -S ./libodenrt.dylib",
+              `zip -r libodenrt-quickjs-${buildItem.arch}-apple-darwin.zip libodenrt.dylib`,
+              `shasum -a 256 libodenrt-quickjs-${buildItem.arch}-apple-darwin.zip > libodenrt-quickjs-${buildItem.arch}-apple-darwin.zip.sha256sum`,
               "restore_v8_runtimes",
               "trap - EXIT",
             ],
@@ -862,15 +862,15 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             },
           },
           {
-            name: "Code sign deno.exe (windows)",
+            name: "Code sign oden.exe (windows)",
             if: isWindows.and(isDenoland).and(isMainOrTag),
             uses: "Azure/artifact-signing-action@v0",
             with: {
               "endpoint": "https://eus.codesigning.azure.net/",
-              "trusted-signing-account-name": "deno-cli-code-signing",
-              "certificate-profile-name": "deno-cli-code-signing-cert",
+              "trusted-signing-account-name": "oden-cli-code-signing",
+              "certificate-profile-name": "oden-cli-code-signing-cert",
               "files-folder": "target/release",
-              "files-folder-filter": "deno.exe",
+              "files-folder-filter": "oden.exe",
               "file-digest": "SHA256",
               "timestamp-rfc3161": "http://timestamp.acs.microsoft.com",
               "timestamp-digest": "SHA256",
@@ -890,7 +890,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             run: [
               '$SignTool = Get-ChildItem -Path "C:\\Program Files*\\Windows Kits\\*\\bin\\*\\x64\\signtool.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1',
               "$SignToolPath = $SignTool.FullName",
-              "& $SignToolPath verify /pa /v target\\release\\deno.exe",
+              "& $SignToolPath verify /pa /v target\\release\\oden.exe",
             ],
           },
           {
@@ -898,33 +898,33 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             if: isWindows.and(isDenoland),
             shell: "pwsh",
             run: [
-              `Get-FileHash target/release/deno.exe -Algorithm SHA256 | Format-List > target/release/deno-${buildItem.arch}-pc-windows-msvc.sha256sum`,
-              `Compress-Archive -CompressionLevel Optimal -Force -Path target/release/deno.exe -DestinationPath target/release/deno-${buildItem.arch}-pc-windows-msvc.zip`,
-              `Get-FileHash target/release/deno-${buildItem.arch}-pc-windows-msvc.zip -Algorithm SHA256 | Format-List > target/release/deno-${buildItem.arch}-pc-windows-msvc.zip.sha256sum`,
-              `Compress-Archive -CompressionLevel Optimal -Force -Path target/release/denort.exe -DestinationPath target/release/denort-${buildItem.arch}-pc-windows-msvc.zip`,
-              `Get-FileHash target/release/denort-${buildItem.arch}-pc-windows-msvc.zip -Algorithm SHA256 | Format-List > target/release/denort-${buildItem.arch}-pc-windows-msvc.zip.sha256sum`,
-              `Compress-Archive -CompressionLevel Optimal -Force -Path target/release/denort.dll -DestinationPath target/release/libdenort-${buildItem.arch}-pc-windows-msvc.zip`,
-              `Get-FileHash target/release/libdenort-${buildItem.arch}-pc-windows-msvc.zip -Algorithm SHA256 | Format-List > target/release/libdenort-${buildItem.arch}-pc-windows-msvc.zip.sha256sum`,
-              // QuickJS denort/libdenort for `deno compile --engine quickjs`
+              `Get-FileHash target/release/oden.exe -Algorithm SHA256 | Format-List > target/release/oden-${buildItem.arch}-pc-windows-msvc.sha256sum`,
+              `Compress-Archive -CompressionLevel Optimal -Force -Path target/release/oden.exe -DestinationPath target/release/oden-${buildItem.arch}-pc-windows-msvc.zip`,
+              `Get-FileHash target/release/oden-${buildItem.arch}-pc-windows-msvc.zip -Algorithm SHA256 | Format-List > target/release/oden-${buildItem.arch}-pc-windows-msvc.zip.sha256sum`,
+              `Compress-Archive -CompressionLevel Optimal -Force -Path target/release/odenrt.exe -DestinationPath target/release/odenrt-${buildItem.arch}-pc-windows-msvc.zip`,
+              `Get-FileHash target/release/odenrt-${buildItem.arch}-pc-windows-msvc.zip -Algorithm SHA256 | Format-List > target/release/odenrt-${buildItem.arch}-pc-windows-msvc.zip.sha256sum`,
+              `Compress-Archive -CompressionLevel Optimal -Force -Path target/release/odenrt.dll -DestinationPath target/release/libodenrt-${buildItem.arch}-pc-windows-msvc.zip`,
+              `Get-FileHash target/release/libodenrt-${buildItem.arch}-pc-windows-msvc.zip -Algorithm SHA256 | Format-List > target/release/libodenrt-${buildItem.arch}-pc-windows-msvc.zip.sha256sum`,
+              // QuickJS odenrt/libodenrt for `oden compile --engine quickjs`
               // (see the linux note).
               "try {",
-              "  Move-Item target/release/denort.exe target/release/denort.v8.exe",
-              "  Move-Item target/release/denort.dll target/release/denort.v8.dll",
-              // Both packages produce denort.pdb on Windows. Building them in
+              "  Move-Item target/release/odenrt.exe target/release/odenrt.v8.exe",
+              "  Move-Item target/release/odenrt.dll target/release/odenrt.v8.dll",
+              // Both packages produce odenrt.pdb on Windows. Building them in
               // one Cargo invocation lets their linkers race to write it.
-              `  cargo build --release --locked -p denort --no-default-features --features quickjs`,
-              '  if ($LASTEXITCODE -ne 0) { throw "QuickJS denort build failed" }',
-              `  cargo build --release --locked -p denort_desktop --no-default-features --features quickjs`,
-              '  if ($LASTEXITCODE -ne 0) { throw "QuickJS denort_desktop build failed" }',
-              `  Compress-Archive -CompressionLevel Optimal -Force -Path target/release/denort.exe -DestinationPath target/release/denort-quickjs-${buildItem.arch}-pc-windows-msvc.zip`,
-              `  Get-FileHash target/release/denort-quickjs-${buildItem.arch}-pc-windows-msvc.zip -Algorithm SHA256 | Format-List > target/release/denort-quickjs-${buildItem.arch}-pc-windows-msvc.zip.sha256sum`,
-              `  Compress-Archive -CompressionLevel Optimal -Force -Path target/release/denort.dll -DestinationPath target/release/libdenort-quickjs-${buildItem.arch}-pc-windows-msvc.zip`,
-              `  Get-FileHash target/release/libdenort-quickjs-${buildItem.arch}-pc-windows-msvc.zip -Algorithm SHA256 | Format-List > target/release/libdenort-quickjs-${buildItem.arch}-pc-windows-msvc.zip.sha256sum`,
+              `  cargo build --release --locked -p odenrt --no-default-features --features quickjs`,
+              '  if ($LASTEXITCODE -ne 0) { throw "QuickJS odenrt build failed" }',
+              `  cargo build --release --locked -p odenrt_desktop --no-default-features --features quickjs`,
+              '  if ($LASTEXITCODE -ne 0) { throw "QuickJS odenrt_desktop build failed" }',
+              `  Compress-Archive -CompressionLevel Optimal -Force -Path target/release/odenrt.exe -DestinationPath target/release/odenrt-quickjs-${buildItem.arch}-pc-windows-msvc.zip`,
+              `  Get-FileHash target/release/odenrt-quickjs-${buildItem.arch}-pc-windows-msvc.zip -Algorithm SHA256 | Format-List > target/release/odenrt-quickjs-${buildItem.arch}-pc-windows-msvc.zip.sha256sum`,
+              `  Compress-Archive -CompressionLevel Optimal -Force -Path target/release/odenrt.dll -DestinationPath target/release/libodenrt-quickjs-${buildItem.arch}-pc-windows-msvc.zip`,
+              `  Get-FileHash target/release/libodenrt-quickjs-${buildItem.arch}-pc-windows-msvc.zip -Algorithm SHA256 | Format-List > target/release/libodenrt-quickjs-${buildItem.arch}-pc-windows-msvc.zip.sha256sum`,
               "} finally {",
-              "  if (Test-Path target/release/denort.v8.exe) { Move-Item -Force target/release/denort.v8.exe target/release/denort.exe }",
-              "  if (Test-Path target/release/denort.v8.dll) { Move-Item -Force target/release/denort.v8.dll target/release/denort.dll }",
+              "  if (Test-Path target/release/odenrt.v8.exe) { Move-Item -Force target/release/odenrt.v8.exe target/release/odenrt.exe }",
+              "  if (Test-Path target/release/odenrt.v8.dll) { Move-Item -Force target/release/odenrt.v8.dll target/release/odenrt.dll }",
               "}",
-              `target/release/deno.exe -A tools/release/create_symcache.ts target/release/deno-${buildItem.arch}-pc-windows-msvc.symcache`,
+              `target/release/oden.exe -A tools/release/create_symcache.ts target/release/oden-${buildItem.arch}-pc-windows-msvc.symcache`,
             ],
           },
           {
@@ -942,10 +942,10 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               'PREV_VERSION=$(curl -sf https://dl.deno.land/release-latest.txt | tr -d "v\\n") || true',
               'if [ -z "$PREV_VERSION" ]; then echo "No previous version found, skipping delta"; exit 0; fi',
               'echo "Generating delta from $PREV_VERSION for $TARGET"',
-              'curl -fSL -o prev.zip "https://github.com/denoland/deno/releases/download/v${PREV_VERSION}/deno-${TARGET}.zip" || { echo "Previous release not found, skipping delta"; exit 0; }',
+              'curl -fSL -o prev.zip "https://github.com/denoland/deno/releases/download/v${PREV_VERSION}/oden-${TARGET}.zip" || { echo "Previous release not found, skipping delta"; exit 0; }',
               "unzip -o prev.zip -d prev/",
-              './target/release/bsdiff_helper prev/deno target/release/deno "target/release/deno-${TARGET}.from-${PREV_VERSION}.bsdiff"',
-              'cd target/release && shasum -a 256 "deno-${TARGET}.from-${PREV_VERSION}.bsdiff" > "deno-${TARGET}.from-${PREV_VERSION}.bsdiff.sha256sum"',
+              './target/release/bsdiff_helper prev/oden target/release/oden "target/release/oden-${TARGET}.from-${PREV_VERSION}.bsdiff"',
+              'cd target/release && shasum -a 256 "oden-${TARGET}.from-${PREV_VERSION}.bsdiff" > "oden-${TARGET}.from-${PREV_VERSION}.bsdiff.sha256sum"',
             ],
           },
           {
@@ -956,10 +956,10 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               'PREV_VERSION=$(curl -sf https://dl.deno.land/release-latest.txt | tr -d "v\\n") || true',
               'if [ -z "$PREV_VERSION" ]; then echo "No previous version found, skipping delta"; exit 0; fi',
               'echo "Generating delta from $PREV_VERSION for $TARGET"',
-              'curl -fSL -o prev.zip "https://github.com/denoland/deno/releases/download/v${PREV_VERSION}/deno-${TARGET}.zip" || { echo "Previous release not found, skipping delta"; exit 0; }',
+              'curl -fSL -o prev.zip "https://github.com/denoland/deno/releases/download/v${PREV_VERSION}/oden-${TARGET}.zip" || { echo "Previous release not found, skipping delta"; exit 0; }',
               "unzip -o prev.zip -d prev/",
-              './target/release/bsdiff_helper prev/deno target/release/deno "target/release/deno-${TARGET}.from-${PREV_VERSION}.bsdiff"',
-              'cd target/release && shasum -a 256 "deno-${TARGET}.from-${PREV_VERSION}.bsdiff" > "deno-${TARGET}.from-${PREV_VERSION}.bsdiff.sha256sum"',
+              './target/release/bsdiff_helper prev/oden target/release/oden "target/release/oden-${TARGET}.from-${PREV_VERSION}.bsdiff"',
+              'cd target/release && shasum -a 256 "oden-${TARGET}.from-${PREV_VERSION}.bsdiff" > "oden-${TARGET}.from-${PREV_VERSION}.bsdiff.sha256sum"',
             ],
           },
           {
@@ -974,8 +974,8 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               'try { Invoke-WebRequest -Uri "https://github.com/denoland/deno/releases/download/v$PrevVersion/deno-$Target.zip" -OutFile prev.zip } catch { Write-Host "Previous release not found, skipping delta"; exit 0 }',
               "Remove-Item -Recurse -Force prev -ErrorAction SilentlyContinue; New-Item -ItemType Directory -Path prev | Out-Null",
               "Expand-Archive -Force -Path prev.zip -DestinationPath prev",
-              '& .\\target\\release\\bsdiff_helper.exe "prev\\deno.exe" "target\\release\\deno.exe" "target\\release\\deno-$Target.from-$PrevVersion.bsdiff"',
-              'Get-FileHash "target\\release\\deno-$Target.from-$PrevVersion.bsdiff" -Algorithm SHA256 | Format-List > "target\\release\\deno-$Target.from-$PrevVersion.bsdiff.sha256sum"',
+              '& .\\target\\release\\bsdiff_helper.exe "prev\\oden.exe" "target\\release\\oden.exe" "target\\release\\oden-$Target.from-$PrevVersion.bsdiff"',
+              'Get-FileHash "target\\release\\oden-$Target.from-$PrevVersion.bsdiff" -Algorithm SHA256 | Format-List > "target\\release\\oden-$Target.from-$PrevVersion.bsdiff.sha256sum"',
             ],
           },
           step({
@@ -983,18 +983,18 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             if: isDenoland.and(isMainBranch),
             env: S3Envs,
             run: [
-              'aws s3 sync ./target/release/ s3://dl-deno-land/canary/$(git rev-parse HEAD)/ --exclude "*" --include "*.zip"',
-              'aws s3 sync ./target/release/ s3://dl-deno-land/canary/$(git rev-parse HEAD)/ --exclude "*" --include "*.sha256sum"',
-              'aws s3 sync ./target/release/ s3://dl-deno-land/canary/$(git rev-parse HEAD)/ --exclude "*" --include "*.symcache"',
+              'aws s3 sync ./target/release/ s3://dl-oden-land/canary/$(git rev-parse HEAD)/ --exclude "*" --include "*.zip"',
+              'aws s3 sync ./target/release/ s3://dl-oden-land/canary/$(git rev-parse HEAD)/ --exclude "*" --include "*.sha256sum"',
+              'aws s3 sync ./target/release/ s3://dl-oden-land/canary/$(git rev-parse HEAD)/ --exclude "*" --include "*.symcache"',
               "echo ${{ github.sha }} > canary-latest.txt",
-              'aws s3 cp canary-latest.txt s3://dl-deno-land/canary-$(rustc -vV | sed -n "s|host: ||p")-latest.txt',
+              'aws s3 cp canary-latest.txt s3://dl-oden-land/canary-$(rustc -vV | sed -n "s|host: ||p")-latest.txt',
               "rm canary-latest.txt",
             ],
           }),
         );
-        const packagesToBuild = ["deno", "denort", "test_server"]
+        const packagesToBuild = ["oden", "odenrt", "test_server"]
           .map((name) => `-p ${name}`).join(" ");
-        const binsToBuild = ["deno", "denort", "test_server"]
+        const binsToBuild = ["oden", "odenrt", "test_server"]
           .map((name) => `--bin ${name}`).join(" ");
         const cargoBuildReleaseCommand =
           `cargo build${buildStdArgs} --release --locked ${packagesToBuild} ${binsToBuild} --features=${panicTraceFeatures}`;
@@ -1004,7 +1004,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
           )
           .dependsOn(
             installLldStep,
-            installDenoStep,
+            installOdenStep,
             restoreCacheStep,
             installRustStep,
             sysRootStep,
@@ -1013,13 +1013,13 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               // do this on PRs as well as main so that PRs can use the cargo build cache from main
               name: "Configure canary build",
               if: isNotTag,
-              run: 'echo "DENO_CANARY=true" >> $GITHUB_ENV',
+              run: 'echo "ODEN_CANARY=true" >> $GITHUB_ENV',
             },
             ...(usesFramePointerPanicTrace
               ? [{
                 name: "Configure frame-pointer panic traces",
                 run: [
-                  // `build-std` is unstable, but keeping Deno's pinned stable
+                  // `build-std` is unstable, but keeping Oden's pinned stable
                   // compiler plus this narrow opt-in is preferable to moving
                   // release builds to a separate nightly toolchain.
                   'echo "RUSTC_BOOTSTRAP=1" >> "$GITHUB_ENV"',
@@ -1029,9 +1029,9 @@ const buildJobs = buildItems.map((rawBuildItem) => {
                   // existing value, otherwise the added flags fuse into one
                   // bogus token.
                   "{",
-                  '  echo "RUSTFLAGS<<__DENO_RUSTFLAGS"',
+                  '  echo "RUSTFLAGS<<__ODEN_RUSTFLAGS"',
                   '  echo "$RUSTFLAGS -C force-frame-pointers=yes -C force-unwind-tables=no -C link-arg=-Wl,--no-eh-frame-hdr"',
-                  '  echo "__DENO_RUSTFLAGS"',
+                  '  echo "__ODEN_RUSTFLAGS"',
                   '} >> "$GITHUB_ENV"',
                 ],
               }]
@@ -1039,7 +1039,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             {
               name: "Build release",
               env: {
-                DENO_SNAPSHOT_MINIFY_SOURCES: "1",
+                ODEN_SNAPSHOT_MINIFY_SOURCES: "1",
               },
               run: [
                 // On macOS aarch64, link through lzld so system frameworks
@@ -1057,11 +1057,11 @@ const buildJobs = buildItems.map((rawBuildItem) => {
                 // output fs space before and after building
                 "df -h",
                 cargoBuildReleaseCommand,
-                // Build the desktop runtime shared library (libdenort cdylib) for
+                // Build the desktop runtime shared library (libodenrt cdylib) for
                 // laufey-based desktop apps. It is a separate invocation, but
                 // still needs the frame-pointer standard library before its
                 // unwind sections can be removed during packaging.
-                `cargo build${buildStdArgs} --release --locked -p denort_desktop`,
+                `cargo build${buildStdArgs} --release --locked -p odenrt_desktop`,
                 "df -h",
               ],
             },
@@ -1071,39 +1071,39 @@ const buildJobs = buildItems.map((rawBuildItem) => {
                 if: runStartupOrder,
                 run: rawBuildItem.os === "macos"
                   ? [
-                    "cp -p target/release/deno target/release/deno-before-startup-order",
-                    "target/release/deno run -A tools/startup_order/generate_macos_function_orderfile.ts \\",
-                    "  --binary $GITHUB_WORKSPACE/target/release/deno-before-startup-order \\",
+                    "cp -p target/release/oden target/release/oden-before-startup-order",
+                    "target/release/oden run -A tools/startup_order/generate_macos_function_orderfile.ts \\",
+                    "  --binary $GITHUB_WORKSPACE/target/release/oden-before-startup-order \\",
                     `  --output $GITHUB_WORKSPACE/${startupOrderPath} \\`,
                     "  --repeats 3 \\",
                     "  --workload-profile run-first",
                   ]
                   : [
-                    "cp -p target/release/deno target/release/deno-before-startup-order",
-                    "target/release/deno run -A tools/startup_order/generate_linux_function_orderfile.ts \\",
-                    "  --binary $GITHUB_WORKSPACE/target/release/deno-before-startup-order \\",
+                    "cp -p target/release/oden target/release/oden-before-startup-order",
+                    "target/release/oden run -A tools/startup_order/generate_linux_function_orderfile.ts \\",
+                    "  --binary $GITHUB_WORKSPACE/target/release/oden-before-startup-order \\",
                     `  --output $GITHUB_WORKSPACE/${startupOrderPath} \\`,
                     "  --repeats 3 \\",
                     "  --workload-profile run-first",
                   ],
                 env: { NO_COLOR: 1 },
               }, {
-                name: "Relink release deno with startup order",
+                name: "Relink release oden with startup order",
                 if: runStartupOrder,
                 run: cargoBuildReleaseCommand,
                 env: {
-                  DENO_SNAPSHOT_MINIFY_SOURCES: "1",
-                  DENO_USE_STARTUP_ORDER: "1",
-                  DENO_STARTUP_ORDER_FILE:
+                  ODEN_SNAPSHOT_MINIFY_SOURCES: "1",
+                  ODEN_USE_STARTUP_ORDER: "1",
+                  ODEN_STARTUP_ORDER_FILE:
                     `\${{ github.workspace }}/${startupOrderPath}`,
                 },
               }, {
                 name: "Verify startup order",
                 if: runStartupOrder,
                 run: [
-                  "target/release/deno run -A tools/startup_order/verify_orderfile.ts \\",
-                  "  --baseline-binary target/release/deno-before-startup-order \\",
-                  "  --binary target/release/deno \\",
+                  "target/release/oden run -A tools/startup_order/verify_orderfile.ts \\",
+                  "  --baseline-binary target/release/oden-before-startup-order \\",
+                  "  --binary target/release/oden \\",
                   `  --order ${startupOrderPath} \\`,
                   `  --output ${startupOrderPath}.verify.json`,
                 ],
@@ -1131,8 +1131,8 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               name: "Check release snapshot flags",
               if: isLinux,
               run: [
-                "if strings target/release/deno | grep -F -- '--no-lazy --no-lazy-eval --no-lazy-streaming'; then",
-                '  echo "release deno binary contains eager snapshot flags"',
+                "if strings target/release/oden | grep -F -- '--no-lazy --no-lazy-eval --no-lazy-streaming'; then",
+                '  echo "release oden binary contains eager snapshot flags"',
                 "  exit 1",
                 "fi",
               ],
@@ -1155,9 +1155,9 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             {
               name: "Generate symcache",
               run: [
-                "target/release/deno -A tools/release/create_symcache.ts ./deno.symcache",
-                "du -h deno.symcache",
-                "du -h target/release/deno",
+                "target/release/oden -A tools/release/create_symcache.ts ./oden.symcache",
+                "du -h oden.symcache",
+                "du -h target/release/oden",
               ],
               env: { NO_COLOR: 1 },
             },
@@ -1167,8 +1167,8 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               if: isMainOrTag,
               run: [
                 `du -hd1 "./target/${buildItem.profile}"`,
-                `du -ha  "./target/${buildItem.profile}/deno"`,
-                `du -ha  "./target/${buildItem.profile}/denort"`,
+                `du -ha  "./target/${buildItem.profile}/oden"`,
+                `du -ha  "./target/${buildItem.profile}/odenrt"`,
               ],
             },
           );
@@ -1184,45 +1184,45 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               name: "Build debug",
               if: isDebug,
               run:
-                `cargo build --locked ${packagesToBuild} ${binsToBuild} --features=deno/panic-trace`,
+                `cargo build --locked ${packagesToBuild} ${binsToBuild} --features=oden/panic-trace`,
               env: { CARGO_PROFILE_DEV_DEBUG: 0 },
             },
             {
               // The rest of CI only exercises the default v8 backend. Make sure the
-              // experimental QuickJS backend (the deno_v8 facade over the v8x crate)
-              // keeps compiling for the deno + denort binaries so `deno compile`
+              // experimental QuickJS backend (the oden_v8 facade over the v8x crate)
+              // keeps compiling for the oden + odenrt binaries so `oden compile`
               // and the desktop runtime don't silently regress (notably the
               // mutually-exclusive v8/quickjs feature guard). A `check` is enough to
               // catch feature/build-script breakage and does not clobber the v8
               // binary this job produces.
-              name: "Check QuickJS backend (deno + denort)",
+              name: "Check QuickJS backend (oden + odenrt)",
               if: isDebug.and(
                 isLinux.and(buildItem.arch.equals("x86_64")).or(
                   isMacos.and(buildItem.arch.equals("aarch64")),
                 ),
               ),
               run:
-                `cargo check --locked -p deno -p denort --no-default-features --features quickjs`,
+                `cargo check --locked -p oden -p odenrt --no-default-features --features quickjs`,
               env: { CARGO_PROFILE_DEV_DEBUG: 0 },
             },
             cargoBuildReleaseStep,
             {
               // Run a minimal check to ensure that binary is not corrupted, regardless
               // of our build mode
-              name: "Check deno binary",
+              name: "Check oden binary",
               run:
-                `target/${buildItem.profile}/deno eval "console.log(1+2)" | grep 3`,
+                `target/${buildItem.profile}/oden eval "console.log(1+2)" | grep 3`,
               env: { NO_COLOR: 1 },
             },
             {
               // Verify that the binary actually works in the Ubuntu-16.04 sysroot.
-              name: "Check deno binary (in sysroot)",
+              name: "Check oden binary (in sysroot)",
               if: buildItem.use_sysroot,
               run:
-                `sudo chroot /sysroot "$(pwd)/target/${buildItem.profile}/deno" --version`,
+                `sudo chroot /sysroot "$(pwd)/target/${buildItem.profile}/oden" --version`,
             },
-            denoArtifact.upload(),
-            denortArtifact.upload(),
+            odenArtifact.upload(),
+            odenrtArtifact.upload(),
             testServerArtifact.upload(),
           );
 
@@ -1233,10 +1233,10 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             name: "Upload release to dl.deno.land",
             env: S3Envs,
             run: [
-              'aws s3 sync ./target/release/ s3://dl-deno-land/release/${GITHUB_REF#refs/*/}/ --exclude "*" --include "*.zip"',
-              'aws s3 sync ./target/release/ s3://dl-deno-land/release/${GITHUB_REF#refs/*/}/ --exclude "*" --include "*.sha256sum"',
-              'aws s3 sync ./target/release/ s3://dl-deno-land/release/${GITHUB_REF#refs/*/}/ --exclude "*" --include "*.symcache"',
-              'aws s3 sync ./target/release/ s3://dl-deno-land/release/${GITHUB_REF#refs/*/}/ --exclude "*" --include "*.bsdiff"',
+              'aws s3 sync ./target/release/ s3://dl-oden-land/release/${GITHUB_REF#refs/*/}/ --exclude "*" --include "*.zip"',
+              'aws s3 sync ./target/release/ s3://dl-oden-land/release/${GITHUB_REF#refs/*/}/ --exclude "*" --include "*.sha256sum"',
+              'aws s3 sync ./target/release/ s3://dl-oden-land/release/${GITHUB_REF#refs/*/}/ --exclude "*" --include "*.symcache"',
+              'aws s3 sync ./target/release/ s3://dl-oden-land/release/${GITHUB_REF#refs/*/}/ --exclude "*" --include "*.bsdiff"',
             ],
           },
           {
@@ -1254,52 +1254,52 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             },
             with: {
               files: [
-                "target/release/deno-x86_64-pc-windows-msvc.zip",
-                "target/release/deno-x86_64-pc-windows-msvc.zip.sha256sum",
-                "target/release/deno-x86_64-pc-windows-msvc.sha256sum",
-                "target/release/denort-x86_64-pc-windows-msvc.zip",
-                "target/release/denort-x86_64-pc-windows-msvc.zip.sha256sum",
-                "target/release/libdenort-x86_64-pc-windows-msvc.zip",
-                "target/release/libdenort-x86_64-pc-windows-msvc.zip.sha256sum",
-                "target/release/deno-aarch64-pc-windows-msvc.zip",
-                "target/release/deno-aarch64-pc-windows-msvc.zip.sha256sum",
-                "target/release/deno-aarch64-pc-windows-msvc.sha256sum",
-                "target/release/denort-aarch64-pc-windows-msvc.zip",
-                "target/release/denort-aarch64-pc-windows-msvc.zip.sha256sum",
-                "target/release/libdenort-aarch64-pc-windows-msvc.zip",
-                "target/release/libdenort-aarch64-pc-windows-msvc.zip.sha256sum",
-                "target/release/deno-x86_64-unknown-linux-gnu.zip",
-                "target/release/deno-x86_64-unknown-linux-gnu.zip.sha256sum",
-                "target/release/deno-x86_64-unknown-linux-gnu.sha256sum",
-                "target/release/denort-x86_64-unknown-linux-gnu.zip",
-                "target/release/denort-x86_64-unknown-linux-gnu.zip.sha256sum",
-                "target/release/libdenort-x86_64-unknown-linux-gnu.zip",
-                "target/release/libdenort-x86_64-unknown-linux-gnu.zip.sha256sum",
-                "target/release/deno-x86_64-apple-darwin.zip",
-                "target/release/deno-x86_64-apple-darwin.zip.sha256sum",
-                "target/release/deno-x86_64-apple-darwin.sha256sum",
-                "target/release/denort-x86_64-apple-darwin.zip",
-                "target/release/denort-x86_64-apple-darwin.zip.sha256sum",
-                "target/release/libdenort-x86_64-apple-darwin.zip",
-                "target/release/libdenort-x86_64-apple-darwin.zip.sha256sum",
-                "target/release/deno-aarch64-unknown-linux-gnu.zip",
-                "target/release/deno-aarch64-unknown-linux-gnu.zip.sha256sum",
-                "target/release/deno-aarch64-unknown-linux-gnu.sha256sum",
-                "target/release/denort-aarch64-unknown-linux-gnu.zip",
-                "target/release/denort-aarch64-unknown-linux-gnu.zip.sha256sum",
-                "target/release/libdenort-aarch64-unknown-linux-gnu.zip",
-                "target/release/libdenort-aarch64-unknown-linux-gnu.zip.sha256sum",
-                "target/release/deno-aarch64-apple-darwin.zip",
-                "target/release/deno-aarch64-apple-darwin.zip.sha256sum",
-                "target/release/deno-aarch64-apple-darwin.sha256sum",
-                "target/release/denort-aarch64-apple-darwin.zip",
-                "target/release/denort-aarch64-apple-darwin.zip.sha256sum",
-                "target/release/libdenort-aarch64-apple-darwin.zip",
-                "target/release/libdenort-aarch64-apple-darwin.zip.sha256sum",
-                "target/release/deno_src.tar.gz",
-                "target/release/lib.deno.d.ts",
-                "target/release/deno-*.bsdiff",
-                "target/release/deno-*.bsdiff.sha256sum",
+                "target/release/oden-x86_64-pc-windows-msvc.zip",
+                "target/release/oden-x86_64-pc-windows-msvc.zip.sha256sum",
+                "target/release/oden-x86_64-pc-windows-msvc.sha256sum",
+                "target/release/odenrt-x86_64-pc-windows-msvc.zip",
+                "target/release/odenrt-x86_64-pc-windows-msvc.zip.sha256sum",
+                "target/release/libodenrt-x86_64-pc-windows-msvc.zip",
+                "target/release/libodenrt-x86_64-pc-windows-msvc.zip.sha256sum",
+                "target/release/oden-aarch64-pc-windows-msvc.zip",
+                "target/release/oden-aarch64-pc-windows-msvc.zip.sha256sum",
+                "target/release/oden-aarch64-pc-windows-msvc.sha256sum",
+                "target/release/odenrt-aarch64-pc-windows-msvc.zip",
+                "target/release/odenrt-aarch64-pc-windows-msvc.zip.sha256sum",
+                "target/release/libodenrt-aarch64-pc-windows-msvc.zip",
+                "target/release/libodenrt-aarch64-pc-windows-msvc.zip.sha256sum",
+                "target/release/oden-x86_64-unknown-linux-gnu.zip",
+                "target/release/oden-x86_64-unknown-linux-gnu.zip.sha256sum",
+                "target/release/oden-x86_64-unknown-linux-gnu.sha256sum",
+                "target/release/odenrt-x86_64-unknown-linux-gnu.zip",
+                "target/release/odenrt-x86_64-unknown-linux-gnu.zip.sha256sum",
+                "target/release/libodenrt-x86_64-unknown-linux-gnu.zip",
+                "target/release/libodenrt-x86_64-unknown-linux-gnu.zip.sha256sum",
+                "target/release/oden-x86_64-apple-darwin.zip",
+                "target/release/oden-x86_64-apple-darwin.zip.sha256sum",
+                "target/release/oden-x86_64-apple-darwin.sha256sum",
+                "target/release/odenrt-x86_64-apple-darwin.zip",
+                "target/release/odenrt-x86_64-apple-darwin.zip.sha256sum",
+                "target/release/libodenrt-x86_64-apple-darwin.zip",
+                "target/release/libodenrt-x86_64-apple-darwin.zip.sha256sum",
+                "target/release/oden-aarch64-unknown-linux-gnu.zip",
+                "target/release/oden-aarch64-unknown-linux-gnu.zip.sha256sum",
+                "target/release/oden-aarch64-unknown-linux-gnu.sha256sum",
+                "target/release/odenrt-aarch64-unknown-linux-gnu.zip",
+                "target/release/odenrt-aarch64-unknown-linux-gnu.zip.sha256sum",
+                "target/release/libodenrt-aarch64-unknown-linux-gnu.zip",
+                "target/release/libodenrt-aarch64-unknown-linux-gnu.zip.sha256sum",
+                "target/release/oden-aarch64-apple-darwin.zip",
+                "target/release/oden-aarch64-apple-darwin.zip.sha256sum",
+                "target/release/oden-aarch64-apple-darwin.sha256sum",
+                "target/release/odenrt-aarch64-apple-darwin.zip",
+                "target/release/odenrt-aarch64-apple-darwin.zip.sha256sum",
+                "target/release/libodenrt-aarch64-apple-darwin.zip",
+                "target/release/libodenrt-aarch64-apple-darwin.zip.sha256sum",
+                "target/release/oden_src.tar.gz",
+                "target/release/lib.oden.d.ts",
+                "target/release/oden-*.bsdiff",
+                "target/release/oden-*.bsdiff.sha256sum",
               ].join("\n"),
               body_path: "target/release/release-notes.md",
               draft: true,
@@ -1335,15 +1335,15 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               "command -v rustc && rustc --version || echo 'No rustc found or bad executable'",
               "echo '*** Cargo'",
               "command -v cargo && cargo --version || echo 'No cargo found or bad executable'",
-              "echo '*** Deno'",
-              "command -v deno && deno --version || echo 'No deno found or bad executable'",
+              "echo '*** Oden'",
+              "command -v oden && oden --version || echo 'No oden found or bad executable'",
               "echo '*** Node'",
               "command -v node && node --version || echo 'No node found or bad executable'",
               "echo '*** Installed packages'",
               "command -v dpkg && dpkg -l || echo 'No dpkg found or bad executable'",
             ],
           }).comesAfter(
-            installDenoStep,
+            installOdenStep,
             installNodeStep,
             installPythonStep,
             installRustStep,
@@ -1423,8 +1423,8 @@ const buildJobs = buildItems.map((rawBuildItem) => {
           installRustStep,
           installLldStep,
           sysRootStep,
-          denoArtifact.download(),
-          denortArtifact.download().if(
+          odenArtifact.download(),
+          odenrtArtifact.download().if(
             testCrateNameExpr.equals("integration")
               .or(testCrateNameExpr.equals("specs")),
           ),
@@ -1456,22 +1456,22 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             },
           },
           {
-            // Warm the cache with the compiler `deno check` uses (into the
-            // default target/.native_tsc/deno_dir) so the test step doesn't
-            // re-download it for every test's fresh DENO_DIR. The harness
-            // resolves that path and injects DENO_TSC_BIN per-test itself (see
+            // Warm the cache with the compiler `oden check` uses (into the
+            // default target/.native_tsc/oden_dir) so the test step doesn't
+            // re-download it for every test's fresh ODEN_DIR. The harness
+            // resolves that path and injects ODEN_TSC_BIN per-test itself (see
             // test_util::native_tsc_bin_path); no env export needed. Run it with
-            // the built deno binary (the test job has no system `deno` on PATH).
+            // the built oden binary (the test job has no system `oden` on PATH).
             name: "Pre-download native tsc",
             if: testCrateNameExpr.equals("integration").or(
               testCrateNameExpr.equals("specs"),
             ),
             run: [
-              'DENO_BIN=""',
-              "for c in ./target/release/deno ./target/release/deno.exe ./target/debug/deno ./target/debug/deno.exe; do",
-              '  [ -f "$c" ] && DENO_BIN="$c" && break',
+              'ODEN_BIN=""',
+              "for c in ./target/release/oden ./target/release/oden.exe ./target/debug/oden ./target/debug/oden.exe; do",
+              '  [ -f "$c" ] && ODEN_BIN="$c" && break',
               "done",
-              '"$DENO_BIN" run -A ./tools/download_tsc.ts',
+              '"$ODEN_BIN" run -A ./tools/download_tsc.ts',
             ].join("\n"),
           },
           {
@@ -1574,7 +1574,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
         installRustStep,
         installLldStep,
         sysRootStep,
-        denoArtifact.download(),
+        odenArtifact.download(),
         testServerArtifact.download(),
         {
           name: "Test libs",
@@ -1610,24 +1610,24 @@ const buildJobs = buildItems.map((rawBuildItem) => {
         installWasmStep,
         // we want these crates to be Wasm compatible
         {
-          name: "Cargo check (deno_resolver)",
+          name: "Cargo check (oden_resolver)",
           run:
-            "cargo check --target wasm32-unknown-unknown -p deno_resolver && cargo check --target wasm32-unknown-unknown -p deno_resolver --features graph && cargo check --target wasm32-unknown-unknown -p deno_resolver --features graph --features deno_ast",
+            "cargo check --target wasm32-unknown-unknown -p oden_resolver && cargo check --target wasm32-unknown-unknown -p oden_resolver --features graph && cargo check --target wasm32-unknown-unknown -p oden_resolver --features graph --features deno_ast",
         },
         {
-          name: "Cargo check (deno_npm_installer)",
+          name: "Cargo check (oden_npm_installer)",
           run:
-            "cargo check --target wasm32-unknown-unknown -p deno_npm_installer",
+            "cargo check --target wasm32-unknown-unknown -p oden_npm_installer",
         },
         {
-          name: "Cargo check (deno_config)",
+          name: "Cargo check (oden_config)",
           run: [
-            "cargo check --no-default-features -p deno_config",
-            "cargo check --no-default-features --features workspace -p deno_config",
-            "cargo check --no-default-features --features package_json -p deno_config",
-            "cargo check --no-default-features --features workspace --features sync -p deno_config",
-            "cargo check --target wasm32-unknown-unknown --all-features -p deno_config",
-            "cargo check -p deno --features=lsp-tracing",
+            "cargo check --no-default-features -p oden_config",
+            "cargo check --no-default-features --features workspace -p oden_config",
+            "cargo check --no-default-features --features package_json -p oden_config",
+            "cargo check --no-default-features --features workspace --features sync -p oden_config",
+            "cargo check --target wasm32-unknown-unknown --all-features -p oden_config",
+            "cargo check -p oden --features=lsp-tracing",
           ],
         },
         saveCacheStep,
@@ -1659,9 +1659,9 @@ const buildJobs = buildItems.map((rawBuildItem) => {
           cloneStdSubmoduleStep,
           cloneSubmodule("./tests/wpt/suite"),
           buildCacheSteps.restoreCacheStep,
-          installDenoStep,
+          installOdenStep,
           installPythonStep,
-          denoArtifact.download(),
+          odenArtifact.download(),
           {
             name: "Configure hosts file for WPT",
             run: "./wpt make-hosts-file | sudo tee -a /etc/hosts",
@@ -1670,32 +1670,32 @@ const buildJobs = buildItems.map((rawBuildItem) => {
           {
             name: "Run web platform tests (debug)",
             if: isDebug,
-            env: { DENO_BIN: "./target/debug/deno" },
+            env: { ODEN_BIN: "./target/debug/oden" },
             run: [
-              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
+              "oden run -RWNE --allow-run --lock=tools/oden.lock.json --config tests/config/oden.json \\",
               "    ./tests/wpt/wpt.ts setup",
-              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json --unsafely-ignore-certificate-errors \\",
-              '    ./tests/wpt/wpt.ts run --all --quiet --binary="$DENO_BIN"',
+              "oden run -RWNE --allow-run --lock=tools/oden.lock.json --config tests/config/oden.json --unsafely-ignore-certificate-errors \\",
+              '    ./tests/wpt/wpt.ts run --all --quiet --binary="$ODEN_BIN"',
             ],
           },
           {
             name: "Run web platform tests (release)",
             if: isRelease,
             env: {
-              DENO_BIN: "./target/release/deno",
+              ODEN_BIN: "./target/release/oden",
             },
             run: [
-              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
+              "oden run -RWNE --allow-run --lock=tools/oden.lock.json --config tests/config/oden.json \\",
               "    ./tests/wpt/wpt.ts setup",
-              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json --unsafely-ignore-certificate-errors \\",
-              '    ./tests/wpt/wpt.ts run --all --quiet --release --binary="$DENO_BIN" --json=wpt.json --wptreport=wptreport.json',
+              "oden run -RWNE --allow-run --lock=tools/oden.lock.json --config tests/config/oden.json --unsafely-ignore-certificate-errors \\",
+              '    ./tests/wpt/wpt.ts run --all --quiet --release --binary="$ODEN_BIN" --json=wpt.json --wptreport=wptreport.json',
             ],
           },
           {
             name: "Autobahn testsuite",
             if: isRelease,
             run:
-              "target/release/deno run -A --config tests/config/deno.json ext/websocket/autobahn/fuzzingclient.js",
+              "target/release/oden run -A --config tests/config/oden.json ext/websocket/autobahn/fuzzingclient.js",
           },
           step({
             name: "Upload wpt results to dl.deno.land",
@@ -1706,10 +1706,10 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             env: S3Envs,
             run: [
               "gzip ./wptreport.json",
-              "aws s3 cp ./wpt.json s3://dl-deno-land/wpt/$(git rev-parse HEAD).json",
-              "aws s3 cp ./wptreport.json.gz s3://dl-deno-land/wpt/$(git rev-parse HEAD)-wptreport.json.gz",
+              "aws s3 cp ./wpt.json s3://dl-oden-land/wpt/$(git rev-parse HEAD).json",
+              "aws s3 cp ./wptreport.json.gz s3://dl-oden-land/wpt/$(git rev-parse HEAD)-wptreport.json.gz",
               "echo $(git rev-parse HEAD) > wpt-latest.txt",
-              "aws s3 cp wpt-latest.txt s3://dl-deno-land/wpt-latest.txt",
+              "aws s3 cp wpt-latest.txt s3://dl-oden-land/wpt-latest.txt",
             ],
           }),
           {
@@ -1719,12 +1719,12 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               isNotTag,
             ),
             env: {
-              WPT_FYI_USER: "deno",
+              WPT_FYI_USER: "oden",
               WPT_FYI_PW: "${{ secrets.WPT_FYI_PW }}",
-              GITHUB_TOKEN: "${{ secrets.DENOBOT_PAT }}",
+              GITHUB_TOKEN: "${{ secrets.ODENBOT_PAT }}",
             },
             run: [
-              "./target/release/deno run --allow-all --lock=tools/deno.lock.json \\",
+              "./target/release/oden run --allow-all --lock=tools/oden.lock.json \\",
               "    ./tools/upload_wptfyi.js $(git rev-parse HEAD) --ghstatus",
             ],
           },
@@ -1773,41 +1773,41 @@ const benchJob = job(
         cloneSubmodule("./tests/bench/testdata/lsp_benchdata"),
         cloneStdSubmoduleStep,
         step(sysRootConfig),
-        installDenoStep,
+        installOdenStep,
         {
           name: "Install benchmark tools",
           env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" },
           run: "./tools/install_prebuilt.js wrk hyperfine",
         },
-        // We currently do a full deno build instead of getting this from the build
+        // We currently do a full oden build instead of getting this from the build
         // job because the benchmarks inspect the target folder to see the sizes of
         // libraries like v8 and swc as well as the snapshot sizes. Maybe in the future
         // we could optimize this to not need this.
         {
-          name: "Build deno",
+          name: "Build oden",
           env: {
-            DENO_SNAPSHOT_MINIFY_SOURCES: "1",
+            ODEN_SNAPSHOT_MINIFY_SOURCES: "1",
           },
-          run: "cargo build --release -p deno",
+          run: "cargo build --release -p oden",
         },
         {
           name: "Run benchmarks",
-          run: "cargo bench -p bench_tests --bench deno_bench --locked",
+          run: "cargo bench -p bench_tests --bench oden_bench --locked",
         },
         {
           name: "Post benchmarks",
           if: isDenoland.and(isMainBranch),
           env: {
-            DENOBOT_PAT: "${{ secrets.DENOBOT_PAT }}",
+            ODENBOT_PAT: "${{ secrets.ODENBOT_PAT }}",
           },
           run: [
             "git clone --depth 1 --branch gh-pages                             \\",
-            "    https://${DENOBOT_PAT}@github.com/denoland/benchmark_data.git \\",
+            "    https://${ODENBOT_PAT}@github.com/denoland/benchmark_data.git \\",
             "    gh-pages",
-            "./target/release/deno run --allow-all ./tools/build_benchmark_jsons.js --release",
+            "./target/release/oden run --allow-all ./tools/build_benchmark_jsons.js --release",
             "cd gh-pages",
             'git config user.email "propelml@gmail.com"',
-            'git config user.name "denobot"',
+            'git config user.name "odenbot"',
             "git add .",
             'git commit --message "Update benchmarks"',
             "git push origin gh-pages",
@@ -1867,24 +1867,24 @@ const lintJob = job("lint", {
       cloneStdSubmoduleStep,
       restoreCacheStep,
       installRustStep,
-      installDenoStep,
+      installOdenStep,
       step.if(lintMatrix.os.equals("linux"))(
         {
           name: "test_format.js",
           run:
-            "deno run --allow-write --allow-read --allow-run --allow-net ./tools/format.js --check",
+            "oden run --allow-write --allow-read --allow-run --allow-net ./tools/format.js --check",
         },
         {
           name: "jsdoc_checker.js",
           run:
-            "deno run --allow-read --allow-env --allow-sys ./tools/jsdoc_checker.js",
+            "oden run --allow-read --allow-env --allow-sys ./tools/jsdoc_checker.js",
         },
       ),
       {
         name: "lint.js",
         env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" },
         run:
-          "deno run --allow-write --allow-read --allow-run --allow-net --allow-env ./tools/lint.js",
+          "oden run --allow-write --allow-read --allow-run --allow-net --allow-env ./tools/lint.js",
       },
       saveCacheStep,
     );
@@ -1905,43 +1905,43 @@ const publishCanaryJob = job("publish-canary", {
         env: S3Envs,
         run: [
           "echo ${{ github.sha }} > canary-latest.txt",
-          "aws s3 cp canary-latest.txt s3://dl-deno-land/canary-latest.txt",
+          "aws s3 cp canary-latest.txt s3://dl-oden-land/canary-latest.txt",
         ],
       },
     );
   })(),
 });
 
-// === deno_core test job ===
+// === oden_core test job ===
 // Ported from denoland/deno_core .github/workflows/ci-test/action.yml
-// Tests the merged deno_core crates (libs/*) using cargo nextest.
+// Tests the merged oden_core crates (libs/*) using cargo nextest.
 
-// Cargo package names for the libs/* workspace members (merged from deno_core).
-const denoCorePackageNames = [
-  "deno_core",
-  "deno_v8",
+// Cargo package names for the libs/* workspace members (merged from oden_core).
+const odenCorePackageNames = [
+  "oden_core",
+  "oden_v8",
   "build-your-own-js-snapshot",
   "dcore",
-  "deno_ops",
-  "deno_ops_compile_test_runner",
+  "oden_ops",
+  "oden_ops_compile_test_runner",
   "serde_v8",
-  "deno_core_testing",
+  "oden_core_testing",
 ];
-const denoCoreTestProfile = defineExprObj({
+const odenCoreTestProfile = defineExprObj({
   ...Runners.linuxX86Xl,
   profile: "release",
 });
-const denoCoreTestCacheSteps = createCacheSteps({
-  ...denoCoreTestProfile,
-  cachePrefix: "deno-core-test",
+const odenCoreTestCacheSteps = createCacheSteps({
+  ...odenCoreTestProfile,
+  cachePrefix: "oden-core-test",
 });
-const denoCoreTestJob = job("deno-core-test", {
-  name: `deno_core test linux-x86_64`,
+const odenCoreTestJob = job("oden-core-test", {
+  name: `oden_core test linux-x86_64`,
   needs: [preBuildJob],
   if: preBuildJob.outputs.skip_build.notEquals("true")
-    .and(preBuildJob.outputs.skip_deno_core_test.notEquals("true"))
+    .and(preBuildJob.outputs.skip_oden_core_test.notEquals("true"))
     .and(notDocsOnly),
-  runsOn: denoCoreTestProfile.runner,
+  runsOn: odenCoreTestProfile.runner,
   timeoutMinutes: 60,
   defaults: {
     run: {
@@ -1957,7 +1957,7 @@ const denoCoreTestJob = job("deno-core-test", {
     {
       // Frees several GB of preinstalled toolchains this job never uses
       // (.NET, Android SDK, GHC, Boost), fixing recurring "No space left
-      // on device" failures while compiling deno_core's doctests.
+      // on device" failures while compiling oden_core's doctests.
       name: "Free disk space",
       run: [
         'sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost "$AGENT_TOOLSDIRECTORY" || true',
@@ -1965,9 +1965,9 @@ const denoCoreTestJob = job("deno-core-test", {
       ],
     },
     cloneRepoStep,
-    denoCoreTestCacheSteps.restoreCacheStep,
+    odenCoreTestCacheSteps.restoreCacheStep,
     installRustStep,
-    installDenoStep,
+    installOdenStep,
     step(sysRootConfig),
     {
       name: "Install cargo-binstall",
@@ -1981,22 +1981,22 @@ const denoCoreTestJob = job("deno-core-test", {
       name: "Cargo nextest (release)",
       run: [
         `cargo nextest run --release`,
-        `  --features "deno_core/default deno_core/unsafe_use_unprotected_platform deno_core/v8"`,
+        `  --features "oden_core/default oden_core/unsafe_use_unprotected_platform oden_core/v8"`,
         `  --tests --examples`,
-        `  ${denoCorePackageNames.map((p) => `-p ${p}`).join(" ")}`,
+        `  ${odenCorePackageNames.map((p) => `-p ${p}`).join(" ")}`,
       ].join(" \\\n    "),
     },
     {
       // Ported from denoland/deno_core .github/workflows/ci-test-ops/action.yml
       name: "Cargo nextest ops compile test runner (release)",
       run:
-        "cargo nextest run --release -p deno_ops_compile_test_runner -p deno_v8",
+        "cargo nextest run --release -p oden_ops_compile_test_runner -p oden_v8",
     },
     {
       name: "Cargo doc test",
       run: `cargo test --doc --release ${
-        denoCorePackageNames.filter((p) =>
-          p !== "deno_ops_compile_test_runner" && p !== "dcore"
+        odenCorePackageNames.filter((p) =>
+          p !== "oden_ops_compile_test_runner" && p !== "dcore"
         ).map((p) => `-p ${p}`).join(" ")
       }`,
     },
@@ -2004,20 +2004,20 @@ const denoCoreTestJob = job("deno-core-test", {
       // Regression test for https://github.com/denoland/deno/pull/19615.
       name: "Run examples (regression tests)",
       run: [
-        "cargo run -p deno_core --example op2 --features v8",
+        "cargo run -p oden_core --example op2 --features v8",
       ],
     },
-    denoCoreTestCacheSteps.saveCacheStep,
+    odenCoreTestCacheSteps.saveCacheStep,
   ),
 });
 
-// === deno_core miri test job ===
+// === oden_core miri test job ===
 // Ported from denoland/deno_core .github/workflows/ci-test-miri/action.yml
-// Runs miri tests for deno_core using a nightly Rust toolchain.
+// Runs miri tests for oden_core using a nightly Rust toolchain.
 
 const miriNightlyToolchain = "nightly-2025-11-12";
-const denoCoreMiriJob = job("deno-core-miri", {
-  name: "deno_core miri linux-x86_64",
+const odenCoreMiriJob = job("oden-core-miri", {
+  name: "oden_core miri linux-x86_64",
   needs: [preBuildJob],
   if: preBuildJob.outputs.skip_build.notEquals("true").and(notDocsOnly),
   runsOn: Runners.linuxX86Xl.runner,
@@ -2047,7 +2047,7 @@ const denoCoreMiriJob = job("deno-core-miri", {
         "cargo clean",
         `rustup component add --toolchain ${miriNightlyToolchain} miri`,
         "# This somehow prints errors in CI that don't show up locally",
-        `RUSTFLAGS=-Awarnings cargo +${miriNightlyToolchain} miri test -p deno_core --features v8`,
+        `RUSTFLAGS=-Awarnings cargo +${miriNightlyToolchain} miri test -p oden_core --features v8`,
       ],
     },
   ),
@@ -2063,8 +2063,8 @@ const ciStatusJob = job("ci-status", {
     benchJob,
     ...buildJobs.map((j) => [j.buildJob, ...j.additionalJobs]).flat(),
     lintJob,
-    denoCoreTestJob,
-    denoCoreMiriJob,
+    odenCoreTestJob,
+    odenCoreMiriJob,
   ],
   if: preBuildJob.outputs.skip_build.notEquals("true")
     .and(conditions.status.always()),
@@ -2114,8 +2114,8 @@ const workflow = createWorkflow({
     benchJob,
     ...buildJobs.map((j) => [j.buildJob, ...j.additionalJobs]).flat(),
     lintJob,
-    denoCoreTestJob,
-    denoCoreMiriJob,
+    odenCoreTestJob,
+    odenCoreMiriJob,
     ciStatusJob,
     publishCanaryJob,
   ],
@@ -2138,7 +2138,7 @@ if (import.meta.main) {
 
 function resolveTestCrateTests() {
   const rootCargoToml = parseToml(
-    Deno.readTextFileSync(new URL("../../Cargo.toml", import.meta.url)),
+    Oden.readTextFileSync(new URL("../../Cargo.toml", import.meta.url)),
   ) as { workspace: { members: string[] } };
 
   const testCrates: { name: string; package: string }[] = [];
@@ -2147,7 +2147,7 @@ function resolveTestCrateTests() {
   for (const member of rootCargoToml.workspace.members) {
     if (!member.startsWith("tests")) continue;
     const cargoToml = parseToml(
-      Deno.readTextFileSync(
+      Oden.readTextFileSync(
         new URL(`../../${member}/Cargo.toml`, import.meta.url),
       ),
     ) as {
@@ -2173,14 +2173,14 @@ function resolveTestCrateTests() {
 function resolveWorkspaceCrates(testPackageMembers: Set<string>) {
   // discover workspace members for the libs test job, split by type
   const rootCargoToml = parseToml(
-    Deno.readTextFileSync(new URL("../../Cargo.toml", import.meta.url)),
+    Oden.readTextFileSync(new URL("../../Cargo.toml", import.meta.url)),
   ) as { workspace: { members: string[] } };
 
   const libCrates: string[] = [];
   const binCrates: string[] = [];
   for (const member of rootCargoToml.workspace.members) {
     const cargoToml = parseToml(
-      Deno.readTextFileSync(
+      Oden.readTextFileSync(
         new URL(`../../${member}/Cargo.toml`, import.meta.url),
       ),
     ) as {
@@ -2193,9 +2193,9 @@ function resolveWorkspaceCrates(testPackageMembers: Set<string>) {
       if (!testPackageMembers.has(member)) {
         ensureNoIntegrationTests(member, cargoToml);
       }
-    } else if (denoCorePackageDirs.includes(member)) {
-      // libs/* crates (merged from deno_core) have their own dedicated
-      // deno-core-test CI job, so skip them here.
+    } else if (odenCorePackageDirs.includes(member)) {
+      // libs/* crates (merged from oden_core) have their own dedicated
+      // oden-core-test CI job, so skip them here.
       continue;
     } else if (cargoToml.bin) {
       ensureNoIntegrationTests(member, cargoToml);
@@ -2219,8 +2219,8 @@ function ensureNoIntegrationTests(
     errors.push("has a tests/ folder");
   }
   const hasNonRunnerTests = cargoToml.test?.some(
-    // this path is allowed because it's only used by deno and denort
-    // to cause the deno and denort binaries to be built when running
+    // this path is allowed because it's only used by oden and odenrt
+    // to cause the oden and odenrt binaries to be built when running
     // tests, but it doesn't actually run any tests itself
     (t) => t.path !== "integration_tests_runner.rs",
   );
@@ -2241,10 +2241,10 @@ function ensureNoIntegrationTests(
 
 function existsSync(path: string | URL) {
   try {
-    Deno.statSync(path);
+    Oden.statSync(path);
     return true;
   } catch (e) {
-    if (!(e instanceof Deno.errors.NotFound)) throw e;
+    if (!(e instanceof Oden.errors.NotFound)) throw e;
     return false;
   }
 }

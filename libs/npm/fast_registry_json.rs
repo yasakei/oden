@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // JSON scanning adapted from the "stage 1" of https://github.com/simdjson/simdjson, though it diverges
 // to optimize for this specific use case.
@@ -935,8 +935,8 @@ enum PackumentState<'i> {
   Start,
   WantNameValue,
   WantModifiedValue,
-  WantDenoEtagValue,
-  WantDenoPackumentFormatValue,
+  WantOdenEtagValue,
+  WantOdenPackumentFormatValue,
   InVersions,
   WantVersion(&'i str),
   InDistTags,
@@ -991,8 +991,8 @@ struct PackumentIndexer<'i> {
   state: PackumentState<'i>,
   name: Option<&'i str>,
   modified: Option<&'i str>,
-  deno_etag: Option<&'i str>,
-  deno_packument_format: Option<&'i str>,
+  oden_etag: Option<&'i str>,
+  oden_packument_format: Option<&'i str>,
   versions: Vec<&'i str>,
   version_ranges: Vec<(u32, u32)>,
   dist_tags: rustc_hash::FxHashMap<&'i str, &'i str>,
@@ -1012,8 +1012,8 @@ impl<'i> PackumentIndexer<'i> {
       state: PackumentState::Start,
       name: None,
       modified: None,
-      deno_etag: None,
-      deno_packument_format: None,
+      oden_etag: None,
+      oden_packument_format: None,
       versions: Vec::new(),
       version_ranges: Vec::new(),
       dist_tags: rustc_hash::FxHashMap::default(),
@@ -1066,23 +1066,23 @@ impl<'i> PackumentIndexer<'i> {
         self.modified = Some(self.string_value(start, end));
         self.state = PackumentState::Start;
       } else if !is_key
-        && matches!(self.state, PackumentState::WantDenoEtagValue)
+        && matches!(self.state, PackumentState::WantOdenEtagValue)
       {
-        self.deno_etag = Some(self.string_value(start, end));
+        self.oden_etag = Some(self.string_value(start, end));
         self.state = PackumentState::Start;
       } else if !is_key
-        && matches!(self.state, PackumentState::WantDenoPackumentFormatValue)
+        && matches!(self.state, PackumentState::WantOdenPackumentFormatValue)
       {
-        self.deno_packument_format = Some(self.string_value(start, end));
+        self.oden_packument_format = Some(self.string_value(start, end));
         self.state = PackumentState::Start;
       } else if is_key && v == b"name" {
         self.state = PackumentState::WantNameValue;
       } else if is_key && v == b"modified" {
         self.state = PackumentState::WantModifiedValue;
-      } else if is_key && v == b"_deno.etag" {
-        self.state = PackumentState::WantDenoEtagValue;
-      } else if is_key && v == b"_deno.packumentFormat" {
-        self.state = PackumentState::WantDenoPackumentFormatValue;
+      } else if is_key && v == b"_oden.etag" {
+        self.state = PackumentState::WantOdenEtagValue;
+      } else if is_key && v == b"_oden.packumentFormat" {
+        self.state = PackumentState::WantOdenPackumentFormatValue;
       } else if is_key && v == b"versions" {
         self.state = PackumentState::InVersions;
       } else if is_key && v == b"dist-tags" {
@@ -1274,8 +1274,8 @@ impl<'i> PackumentIndexer<'i> {
     Ok(PackumentIndex {
       name: self.name,
       modified: self.modified,
-      deno_etag: self.deno_etag,
-      deno_packument_format: self.deno_packument_format,
+      oden_etag: self.oden_etag,
+      oden_packument_format: self.oden_packument_format,
       versions: self.versions,
       version_ranges: self.version_ranges,
       dist_tags: self.dist_tags,
@@ -1344,10 +1344,10 @@ pub struct PackumentIndex<'i> {
   /// Top-level `modified` date of the abbreviated install manifest, which is
   /// the last time any version was published (or the package changed).
   pub modified: Option<&'i str>,
-  pub deno_etag: Option<&'i str>,
+  pub oden_etag: Option<&'i str>,
   /// Custom top-level property written by the cache to record which format
   /// the packument was fetched in (currently only `"full"`).
-  pub deno_packument_format: Option<&'i str>,
+  pub oden_packument_format: Option<&'i str>,
   pub versions: Vec<&'i str>,
   pub version_ranges: Vec<(u32, u32)>,
   pub dist_tags: rustc_hash::FxHashMap<&'i str, &'i str>,
@@ -1664,10 +1664,10 @@ mod tests {
 
   #[test]
   fn test_pluck_packument_index() {
-    let input = r#"{"name":"pkg","_deno.etag":"etag-1","dist-tags":{"latest":"1.1.0"},"versions":{"1.0.0":{"version":"1.0.0","dist":{"attestations":{"provenance":{"x":1}}}},"1.1.0":{"version":"1.1.0","_npmUser":{"trustedPublisher":{"x":1},"approver":{"name":"a"}}}},"time":{"created":"2024-01-01T00:00:00.000Z","modified":"2024-01-03T00:00:00.000Z","1.0.0":"2024-01-02T00:00:00.000Z","1.1.0":"2024-01-03T00:00:00.000Z"}}"#;
+    let input = r#"{"name":"pkg","_oden.etag":"etag-1","dist-tags":{"latest":"1.1.0"},"versions":{"1.0.0":{"version":"1.0.0","dist":{"attestations":{"provenance":{"x":1}}}},"1.1.0":{"version":"1.1.0","_npmUser":{"trustedPublisher":{"x":1},"approver":{"name":"a"}}}},"time":{"created":"2024-01-01T00:00:00.000Z","modified":"2024-01-03T00:00:00.000Z","1.0.0":"2024-01-02T00:00:00.000Z","1.1.0":"2024-01-03T00:00:00.000Z"}}"#;
     let index = pluck_packument_index(input).unwrap();
     assert_eq!(index.name, Some("pkg"));
-    assert_eq!(index.deno_etag, Some("etag-1"));
+    assert_eq!(index.oden_etag, Some("etag-1"));
     assert_eq!(index.versions, vec!["1.0.0", "1.1.0"]);
     assert_eq!(
       index.dist_tags,
@@ -1702,11 +1702,11 @@ mod tests {
   }
 
   #[test]
-  fn packument_index_ignores_nested_deno_etag() {
-    let input = r#"{"name":"pkg","versions":{"1.0.0":{"version":"1.0.0","_deno.etag":"nested"}}}"#;
+  fn packument_index_ignores_nested_oden_etag() {
+    let input = r#"{"name":"pkg","versions":{"1.0.0":{"version":"1.0.0","_oden.etag":"nested"}}}"#;
     let index = pluck_packument_index(input).unwrap();
     assert_eq!(index.name, Some("pkg"));
-    assert_eq!(index.deno_etag, None);
+    assert_eq!(index.oden_etag, None);
     assert_eq!(index.versions, vec!["1.0.0"]);
   }
 
@@ -1728,19 +1728,19 @@ mod tests {
   }
 
   #[test]
-  fn packument_index_plucks_deno_packument_format() {
-    let input = r#"{"name":"pkg","versions":{"1.0.0":{"version":"1.0.0"}},"time":{},"_deno.packumentFormat":"full"}"#;
+  fn packument_index_plucks_oden_packument_format() {
+    let input = r#"{"name":"pkg","versions":{"1.0.0":{"version":"1.0.0"}},"time":{},"_oden.packumentFormat":"full"}"#;
     let index = pluck_packument_index(input).unwrap();
-    assert_eq!(index.deno_packument_format, Some("full"));
+    assert_eq!(index.oden_packument_format, Some("full"));
     assert_eq!(index.versions, vec!["1.0.0"]);
     assert!(index.time.is_empty());
   }
 
   #[test]
-  fn packument_index_ignores_nested_deno_packument_format() {
-    let input = r#"{"name":"pkg","versions":{"1.0.0":{"version":"1.0.0","_deno.packumentFormat":"full"}}}"#;
+  fn packument_index_ignores_nested_oden_packument_format() {
+    let input = r#"{"name":"pkg","versions":{"1.0.0":{"version":"1.0.0","_oden.packumentFormat":"full"}}}"#;
     let index = pluck_packument_index(input).unwrap();
-    assert_eq!(index.deno_packument_format, None);
+    assert_eq!(index.oden_packument_format, None);
     assert_eq!(index.versions, vec!["1.0.0"]);
   }
 
@@ -1997,7 +1997,7 @@ mod tests {
       )
       .unwrap();
       assert_eq!(index.name, tokenized_index.name);
-      assert_eq!(index.deno_etag, tokenized_index.deno_etag);
+      assert_eq!(index.oden_etag, tokenized_index.oden_etag);
       assert_eq!(index.versions, tokenized_index.versions);
       assert_eq!(index.version_ranges, tokenized_index.version_ranges);
       assert_eq!(index.dist_tags, tokenized_index.dist_tags);

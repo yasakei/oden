@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 (function () {
 const { core } = __bootstrap;
 const { Encodings } = core.loadExtScript(
-  "ext:deno_node/internal_binding/_node.ts",
+  "ext:oden_node/internal_binding/_node.ts",
 );
 
 const encodings = [];

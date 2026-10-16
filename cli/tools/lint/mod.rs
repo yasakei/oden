@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! This module provides file linting utilities using
 //! [`deno_lint`](https://github.com/denoland/deno_lint).
@@ -13,25 +13,25 @@ use std::sync::Arc;
 
 use deno_ast::ModuleSpecifier;
 use deno_ast::ParsedSource;
-use deno_config::deno_json::LintRulesConfig;
-use deno_config::glob::FileCollector;
-use deno_config::glob::FilePatterns;
-use deno_config::workspace::WorkspaceDirectory;
-use deno_config::workspace::WorkspaceDirectoryRc;
-use deno_core::anyhow::anyhow;
-use deno_core::anyhow::bail;
-use deno_core::error::AnyError;
-use deno_core::futures::FutureExt;
-use deno_core::futures::future::LocalBoxFuture;
-use deno_core::parking_lot::Mutex;
-use deno_core::serde_json;
-use deno_core::unsync::future::LocalFutureExt;
-use deno_core::unsync::future::SharedLocal;
+use oden_config::oden_json::LintRulesConfig;
+use oden_config::glob::FileCollector;
+use oden_config::glob::FilePatterns;
+use oden_config::workspace::WorkspaceDirectory;
+use oden_config::workspace::WorkspaceDirectoryRc;
+use oden_core::anyhow::anyhow;
+use oden_core::anyhow::bail;
+use oden_core::error::AnyError;
+use oden_core::futures::FutureExt;
+use oden_core::futures::future::LocalBoxFuture;
+use oden_core::parking_lot::Mutex;
+use oden_core::serde_json;
+use oden_core::unsync::future::LocalFutureExt;
+use oden_core::unsync::future::SharedLocal;
 use deno_graph::ModuleGraph;
-use deno_lib::util::hash::FastInsecureHasher;
+use oden_lib::util::hash::FastInsecureHasher;
 use deno_lint::diagnostic::LintDiagnostic;
-use deno_print::drop_println;
-use deno_resolver::deno_json::CompilerOptionsResolver;
+use oden_print::drop_println;
+use oden_resolver::oden_json::CompilerOptionsResolver;
 use log::debug;
 use reporters::LintReporter;
 use reporters::create_reporter;
@@ -76,7 +76,7 @@ pub use rules::collect_no_slow_type_diagnostics;
 
 const JSON_SCHEMA_VERSION: u8 = 1;
 
-static STDIN_FILE_NAME: &str = "$deno$stdin.mts";
+static STDIN_FILE_NAME: &str = "$oden$stdin.mts";
 
 pub async fn lint(
   flags: Arc<Flags>,
@@ -129,7 +129,7 @@ pub async fn lint(
     linter.finish()
   };
   if !success {
-    deno_runtime::exit(1);
+    oden_runtime::exit(1);
   }
 
   Ok(())
@@ -310,7 +310,7 @@ impl WorkspaceLinter {
     // TODO(bartlomieju): for now we don't support incremental caching if plugins are being used.
     // https://github.com/denoland/deno/issues/28025
     if lint_rules.supports_incremental_cache() && plugin_specifiers.is_empty() {
-      let mut hasher = FastInsecureHasher::new_deno_versioned();
+      let mut hasher = FastInsecureHasher::new_oden_versioned();
       hasher.write_hashable(lint_rules.incremental_cache_state());
       if !plugin_specifiers.is_empty() {
         hasher.write_hashable(&plugin_specifiers);
@@ -423,7 +423,7 @@ impl WorkspaceLinter {
         future.await?;
       }
     } else {
-      deno_core::futures::future::try_join_all(futures).await?;
+      oden_core::futures::future::try_join_all(futures).await?;
     }
 
     if let Some(incremental_cache) = &maybe_incremental_cache {

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -29,7 +29,7 @@ pub enum FdOwnership {
 
 /// Central table tracking all known file descriptors.
 ///
-/// Both Deno's resource table and Node's fd-based ops use this table
+/// Both Oden's resource table and Node's fd-based ops use this table
 /// to look up files and detect duplicate registrations.
 pub struct FdTable {
   entries: HashMap<i32, FdOwnership>,

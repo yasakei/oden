@@ -1,19 +1,19 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_bench_util::bench_js_sync;
-use deno_bench_util::bench_or_profile;
-use deno_bench_util::bencher::Bencher;
-use deno_bench_util::bencher::benchmark_group;
-use deno_core::Extension;
+use oden_bench_util::bench_js_sync;
+use oden_bench_util::bench_or_profile;
+use oden_bench_util::bencher::Bencher;
+use oden_bench_util::bencher::benchmark_group;
+use oden_core::Extension;
 
 fn setup() -> Vec<Extension> {
-  deno_core::extension!(
-    deno_webidl_bench,
-    esm_entry_point = "ext:deno_webidl_bench/setup.js",
-    esm = ["ext:deno_webidl_bench/setup.js" = "benches/dict.js"]
+  oden_core::extension!(
+    oden_webidl_bench,
+    esm_entry_point = "ext:oden_webidl_bench/setup.js",
+    esm = ["ext:oden_webidl_bench/setup.js" = "benches/dict.js"]
   );
 
-  vec![deno_webidl::deno_webidl::init(), deno_webidl_bench::init()]
+  vec![oden_webidl::oden_webidl::init(), oden_webidl_bench::init()]
 }
 
 fn converter_undefined(b: &mut Bencher) {

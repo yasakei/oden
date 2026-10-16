@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 /// Minimal memory info for monitoring available system memory.
 pub struct MemInfo {

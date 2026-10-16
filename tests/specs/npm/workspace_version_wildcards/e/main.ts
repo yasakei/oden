@@ -1,7 +1,7 @@
-import * as a from "@denotest/a";
-import * as b from "@denotest/b";
-import * as c from "@denotest/c";
-import * as d from "@denotest/d";
+import * as a from "@odentest/a";
+import * as b from "@odentest/b";
+import * as c from "@odentest/c";
+import * as d from "@odentest/d";
 
 a.sayHello();
 b.sayHello();

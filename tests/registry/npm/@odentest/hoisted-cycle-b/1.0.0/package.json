@@ -1,0 +1,8 @@
+{
+  "name": "@odentest/hoisted-cycle-b",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@odentest/hoisted-cycle-a": "1.0.0"
+  }
+}

@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cmp::Ordering;
 use std::path::Path;
 use std::path::PathBuf;
 
-use deno_npm::NpmPackageCacheFolderId;
-use deno_npm::NpmPackageId;
-use deno_npm::resolution::NpmResolutionSnapshot;
+use oden_npm::NpmPackageCacheFolderId;
+use oden_npm::NpmPackageId;
+use oden_npm::resolution::NpmResolutionSnapshot;
 use deno_semver::Version;
 use node_resolver::NpmPackageFolderResolver;
 use node_resolver::UrlOrPathRef;

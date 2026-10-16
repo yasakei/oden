@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Adapted from https://github.com/jsdom/webidl-conversions.
 // Copyright Domenic Denicola. Licensed under BSD-2-Clause License.
@@ -1377,9 +1377,9 @@ function mixinPairIterable(name, prototype, dataSymbol, keyKey, valueKey) {
       return { value: result, done: false };
     },
     // Node-compatible inspector output (e.g. `URLSearchParams Iterator { 'a',
-    // 'b' }`). Picked up by Deno's `util.inspect` via the privateCustomInspect
+    // 'b' }`). Picked up by Oden's `util.inspect` via the privateCustomInspect
     // path so `node:util.inspect` returns the same shape.
-    [SymbolFor("Deno.privateCustomInspect")](inspect, inspectOptions) {
+    [SymbolFor("Oden.privateCustomInspect")](inspect, inspectOptions) {
       const internal = this == null ? undefined : this[_iteratorInternal];
       const label = `${name} Iterator`;
       if (!internal) return `${label} {}`;
@@ -1645,12 +1645,12 @@ function setlikeObjectWrap(objPrototype, readonly) {
 
 internals.webidlBrand = brand;
 // The subset of webidl needed by post-bootstrap classic scripts that can't
-// `import` this module (e.g. the `deno desktop` init script, which defines
+// `import` this module (e.g. the `oden desktop` init script, which defines
 // web interfaces like `navigator.clipboard`).
 //
 // `converters` is deliberately NOT exposed. It is the live registry backing
 // argument coercion for every web API in the process, and this object lands
-// in every Deno runtime rather than just desktop, so handing it out would
+// in every Oden runtime rather than just desktop, so handing it out would
 // let anything with `internals` access rewrite how any API coerces its
 // arguments. Only the individual converters a consumer needs belong here.
 internals.webidl = ObjectFreeze({

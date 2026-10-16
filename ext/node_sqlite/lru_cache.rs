@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Ported from https://github.com/nodejs/node/blob/70f6b58ac655234435a99d72b857dd7b316d34bf/src/lru_cache-inl.h
 

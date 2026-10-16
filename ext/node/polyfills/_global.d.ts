@@ -1,5 +1,5 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
-import { EventEmitter } from "ext:deno_node/_events.d.ts";
+// Copyright 2018-2026 the Oden authors. MIT license.
+import { EventEmitter } from "ext:oden_node/_events.d.ts";
 import { Buffer } from "node:buffer";
 
 export type BufferEncoding =

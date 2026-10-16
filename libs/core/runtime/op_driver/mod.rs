@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::future::Future;
 use std::task::Context;
@@ -38,7 +38,7 @@ pub enum OpScheduling {
   Deferred,
 }
 
-/// `OpDriver` encapsulates the interface for handling operations within Deno's runtime.
+/// `OpDriver` encapsulates the interface for handling operations within Oden's runtime.
 ///
 /// This trait defines methods for submitting ops and polling readiness inside of the
 /// event loop.

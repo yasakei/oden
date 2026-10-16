@@ -1,4 +1,4 @@
-# deno_crypto
+# oden_crypto
 
 **This crate implements the Web Cryptography API.**
 
@@ -12,7 +12,7 @@ From javascript, include the extension's source, and assign `CryptoKey`,
 ```javascript
 import { core } from "ext:core/mod.js";
 
-const crypto = core.loadExtScript("ext:deno_crypto/00_crypto.js");
+const crypto = core.loadExtScript("ext:oden_crypto/00_crypto.js");
 
 Object.defineProperty(globalThis, "CryptoKey", {
   value: crypto.CryptoKey,
@@ -43,15 +43,15 @@ Object.defineProperty(globalThis, "SubtleCrypto", {
 });
 ```
 
-Then from rust, provide: `deno_crypto::deno_crypto::init(Option<u64>)` in the
+Then from rust, provide: `oden_crypto::oden_crypto::init(Option<u64>)` in the
 `extensions` field of your `RuntimeOptions`
 
 Where the `Option<u64>` represents an optional seed for initialization.
 
 ## Dependencies
 
-- **deno_webidl**: Provided by the `deno_webidl` crate
-- **deno_web**: Provided by the `deno_web` crate
+- **oden_webidl**: Provided by the `oden_webidl` crate
+- **oden_web**: Provided by the `oden_web` crate
 
 ## Surface
 

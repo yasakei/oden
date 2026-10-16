@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // deno-lint-ignore-file no-console
 import { greaterThan, parse } from "jsr:@std/semver@1";
 
@@ -8,7 +8,7 @@ if (!response.ok) {
 }
 
 const latestVersionText = (await response.text()).trim();
-const currentVersionText = Deno.args[0];
+const currentVersionText = Oden.args[0];
 console.error("Latest version:", latestVersionText);
 console.error("Current version:", currentVersionText);
 
@@ -22,4 +22,4 @@ if (isGreater) {
     "Skipping release-latest.txt update because this version is not greater than the latest.",
   );
 }
-Deno.exit(isGreater ? 0 : 1);
+Oden.exit(isGreater ? 0 : 1);

@@ -1,3 +1,3 @@
-import { foo } from "@denotest/fallible-imports/infallible";
+import { foo } from "@odentest/fallible-imports/infallible";
 
 console.log(foo);

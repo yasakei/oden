@@ -1,5 +1,5 @@
-#!/usr/bin/env -S deno run --check --allow-write=. --allow-read=. --lock=./tools/deno.lock.json
-// Copyright 2018-2026 the Deno authors. MIT license.
+#!/usr/bin/env -S oden run --check --allow-write=. --allow-read=. --lock=./tools/oden.lock.json
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { conditions, createWorkflow, step } from "jsr:@david/gagen@0.3.1";
 
 const workflow = createWorkflow({
@@ -31,8 +31,8 @@ const workflow = createWorkflow({
         uses: "actions/checkout@v6",
       }),
       step({
-        uses: "denoland/setup-deno@v2",
-        with: { "deno-version": "v2.x" },
+        uses: "denoland/setup-oden@v2",
+        with: { "oden-version": "v2.x" },
       }),
       step({
         name: "Upload version file to dl.deno.land",
@@ -52,11 +52,11 @@ const workflow = createWorkflow({
           "  v[0-9]*) ;;",
           '  *) echo "Not a release tag: $VERSION" >&2; exit 1 ;;',
           "esac",
-          'deno run --allow-net --allow-write tools/release/update_versions_json.ts "$VERSION"',
-          "aws s3 cp versions.json s3://dl-deno-land/versions.json --content-type application/json",
-          'LATEST_FILE=$(deno run --allow-net --allow-write tools/release/upload_version_file.ts "$VERSION" || exit 0)',
+          'oden run --allow-net --allow-write tools/release/update_versions_json.ts "$VERSION"',
+          "aws s3 cp versions.json s3://dl-oden-land/versions.json --content-type application/json",
+          'LATEST_FILE=$(oden run --allow-net --allow-write tools/release/upload_version_file.ts "$VERSION" || exit 0)',
           '[ -z "$LATEST_FILE" ] && exit 0',
-          'aws s3 cp "$LATEST_FILE" "s3://dl-deno-land/$LATEST_FILE"',
+          'aws s3 cp "$LATEST_FILE" "s3://dl-oden-land/$LATEST_FILE"',
           'echo "LATEST_FILE=$LATEST_FILE" >> "$GITHUB_ENV"',
         ],
       }),
@@ -68,9 +68,9 @@ const workflow = createWorkflow({
         },
         run: [
           "# These live at a stable URL but change every release, so the edge",
-          "# has to be told to drop them. Otherwise `deno upgrade` keeps",
+          "# has to be told to drop them. Otherwise `oden upgrade` keeps",
           "# serving the previous version until the 4 hour TTL expires.",
-          'deno run -A --lock=tools/deno.lock.json tools/release/purge_cdn_cache.ts versions.json ${LATEST_FILE:+"$LATEST_FILE"}',
+          'oden run -A --lock=tools/oden.lock.json tools/release/purge_cdn_cache.ts versions.json ${LATEST_FILE:+"$LATEST_FILE"}',
         ],
       }),
     ],

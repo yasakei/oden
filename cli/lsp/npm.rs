@@ -1,14 +1,14 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::sync::Arc;
 
 use dashmap::DashMap;
-use deno_core::anyhow::anyhow;
-use deno_core::error::AnyError;
-use deno_core::serde_json;
-use deno_npm::resolution::NpmVersionResolver;
-use deno_npmrc::NpmRc;
-use deno_npmrc::NpmRegistryUrl;
+use oden_core::anyhow::anyhow;
+use oden_core::error::AnyError;
+use oden_core::serde_json;
+use oden_npm::resolution::NpmVersionResolver;
+use oden_npmrc::NpmRc;
+use oden_npmrc::NpmRegistryUrl;
 use deno_semver::Version;
 use deno_semver::package::PackageNv;
 use once_cell::sync::Lazy;
@@ -71,7 +71,7 @@ impl PackageSearchApi for CliNpmSearchApi {
       .query_pairs_mut()
       .append_pair("text", &format!("{} boost-exact:false", query));
     let file_fetcher = self.file_fetcher.clone();
-    let file = deno_core::unsync::spawn(async move {
+    let file = oden_core::unsync::spawn(async move {
       let file = file_fetcher.fetch_bypass_permissions(&search_url).await?;
       TextDecodedFile::decode(file)
     })

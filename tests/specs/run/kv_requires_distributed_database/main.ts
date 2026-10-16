@@ -1,7 +1,7 @@
-// Probe Deno.openKv() under DENO_KV_REQUIRES_DISTRIBUTED_DATABASE.
-console.log("typeof openKv:", typeof Deno.openKv);
+// Probe Oden.openKv() under ODEN_KV_REQUIRES_DISTRIBUTED_DATABASE.
+console.log("typeof openKv:", typeof Oden.openKv);
 try {
-  const kv = await Deno.openKv();
+  const kv = await Oden.openKv();
   console.log("opened ok");
   kv.close();
 } catch (e) {

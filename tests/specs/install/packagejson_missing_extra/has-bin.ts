@@ -1,8 +1,8 @@
-const name = Deno.args[0].trim();
+const name = Oden.args[0].trim();
 
 function exists(path: string) {
   try {
-    Deno.statSync(path);
+    Oden.statSync(path);
     return true;
   } catch (error) {
     return false;
@@ -15,6 +15,6 @@ if (
 ) {
   console.log("missing bin");
   console.log(`node_modules/.bin/${name}`);
-  console.log(Deno.readDirSync("node_modules/.bin").toArray());
-  Deno.exit(1);
+  console.log(Oden.readDirSync("node_modules/.bin").toArray());
+  Oden.exit(1);
 }

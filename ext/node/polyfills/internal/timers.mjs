@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 
 // deno-lint-ignore-file no-this-alias
@@ -40,16 +40,16 @@ const {
   enabledHooksExist,
   executionAsyncId,
   newAsyncId: nextAsyncId,
-} = core.loadExtScript("ext:deno_node/internal/async_hooks.ts");
+} = core.loadExtScript("ext:oden_node/internal/async_hooks.ts");
 const { inspect } = core.loadExtScript(
-  "ext:deno_node/internal/util/inspect.mjs",
+  "ext:oden_node/internal/util/inspect.mjs",
 );
 const {
   validateFunction,
   validateNumber,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
 const { ERR_OUT_OF_RANGE } = core.loadExtScript(
-  "ext:deno_node/internal/errors.ts",
+  "ext:oden_node/internal/errors.ts",
 );
 const lazyProcess = core.createLazyLoader("node:process");
 
@@ -385,7 +385,7 @@ function setUnrefTimeout(callback, timeout, ...args) {
   // isSystem=true: this is a runtime-internal timer (keep-alive, socket
   // timeouts, idle eviction etc.). The leak sanitizer skips system timers
   // so e.g. Agent.keepSocketAlive's 5000 ms unref'd timer stays invisible
-  // to Deno.test's `sanitizeOps`.
+  // to Oden.test's `sanitizeOps`.
   return new Timeout(callback, timeout, args, false, false, true);
 }
 

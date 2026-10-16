@@ -1,0 +1,6 @@
+{
+  "links": ["./flag"],
+  "imports": {
+    "@odentest/flag": "jsr:@odentest/flag@^1.0.0"
+  }
+}

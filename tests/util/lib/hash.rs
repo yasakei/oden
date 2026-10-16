@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::hash::Hasher;
 use std::io::Read;
@@ -80,7 +80,7 @@ fn collect_entries_recursive(dir: &Path, out: &mut Vec<PathBuf>) {
 }
 
 // repo at https://github.com/denoland/hashy
-const HASHY_URL: &str = "https://hashy.deno.deno.net";
+const HASHY_URL: &str = "https://hashy.oden.oden.net";
 
 pub enum CiHashStatus {
   /// Not on CI — always run tests.
@@ -134,7 +134,7 @@ impl CiHashPending {
 /// let ci_hash = test_util::hash::check_ci_hash("specs", |hasher| {
 ///     hasher
 ///         .hash_dir(tests.join("specs"))
-///         .hash_file(deno_exe_path());
+///         .hash_file(oden_exe_path());
 /// });
 /// if matches!(ci_hash, CiHashStatus::Skip) {
 ///     return;

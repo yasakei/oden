@@ -1,18 +1,18 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use deno_core::anyhow;
-use deno_core::anyhow::Context;
-use deno_core::error::AnyError;
-use deno_npm::registry::NpmRegistryApi;
-use deno_npm_cache::TarballCache;
-use deno_npmrc::ResolvedNpmRc;
-use deno_resolver::workspace::WorkspaceNpmLinkPackagesRc;
+use oden_core::anyhow;
+use oden_core::anyhow::Context;
+use oden_core::error::AnyError;
+use oden_npm::registry::NpmRegistryApi;
+use oden_npm_cache::TarballCache;
+use oden_npmrc::ResolvedNpmRc;
+use oden_resolver::workspace::WorkspaceNpmLinkPackagesRc;
 use deno_semver::package::PackageNv;
 
-use crate::cache::DenoDir;
+use crate::cache::OdenDir;
 use crate::npm::CliNpmCache;
 use crate::npm::CliNpmCacheHttpClient;
 use crate::npm::CliNpmRegistryInfoProvider;
@@ -42,7 +42,7 @@ fn esbuild_platform() -> &'static str {
 }
 
 pub async fn ensure_esbuild(
-  deno_dir: &DenoDir,
+  oden_dir: &OdenDir,
   npmrc: &ResolvedNpmRc,
   api: &Arc<CliNpmRegistryInfoProvider>,
   workspace_link_packages: &WorkspaceNpmLinkPackagesRc,
@@ -50,7 +50,7 @@ pub async fn ensure_esbuild(
   npm_cache: &CliNpmCache,
 ) -> Result<PathBuf, AnyError> {
   let target = esbuild_platform();
-  let mut esbuild_path = deno_dir
+  let mut esbuild_path = oden_dir
     .dl_folder_path()
     .join(format!(
       "esbuild-{}-{}",
@@ -107,7 +107,7 @@ pub async fn ensure_esbuild(
     })?;
     // Install the binary atomically: copy to a temporary file in the same
     // directory and then rename it into place. The rename is atomic, so a
-    // concurrent `deno bundle` process never observes (via the `exists()`
+    // concurrent `oden bundle` process never observes (via the `exists()`
     // check above) and tries to execute a half-written binary, which would
     // otherwise fail with ETXTBSY ("text file busy") on Linux.
     let tmp_path =

@@ -1,5 +1,5 @@
 // Negative retry/repeats values must be rejected at registration time.
-Deno.test({
+Oden.test({
   name: "should never run",
   retry: -1,
   fn() {},

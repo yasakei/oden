@@ -1,0 +1,6 @@
+{
+  "nodeModulesDir": "manual",
+  "imports": {
+    "@odentest/fallible-imports": "npm:@odentest/fallible-imports"
+  }
+}

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 (function () {
 const { core, primordials } = __bootstrap;
 const { op_console_size } = core.ops;
@@ -16,7 +16,7 @@ function consoleSize() {
   return { columns: size[0], rows: size[1] };
 }
 
-// Note: This function was soft-removed in Deno 2. Its types have been removed,
+// Note: This function was soft-removed in Oden 2. Its types have been removed,
 // but its implementation has been kept to avoid breaking changes.
 function isatty(rid) {
   return isTerminal(rid);

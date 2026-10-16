@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   assert,
   assertEquals,
@@ -12,49 +12,49 @@ function assertMissing(path: string) {
   let caughtErr = false;
   let info;
   try {
-    info = Deno.lstatSync(path);
+    info = Oden.lstatSync(path);
   } catch (e) {
     caughtErr = true;
-    assert(e instanceof Deno.errors.NotFound);
+    assert(e instanceof Oden.errors.NotFound);
   }
   assert(caughtErr);
   assertEquals(info, undefined);
 }
 
 function assertFile(path: string) {
-  const info = Deno.lstatSync(path);
+  const info = Oden.lstatSync(path);
   assert(info.isFile);
 }
 
 function assertDirectory(path: string, mode?: number) {
-  const info = Deno.lstatSync(path);
+  const info = Oden.lstatSync(path);
   assert(info.isDirectory);
-  if (Deno.build.os !== "windows" && mode !== undefined) {
-    assertEquals(info.mode! & 0o777, mode & ~Deno.umask());
+  if (Oden.build.os !== "windows" && mode !== undefined) {
+    assertEquals(info.mode! & 0o777, mode & ~Oden.umask());
   }
 }
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function renameSyncSuccess() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const oldpath = testDir + "/oldpath";
     const newpath = testDir + "/newpath";
-    Deno.mkdirSync(oldpath);
-    Deno.renameSync(oldpath, newpath);
+    Oden.mkdirSync(oldpath);
+    Oden.renameSync(oldpath, newpath);
     assertDirectory(newpath);
     assertMissing(oldpath);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function renameSyncWithURL() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const oldpath = testDir + "/oldpath";
     const newpath = testDir + "/newpath";
-    Deno.mkdirSync(oldpath);
-    Deno.renameSync(
+    Oden.mkdirSync(oldpath);
+    Oden.renameSync(
       pathToAbsoluteFileUrl(oldpath),
       pathToAbsoluteFileUrl(newpath),
     );
@@ -63,49 +63,49 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: false, write: true } },
   function renameSyncReadPerm() {
     assertThrows(() => {
       const oldpath = "/oldbaddir";
       const newpath = "/newbaddir";
-      Deno.renameSync(oldpath, newpath);
-    }, Deno.errors.NotCapable);
+      Oden.renameSync(oldpath, newpath);
+    }, Oden.errors.NotCapable);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: false } },
   function renameSyncWritePerm() {
     assertThrows(() => {
       const oldpath = "/oldbaddir";
       const newpath = "/newbaddir";
-      Deno.renameSync(oldpath, newpath);
-    }, Deno.errors.NotCapable);
+      Oden.renameSync(oldpath, newpath);
+    }, Oden.errors.NotCapable);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function renameSuccess() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const oldpath = testDir + "/oldpath";
     const newpath = testDir + "/newpath";
-    Deno.mkdirSync(oldpath);
-    await Deno.rename(oldpath, newpath);
+    Oden.mkdirSync(oldpath);
+    await Oden.rename(oldpath, newpath);
     assertDirectory(newpath);
     assertMissing(oldpath);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function renameWithURL() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const oldpath = testDir + "/oldpath";
     const newpath = testDir + "/newpath";
-    Deno.mkdirSync(oldpath);
-    await Deno.rename(
+    Oden.mkdirSync(oldpath);
+    await Oden.rename(
       pathToAbsoluteFileUrl(oldpath),
       pathToAbsoluteFileUrl(newpath),
     );
@@ -115,7 +115,7 @@ Deno.test(
 );
 
 function readFileString(filename: string): string {
-  const dataRead = Deno.readFileSync(filename);
+  const dataRead = Oden.readFileSync(filename);
   const dec = new TextDecoder("utf-8");
   return dec.decode(dataRead);
 }
@@ -123,30 +123,30 @@ function readFileString(filename: string): string {
 function writeFileString(filename: string, s: string) {
   const enc = new TextEncoder();
   const data = enc.encode(s);
-  Deno.writeFileSync(filename, data, { mode: 0o666 });
+  Oden.writeFileSync(filename, data, { mode: 0o666 });
 }
 
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
     permissions: { read: true, write: true },
   },
   function renameSyncErrorsUnix() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const oldfile = testDir + "/oldfile";
     const olddir = testDir + "/olddir";
     const emptydir = testDir + "/empty";
     const fulldir = testDir + "/dir";
     const file = fulldir + "/file";
     writeFileString(oldfile, "Hello");
-    Deno.mkdirSync(olddir);
-    Deno.mkdirSync(emptydir);
-    Deno.mkdirSync(fulldir);
+    Oden.mkdirSync(olddir);
+    Oden.mkdirSync(emptydir);
+    Oden.mkdirSync(fulldir);
     writeFileString(file, "world");
 
     assertThrows(
       () => {
-        Deno.renameSync(oldfile, emptydir);
+        Oden.renameSync(oldfile, emptydir);
       },
       Error,
       "Is a directory",
@@ -154,7 +154,7 @@ Deno.test(
     try {
       assertThrows(
         () => {
-          Deno.renameSync(olddir, fulldir);
+          Oden.renameSync(olddir, fulldir);
         },
         Error,
         "Directory not empty",
@@ -169,14 +169,14 @@ Deno.test(
     }
     assertThrows(
       () => {
-        Deno.renameSync(olddir, file);
+        Oden.renameSync(olddir, file);
       },
       Error,
       "Not a directory",
     );
     assertThrows(
       () => {
-        Deno.renameSync(olddir, file);
+        Oden.renameSync(olddir, file);
       },
       Error,
       `rename '${olddir}' -> '${file}'`,
@@ -185,76 +185,76 @@ Deno.test(
     const fileLink = testDir + "/fileLink";
     const dirLink = testDir + "/dirLink";
     const danglingLink = testDir + "/danglingLink";
-    Deno.symlinkSync(file, fileLink);
-    Deno.symlinkSync(emptydir, dirLink);
-    Deno.symlinkSync(testDir + "/nonexistent", danglingLink);
+    Oden.symlinkSync(file, fileLink);
+    Oden.symlinkSync(emptydir, dirLink);
+    Oden.symlinkSync(testDir + "/nonexistent", danglingLink);
 
     assertThrows(
       () => {
-        Deno.renameSync(olddir, fileLink);
+        Oden.renameSync(olddir, fileLink);
       },
       Error,
       "Not a directory",
     );
     assertThrows(
       () => {
-        Deno.renameSync(olddir, dirLink);
+        Oden.renameSync(olddir, dirLink);
       },
       Error,
       "Not a directory",
     );
     assertThrows(
       () => {
-        Deno.renameSync(olddir, danglingLink);
+        Oden.renameSync(olddir, danglingLink);
       },
       Error,
       "Not a directory",
     );
 
     // should succeed on Unix
-    Deno.renameSync(olddir, emptydir);
-    Deno.renameSync(oldfile, dirLink);
-    Deno.renameSync(dirLink, danglingLink);
+    Oden.renameSync(olddir, emptydir);
+    Oden.renameSync(oldfile, dirLink);
+    Oden.renameSync(dirLink, danglingLink);
     assertFile(danglingLink);
     assertEquals("Hello", readFileString(danglingLink));
   },
 );
 
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os !== "windows",
+    ignore: Oden.build.os !== "windows",
     permissions: { read: true, write: true },
   },
   function renameSyncErrorsWin() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const oldfile = testDir + "/oldfile";
     const olddir = testDir + "/olddir";
     const emptydir = testDir + "/empty";
     const fulldir = testDir + "/dir";
     const file = fulldir + "/file";
     writeFileString(oldfile, "Hello");
-    Deno.mkdirSync(olddir);
-    Deno.mkdirSync(emptydir);
-    Deno.mkdirSync(fulldir);
+    Oden.mkdirSync(olddir);
+    Oden.mkdirSync(emptydir);
+    Oden.mkdirSync(fulldir);
     writeFileString(file, "world");
 
     assertThrows(
       () => {
-        Deno.renameSync(oldfile, emptydir);
+        Oden.renameSync(oldfile, emptydir);
       },
-      Deno.errors.PermissionDenied,
+      Oden.errors.PermissionDenied,
       "Access is denied",
     );
     assertThrows(
       () => {
-        Deno.renameSync(olddir, fulldir);
+        Oden.renameSync(olddir, fulldir);
       },
       Error,
       "The directory is not empty",
     );
 
     // should succeed on Windows
-    Deno.renameSync(olddir, emptydir);
+    Oden.renameSync(olddir, emptydir);
     assertDirectory(emptydir);
   },
 );

@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "@odentest/add": "jsr:@odentest/add@^1.0.0"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "tasks": {
+    "build1": "oden run ../build1.js",
+    "build2": "oden run ../build2.js",
+    "run": {
+      "command": "oden run ../run.js",
+      "dependencies": ["build1", "build2"]
+    }
+  }
+}

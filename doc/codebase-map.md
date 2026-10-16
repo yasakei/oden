@@ -8,10 +8,10 @@ first. For the conceptual layering behind this layout, see
 
 | Directory      | What lives here                                             |
 | -------------- | ----------------------------------------------------------- |
-| `cli/`         | The `deno` binary: subcommands, tooling, LSP, module loader |
-| `runtime/`     | `deno_runtime`: assembles the JS runtime and workers        |
+| `cli/`         | The `oden` binary: subcommands, tooling, LSP, module loader |
+| `runtime/`     | `oden_runtime`: assembles the JS runtime and workers        |
 | `ext/`         | Extensions — native capabilities exposed to JavaScript      |
-| `libs/`        | `deno_core` and the supporting resolution/packaging crates  |
+| `libs/`        | `oden_core` and the supporting resolution/packaging crates  |
 | `tests/`       | All test suites (see [`testing.md`](./testing.md))          |
 | `tools/`       | Dev scripts: `format.js`, `lint.js`, CI helpers, releases   |
 | `third_party/` | Vendored dependencies and test fixtures                     |
@@ -44,7 +44,7 @@ roughly by purpose:
 - **Web platform:** `web`, `fetch`, `url`, `crypto`, `console`, `webidl`,
   `websocket`, `webgpu`, `canvas`, `image`, `broadcast_channel`, `webstorage`.
 - **System access:** `fs`, `net`, `io`, `os`, `process`, `signals`, `tls`.
-- **Deno APIs:** `kv`, `cron`, `cache`, `ffi`, `napi`, `bundle`, `telemetry`.
+- **Oden APIs:** `kv`, `cron`, `cache`, `ffi`, `napi`, `bundle`, `telemetry`.
 - **Node compatibility:** `node` (most `node:*` builtins), `node_crypto`,
   `node_sqlite`.
 
@@ -54,7 +54,7 @@ load order (`00_*.js`, `01_*.js`, …).
 
 ## Inside `libs/`
 
-The `deno_core` foundation and the crates the CLI composes for resolution and
+The `oden_core` foundation and the crates the CLI composes for resolution and
 packaging:
 
 - **Core/V8 bridge:** `core`, `core_testing`, `ops`, `serde_v8`, `dcore`.
@@ -71,7 +71,7 @@ packaging:
 - `tests/unit/` — JavaScript/TypeScript unit tests for runtime APIs
   (`*_test.ts`).
 - `tests/unit_node/` — unit tests for the `node:*` compatibility layer.
-- `tests/node_compat/` — Node.js's own test suite, run against Deno.
+- `tests/node_compat/` — Node.js's own test suite, run against Oden.
 - `tests/wpt/` — Web Platform Tests.
 - `tests/testdata/` — fixtures shared across suites.
 
@@ -79,11 +79,11 @@ See [`testing.md`](./testing.md) for the command that runs each suite.
 
 ## Inside `tools/`
 
-Developer and CI scripts, all run with Deno:
+Developer and CI scripts, all run with Oden:
 
-- `tools/format.js` — format the whole tree (`deno fmt` plus extras).
+- `tools/format.js` — format the whole tree (`oden fmt` plus extras).
 - `tools/lint.js` — lint Rust and JS/TS; pass `--js` for JS/TS only.
-- `tools/check_deno_core_changes.js`, `tools/check_docs_only_changes.js` — CI
+- `tools/check_oden_core_changes.js`, `tools/check_docs_only_changes.js` — CI
   helpers that decide which jobs to run based on the changed files.
 - `tools/release/` — release automation.
 

@@ -1,2 +1,2 @@
-import version from "@denotest/different-nested-dep";
+import version from "@odentest/different-nested-dep";
 console.log(version);

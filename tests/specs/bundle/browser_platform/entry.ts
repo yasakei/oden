@@ -1,3 +1,3 @@
-import * as mod from "npm:@denotest/browser-field";
+import * as mod from "npm:@odentest/browser-field";
 
 console.log(Object.keys(mod)[0]);

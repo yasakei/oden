@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@odentest/esm-basic": "^1.0.0",
+    "@odentest/say-hello": "^1.0.0"
+  }
+}

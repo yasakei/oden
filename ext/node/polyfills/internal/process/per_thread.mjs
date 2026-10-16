@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and Node.js contributors. All rights reserved. MIT license.
 (function () {
 const { primordials } = __bootstrap;
@@ -222,7 +222,7 @@ function buildAllowedFlags() {
 
   // Ignoring primordial lint. Extending from SafeSet prevents augmenting `keys`
   // and [SymbolIterator] instance methods.
-  // deno-lint-ignore deno-internal/prefer-primordials
+  // deno-lint-ignore oden-internal/prefer-primordials
   class NodeEnvironmentFlagsSet extends Set {
     constructor(array) {
       super();

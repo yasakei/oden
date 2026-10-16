@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { Buffer } from "node:buffer";
 import { randomFill, randomFillSync } from "node:crypto";
 import { assertEquals, assertNotEquals, assertThrows } from "@std/assert";
@@ -11,7 +11,7 @@ const validateZero = (buf: Buffer) => {
   buf.forEach((val) => assertEquals(val, 0));
 };
 
-Deno.test("[node/crypto.randomFill]", async () => {
+Oden.test("[node/crypto.randomFill]", async () => {
   const { promise, resolve } = Promise.withResolvers<boolean>();
   const buf = Buffer.alloc(10);
   const before = buf.toString("hex");
@@ -25,7 +25,7 @@ Deno.test("[node/crypto.randomFill]", async () => {
   await promise;
 });
 
-Deno.test("[node/crypto.randomFillSync]", () => {
+Oden.test("[node/crypto.randomFillSync]", () => {
   const buf = Buffer.alloc(10);
   const before = buf.toString("hex");
 
@@ -34,19 +34,19 @@ Deno.test("[node/crypto.randomFillSync]", () => {
   assertNotEquals(before, after.toString("hex"));
 });
 
-Deno.test("[node/crypto.randomFillSync] Complete fill, explicit size", () => {
+Oden.test("[node/crypto.randomFillSync] Complete fill, explicit size", () => {
   const buf = Buffer.alloc(10);
   randomFillSync(buf, undefined, 10);
   validateNonZero(buf);
 });
 
-Deno.test("[randomFillSync] Complete fill", () => {
+Oden.test("[randomFillSync] Complete fill", () => {
   const buf = Buffer.alloc(10);
   randomFillSync(buf);
   validateNonZero(buf);
 });
 
-Deno.test("[node/crypto.randomFillSync] Fill beginning, explicit offset+size", () => {
+Oden.test("[node/crypto.randomFillSync] Fill beginning, explicit offset+size", () => {
   const buf = Buffer.alloc(10);
   randomFillSync(buf, 0, 5);
   validateNonZero(buf);
@@ -56,6 +56,6 @@ Deno.test("[node/crypto.randomFillSync] Fill beginning, explicit offset+size", (
   validateZero(untouched);
 });
 
-Deno.test("[node/crypto.randomFillSync] Invalid offst/size", () => {
+Oden.test("[node/crypto.randomFillSync] Invalid offst/size", () => {
   assertThrows(() => randomFillSync(Buffer.alloc(10), 1, 10));
 });

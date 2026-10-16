@@ -1,4 +1,4 @@
-Deno.bench("noop with start and end", (b) => {
+Oden.bench("noop with start and end", (b) => {
   b.start();
   b.end();
 });

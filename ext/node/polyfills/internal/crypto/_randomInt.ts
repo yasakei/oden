@@ -1,13 +1,13 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 (function () {
 const { core, primordials } = __bootstrap;
 const { op_node_random_int } = core.ops;
 const {
   ERR_INVALID_ARG_TYPE,
   ERR_OUT_OF_RANGE,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
 const { validateFunction } = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
 const {
   MathCeil,

@@ -1,7 +1,7 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assertEquals } from "./test_util.ts";
 
-Deno.test(function progressEventConstruct() {
+Oden.test(function progressEventConstruct() {
   const progressEventDefs = new ProgressEvent("progressEventType", {});
   assertEquals(progressEventDefs.lengthComputable, false);
   assertEquals(progressEventDefs.loaded, 0);

@@ -1,18 +1,18 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::io::Error;
 use std::io::ErrorKind;
 use std::path::Path;
 use std::path::PathBuf;
 
-use deno_config::glob::FileCollector;
-use deno_config::glob::FilePatterns;
-use deno_config::glob::PathOrPattern;
-use deno_config::glob::PathOrPatternSet;
-use deno_config::glob::WalkEntry;
-use deno_core::ModuleSpecifier;
-use deno_core::anyhow::anyhow;
-use deno_core::error::AnyError;
+use oden_config::glob::FileCollector;
+use oden_config::glob::FilePatterns;
+use oden_config::glob::PathOrPattern;
+use oden_config::glob::PathOrPatternSet;
+use oden_config::glob::WalkEntry;
+use oden_core::ModuleSpecifier;
+use oden_core::anyhow::anyhow;
+use oden_core::error::AnyError;
 use sys_traits::FsMetadataValue;
 use sys_traits::PathsInErrorsExt;
 
@@ -186,7 +186,7 @@ pub struct FsCleaner {
   pub bytes_removed: u64,
   /// Paths that could not be removed, along with the error encountered. The
   /// cleaner is best-effort: a single locked or read-only file (for example a
-  /// cache database held open by a running Deno process) should not abort the
+  /// cache database held open by a running Oden process) should not abort the
   /// entire clean, so failures are collected here and reported afterwards.
   pub failed: Vec<(PathBuf, std::io::Error)>,
   pub progress_guard: Option<UpdateGuard>,

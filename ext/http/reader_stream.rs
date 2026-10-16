@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::pin::Pin;
 use std::sync::Arc;
@@ -8,7 +8,7 @@ use std::task::Context;
 use std::task::Poll;
 
 use bytes::Bytes;
-use deno_core::futures::Stream;
+use oden_core::futures::Stream;
 use pin_project::pin_project;
 use tokio::io::AsyncRead;
 use tokio_util::io::ReaderStream;
@@ -67,7 +67,7 @@ impl<R: AsyncRead> Stream for ExternallyAbortableReaderStream<R> {
 #[cfg(test)]
 mod tests {
   use bytes::Bytes;
-  use deno_core::futures::StreamExt;
+  use oden_core::futures::StreamExt;
   use tokio::io::AsyncWriteExt;
 
   use super::*;

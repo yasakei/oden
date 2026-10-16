@@ -1,6 +1,6 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
-use deno_core::op2;
-use deno_core::v8;
+// Copyright 2018-2026 the Oden authors. MIT license.
+use oden_core::op2;
+use oden_core::v8;
 
 #[op2]
 pub fn op_preview_entries<'s>(

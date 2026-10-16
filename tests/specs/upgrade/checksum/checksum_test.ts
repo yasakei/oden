@@ -2,16 +2,16 @@
 // and then runs upgrade commands to verify checksum validation works.
 
 const version = "99.99.99";
-const target = Deno.build.target;
-const archiveName = `deno-${target}.zip`;
+const target = Oden.build.target;
+const archiveName = `oden-${target}.zip`;
 const downloadUrl =
-  `http://localhost:4545/deno-upgrade/download/v${version}/${archiveName}`;
+  `http://localhost:4545/oden-upgrade/download/v${version}/${archiveName}`;
 
 // Fetch the archive and compute its SHA256 checksum
 const response = await fetch(downloadUrl);
 if (!response.ok) {
   console.error(`Failed to fetch ${downloadUrl}: ${response.status}`);
-  Deno.exit(1);
+  Oden.exit(1);
 }
 
 const data = new Uint8Array(await response.arrayBuffer());
@@ -24,11 +24,11 @@ console.log(`Downloaded ${data.length} bytes`);
 console.log(`Computed checksum: ${correctChecksum}`);
 
 async function runUpgrade(args: string[]) {
-  const command = new Deno.Command(Deno.execPath(), {
+  const command = new Oden.Command(Oden.execPath(), {
     args: ["upgrade", ...args],
     env: {
-      ...Deno.env.toObject(),
-      "DENO_TESTING_UPGRADE": "1",
+      ...Oden.env.toObject(),
+      "ODEN_TESTING_UPGRADE": "1",
     },
     stdout: "inherit",
     stderr: "inherit",

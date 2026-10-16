@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::RefCell;
 use std::collections::BTreeMap;
@@ -9,25 +9,25 @@ use std::sync::Arc;
 
 use capacity_builder::StringBuilder;
 use deno_error::JsErrorBox;
-use deno_lockfile::NpmPackageDependencyLockfileInfo;
-use deno_lockfile::NpmPackageLockfileInfo;
-use deno_npm::NpmResolutionPackage;
-use deno_npm::registry::NpmPackageInfo;
-use deno_npm::registry::NpmRegistryApi;
-use deno_npm::registry::NpmRegistryPackageInfoLoadError;
-use deno_npm::resolution::AddPkgReqsOptions;
-use deno_npm::resolution::DefaultTarballUrlProvider;
-use deno_npm::resolution::NpmResolutionError;
-use deno_npm::resolution::NpmResolutionSnapshot;
-use deno_npm::resolution::UnmetPeerDepDiagnostic;
-use deno_npm_cache::NpmCacheHttpClient;
-use deno_npm_cache::NpmCacheSys;
-use deno_npm_cache::RegistryInfoProvider;
-use deno_resolver::display::DisplayTreeNode;
-use deno_resolver::factory::NpmVersionResolverRc;
-use deno_resolver::lockfile::LockfileLock;
-use deno_resolver::lockfile::LockfileSys;
-use deno_resolver::npm::managed::NpmResolutionCell;
+use oden_lockfile::NpmPackageDependencyLockfileInfo;
+use oden_lockfile::NpmPackageLockfileInfo;
+use oden_npm::NpmResolutionPackage;
+use oden_npm::registry::NpmPackageInfo;
+use oden_npm::registry::NpmRegistryApi;
+use oden_npm::registry::NpmRegistryPackageInfoLoadError;
+use oden_npm::resolution::AddPkgReqsOptions;
+use oden_npm::resolution::DefaultTarballUrlProvider;
+use oden_npm::resolution::NpmResolutionError;
+use oden_npm::resolution::NpmResolutionSnapshot;
+use oden_npm::resolution::UnmetPeerDepDiagnostic;
+use oden_npm_cache::NpmCacheHttpClient;
+use oden_npm_cache::NpmCacheSys;
+use oden_npm_cache::RegistryInfoProvider;
+use oden_resolver::display::DisplayTreeNode;
+use oden_resolver::factory::NpmVersionResolverRc;
+use oden_resolver::lockfile::LockfileLock;
+use oden_resolver::lockfile::LockfileSys;
+use oden_resolver::npm::managed::NpmResolutionCell;
 use deno_semver::SmallStackString;
 use deno_semver::StackString;
 use deno_semver::jsr::JsrDepPackageReq;
@@ -94,7 +94,7 @@ pub struct NpmResolutionInstaller<
   has_js_execution_started_flag: HasJsExecutionStartedFlagRc,
   npm_version_resolver: NpmVersionResolverRc,
   registry_info_provider: Arc<RegistryInfoProvider<TNpmCacheHttpClient, TSys>>,
-  reporter: Option<Arc<dyn deno_npm::resolution::Reporter>>,
+  reporter: Option<Arc<dyn oden_npm::resolution::Reporter>>,
   resolution: Arc<NpmResolutionCell>,
   maybe_lockfile: Option<Arc<LockfileLock<TSys>>>,
   update_queue: TaskQueue,
@@ -110,7 +110,7 @@ impl<TNpmCacheHttpClient: NpmCacheHttpClient, TSys: NpmResolutionInstallerSys>
     registry_info_provider: Arc<
       RegistryInfoProvider<TNpmCacheHttpClient, TSys>,
     >,
-    reporter: Option<Arc<dyn deno_npm::resolution::Reporter>>,
+    reporter: Option<Arc<dyn oden_npm::resolution::Reporter>>,
     resolution: Arc<NpmResolutionCell>,
     maybe_lockfile: Option<Arc<LockfileLock<TSys>>>,
   ) -> Self {
@@ -188,13 +188,13 @@ impl<TNpmCacheHttpClient: NpmCacheHttpClient, TSys: NpmResolutionInstallerSys>
   async fn add_package_reqs_to_snapshot(
     &self,
     package_reqs: &[PackageReq],
-  ) -> deno_npm::resolution::AddPkgReqsResult {
+  ) -> oden_npm::resolution::AddPkgReqsResult {
     let snapshot = self.resolution.snapshot();
     // Skip npm resolution when the lockfile snapshot already resolves every
     // requirement and either the lockfile is unchanged, or we are offline
     // (`--cached-only`). The offline case is important: a lockfile can be
     // flagged as changed for reasons unrelated to npm — most notably a `links`
-    // section that older deno versions did not write and is re-derived from the
+    // section that older oden versions did not write and is re-derived from the
     // workspace config on load. Re-resolving then would need to fetch registry
     // metadata that an offline cache does not contain, failing the run even
     // though the lockfile's npm section is already complete. Online, the
@@ -206,7 +206,7 @@ impl<TNpmCacheHttpClient: NpmCacheHttpClient, TSys: NpmResolutionInstallerSys>
         .all(|req| snapshot.package_reqs().contains_key(req))
     {
       log::debug!("Snapshot already up to date. Skipping npm resolution.");
-      return deno_npm::resolution::AddPkgReqsResult {
+      return oden_npm::resolution::AddPkgReqsResult {
         results: package_reqs
           .iter()
           .map(|req| Ok(snapshot.package_reqs().get(req).unwrap().clone()))
@@ -357,7 +357,7 @@ impl<TNpmCacheHttpClient: NpmCacheHttpClient, TSys: NpmResolutionInstallerSys>
         tarball: pkg.dist.as_ref().and_then(|dist| {
           // Omit the tarball URL if it's the standard NPM registry URL
           let tarbal_url_provider =
-            deno_npm::resolution::NpmRegistryDefaultTarballUrlProvider;
+            oden_npm::resolution::NpmRegistryDefaultTarballUrlProvider;
           if dist.tarball == tarbal_url_provider.default_tarball_url(&pkg.id.nv)
           {
             None
@@ -387,7 +387,7 @@ impl<TNpmCacheHttpClient: NpmCacheHttpClient, TSys: NpmResolutionInstallerSys>
         PackageKind::Jsr => true,
       });
     for (package_req, nv) in snapshot.package_reqs() {
-      let id = &snapshot.resolve_package_from_deno_module(nv).unwrap().id;
+      let id = &snapshot.resolve_package_from_oden_module(nv).unwrap().id;
       lockfile.insert_package_specifier(
         JsrDepPackageReq::npm(package_req.clone()),
         {
@@ -426,7 +426,7 @@ pub fn format_unmet_peer_dep_warning(
     "\nThese packages were resolved to a version that does not satisfy a peer \
      dependency constraint, which can cause runtime errors. To silence this \
      warning, install a compatible version or add an \"overrides\" entry to \
-     your package.json or deno.json.\n",
+     your package.json or oden.json.\n",
   );
   text.push_str("Learn more: https://docs.deno.com/go/peer-deps");
   text

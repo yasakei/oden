@@ -1,3 +1,3 @@
-const [from, to] = Deno.args;
+const [from, to] = Oden.args;
 
-Deno.renameSync(from.trim(), to.trim());
+Oden.renameSync(from.trim(), to.trim());

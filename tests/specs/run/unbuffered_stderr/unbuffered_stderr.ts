@@ -1,1 +1,1 @@
-Deno.stderr.write(new TextEncoder().encode("x"));
+Oden.stderr.write(new TextEncoder().encode("x"));

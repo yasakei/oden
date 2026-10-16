@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // The legacy `exports` option bundles the default export (its `default` key)
 // and the named exports (its remaining keys) into a single object. It works for
 // both ESM and CJS modules, observed from both module systems.

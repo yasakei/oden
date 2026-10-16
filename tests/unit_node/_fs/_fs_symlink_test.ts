@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assert, assertThrows, fail } from "@std/assert";
 import { symlink, symlinkSync } from "node:fs";
 
-Deno.test({
+Oden.test({
   name: "ASYNC: no callback function results in Error",
   fn() {
     assertThrows(
@@ -16,10 +16,10 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "ASYNC: create symlink point to a file",
   async fn() {
-    const file: string = Deno.makeTempFileSync();
+    const file: string = Oden.makeTempFileSync();
     const linkedFile: string = file + ".link";
 
     await new Promise<void>((resolve, reject) => {
@@ -30,7 +30,7 @@ Deno.test({
     })
       .then(
         () => {
-          const stat = Deno.lstatSync(linkedFile);
+          const stat = Oden.lstatSync(linkedFile);
           assert(stat.isSymlink);
         },
         () => {
@@ -38,16 +38,16 @@ Deno.test({
         },
       )
       .finally(() => {
-        Deno.removeSync(file);
-        Deno.removeSync(linkedFile);
+        Oden.removeSync(file);
+        Oden.removeSync(linkedFile);
       });
   },
 });
 
-Deno.test({
+Oden.test({
   name: "ASYNC: create symlink point to a dir",
   async fn() {
-    const dir: string = Deno.makeTempDirSync();
+    const dir: string = Oden.makeTempDirSync();
     const linkedDir: string = dir + ".link";
 
     await new Promise<void>((resolve, reject) => {
@@ -58,7 +58,7 @@ Deno.test({
     })
       .then(
         () => {
-          const stat = Deno.lstatSync(linkedDir);
+          const stat = Oden.lstatSync(linkedDir);
           assert(stat.isSymlink);
         },
         () => {
@@ -66,59 +66,59 @@ Deno.test({
         },
       )
       .finally(() => {
-        Deno.removeSync(dir);
-        Deno.removeSync(linkedDir);
+        Oden.removeSync(dir);
+        Oden.removeSync(linkedDir);
       });
   },
 });
 
-Deno.test({
+Oden.test({
   name: "SYNC: create symlink point to a file",
   fn() {
-    const file: string = Deno.makeTempFileSync();
+    const file: string = Oden.makeTempFileSync();
     const linkedFile: string = file + ".link";
 
     try {
       symlinkSync(file, linkedFile);
-      const stat = Deno.lstatSync(linkedFile);
+      const stat = Oden.lstatSync(linkedFile);
       assert(stat.isSymlink);
     } finally {
-      Deno.removeSync(file);
-      Deno.removeSync(linkedFile);
+      Oden.removeSync(file);
+      Oden.removeSync(linkedFile);
     }
   },
 });
 
-Deno.test({
+Oden.test({
   name: "SYNC: create symlink point to a dir",
   fn() {
-    const dir: string = Deno.makeTempDirSync();
+    const dir: string = Oden.makeTempDirSync();
     const linkedDir: string = dir + ".link";
 
     try {
       symlinkSync(dir, linkedDir);
-      const stat = Deno.lstatSync(linkedDir);
+      const stat = Oden.lstatSync(linkedDir);
       assert(stat.isSymlink);
     } finally {
-      Deno.removeSync(dir);
-      Deno.removeSync(linkedDir);
+      Oden.removeSync(dir);
+      Oden.removeSync(linkedDir);
     }
   },
 });
 
-Deno.test({
+Oden.test({
   name: "SYNC: symlink junction",
   fn() {
-    const dir: string = Deno.makeTempDirSync();
+    const dir: string = Oden.makeTempDirSync();
     const linkedDir: string = dir + "-junction";
 
     try {
       symlinkSync(dir, linkedDir, "junction");
-      const stat = Deno.lstatSync(linkedDir);
+      const stat = Oden.lstatSync(linkedDir);
       assert(stat.isSymlink);
     } finally {
-      Deno.removeSync(dir);
-      Deno.removeSync(linkedDir);
+      Oden.removeSync(dir);
+      Oden.removeSync(linkedDir);
     }
   },
 });

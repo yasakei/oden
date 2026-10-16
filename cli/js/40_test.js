@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { core, primordials } from "ext:core/mod.js";
 import { escapeName, withPermissions } from "ext:cli/40_test_common.js";
@@ -45,11 +45,11 @@ const {
   TypeError,
 } = primordials;
 
-const { setExitHandler } = core.loadExtScript("ext:deno_os/30_os.js");
+const { setExitHandler } = core.loadExtScript("ext:oden_os/30_os.js");
 
-// Capture `Deno` global so that users deleting or mangling it, won't
+// Capture `Oden` global so that users deleting or mangling it, won't
 // have impact on our sanitizers.
-const DenoNs = globalThis.Deno;
+const OdenNs = globalThis.Oden;
 
 /**
  * @typedef {{
@@ -102,7 +102,7 @@ const testStates = new Map();
 /**
  * Symbol that test functions (or their wrappers) can carry to tell the test
  * runner which source location to report for the test, instead of the call
- * site of `Deno.test()` itself.
+ * site of `Oden.test()` itself.
  *
  * The value must be a string in the format `"fileName:lineNumber:columnNumber"`,
  * where `fileName` may be an absolute file URL or any remote URL.  Parsing
@@ -110,11 +110,11 @@ const testStates = new Map();
  * handled correctly.
  *
  * This is primarily intended for test-helper libraries (e.g. `@std/testing/bdd`)
- * that call `Deno.test()` on behalf of the user: by setting this symbol on the
+ * that call `Oden.test()` on behalf of the user: by setting this symbol on the
  * wrapped function they can report the location in *user* code rather than the
  * location inside the library itself.
  */
-const TEST_LOCATION_SYMBOL = SymbolFor("Deno.test.location");
+const TEST_LOCATION_SYMBOL = SymbolFor("Oden.test.location");
 
 /**
  * Parse a location string of the form `"fileName:lineNumber:columnNumber"`.
@@ -145,14 +145,14 @@ function parseTestLocation(str) {
 }
 
 // Default exit handler installed at the start of every test isolate (see
-// `installTestIsolateExitHandler` below). When user code calls `Deno.exit()`
+// `installTestIsolateExitHandler` below). When user code calls `Oden.exit()`
 // outside of any test function - at module top level, in an `unload` event,
-// or from async work that escaped a test - we don't want to kill the deno
+// or from async work that escaped a test - we don't want to kill the oden
 // process. Instead we record the exit code, notify the reporter, and ask V8
 // to terminate the isolate so the test runner can move on to the next file.
 //
 // `defaultExitHandler` is also what `assertExit` restores when a per-test
-// handler finishes, so that `Deno.exit()` after a test (e.g., in an unload
+// handler finishes, so that `Oden.exit()` after a test (e.g., in an unload
 // listener) is still routed to the isolate-exit path.
 let defaultExitHandler = null;
 
@@ -164,7 +164,7 @@ function installTestIsolateExitHandler() {
     // doesn't check the termination flag before some intermediate frame
     // catches the (uncatchable) termination exception. Either way, the test
     // runner detects the isolate-exit via `IsolateExitInfo` in `OpState`.
-    throw new Error(`Deno.exit(${exitCode}) called outside of a test`);
+    throw new Error(`Oden.exit(${exitCode}) called outside of a test`);
   };
   setExitHandler(defaultExitHandler);
 }
@@ -200,10 +200,10 @@ function assertExit(fn, isTest, sanitizeExit) {
     try {
       const innerResult = await fn(...new SafeArrayIterator(params));
       if (sanitizeExit) {
-        const exitCode = DenoNs.exitCode;
+        const exitCode = OdenNs.exitCode;
         if (exitCode !== 0) {
           // Reset the code to allow other tests to run...
-          DenoNs.exitCode = 0;
+          OdenNs.exitCode = 0;
           // ...and fail the current test.
           throw new Error(
             `${
@@ -217,7 +217,7 @@ function assertExit(fn, isTest, sanitizeExit) {
       }
     } finally {
       // Restore the isolate-level default handler so that a subsequent
-      // top-level `Deno.exit()` (e.g., in an `unload` listener) is routed
+      // top-level `Oden.exit()` (e.g., in an `unload` listener) is routed
       // back into the test runner instead of falling through to `op_exit`.
       setExitHandler(defaultExitHandler);
     }
@@ -356,7 +356,7 @@ function encodeCount(value, label) {
 // As long as we're using one isolate per test, we can cache the origin since it won't change
 let cachedOrigin = undefined;
 
-// Module-level sanitizer overrides set via Deno.test.sanitizer()
+// Module-level sanitizer overrides set via Oden.test.sanitizer()
 // These have higher precedence than CLI flags/config but lower than per-test options
 let moduleSanitizeOps = undefined;
 let moduleSanitizeResources = undefined;
@@ -367,7 +367,7 @@ function testInner(
   maybeFn,
   overrides = { __proto__: null },
 ) {
-  // No-op if we're not running in `deno test` subcommand.
+  // No-op if we're not running in `oden test` subcommand.
   if (typeof op_register_test !== "function") {
     return;
   }
@@ -377,9 +377,9 @@ function testInner(
     ignore: false,
     only: false,
     sanitizeOps: moduleSanitizeOps ??
-      Deno[Deno.internal].testSanitizeOps ?? false,
+      Oden[Oden.internal].testSanitizeOps ?? false,
     sanitizeResources: moduleSanitizeResources ??
-      Deno[Deno.internal].testSanitizeResources ?? false,
+      Oden[Oden.internal].testSanitizeResources ?? false,
     sanitizeExit: true,
     permissions: null,
     timeout: undefined,
@@ -419,10 +419,10 @@ function testInner(
       throw new TypeError("The test function must have a name");
     }
     if (optionsOrFn != undefined) {
-      throw new TypeError("Unexpected second argument to Deno.test()");
+      throw new TypeError("Unexpected second argument to Oden.test()");
     }
     if (maybeFn != undefined) {
-      throw new TypeError("Unexpected third argument to Deno.test()");
+      throw new TypeError("Unexpected third argument to Oden.test()");
     }
     testDesc = {
       ...defaults,
@@ -508,7 +508,7 @@ function testInner(
   });
 }
 
-// Main test function provided by Deno.
+// Main test function provided by Oden.
 function test(
   nameOrFnOrOptions,
   optionsOrFn,
@@ -530,7 +530,7 @@ test.only = function (
 };
 
 function registerHook(hookType, fn) {
-  // No-op if we're not running in `deno test` subcommand.
+  // No-op if we're not running in `oden test` subcommand.
   if (typeof op_register_test_hook !== "function") {
     return;
   }
@@ -561,7 +561,7 @@ test.afterAll = function (fn) {
 test.sanitizer = function (options) {
   if (typeof options !== "object" || options === null) {
     throw new TypeError(
-      "Deno.test.sanitizer: options must be an object",
+      "Oden.test.sanitizer: options must be an object",
     );
   }
   if (options.ops !== undefined) {
@@ -574,7 +574,7 @@ test.sanitizer = function (options) {
 
 // Matches a `printf`-style token (`%s`, `%d`, `%i`, `%f`, `%j`, `%o`, `%O`,
 // `%#`, `%%`) or a `$`-prefixed object path (`$foo`, `$foo.bar`) inside a
-// `Deno.test.each()` name template.
+// `Oden.test.each()` name template.
 const EACH_NAME_TOKEN = new SafeRegExp(
   "%[sdifjoO#%]|\\$[\\w$]+(?:\\.[\\w$]+)*",
   "g",
@@ -608,11 +608,11 @@ function eachResolvePath(row, path) {
   return current;
 }
 
-// Build the name for a single `Deno.test.each()` case by interpolating the
+// Build the name for a single `Oden.test.each()` case by interpolating the
 // template against the case's row and its zero-based index.
 function formatEachName(template, row, index) {
   if (typeof template !== "string") {
-    throw new TypeError("Deno.test.each: test name must be a string");
+    throw new TypeError("Oden.test.each: test name must be a string");
   }
   const isArray = ArrayIsArray(row);
   const positional = isArray ? row : [row];
@@ -650,13 +650,13 @@ function formatEachName(template, row, index) {
   });
 }
 
-// Create a `Deno.test.each()` (and `.only.each`/`.ignore.each`) implementation
+// Create a `Oden.test.each()` (and `.only.each`/`.ignore.each`) implementation
 // bound to the given test registration `overrides`.
 function createEach(overrides) {
   return function each(cases) {
     if (!ArrayIsArray(cases)) {
       throw new TypeError(
-        "Deno.test.each: expected an array of test cases",
+        "Oden.test.each: expected an array of test cases",
       );
     }
     return function (name, optionsOrFn, maybeFn) {
@@ -669,7 +669,7 @@ function createEach(overrides) {
         fn = maybeFn;
       }
       if (typeof fn !== "function") {
-        throw new TypeError("Deno.test.each: missing test function");
+        throw new TypeError("Oden.test.each: missing test function");
       }
 
       // Report all generated tests at the user's `.each(...)(...)` call site
@@ -761,7 +761,7 @@ function createTestContext(desc) {
     origin: desc.origin,
     /**
      * Asserts that `actual` matches the snapshot stored in the snapshot
-     * file. With `deno test --update-snapshots`, mismatching or missing
+     * file. With `oden test --update-snapshots`, mismatching or missing
      * snapshots are written to the snapshot file instead.
      *
      * @param actual {unknown}
@@ -879,6 +879,6 @@ function wrapTest(desc) {
   return wrapOuter(testFn, desc);
 }
 
-globalThis.Deno.test = test;
-globalThis.Deno[globalThis.Deno.internal].installTestIsolateExitHandler =
+globalThis.Oden.test = test;
+globalThis.Oden[globalThis.Oden.internal].installTestIsolateExitHandler =
   installTestIsolateExitHandler;

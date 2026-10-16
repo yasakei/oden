@@ -1,0 +1,10 @@
+{
+  "name": "@odentest/transitive-bin",
+  "version": "1.0.0",
+  "dependencies": {
+    "@odentest/bin": "1.0.0"
+  },
+  "bin": {
+    "cli-cjs": "cli-cjs.js"
+  }
+}

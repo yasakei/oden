@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "@odentest/add": "npm:@odentest/add@^1.0.0"
+  },
+  "nodeModulesDir": "manual"
+}

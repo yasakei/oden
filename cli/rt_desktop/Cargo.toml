@@ -1,38 +1,38 @@
-# Copyright 2018-2026 the Deno authors. MIT license.
+# Copyright 2018-2026 the Oden authors. MIT license.
 
 [package]
-name = "denort_desktop"
+name = "odenrt_desktop"
 version = "2.7.4"
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 publish = false
 repository.workspace = true
-description = "Provides libdenort shared library for laufey desktop apps"
+description = "Provides libodenrt shared library for laufey desktop apps"
 
 [lib]
-name = "denort"
+name = "odenrt"
 path = "lib.rs"
 crate-type = ["cdylib"]
 
 [features]
 default = ["v8"]
-quickjs = ["deno_core/quickjs", "denort/quickjs", "v8/quickjs"]
-v8 = ["deno_core/v8", "denort/v8", "v8/v8"]
+quickjs = ["oden_core/quickjs", "odenrt/quickjs", "v8/quickjs"]
+v8 = ["oden_core/v8", "odenrt/v8", "v8/v8"]
 
 [build-dependencies]
-deno_runtime.workspace = true
-deno_core.workspace = true
+oden_runtime.workspace = true
+oden_core.workspace = true
 v8.workspace = true
 
 [dependencies]
-deno_core.workspace = true
+oden_core.workspace = true
 deno_error.workspace = true
-deno_lib.workspace = true
-deno_runtime.workspace = true
-deno_snapshots.workspace = true
+oden_lib.workspace = true
+oden_runtime.workspace = true
+oden_snapshots.workspace = true
 deno_terminal.workspace = true
-denort = { path = "../rt", default-features = false }
+odenrt = { path = "../rt", default-features = false }
 laufey = "0.7.0"
 libsui.workspace = true
 

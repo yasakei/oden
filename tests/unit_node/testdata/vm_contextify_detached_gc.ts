@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { createContext, runInContext } from "node:vm";
 import { strictEqual } from "node:assert/strict";
 

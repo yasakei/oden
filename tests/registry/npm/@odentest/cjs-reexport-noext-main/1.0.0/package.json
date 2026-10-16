@@ -1,0 +1,5 @@
+{
+  "name": "@odentest/cjs-reexport-noext-main",
+  "version": "1.0.0",
+  "main": "lib/index"
+}

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // On receiving a count, synchronously posts that many messages back to the
 // host in one event-loop turn. This exercises the host-side (Web `Worker`

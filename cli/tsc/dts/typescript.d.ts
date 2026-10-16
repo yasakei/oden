@@ -884,7 +884,7 @@ declare namespace ts {
                 arguments: DocumentHighlightsRequestArgs;
             }
             /**
-             * Span augmented with extra information that denotes the kind of the highlighting to be used for span.
+             * Span augmented with extra information that odentes the kind of the highlighting to be used for span.
              */
             export interface HighlightSpan extends TextSpanWithContext {
                 kind: HighlightSpanKind;
@@ -1827,7 +1827,7 @@ declare namespace ts {
                 contents: string[];
                 /**
                  * Areas of "focus" to inform the code mapper with. For example, cursor
-                 * location, current selection, viewport, etc. Nested arrays denote
+                 * location, current selection, viewport, etc. Nested arrays odente
                  * priority: toplevel arrays are more important than inner arrays, and
                  * inner array priorities are based on items within that array. Items
                  * earlier in the arrays have higher priority.
@@ -3642,7 +3642,7 @@ declare namespace ts {
             responseRequired?: boolean;
         }
     }
-    namespace deno {
+    namespace oden {
         function setEnterSpan(f: EnterSpan): void;
         function setExitSpan(f: ExitSpan): void;
         function spanned<T>(name: string, f: () => T): T;
@@ -3650,12 +3650,12 @@ declare namespace ts {
         function setNodeBuiltInModuleNames(names: readonly string[]): void;
         function setNodeOnlyGlobalNames(names: readonly string[]): void;
         function setTypesNodeIgnorableNames(names: Set<string>): void;
-        function createDenoForkContext({ mergeSymbol, globals, nodeGlobals, ambientModuleSymbolRegex }: {
+        function createOdenForkContext({ mergeSymbol, globals, nodeGlobals, ambientModuleSymbolRegex }: {
             mergeSymbol(target: ts.Symbol, source: ts.Symbol, unidirectional?: boolean): ts.Symbol;
             globals: ts.SymbolTable;
             nodeGlobals: ts.SymbolTable;
             ambientModuleSymbolRegex: RegExp;
-        }): DenoForkContext;
+        }): OdenForkContext;
         function isTypesNodePkgPath(path: ts.Path): boolean;
         function tryParseNpmPackageReference(text: string): NpmPackageReference | undefined;
         function parseNpmPackageReference(text: string): NpmPackageReference;
@@ -3664,7 +3664,7 @@ declare namespace ts {
         type ExitSpan = (span: object) => void;
         let enterSpan: EnterSpan;
         let exitSpan: ExitSpan;
-        interface DenoForkContext {
+        interface OdenForkContext {
             hasNodeSourceFile: (node: ts.Node | undefined) => boolean;
             getGlobalsForName: (id: ts.__String) => ts.SymbolTable;
             mergeGlobalSymbolTable: (node: ts.Node, source: ts.SymbolTable, unidirectional?: boolean) => void;

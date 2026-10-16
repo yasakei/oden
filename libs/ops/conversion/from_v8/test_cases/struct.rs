@@ -1,7 +1,7 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![deny(warnings)]
-deno_ops_compile_test_runner::prelude!();
+oden_ops_compile_test_runner::prelude!();
 
 #[derive(FromV8)]
 pub struct Struct {

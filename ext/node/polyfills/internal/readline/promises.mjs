@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 
 (function () {
@@ -9,20 +9,20 @@ const {
 const {
   ArrayPrototypeJoin,
   ArrayPrototypePush,
-} = core.loadExtScript("ext:deno_node/internal/primordials.mjs");
+} = core.loadExtScript("ext:oden_node/internal/primordials.mjs");
 
 const { CSI } = core.loadExtScript(
-  "ext:deno_node/internal/readline/utils.mjs",
+  "ext:oden_node/internal/readline/utils.mjs",
 );
 const {
   validateBoolean,
   validateInteger,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
 const { isWritable } = core.loadExtScript(
-  "ext:deno_node/internal/streams/utils.js",
+  "ext:oden_node/internal/streams/utils.js",
 );
 const { ERR_INVALID_ARG_TYPE } = core.loadExtScript(
-  "ext:deno_node/internal/errors.ts",
+  "ext:oden_node/internal/errors.ts",
 );
 
 const {

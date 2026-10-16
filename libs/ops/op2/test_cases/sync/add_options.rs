@@ -1,7 +1,7 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![deny(warnings)]
-deno_ops_compile_test_runner::prelude!();
+oden_ops_compile_test_runner::prelude!();
 
 #[op2]
 pub fn op_test_add_option(a: u32, b: Option<u32>) -> u32 {

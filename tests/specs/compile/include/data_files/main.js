@@ -1,1 +1,1 @@
-console.log(Deno.readTextFileSync("./data-file.txt").trim());
+console.log(Oden.readTextFileSync("./data-file.txt").trim());

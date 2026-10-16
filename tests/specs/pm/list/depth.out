@@ -1,4 +1,4 @@
-jsr:@denotest/add [WILDLINE]
-npm:@denotest/esm-basic [WILDLINE]
-npm:@denotest/esm-import-cjs-default [WILDLINE]
-└─ npm:@denotest/cjs-default-export [WILDLINE]
+jsr:@odentest/add [WILDLINE]
+npm:@odentest/esm-basic [WILDLINE]
+npm:@odentest/esm-import-cjs-default [WILDLINE]
+└─ npm:@odentest/cjs-default-export [WILDLINE]

@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![deny(clippy::disallowed_methods)]
 
 mod cache;
 mod common;
-mod deno_dir;
+mod oden_dir;
 #[cfg(feature = "file_fetcher")]
 pub mod file_fetcher;
 mod global;
@@ -28,10 +28,10 @@ pub use cache::NOT_FOUND_CACHE_HEADER;
 pub use cache::SerializedCachedUrlMetadata;
 pub use cache::url_to_filename;
 pub use common::HeadersMap;
-pub use deno_dir::DenoDirResolutionError;
-pub use deno_dir::ResolveDenoDirOptions;
-pub use deno_dir::ResolveDenoDirSys;
-pub use deno_dir::resolve_deno_dir;
+pub use oden_dir::OdenDirResolutionError;
+pub use oden_dir::ResolveOdenDirOptions;
+pub use oden_dir::ResolveOdenDirSys;
+pub use oden_dir::resolve_oden_dir;
 pub use global::GlobalHttpCache;
 pub use global::GlobalHttpCacheRc;
 pub use global::GlobalHttpCacheSys;

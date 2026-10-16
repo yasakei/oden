@@ -1,19 +1,19 @@
-// Copyright 2018-2026 the Deno authors. All rights reserved. MIT license.
+// Copyright 2018-2026 the Oden authors. All rights reserved. MIT license.
 
 // Regression test: sending multiple datagrams that exceed the incoming
 // high-water mark (default 1) must not cause an infinite loop.
 
 import { decodeBase64 } from "@std/encoding/base64";
 
-const cert = Deno.readTextFileSync("../../../testdata/tls/localhost.crt");
-const key = Deno.readTextFileSync("../../../testdata/tls/localhost.key");
+const cert = Oden.readTextFileSync("../../../testdata/tls/localhost.crt");
+const key = Oden.readTextFileSync("../../../testdata/tls/localhost.key");
 const certHash = await crypto.subtle.digest(
   "SHA-256",
   decodeBase64(cert.split("\n").slice(1, -2).join("")),
 );
 
-Deno.test("datagram overflow does not hang", async () => {
-  const server = new Deno.QuicEndpoint({
+Oden.test("datagram overflow does not hang", async () => {
+  const server = new Oden.QuicEndpoint({
     hostname: "localhost",
     port: 0,
   });
@@ -28,7 +28,7 @@ Deno.test("datagram overflow does not hang", async () => {
   (async () => {
     for await (const incoming of listener) {
       const conn = await incoming.accept();
-      const wt = await Deno.upgradeWebTransport(conn);
+      const wt = await Oden.upgradeWebTransport(conn);
       await wt.ready;
       serverReady.resolve();
       // Intentionally do NOT drain wt.datagrams.readable,

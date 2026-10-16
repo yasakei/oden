@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use deno_semver::StackString;
 use deno_semver::jsr::JsrDepPackageReqParseError;
@@ -24,7 +24,7 @@ pub enum LockfileErrorReason {
   #[error("Failed deserializing. Lockfile may be corrupt")]
   DeserializationError(#[source] DeserializationError),
   #[error(
-    "Unsupported lockfile version '{version}'. Try upgrading Deno or recreating the lockfile"
+    "Unsupported lockfile version '{version}'. Try upgrading Oden or recreating the lockfile"
   )]
   UnsupportedVersion { version: String },
   #[error(

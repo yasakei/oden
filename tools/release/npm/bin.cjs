@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // @ts-check
 const path = require("path");
@@ -9,13 +9,13 @@ const fs = require("fs");
 
 const exePath = path.join(
   __dirname,
-  os.platform() === "win32" ? "deno.exe" : "deno",
+  os.platform() === "win32" ? "oden.exe" : "oden",
 );
 
 if (!fs.existsSync(exePath)) {
   try {
     const resolvedExePath = require("./install_api.cjs").runInstall();
-    runDenoExe(resolvedExePath);
+    runOdenExe(resolvedExePath);
   } catch (err) {
     if (err !== undefined && typeof err.message === "string") {
       console.error(err.message);
@@ -25,11 +25,11 @@ if (!fs.existsSync(exePath)) {
     process.exit(1);
   }
 } else {
-  runDenoExe(exePath);
+  runOdenExe(exePath);
 }
 
 /** @param exePath {string} */
-function runDenoExe(exePath) {
+function runOdenExe(exePath) {
   const result = child_process.spawnSync(
     exePath,
     process.argv.slice(2),
@@ -39,7 +39,7 @@ function runDenoExe(exePath) {
     if (!fs.existsSync(exePath)) {
       throw new Error(
         "Could not find exe at path '" + exePath +
-          "'. Maybe try installing deno again.",
+          "'. Maybe try installing oden again.",
       );
     }
     throw result.error;

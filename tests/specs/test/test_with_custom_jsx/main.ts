@@ -1,4 +1,4 @@
-Deno.test({
+Oden.test({
   name: "hello world test",
   fn(): void {
     const world = "world";

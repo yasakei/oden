@@ -1,5 +1,5 @@
-#!/usr/bin/env -S deno run --check --allow-write=. --allow-read=. --lock=./tools/deno.lock.json
-// Copyright 2018-2026 the Deno authors. MIT license.
+#!/usr/bin/env -S oden run --check --allow-write=. --allow-read=. --lock=./tools/oden.lock.json
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { createWorkflow, step } from "jsr:@david/gagen@0.3.1";
 
 const workflow = createWorkflow({
@@ -34,15 +34,15 @@ const workflow = createWorkflow({
         uses: "actions/checkout@v6",
         with: {
           "fetch-depth": 0,
-          token: "${{ secrets.DENOBOT_PAT }}",
+          token: "${{ secrets.ODENBOT_PAT }}",
           submodules: "recursive",
         },
       }),
       step({ uses: "dsherret/rust-toolchain-file@v1" }),
       step({
-        name: "Install deno",
-        uses: "denoland/setup-deno@v2",
-        with: { "deno-version": "v2.x" },
+        name: "Install oden",
+        uses: "denoland/setup-oden@v2",
+        with: { "oden-version": "v2.x" },
       }),
       step({
         name: "Publish",
@@ -54,7 +54,7 @@ const workflow = createWorkflow({
       step({
         name: "Create release tag and check forward commit to main",
         env: {
-          GITHUB_TOKEN: "${{ secrets.DENOBOT_PAT }}",
+          GITHUB_TOKEN: "${{ secrets.ODENBOT_PAT }}",
           GH_WORKFLOW_ACTOR: "${{ github.actor }}",
         },
         run: [

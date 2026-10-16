@@ -3,4 +3,4 @@ addEventListener("beforeunload", (e) => {
   e.preventDefault();
 });
 
-Deno.test("foo", () => {});
+Oden.test("foo", () => {});

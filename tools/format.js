@@ -1,10 +1,10 @@
-#!/usr/bin/env -S deno run --allow-all --config=tests/config/deno.json
-// Copyright 2018-2026 the Deno authors. MIT license.
+#!/usr/bin/env -S oden run --allow-all --config=tests/config/oden.json
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { join, ROOT_PATH } from "./util.js";
 
-const subcommand = Deno.args.includes("--check") ? "check" : "fmt";
+const subcommand = Oden.args.includes("--check") ? "check" : "fmt";
 const configFile = join(ROOT_PATH, ".dprint.json");
-const cmd = new Deno.Command("deno", {
+const cmd = new Oden.Command("oden", {
   args: [
     "run",
     "-A",
@@ -19,4 +19,4 @@ const cmd = new Deno.Command("deno", {
 });
 
 const { code } = await cmd.output();
-Deno.exit(code);
+Oden.exit(code);

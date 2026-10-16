@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
-// https://github.com/dsherret/deno-which/blob/main/mod.ts
+// Copyright 2018-2026 the Oden authors. MIT license.
+// https://github.com/dsherret/oden-which/blob/main/mod.ts
 
 /**
- * This file triggered a crash in Deno.
+ * This file triggered a crash in Oden.
  */
 
-declare namespace Deno {
+declare namespace Oden {
   class FileInfo {
     name: string;
     isFile: boolean;
@@ -26,33 +26,33 @@ declare namespace Deno {
 export interface Environment {
   /** Gets an environment variable. */
   env(key: string): string | undefined;
-  /** Resolves the `Deno.FileInfo` for the specified
+  /** Resolves the `Oden.FileInfo` for the specified
    * path following symlinks.
    */
-  stat(filePath: string): Promise<Pick<Deno.FileInfo, "isFile">>;
-  /** Synchronously resolves the `Deno.FileInfo` for
+  stat(filePath: string): Promise<Pick<Oden.FileInfo, "isFile">>;
+  /** Synchronously resolves the `Oden.FileInfo` for
    * the specified path following symlinks.
    */
-  statSync(filePath: string): Pick<Deno.FileInfo, "isFile">;
+  statSync(filePath: string): Pick<Oden.FileInfo, "isFile">;
   /** Gets the current operating system. */
-  os: typeof Deno.build.os;
+  os: typeof Oden.build.os;
 }
 
 export class RealEnvironment implements Environment {
   env(key: string): string | undefined {
-    return Deno.env.get(key);
+    return Oden.env.get(key);
   }
 
-  stat(path: string): Promise<Pick<Deno.FileInfo, "isFile">> {
-    return Deno.stat(path);
+  stat(path: string): Promise<Pick<Oden.FileInfo, "isFile">> {
+    return Oden.stat(path);
   }
 
-  statSync(path: string): Pick<Deno.FileInfo, "isFile"> {
-    return Deno.statSync(path);
+  statSync(path: string): Pick<Oden.FileInfo, "isFile"> {
+    return Oden.statSync(path);
   }
 
-  get os(): typeof Deno.build.os {
-    return Deno.build.os;
+  get os(): typeof Oden.build.os {
+    return Oden.build.os;
   }
 }
 
@@ -93,7 +93,7 @@ async function pathMatches(
     const result = await environment.stat(path);
     return result.isFile;
   } catch (err) {
-    if (err instanceof Deno.errors.NotCapable) {
+    if (err instanceof Oden.errors.NotCapable) {
       throw err;
     }
     return false;
@@ -136,7 +136,7 @@ function pathMatchesSync(
     const result = environment.statSync(path);
     return result.isFile;
   } catch (err) {
-    if (err instanceof Deno.errors.NotCapable) {
+    if (err instanceof Oden.errors.NotCapable) {
       throw err;
     }
     return false;

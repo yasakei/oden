@@ -1,7 +1,7 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assertEquals, assertMatch } from "./test_util.ts";
 
-Deno.test(function errorStackMessageLine() {
+Oden.test(function errorStackMessageLine() {
   const e1 = new Error();
   e1.name = "Foo";
   e1.message = "bar";
@@ -41,7 +41,7 @@ Deno.test(function errorStackMessageLine() {
   assertMatch(e6.stack!, /^null: null\n/);
 });
 
-Deno.test(function captureStackTrace() {
+Oden.test(function captureStackTrace() {
   function foo() {
     const error = new Error();
     const stack1 = error.stack!;

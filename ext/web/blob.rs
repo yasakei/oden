@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -7,14 +7,14 @@ use std::rc::Rc;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use deno_core::FromV8;
-use deno_core::JsBuffer;
-use deno_core::OpState;
-use deno_core::ToV8;
-use deno_core::convert::Uint8Array;
-use deno_core::op2;
-use deno_core::parking_lot::Mutex;
-use deno_core::url::Url;
+use oden_core::FromV8;
+use oden_core::JsBuffer;
+use oden_core::OpState;
+use oden_core::ToV8;
+use oden_core::convert::Uint8Array;
+use oden_core::op2;
+use oden_core::parking_lot::Mutex;
+use oden_core::url::Url;
 use uuid::Uuid;
 
 #[derive(Debug, thiserror::Error, deno_error::JsError)]
@@ -30,7 +30,7 @@ pub enum BlobError {
   BlobURLsNotSupported,
   #[class(generic)]
   #[error(transparent)]
-  Url(#[from] deno_core::url::ParseError),
+  Url(#[from] oden_core::url::ParseError),
 }
 
 use crate::Location;
@@ -389,13 +389,13 @@ mod tests {
   use std::sync::atomic::AtomicUsize;
   use std::sync::atomic::Ordering;
 
-  use deno_core::OpState;
+  use oden_core::OpState;
 
   use super::*;
 
   /// A counting wrapper around `BlobStore` that increments a counter
   /// on every `insert_part` call. Used to prove that a custom impl
-  /// plumbed through `deno_web::init()` is actually invoked by ops.
+  /// plumbed through `oden_web::init()` is actually invoked by ops.
   #[derive(Debug)]
   struct CountingBlobStore {
     inner: BlobStore,
@@ -444,7 +444,7 @@ mod tests {
   }
 
   /// Verify that a custom `BlobStoreTrait` impl passed through
-  /// `deno_web::init()` ends up in `OpState` and is the same
+  /// `oden_web::init()` ends up in `OpState` and is the same
   /// instance the ops would use.
   #[test]
   fn custom_blob_store_through_init() {
@@ -453,7 +453,7 @@ mod tests {
     let blob_store: Arc<dyn BlobStoreTrait> = counting.clone();
 
     // Build the extension the same way the runtime does.
-    let ext = crate::deno_web::init(
+    let ext = crate::oden_web::init(
       blob_store,
       None,
       Default::default(),
@@ -464,7 +464,7 @@ mod tests {
     let mut op_state = OpState::new(None);
     let state_fn = ext
       .op_state_fn
-      .expect("deno_web extension should have an op_state_fn");
+      .expect("oden_web extension should have an op_state_fn");
     state_fn(&mut op_state);
 
     // Extract the store from OpState — same code path as the ops.

@@ -1,3 +1,3 @@
-Deno.test("foo", function () {});
-Deno.test("bar", function () {});
-Deno.test("baz", function () {});
+Oden.test("foo", function () {});
+Oden.test("bar", function () {});
+Oden.test("baz", function () {});

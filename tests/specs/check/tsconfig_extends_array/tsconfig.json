@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["deno.window"]
+    "lib": ["oden.window"]
   },
   "references": [
     { "path": "tsconfig.extends.json" }

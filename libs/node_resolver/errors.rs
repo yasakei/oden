@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::fmt::Write;
@@ -6,7 +6,7 @@ use std::path::PathBuf;
 
 use boxed_error::Boxed;
 use deno_error::JsError;
-use deno_package_json::MissingPkgJsonNameError;
+use oden_package_json::MissingPkgJsonNameError;
 use deno_path_util::UrlToFilePathError;
 use thiserror::Error;
 use url::Url;
@@ -29,7 +29,7 @@ pub enum NodeJsErrorCode {
   ERR_UNSUPPORTED_ESM_URL_SCHEME,
   ERR_INVALID_FILE_URL_PATH,
   ERR_UNKNOWN_BUILTIN_MODULE,
-  /// Deno specific since Node doesn't support type checking TypeScript.
+  /// Oden specific since Node doesn't support type checking TypeScript.
   ERR_TYPES_NOT_FOUND,
 }
 
@@ -216,34 +216,34 @@ pub enum PackageFolderResolveErrorKind {
 }
 
 #[derive(Debug, Boxed, JsError)]
-pub struct PackageSubpathFromDenoModuleResolveError(
-  pub Box<PackageSubpathFromDenoModuleResolveErrorKind>,
+pub struct PackageSubpathFromOdenModuleResolveError(
+  pub Box<PackageSubpathFromOdenModuleResolveErrorKind>,
 );
 
-impl NodeJsErrorCoded for PackageSubpathFromDenoModuleResolveError {
+impl NodeJsErrorCoded for PackageSubpathFromOdenModuleResolveError {
   fn code(&self) -> NodeJsErrorCode {
     match self.as_kind() {
-      PackageSubpathFromDenoModuleResolveErrorKind::SubPath(e) => e.code(),
-      PackageSubpathFromDenoModuleResolveErrorKind::FinalizeResolution(e) => {
+      PackageSubpathFromOdenModuleResolveErrorKind::SubPath(e) => e.code(),
+      PackageSubpathFromOdenModuleResolveErrorKind::FinalizeResolution(e) => {
         e.code()
       }
-      PackageSubpathFromDenoModuleResolveErrorKind::BrowserMapDisabled(_) => {
+      PackageSubpathFromOdenModuleResolveErrorKind::BrowserMapDisabled(_) => {
         NodeJsErrorCode::ERR_MODULE_NOT_FOUND
       }
     }
   }
 }
 
-impl PackageSubpathFromDenoModuleResolveError {
+impl PackageSubpathFromOdenModuleResolveError {
   pub fn as_types_not_found(&self) -> Option<&TypesNotFoundError> {
     match self.as_kind() {
-      PackageSubpathFromDenoModuleResolveErrorKind::SubPath(e) => {
+      PackageSubpathFromOdenModuleResolveErrorKind::SubPath(e) => {
         e.as_types_not_found()
       }
-      PackageSubpathFromDenoModuleResolveErrorKind::FinalizeResolution(e) => {
+      PackageSubpathFromOdenModuleResolveErrorKind::FinalizeResolution(e) => {
         e.as_types_not_found()
       }
-      PackageSubpathFromDenoModuleResolveErrorKind::BrowserMapDisabled(_) => {
+      PackageSubpathFromOdenModuleResolveErrorKind::BrowserMapDisabled(_) => {
         None
       }
     }
@@ -251,13 +251,13 @@ impl PackageSubpathFromDenoModuleResolveError {
 
   pub fn maybe_specifier(&self) -> Option<Cow<'_, UrlOrPath>> {
     match self.as_kind() {
-      PackageSubpathFromDenoModuleResolveErrorKind::SubPath(e) => {
+      PackageSubpathFromOdenModuleResolveErrorKind::SubPath(e) => {
         e.maybe_specifier()
       }
-      PackageSubpathFromDenoModuleResolveErrorKind::FinalizeResolution(e) => {
+      PackageSubpathFromOdenModuleResolveErrorKind::FinalizeResolution(e) => {
         e.maybe_specifier()
       }
-      PackageSubpathFromDenoModuleResolveErrorKind::BrowserMapDisabled(_) => {
+      PackageSubpathFromOdenModuleResolveErrorKind::BrowserMapDisabled(_) => {
         None
       }
     }
@@ -265,15 +265,15 @@ impl PackageSubpathFromDenoModuleResolveError {
 
   pub fn into_node_resolve_error(self) -> NodeResolveError {
     match self.into_kind() {
-      PackageSubpathFromDenoModuleResolveErrorKind::SubPath(e) => {
+      PackageSubpathFromOdenModuleResolveErrorKind::SubPath(e) => {
         NodeResolveErrorKind::PackageResolve(
           PackageResolveErrorKind::SubpathResolve(e).into_box(),
         )
       }
-      PackageSubpathFromDenoModuleResolveErrorKind::FinalizeResolution(e) => {
+      PackageSubpathFromOdenModuleResolveErrorKind::FinalizeResolution(e) => {
         NodeResolveErrorKind::FinalizeResolution(e)
       }
-      PackageSubpathFromDenoModuleResolveErrorKind::BrowserMapDisabled(e) => {
+      PackageSubpathFromOdenModuleResolveErrorKind::BrowserMapDisabled(e) => {
         NodeResolveErrorKind::BrowserMapDisabled(e)
       }
     }
@@ -282,7 +282,7 @@ impl PackageSubpathFromDenoModuleResolveError {
 }
 
 #[derive(Debug, Error, JsError)]
-pub enum PackageSubpathFromDenoModuleResolveErrorKind {
+pub enum PackageSubpathFromOdenModuleResolveErrorKind {
   #[class(inherit)]
   #[error(transparent)]
   SubPath(#[from] PackageSubpathResolveError),
@@ -539,7 +539,7 @@ impl NodeJsErrorCoded for TypesNotFoundError {
 #[derive(Debug, Error, JsError)]
 #[class(inherit)]
 #[error("[{}] Invalid package config. {}", self.code(), .0)]
-pub struct PackageJsonLoadError(pub deno_package_json::PackageJsonLoadError);
+pub struct PackageJsonLoadError(pub oden_package_json::PackageJsonLoadError);
 
 impl NodeJsErrorCoded for PackageJsonLoadError {
   fn code(&self) -> NodeJsErrorCode {

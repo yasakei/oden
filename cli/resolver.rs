@@ -1,34 +1,34 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_resolver::npm::DenoInNpmPackageChecker;
-use node_resolver::DenoIsBuiltInNodeModuleChecker;
+use oden_resolver::npm::OdenInNpmPackageChecker;
+use node_resolver::OdenIsBuiltInNodeModuleChecker;
 
 use crate::npm::CliNpmResolver;
 use crate::sys::CliSys;
 
 pub type CliCjsTracker =
-  deno_resolver::cjs::CjsTracker<DenoInNpmPackageChecker, CliSys>;
+  oden_resolver::cjs::CjsTracker<OdenInNpmPackageChecker, CliSys>;
 pub type CliIsCjsResolver =
-  deno_resolver::cjs::IsCjsResolver<DenoInNpmPackageChecker, CliSys>;
-pub type CliNpmReqResolver<TSys = CliSys> = deno_resolver::npm::NpmReqResolver<
-  DenoInNpmPackageChecker,
-  DenoIsBuiltInNodeModuleChecker,
+  oden_resolver::cjs::IsCjsResolver<OdenInNpmPackageChecker, CliSys>;
+pub type CliNpmReqResolver<TSys = CliSys> = oden_resolver::npm::NpmReqResolver<
+  OdenInNpmPackageChecker,
+  OdenIsBuiltInNodeModuleChecker,
   CliNpmResolver<TSys>,
   TSys,
 >;
-pub type CliResolver = deno_resolver::graph::DenoResolver<
-  DenoInNpmPackageChecker,
-  DenoIsBuiltInNodeModuleChecker,
+pub type CliResolver = oden_resolver::graph::OdenResolver<
+  OdenInNpmPackageChecker,
+  OdenIsBuiltInNodeModuleChecker,
   CliNpmResolver,
   CliSys,
 >;
 
 pub fn on_resolve_diagnostic(
-  diagnostic: deno_resolver::graph::MappedResolutionDiagnosticWithPosition,
+  diagnostic: oden_resolver::graph::MappedResolutionDiagnosticWithPosition,
 ) {
   log::warn!(
     "{} {}\n    at {}:{}",
-    deno_runtime::colors::yellow("Warning"),
+    oden_runtime::colors::yellow("Warning"),
     diagnostic.diagnostic,
     diagnostic.referrer,
     diagnostic.start

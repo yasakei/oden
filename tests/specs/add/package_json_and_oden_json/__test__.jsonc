@@ -1,0 +1,69 @@
+{
+  "tempDir": true,
+  "tests": {
+    "npm_prefers_package_json": {
+      "steps": [
+        {
+          "args": "add npm:@odentest/esm-basic jsr:@odentest/add npm:@odentest/say-hello",
+          "output": "add.out"
+        },
+        {
+          "args": [
+            "eval",
+            "console.log(Oden.readTextFileSync('package.json').trim())"
+          ],
+          "output": "npm_prefer_package.json.out"
+        },
+        {
+          "args": [
+            "eval",
+            "console.log(Oden.readTextFileSync('oden.json').trim())"
+          ],
+          "output": "npm_prefer_oden.json.out"
+        }
+      ]
+    },
+    "only_creates_oden_json_if_no_config": {
+      "steps": [
+        {
+          "args": ["eval", "Oden.removeSync('oden.json')"],
+          "output": ""
+        },
+        {
+          "args": "add npm:@odentest/esm-basic",
+          "output": "add_esm_basic.out"
+        },
+        {
+          "args": [
+            "eval",
+            "try { Oden.statSync('oden.json'); console.log('bad'); } catch (e) { if (e instanceof Oden.errors.NotFound) { console.log('good'); } else { console.log('bad error', e); }}"
+          ],
+          "output": "good\n"
+        }
+      ]
+    },
+    "only_prefers_package_json_if_closer": {
+      "steps": [
+        {
+          "cwd": "./subdir",
+          "args": "add npm:@odentest/esm-basic jsr:@odentest/add npm:@odentest/say-hello",
+          "output": "[WILDCARD]"
+        },
+        {
+          "args": [
+            "eval",
+            "console.log(Oden.readTextFileSync('package.json').trim())"
+          ],
+          "output": "{}\n"
+        },
+        {
+          "args": [
+            "eval",
+            "console.log(Oden.readTextFileSync('./subdir/oden.json').trim())"
+          ],
+          "output": "subdir/prefer_if_closer_oden.json.out"
+        }
+      ]
+    }
+  }
+}

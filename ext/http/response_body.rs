@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 use std::io::Write;
 use std::pin::Pin;
 use std::rc::Rc;
@@ -10,10 +10,10 @@ use brotli::enc::encode::BrotliEncoderStateStruct;
 use brotli::writer::StandardAlloc;
 use bytes::Bytes;
 use bytes::BytesMut;
-use deno_core::AsyncResult;
-use deno_core::BufView;
-use deno_core::Resource;
-use deno_core::futures::FutureExt;
+use oden_core::AsyncResult;
+use oden_core::BufView;
+use oden_core::Resource;
+use oden_core::futures::FutureExt;
 use deno_error::JsErrorBox;
 use flate2::write::GzEncoder;
 use hyper::body::Frame;

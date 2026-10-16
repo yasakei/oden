@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! Shell argument splitter for child_process command transformation.
 //!
@@ -7,7 +7,7 @@
 //! pipes, boolean operators, etc.). The suffix is preserved verbatim
 //! so it can be passed through to the shell unchanged.
 
-use deno_core::op2;
+use oden_core::op2;
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]

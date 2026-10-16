@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // deno-lint-ignore-file
 
 /*
  * @module mod
  * @description
- * This module provides a `display()` function for the Jupyter Deno Kernel, similar to IPython's display.
+ * This module provides a `display()` function for the Jupyter Oden Kernel, similar to IPython's display.
  * It can be used to asynchronously display objects in Jupyter frontends. There are also tagged template functions
  * for quickly creating HTML, Markdown, and SVG views.
  *
@@ -14,13 +14,13 @@
  * import { display, html, md } from "https://deno.land/x/deno_jupyter/mod.ts";
  *
  * await display(html`<h1>Hello, world!</h1>`);
- * await display(md`# Notebooks in TypeScript via Deno ![Deno logo](https://github.com/denoland.png?size=32)
+ * await display(md`# Notebooks in TypeScript via Oden ![Oden logo](https://github.com/denoland.png?size=32)
  *
- * * TypeScript ${Deno.version.typescript}
- * * V8 ${Deno.version.v8}
- * * Deno ${Deno.version.deno}
+ * * TypeScript ${Oden.version.typescript}
+ * * V8 ${Oden.version.v8}
+ * * Oden ${Oden.version.oden}
  *
- * Interactive compute with Jupyter _built into Deno_!
+ * Interactive compute with Jupyter _built into Oden_!
  * `);
  * ```
  *
@@ -247,7 +247,7 @@ function makeDisplayable(obj) {
 }
 
 /**
- * Format an object for displaying in Deno
+ * Format an object for displaying in Oden
  *
  * @param obj - The object to be displayed
  * @returns MediaBundle
@@ -258,8 +258,8 @@ async function format(obj) {
   }
   if (typeof obj !== "object") {
     return {
-      "text/plain": Deno[Deno.internal].inspectArgs(["%o", obj], {
-        colors: !Deno.noColor,
+      "text/plain": Oden[Oden.internal].inspectArgs(["%o", obj], {
+        colors: !Oden.noColor,
       }),
     };
   }
@@ -304,17 +304,17 @@ async function format(obj) {
   }
   if (obj instanceof GPUBuffer) {
     return {
-      "text/plain": Deno[Deno.internal].inspectArgs([
+      "text/plain": Oden[Oden.internal].inspectArgs([
         "%o",
         core.ops.op_jupyter_get_buffer(obj),
       ], {
-        colors: !Deno.noColor,
+        colors: !Oden.noColor,
       }),
     };
   }
   return {
-    "text/plain": Deno[Deno.internal].inspectArgs(["%o", obj], {
-      colors: !Deno.noColor,
+    "text/plain": Oden[Oden.internal].inspectArgs(["%o", obj], {
+      colors: !Oden.noColor,
     }),
   };
 }
@@ -346,13 +346,13 @@ function createTaggedTemplateDisplayable(mediatype) {
  * Create a Markdown view.
  *
  * ```typescript
- * md`# Notebooks in TypeScript via Deno ![Deno logo](https://github.com/denoland.png?size=32)
+ * md`# Notebooks in TypeScript via Oden ![Oden logo](https://github.com/denoland.png?size=32)
  *
- * * TypeScript ${Deno.version.typescript}
- * * V8 ${Deno.version.v8}
- * * Deno ${Deno.version.deno}
+ * * TypeScript ${Oden.version.typescript}
+ * * V8 ${Oden.version.v8}
+ * * Oden ${Oden.version.oden}
  *
- * Interactive compute with Jupyter _built into Deno_!
+ * Interactive compute with Jupyter _built into Oden_!
  * `
  * ```
  */
@@ -386,7 +386,7 @@ const svg = createTaggedTemplateDisplayable("image/svg+xml");
 function image(obj) {
   if (typeof obj === "string") {
     try {
-      obj = Deno.readFileSync(obj);
+      obj = Oden.readFileSync(obj);
     } catch {
       // pass
     }
@@ -411,7 +411,7 @@ function image(obj) {
   }
 
   throw new TypeError(
-    "Object is not a valid image or a path to an image. `Deno.jupyter.image` supports displaying JPG or PNG images, or GPUTextures.",
+    "Object is not a valid image or a path to an image. `Oden.jupyter.image` supports displaying JPG or PNG images, or GPUTextures.",
   );
 }
 
@@ -504,7 +504,7 @@ function enableJupyter() {
   internals.jupyter.broadcastResult = broadcastResult;
 
   /**
-   * Display function for Jupyter Deno Kernel.
+   * Display function for Jupyter Oden Kernel.
    * Mimics the behavior of IPython's `display(obj, raw=True)` function to allow
    * asynchronous displaying of objects in Jupyter.
    *
@@ -532,7 +532,7 @@ function enableJupyter() {
   /**
    * Prompt for user confirmation (in Jupyter Notebook context)
    * Override confirm and prompt because they depend on a tty
-   * and in the Deno.jupyter environment that doesn't exist.
+   * and in the Oden.jupyter environment that doesn't exist.
    * @param {string} message - The message to display.
    * @returns {Promise<boolean>} User confirmation.
    */
@@ -568,7 +568,7 @@ function enableJupyter() {
 
   globalThis.confirm = confirm;
   globalThis.prompt = prompt;
-  globalThis.Deno.jupyter = {
+  globalThis.Oden.jupyter = {
     broadcast,
     display,
     format,

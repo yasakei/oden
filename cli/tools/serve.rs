@@ -1,15 +1,15 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::num::NonZeroUsize;
 use std::str::FromStr;
 use std::sync::Arc;
 
-use deno_core::ModuleSpecifier;
-use deno_core::error::AnyError;
-use deno_core::futures::FutureExt;
-use deno_core::futures::TryFutureExt;
-use deno_lib::worker::LibWorkerFactoryRoots;
-use deno_runtime::UnconfiguredRuntime;
+use oden_core::ModuleSpecifier;
+use oden_core::error::AnyError;
+use oden_core::futures::FutureExt;
+use oden_core::futures::TryFutureExt;
+use oden_lib::worker::LibWorkerFactoryRoots;
+use oden_runtime::UnconfiguredRuntime;
 use tokio_util::sync::CancellationToken;
 
 use super::run::check_permission_before_script;
@@ -42,15 +42,15 @@ pub async fn serve(
 
   let factory = CliFactory::from_flags(flags);
   let cli_options = factory.cli_options()?;
-  let deno_dir = factory.deno_dir()?;
+  let oden_dir = factory.oden_dir()?;
   let http_client = factory.http_client_provider();
 
   // Run a background task that checks for available upgrades or output
-  // if an earlier run of this background task found a new version of Deno.
+  // if an earlier run of this background task found a new version of Oden.
   #[cfg(feature = "upgrade")]
   super::upgrade::check_for_upgrades(
     http_client.clone(),
-    deno_dir.upgrade_check_file_path(),
+    oden_dir.upgrade_check_file_path(),
   );
 
   let workspace_resolver = factory.workspace_resolver().await?.clone();
@@ -94,7 +94,7 @@ async fn do_serve(
   let worker_count = parallelism_count.get() - 1;
   let mut worker = worker_factory
     .create_main_worker_with_unconfigured_runtime(
-      deno_runtime::WorkerExecutionMode::ServeMain { worker_count },
+      oden_runtime::WorkerExecutionMode::ServeMain { worker_count },
       main_module.clone(),
       // TODO(bartlomieju):
       vec![],
@@ -123,7 +123,7 @@ async fn do_serve(
     std::thread::Builder::new()
       .name(format!("serve-worker-{}", i + 1))
       .spawn(move || {
-        deno_runtime::tokio_util::create_and_run_current_thread(async move {
+        oden_runtime::tokio_util::create_and_run_current_thread(async move {
           let result = tokio::select! {
             result = run_worker(i, worker_factory, main_module, hmr) => result,
             _ = shutdown_token.cancelled() => Ok(0),
@@ -137,7 +137,7 @@ async fn do_serve(
   // this future cancels it as well.
   let (main_result, worker_results) = tokio::try_join!(
     worker.run().map_err(AnyError::from),
-    deno_core::futures::future::try_join_all(
+    oden_core::futures::future::try_join_all(
       channels.into_iter().map(|r| r.map_err(AnyError::from))
     )
   )?;
@@ -160,7 +160,7 @@ async fn run_worker(
 ) -> Result<i32, AnyError> {
   let mut worker: crate::worker::CliMainWorker = worker_factory
     .create_main_worker(
-      deno_runtime::WorkerExecutionMode::ServeWorker { worker_index },
+      oden_runtime::WorkerExecutionMode::ServeWorker { worker_index },
       main_module,
       // TODO(bartlomieju):
       vec![],

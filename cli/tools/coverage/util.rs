@@ -1,6 +1,6 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_core::url::Url;
+use oden_core::url::Url;
 
 pub fn find_root(urls: Vec<&Url>) -> Option<Url> {
   if urls.is_empty() {

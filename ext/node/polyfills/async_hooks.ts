@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 
 (function () {
@@ -6,7 +6,7 @@ const { core, primordials } = __bootstrap;
 const {
   validateFunction,
   validateObject,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
 const {
   AsyncHook,
   emitAfter,
@@ -18,8 +18,8 @@ const {
   executionAsyncId: internalExecutionAsyncId,
   executionAsyncResource: internalExecutionAsyncResource,
   newAsyncId,
-} = core.loadExtScript("ext:deno_node/internal/async_hooks.ts");
-const { kEmptyObject } = core.loadExtScript("ext:deno_node/internal/util.mjs");
+} = core.loadExtScript("ext:oden_node/internal/async_hooks.ts");
+const { kEmptyObject } = core.loadExtScript("ext:oden_node/internal/util.mjs");
 
 const {
   ObjectDefineProperties,
@@ -135,7 +135,7 @@ class AsyncResource {
     thisArg?: AsyncResource,
   ) {
     type = type || fn.name || "bound-anonymous-fn";
-    // deno-lint-ignore deno-internal/prefer-primordials -- `bind` is AsyncResource's own method, not Function.prototype.bind
+    // deno-lint-ignore oden-internal/prefer-primordials -- `bind` is AsyncResource's own method, not Function.prototype.bind
     return (new AsyncResource(type)).bind(fn, thisArg);
   }
 }
@@ -212,7 +212,7 @@ class AsyncLocalStorage {
   }
 
   static bind(fn: (...args: unknown[]) => unknown) {
-    // deno-lint-ignore deno-internal/prefer-primordials -- `bind` is AsyncResource's own static method, not Function.prototype.bind
+    // deno-lint-ignore oden-internal/prefer-primordials -- `bind` is AsyncResource's own static method, not Function.prototype.bind
     return AsyncResource.bind(fn);
   }
 

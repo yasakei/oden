@@ -1,7 +1,7 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![deny(warnings)]
-deno_ops_compile_test_runner::prelude!();
+oden_ops_compile_test_runner::prelude!();
 
 // Regression test for https://github.com/denoland/deno/issues/32718
 // `#[op2]` impl methods with more than the clippy default of 7 arguments
@@ -10,8 +10,8 @@ deno_ops_compile_test_runner::prelude!();
 // not on the `trait Callable` declaration, so any external crate that
 // denied the lint hit the warning at the trait method signature.
 
-use deno_core::cppgc::GarbageCollected;
-use deno_core::v8;
+use oden_core::cppgc::GarbageCollected;
+use oden_core::v8;
 
 pub struct Big;
 

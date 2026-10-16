@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::Cell;
 use std::cell::RefCell;
@@ -26,7 +26,7 @@ pub(crate) struct ExceptionState {
   pub(crate) js_build_custom_error_cb:
     RefCell<Option<v8::Global<v8::Function>>>,
   /// Map of registered error class name to its constructor (the JS
-  /// `Deno.core.errorConstructors` object). Used to natively rebuild an
+  /// `Oden.core.errorConstructors` object). Used to natively rebuild an
   /// exception with the correct prototype without re-entering JS, e.g. from a
   /// V8 fast call. See [`crate::error::throw_js_error_class`].
   pub(crate) js_error_constructors: RefCell<Option<v8::Global<v8::Object>>>,

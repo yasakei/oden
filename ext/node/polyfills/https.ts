@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 
 // deno-lint-ignore-file no-explicit-any
@@ -34,15 +34,15 @@ const { op_get_env_no_permission_check } = core.ops;
 const lazyTls = core.createLazyLoader("node:tls");
 const lazyNet = core.createLazyLoader("node:net");
 const { urlToHttpOptions } = core.loadExtScript(
-  "ext:deno_node/internal/url.ts",
+  "ext:oden_node/internal/url.ts",
 );
 const lazyHttp = core.createLazyLoader("node:http");
 const lazyAddressOverride = core.createLazyLoader(
-  "ext:deno_node/internal/http/address_override.js",
+  "ext:oden_node/internal/http/address_override.js",
 );
-const { nextTick } = core.loadExtScript("ext:deno_node/_next_tick.ts");
+const { nextTick } = core.loadExtScript("ext:oden_node/_next_tick.ts");
 const { ERR_INVALID_URL, ERR_PROXY_TUNNEL } = core.loadExtScript(
-  "ext:deno_node/internal/errors.ts",
+  "ext:oden_node/internal/errors.ts",
 );
 const {
   httpServerPreClose,
@@ -51,12 +51,12 @@ const {
 } = core.createLazyLoader("node:_http_server")();
 const { Agent: HttpAgent } = core.createLazyLoader("node:_http_agent")();
 const { validateObject } = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
 const { kEmptyObject } = core.loadExtScript(
-  "ext:deno_node/internal/util.mjs",
+  "ext:oden_node/internal/util.mjs",
 );
-const { Buffer } = core.loadExtScript("ext:deno_node/internal/buffer.mjs");
+const { Buffer } = core.loadExtScript("ext:oden_node/internal/buffer.mjs");
 
 const tls = lazyTls().default;
 const net = lazyNet();
@@ -137,10 +137,10 @@ Server.prototype.closeIdleConnections =
   HttpServer.prototype.closeIdleConnections;
 Server.prototype.setTimeout = HttpServer.prototype.setTimeout;
 
-// Same DENO_SERVE_ADDRESS override hook as http.Server, but on
+// Same ODEN_SERVE_ADDRESS override hook as http.Server, but on
 // https.Server. The override listener is plain cleartext HTTP (it
 // goes directly through _connectionListener, bypassing tls wrapping)
-// because the typical use case -- Deno Deploy / desktop runtime
+// because the typical use case -- Oden Deploy / desktop runtime
 // vsock/unix control channels -- is trusted local traffic.
 Server.prototype.listen = function listen(this: any, ...args: any[]) {
   const applied = applyAddressOverride();
@@ -549,9 +549,9 @@ function openCONNECTTunnel(agent: any, options: any, cb: any) {
     // Buffer raw bytes until we've parsed the response status line + headers.
     let buf = Buffer.alloc(0);
     function onData(chunk: any) {
-      // deno-lint-ignore deno-internal/prefer-primordials -- Buffer.concat is a Buffer static
+      // deno-lint-ignore oden-internal/prefer-primordials -- Buffer.concat is a Buffer static
       buf = Buffer.concat([buf, chunk]);
-      // deno-lint-ignore deno-internal/prefer-primordials -- Buffer.prototype.indexOf
+      // deno-lint-ignore oden-internal/prefer-primordials -- Buffer.prototype.indexOf
       const idx = buf.indexOf("\r\n\r\n");
       if (idx === -1) {
         // Need more data; if too much is buffered without headers, bail.
@@ -565,9 +565,9 @@ function openCONNECTTunnel(agent: any, options: any, cb: any) {
       waitingForTunnelResponse = false;
       tunnelSocket.removeListener("end", failUnexpectedEnd);
       tunnelSocket.removeListener("close", failUnexpectedEnd);
-      // deno-lint-ignore deno-internal/prefer-primordials -- Buffer.prototype.slice/toString
+      // deno-lint-ignore oden-internal/prefer-primordials -- Buffer.prototype.slice/toString
       const headerStr = buf.slice(0, idx).toString("ascii");
-      // deno-lint-ignore deno-internal/prefer-primordials -- Buffer.prototype.slice
+      // deno-lint-ignore oden-internal/prefer-primordials -- Buffer.prototype.slice
       const remainder = buf.slice(idx + 4);
       const statusLine = StringPrototypeSplit(headerStr, "\r\n", 1)[0];
       const m = RegExpPrototypeExec(STATUS_LINE_RE, statusLine);
@@ -637,7 +637,7 @@ function openCONNECTTunnel(agent: any, options: any, cb: any) {
         // should be empty.
         if (remainder.length > 0) {
           // Stream.unshift (push data back into the readable), not Array#unshift.
-          // deno-lint-ignore deno-internal/prefer-primordials
+          // deno-lint-ignore oden-internal/prefer-primordials
           tlsSocket.unshift?.(remainder);
         }
         // Detach our top-level proxy error handler from the TCP socket so

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use crate::checkin::runner::Output;
 use crate::checkin::runner::TestData;
@@ -13,7 +13,7 @@ pub trait SomeType {}
 
 impl SomeType for () {}
 
-deno_core::extension!(
+oden_core::extension!(
   checkin_runtime,
   parameters = [P: SomeType],
   ops = [

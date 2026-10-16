@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cmp;
 use std::collections::HashMap;
@@ -8,10 +8,10 @@ use std::sync::Arc;
 use std::time::Duration;
 use std::time::Instant;
 
-use deno_core::parking_lot::Mutex;
-use deno_core::serde::Deserialize;
-use deno_core::serde::Serialize;
-use deno_core::serde_json::json;
+use oden_core::parking_lot::Mutex;
+use oden_core::serde::Deserialize;
+use oden_core::serde::Serialize;
+use oden_core::serde_json::json;
 
 use super::logging::lsp_debug;
 

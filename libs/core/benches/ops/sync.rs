@@ -1,13 +1,13 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![allow(deprecated, reason = "bench code")]
 use std::borrow::Cow;
 use std::ffi::c_void;
 
 use bencher::*;
-use deno_core::*;
+use oden_core::*;
 
-deno_core::extension!(
+oden_core::extension!(
   testing,
   ops = [
     op_void,
@@ -225,7 +225,7 @@ fn bench_op(
     .map_err(err_mapper)
     .unwrap();
   let bench = runtime.execute_script("", ascii_str!("bench")).unwrap();
-  deno_core::scope!(scope, &mut runtime);
+  oden_core::scope!(scope, &mut runtime);
   #[allow(clippy::unnecessary_fallible_conversions, reason = "bench code")]
   let bench: v8::Local<v8::Function> =
     v8::Local::<v8::Value>::new(scope, bench)

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -32,17 +32,17 @@ const {
   op_node_os_user_info,
 } = core.ops;
 
-const { isWindows } = core.loadExtScript("ext:deno_node/_util/os.ts");
+const { isWindows } = core.loadExtScript("ext:oden_node/_util/os.ts");
 const { os } = core.loadExtScript(
-  "ext:deno_node/internal_binding/constants.ts",
+  "ext:oden_node/internal_binding/constants.ts",
 );
-const { Buffer } = core.loadExtScript("ext:deno_node/internal/buffer.mjs");
-const { osUptime } = core.loadExtScript("ext:deno_os/30_os.js");
+const { Buffer } = core.loadExtScript("ext:oden_node/internal/buffer.mjs");
+const { osUptime } = core.loadExtScript("ext:oden_os/30_os.js");
 const { validateInt32 } = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
-const { denoErrorToNodeSystemError } = core.loadExtScript(
-  "ext:deno_node/internal/errors.ts",
+const { odenErrorToNodeSystemError } = core.loadExtScript(
+  "ext:oden_node/internal/errors.ts",
 );
 
 const {
@@ -97,10 +97,10 @@ function endianness() {
 }
 
 function freemem() {
-  if (Deno.build.os === "linux" || Deno.build.os == "android") {
-    return Deno.systemMemoryInfo().available;
+  if (Oden.build.os === "linux" || Oden.build.os == "android") {
+    return Oden.systemMemoryInfo().available;
   } else {
-    return Deno.systemMemoryInfo().free;
+    return Oden.systemMemoryInfo().free;
   }
 }
 
@@ -109,7 +109,7 @@ function getPriority(pid = 0) {
   try {
     return op_node_os_get_priority(pid);
   } catch (error) {
-    throw denoErrorToNodeSystemError(error, "uv_os_getpriority");
+    throw odenErrorToNodeSystemError(error, "uv_os_getpriority");
   }
 }
 
@@ -118,14 +118,14 @@ function homedir() {
 }
 
 function hostname() {
-  return Deno.hostname();
+  return Oden.hostname();
 }
 
 function loadavg() {
   if (isWindows) {
     return [0, 0, 0];
   }
-  return Deno.loadavg();
+  return Oden.loadavg();
 }
 
 function networkInterfaces() {
@@ -133,7 +133,7 @@ function networkInterfaces() {
   for (
     const { name, address, netmask, family, mac, scopeid, cidr }
       of new SafeArrayIterator(
-        Deno.networkInterfaces(),
+        Oden.networkInterfaces(),
       )
   ) {
     const addresses = interfaces[name] ||= [];
@@ -167,19 +167,19 @@ function platform() {
 }
 
 function release() {
-  return Deno.osRelease();
+  return Oden.osRelease();
 }
 
 function version() {
-  return Deno.osRelease();
+  return Oden.osRelease();
 }
 
 function machine() {
-  if (Deno.build.arch == "aarch64") {
+  if (Oden.build.arch == "aarch64") {
     return "arm64";
   }
 
-  return Deno.build.arch;
+  return Oden.build.arch;
 }
 
 function setPriority(pid, priority) {
@@ -194,14 +194,14 @@ function setPriority(pid, priority) {
   try {
     op_node_os_set_priority(pid, priority);
   } catch (error) {
-    throw denoErrorToNodeSystemError(error, "uv_os_setpriority");
+    throw odenErrorToNodeSystemError(error, "uv_os_setpriority");
   }
 }
 
 function tmpdir() {
   if (isWindows) {
-    let temp = Deno.env.get("TEMP") || Deno.env.get("TMP") ||
-      (Deno.env.get("SystemRoot") || Deno.env.get("windir")) + "\\temp";
+    let temp = Oden.env.get("TEMP") || Oden.env.get("TMP") ||
+      (Oden.env.get("SystemRoot") || Oden.env.get("windir")) + "\\temp";
     if (
       temp.length > 1 && StringPrototypeEndsWith(temp, "\\") &&
       !StringPrototypeEndsWith(temp, ":\\")
@@ -211,8 +211,8 @@ function tmpdir() {
 
     return temp;
   } else {
-    let temp = Deno.env.get("TMPDIR") || Deno.env.get("TMP") ||
-      Deno.env.get("TEMP") || "/tmp";
+    let temp = Oden.env.get("TMPDIR") || Oden.env.get("TMP") ||
+      Oden.env.get("TEMP") || "/tmp";
     if (temp.length > 1 && StringPrototypeEndsWith(temp, "/")) {
       temp = StringPrototypeSlice(temp, 0, -1);
     }
@@ -221,11 +221,11 @@ function tmpdir() {
 }
 
 function totalmem() {
-  return Deno.systemMemoryInfo().total;
+  return Oden.systemMemoryInfo().total;
 }
 
 function type() {
-  switch (Deno.build.os) {
+  switch (Oden.build.os) {
     case "windows":
       return "Windows_NT";
     case "linux":
@@ -249,8 +249,8 @@ function uptime() {
 function userInfo(
   options: { encoding?: string } | undefined = undefined,
 ) {
-  let uid = Deno.uid();
-  let gid = Deno.gid();
+  let uid = Oden.uid();
+  let gid = Oden.gid();
 
   if (isWindows) {
     uid = -1;

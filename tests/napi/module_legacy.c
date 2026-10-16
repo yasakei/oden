@@ -1,9 +1,9 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // A minimal *legacy* V8/nan style native addon. Unlike an N-API addon it
 // registers itself through `node_module_register` (the `NODE_MODULE` macro)
 // with `nm_version` set to `NODE_MODULE_VERSION` rather than the Node-API
-// version (1). Deno does not support the legacy ABI and must reject this with a
+// version (1). Oden does not support the legacy ABI and must reject this with a
 // clear error instead of crashing. See denoland/deno#26656.
 
 typedef struct node_module {

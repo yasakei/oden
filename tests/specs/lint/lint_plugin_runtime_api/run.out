@@ -1,5 +1,5 @@
-error: Uncaught (in promise) Error: `Deno.lint.runPlugin` is only available in `deno test` subcommand.
-Deno.lint.runPlugin(plugin, "source.ts", "export default {}");
+error: Uncaught (in promise) Error: `Oden.lint.runPlugin` is only available in `oden test` subcommand.
+Oden.lint.runPlugin(plugin, "source.ts", "export default {}");
           ^
     at Object.runPlugin ([WILDCARD])
     at [WILDCARD]main.ts:12:11

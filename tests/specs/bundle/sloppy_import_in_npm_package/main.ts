@@ -1,3 +1,3 @@
-import { sayHiFoo } from "npm:@denotest/sloppy-import";
+import { sayHiFoo } from "npm:@odentest/sloppy-import";
 
 sayHiFoo();

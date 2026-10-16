@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // deno-lint-ignore-file no-console
 
@@ -18,7 +18,7 @@ import { Buffer } from "@std/io/buffer";
 
 const listenPort = 4506;
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchRequiresOneArgument() {
     await assertRejects(
@@ -28,7 +28,7 @@ Deno.test(
   },
 );
 
-Deno.test({ permissions: { net: true } }, async function fetchProtocolError() {
+Oden.test({ permissions: { net: true } }, async function fetchProtocolError() {
   await assertRejects(
     async () => {
       await fetch("ftp://localhost:21/a/file");
@@ -46,10 +46,10 @@ function findClosedPortInRange(
 
   // If we hit the return statement of this loop
   // that means that we did not throw an
-  // AddrInUse error when we executed Deno.listen.
+  // AddrInUse error when we executed Oden.listen.
   while (port < maxPort) {
     try {
-      const listener = Deno.listen({ port });
+      const listener = Oden.listen({ port });
       listener.close();
       return port;
     } catch (_e) {
@@ -62,7 +62,7 @@ function findClosedPortInRange(
   );
 }
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchConnectionError() {
     const port = findClosedPortInRange(4000, 9999);
@@ -78,7 +78,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchBadPortBlocked() {
     // Ports on the Fetch Standard "bad ports" list must be rejected with a
@@ -103,7 +103,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchDnsError() {
     const err = await assertRejects(
@@ -118,7 +118,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchInvalidUriError() {
     await assertRejects(
@@ -130,7 +130,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchMalformedUriError() {
     await assertRejects(
@@ -143,25 +143,25 @@ Deno.test(
   },
 );
 
-Deno.test({ permissions: { net: true } }, async function fetchJsonSuccess() {
+Oden.test({ permissions: { net: true } }, async function fetchJsonSuccess() {
   const response = await fetch("http://localhost:4545/assets/fixture.json");
   const json = await response.json();
-  assertEquals(json.name, "deno");
+  assertEquals(json.name, "oden");
 });
 
-Deno.test({ permissions: { net: false } }, async function fetchPerm() {
+Oden.test({ permissions: { net: false } }, async function fetchPerm() {
   await assertRejects(async () => {
     await fetch("http://localhost:4545/assets/fixture.json");
-  }, Deno.errors.NotCapable);
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test({ permissions: { net: true } }, async function fetchUrl() {
+Oden.test({ permissions: { net: true } }, async function fetchUrl() {
   const response = await fetch("http://localhost:4545/assets/fixture.json");
   assertEquals(response.url, "http://localhost:4545/assets/fixture.json");
   const _json = await response.json();
 });
 
-Deno.test({ permissions: { net: true } }, async function fetchURL() {
+Oden.test({ permissions: { net: true } }, async function fetchURL() {
   const response = await fetch(
     new URL("http://localhost:4545/assets/fixture.json"),
   );
@@ -169,14 +169,14 @@ Deno.test({ permissions: { net: true } }, async function fetchURL() {
   const _json = await response.json();
 });
 
-Deno.test({ permissions: { net: true } }, async function fetchHeaders() {
+Oden.test({ permissions: { net: true } }, async function fetchHeaders() {
   const response = await fetch("http://localhost:4545/assets/fixture.json");
   const headers = response.headers;
   assertEquals(headers.get("Content-Type"), "application/json");
   const _json = await response.json();
 });
 
-Deno.test({ permissions: { net: true } }, async function fetchBlob() {
+Oden.test({ permissions: { net: true } }, async function fetchBlob() {
   const response = await fetch("http://localhost:4545/assets/fixture.json");
   const headers = response.headers;
   const blob = await response.blob();
@@ -184,7 +184,7 @@ Deno.test({ permissions: { net: true } }, async function fetchBlob() {
   assertEquals(blob.size, Number(headers.get("Content-Length")));
 });
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchBodyUsedReader() {
     const response = await fetch(
@@ -202,7 +202,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchBodyUsedCancelStream() {
     const response = await fetch(
@@ -217,7 +217,7 @@ Deno.test(
   },
 );
 
-Deno.test({ permissions: { net: true } }, async function fetchAsyncIterator() {
+Oden.test({ permissions: { net: true } }, async function fetchAsyncIterator() {
   const response = await fetch("http://localhost:4545/assets/fixture.json");
   const headers = response.headers;
 
@@ -231,7 +231,7 @@ Deno.test({ permissions: { net: true } }, async function fetchAsyncIterator() {
   assertEquals(total, Number(headers.get("Content-Length")));
 });
 
-Deno.test({ permissions: { net: true } }, async function fetchBodyReader() {
+Oden.test({ permissions: { net: true } }, async function fetchBodyReader() {
   const response = await fetch("http://localhost:4545/assets/fixture.json");
   const headers = response.headers;
   assert(response.body !== null);
@@ -248,7 +248,7 @@ Deno.test({ permissions: { net: true } }, async function fetchBodyReader() {
   assertEquals(total, Number(headers.get("Content-Length")));
 });
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchBodyReaderBigBody() {
     const data = "a".repeat(10 << 10); // 10mb
@@ -270,7 +270,7 @@ Deno.test(
   },
 );
 
-Deno.test({ permissions: { net: true } }, async function responseClone() {
+Oden.test({ permissions: { net: true } }, async function responseClone() {
   const response = await fetch("http://localhost:4545/assets/fixture.json");
   const response1 = response.clone();
   assert(response !== response1);
@@ -283,7 +283,7 @@ Deno.test({ permissions: { net: true } }, async function responseClone() {
   }
 });
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchMultipartFormDataSuccess() {
     const response = await fetch(
@@ -300,7 +300,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchMultipartFormBadContentType() {
     const response = await fetch(
@@ -318,7 +318,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchURLEncodedFormDataSuccess() {
     const response = await fetch(
@@ -328,15 +328,15 @@ Deno.test(
     assert(formData.has("field_1"));
     assertEquals(formData.get("field_1")!.toString(), "Hi");
     assert(formData.has("field_2"));
-    assertEquals(formData.get("field_2")!.toString(), "<Deno>");
+    assertEquals(formData.get("field_2")!.toString(), "<Oden>");
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchInitFormDataBinaryFileBody() {
     // Some random bytes
-    // deno-fmt-ignore
+    // oden-fmt-ignore
     const binaryFile = new Uint8Array([108,2,0,0,145,22,162,61,157,227,166,77,138,75,180,56,119,188,177,183]);
     const response = await fetch("http://localhost:4545/echo_multipart_file", {
       method: "POST",
@@ -351,29 +351,29 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchInitFormDataMultipleFilesBody() {
     const files = [
       {
-        // deno-fmt-ignore
+        // oden-fmt-ignore
         content: new Uint8Array([137,80,78,71,13,10,26,10, 137, 1, 25]),
         type: "image/png",
         name: "image",
         fileName: "some-image.png",
       },
       {
-        // deno-fmt-ignore
+        // oden-fmt-ignore
         content: new Uint8Array([108,2,0,0,145,22,162,61,157,227,166,77,138,75,180,56,119,188,177,183]),
         name: "file",
         fileName: "file.bin",
         expectedType: "application/octet-stream",
       },
       {
-        content: new TextEncoder().encode("deno land"),
+        content: new TextEncoder().encode("oden land"),
         type: "text/plain",
         name: "text",
-        fileName: "deno.txt",
+        fileName: "oden.txt",
       },
     ];
     const form = new FormData();
@@ -405,7 +405,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
@@ -419,7 +419,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
@@ -434,7 +434,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
@@ -455,7 +455,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
@@ -468,7 +468,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
@@ -484,7 +484,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
@@ -500,7 +500,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
@@ -520,14 +520,14 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true, read: true, write: true },
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
   },
   async function fetchRedirectSensitiveHeadersAreOriginScoped() {
     const started = Promise.withResolvers<number>();
-    await using _server = Deno.serve({
+    await using _server = Oden.serve({
       port: 0,
       onListen: ({ port }) => started.resolve(port),
     }, (request) => {
@@ -544,7 +544,7 @@ Deno.test(
     });
 
     const port = await started.promise;
-    using client = Deno.createHttpClient({
+    using client = Oden.createHttpClient({
       proxy: {
         transport: "tcp",
         hostname: "localhost",
@@ -605,7 +605,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchInitStringBody() {
     const data = "Hello World";
@@ -619,7 +619,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchRequestInitStringBody() {
     const data = "Hello World";
@@ -633,7 +633,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchSeparateInit() {
     // related to: https://github.com/denoland/deno/issues/10396
@@ -648,7 +648,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchInitTypedArrayBody() {
     const data = "Hello World";
@@ -661,7 +661,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchInitArrayBufferBody() {
     const data = "Hello World";
@@ -674,7 +674,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchInitURLSearchParamsBody() {
     const data = "param1=value1&param2=value2";
@@ -693,7 +693,7 @@ Deno.test(
   },
 );
 
-Deno.test({ permissions: { net: true } }, async function fetchInitBlobBody() {
+Oden.test({ permissions: { net: true } }, async function fetchInitBlobBody() {
   const data = "const a = 1 🦕";
   const blob = new Blob([data], {
     type: "text/javascript",
@@ -707,7 +707,7 @@ Deno.test({ permissions: { net: true } }, async function fetchInitBlobBody() {
   assert(response.headers.get("content-type")!.startsWith("text/javascript"));
 });
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchInitFormDataBody() {
     const form = new FormData();
@@ -721,14 +721,14 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchInitFormDataBlobFilenameBody() {
     const form = new FormData();
     form.append("field", "value");
     form.append(
       "file",
-      new Blob([new TextEncoder().encode("deno")]),
+      new Blob([new TextEncoder().encode("oden")]),
       "file name",
     );
     const response = await fetch("http://localhost:4545/echo_server", {
@@ -743,14 +743,14 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchInitFormDataFileFilenameBody() {
     const form = new FormData();
     form.append("field", "value");
     form.append(
       "file",
-      new File([new Blob([new TextEncoder().encode("deno")])], "file name"),
+      new File([new Blob([new TextEncoder().encode("oden")])], "file name"),
     );
     const response = await fetch("http://localhost:4545/echo_server", {
       method: "POST",
@@ -764,10 +764,10 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchInitFormDataTextFileBody() {
-    const fileContent = "deno land";
+    const fileContent = "oden land";
     const form = new FormData();
     form.append("field", "value");
     form.append(
@@ -775,7 +775,7 @@ Deno.test(
       new Blob([new TextEncoder().encode(fileContent)], {
         type: "text/plain",
       }),
-      "deno.txt",
+      "oden.txt",
     );
     const response = await fetch("http://localhost:4545/echo_server", {
       method: "POST",
@@ -794,23 +794,23 @@ Deno.test(
   },
 );
 
-Deno.test({ permissions: { net: true } }, async function fetchUserAgent() {
+Oden.test({ permissions: { net: true } }, async function fetchUserAgent() {
   const data = "Hello World";
   const response = await fetch("http://localhost:4545/echo_server", {
     method: "POST",
     body: new TextEncoder().encode(data),
   });
-  assertEquals(response.headers.get("user-agent"), `Deno/${Deno.version.deno}`);
+  assertEquals(response.headers.get("user-agent"), `Oden/${Oden.version.oden}`);
   await response.text();
 });
 
 function bufferServer(addr: string): Promise<Buffer> {
   const [hostname, port] = addr.split(":");
-  const listener = Deno.listen({
+  const listener = Oden.listen({
     hostname,
     port: Number(port),
-  }) as Deno.Listener;
-  return listener.accept().then(async (conn: Deno.Conn) => {
+  }) as Oden.Listener;
+  return listener.accept().then(async (conn: Oden.Conn) => {
     const buf = new Buffer();
     const p1 = buf.readFrom(conn);
     const p2 = conn.write(
@@ -831,7 +831,7 @@ function bufferServer(addr: string): Promise<Buffer> {
   });
 }
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
@@ -857,7 +857,7 @@ Deno.test(
       "foo: Bar\r\n",
       "accept: */*\r\n",
       "accept-language: *\r\n",
-      `user-agent: Deno/${Deno.version.deno}\r\n`,
+      `user-agent: Oden/${Oden.version.oden}\r\n`,
       "accept-encoding: gzip,br\r\n",
       `host: ${addr}\r\n\r\n`,
     ].join("");
@@ -865,7 +865,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
@@ -889,7 +889,7 @@ Deno.test(
       "content-length: 0\r\n",
       "accept: text/html\r\n",
       "accept-language: en-US\r\n",
-      `user-agent: Deno/${Deno.version.deno}\r\n`,
+      `user-agent: Oden/${Oden.version.oden}\r\n`,
       "accept-encoding: gzip,br\r\n",
       `host: ${addr}\r\n\r\n`,
     ].join("");
@@ -897,7 +897,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
@@ -926,7 +926,7 @@ Deno.test(
       "content-type: text/plain;charset=UTF-8\r\n",
       "accept: */*\r\n",
       "accept-language: *\r\n",
-      `user-agent: Deno/${Deno.version.deno}\r\n`,
+      `user-agent: Oden/${Oden.version.oden}\r\n`,
       "accept-encoding: gzip,br\r\n",
       `host: ${addr}\r\n`,
       `\r\n`,
@@ -936,7 +936,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
@@ -965,7 +965,7 @@ Deno.test(
       "foo: Bar\r\n",
       "accept: */*\r\n",
       "accept-language: *\r\n",
-      `user-agent: Deno/${Deno.version.deno}\r\n`,
+      `user-agent: Oden/${Oden.version.oden}\r\n`,
       "accept-encoding: gzip,br\r\n",
       `host: ${addr}\r\n`,
       `\r\n`,
@@ -975,7 +975,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
@@ -998,7 +998,7 @@ Deno.test(
       "content-length: 0\r\n",
       "accept: */*\r\n",
       "accept-language: *\r\n",
-      `user-agent: Deno/${Deno.version.deno}\r\n`,
+      `user-agent: Oden/${Oden.version.oden}\r\n`,
       "accept-encoding: gzip,br\r\n",
       `host: ${addr}\r\n\r\n`,
     ].join("");
@@ -1006,7 +1006,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
@@ -1030,14 +1030,14 @@ Deno.test(
       `host: ${addr}\r\n`,
       "accept: */*\r\n",
       "accept-language: *\r\n",
-      `user-agent: Deno/${Deno.version.deno}\r\n`,
+      `user-agent: Oden/${Oden.version.oden}\r\n`,
       "accept-encoding: gzip,br\r\n\r\n",
     ].join("");
     assertEquals(actual, expected);
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
@@ -1051,7 +1051,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
@@ -1067,7 +1067,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
@@ -1083,7 +1083,7 @@ Deno.test(
   },
 );
 
-Deno.test(function responseRedirect() {
+Oden.test(function responseRedirect() {
   const redir = Response.redirect("http://example.com/newLocation", 301);
   assertEquals(redir.status, 301);
   assertEquals(redir.statusText, "");
@@ -1095,7 +1095,7 @@ Deno.test(function responseRedirect() {
   assertEquals(redir.type, "default");
 });
 
-Deno.test(function responseRedirectTakeURLObjectAsParameter() {
+Oden.test(function responseRedirectTakeURLObjectAsParameter() {
   const redir = Response.redirect(new URL("https://example.com/"));
   assertEquals(
     redir.headers.get("Location"),
@@ -1103,7 +1103,7 @@ Deno.test(function responseRedirectTakeURLObjectAsParameter() {
   );
 });
 
-Deno.test(async function responseWithoutBody() {
+Oden.test(async function responseWithoutBody() {
   const response = new Response();
   assertEquals(await response.bytes(), new Uint8Array(0));
   const blob = await response.blob();
@@ -1115,7 +1115,7 @@ Deno.test(async function responseWithoutBody() {
   });
 });
 
-Deno.test({ permissions: { net: true } }, async function fetchBodyReadTwice() {
+Oden.test({ permissions: { net: true } }, async function fetchBodyReadTwice() {
   const response = await fetch("http://localhost:4545/assets/fixture.json");
 
   // Read body
@@ -1136,7 +1136,7 @@ Deno.test({ permissions: { net: true } }, async function fetchBodyReadTwice() {
   }
 });
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchBodyReaderAfterRead() {
     const response = await fetch(
@@ -1159,7 +1159,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchBodyReaderWithCancelAndNewReader() {
     const data = "a".repeat(1 << 10);
@@ -1187,7 +1187,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchBodyReaderWithReadCancelAndNewReader() {
     const data = "a".repeat(1 << 10);
@@ -1217,7 +1217,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchResourceCloseAfterStreamCancel() {
     const res = await fetch("http://localhost:4545/assets/fixture.json");
@@ -1229,7 +1229,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchNullBodyStatus() {
     const nullBodyStatus = [101, 204, 205, 304];
@@ -1237,7 +1237,7 @@ Deno.test(
     for (const status of nullBodyStatus) {
       const headers = new Headers([["x-status", String(status)]]);
       const res = await fetch("http://localhost:4545/echo_server", {
-        body: "deno",
+        body: "oden",
         method: "POST",
         headers,
       });
@@ -1247,7 +1247,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchResponseContentLength() {
     const body = new Uint8Array(2 ** 16);
@@ -1266,12 +1266,12 @@ Deno.test(
   },
 );
 
-Deno.test(function fetchResponseConstructorNullBody() {
+Oden.test(function fetchResponseConstructorNullBody() {
   const nullBodyStatus = [204, 205, 304];
 
   for (const status of nullBodyStatus) {
     try {
-      new Response("deno", { status });
+      new Response("oden", { status });
       fail("Response with null body status cannot have body");
     } catch (e) {
       assert(e instanceof TypeError);
@@ -1283,14 +1283,14 @@ Deno.test(function fetchResponseConstructorNullBody() {
   }
 });
 
-Deno.test(function fetchResponseConstructorInvalidStatus() {
+Oden.test(function fetchResponseConstructorInvalidStatus() {
   const invalidStatus = [100, 600, 199, null, "", NaN];
 
   for (const status of invalidStatus) {
     try {
       // deno-lint-ignore ban-ts-comment
       // @ts-ignore
-      new Response("deno", { status });
+      new Response("oden", { status });
       fail(`Invalid status: ${status}`);
     } catch (e) {
       assert(e instanceof RangeError);
@@ -1303,7 +1303,7 @@ Deno.test(function fetchResponseConstructorInvalidStatus() {
   }
 });
 
-Deno.test(function fetchResponseEmptyConstructor() {
+Oden.test(function fetchResponseEmptyConstructor() {
   const response = new Response();
   assertEquals(response.status, 200);
   assertEquals(response.body, null);
@@ -1315,37 +1315,37 @@ Deno.test(function fetchResponseEmptyConstructor() {
   assertEquals([...response.headers], []);
 });
 
-Deno.test(
+Oden.test(
   { permissions: { net: true, read: true } },
   async function fetchCustomHttpClientParamCertificateSuccess(): Promise<
     void
   > {
-    const caCert = Deno.readTextFileSync("tests/testdata/tls/RootCA.pem");
-    const client = Deno.createHttpClient({ caCerts: [caCert] });
-    assert(client instanceof Deno.HttpClient);
+    const caCert = Oden.readTextFileSync("tests/testdata/tls/RootCA.pem");
+    const client = Oden.createHttpClient({ caCerts: [caCert] });
+    assert(client instanceof Oden.HttpClient);
     const response = await fetch("https://localhost:5545/assets/fixture.json", {
       client,
     });
     const json = await response.json();
-    assertEquals(json.name, "deno");
+    assertEquals(json.name, "oden");
     client.close();
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true, read: true } },
   function createHttpClientAcceptPoolIdleTimeout() {
-    const client = Deno.createHttpClient({
+    const client = Oden.createHttpClient({
       poolIdleTimeout: 1000,
     });
     client.close();
   },
 );
 
-Deno.test(
-  { permissions: { net: true }, ignore: Deno.build.os !== "linux" },
+Oden.test(
+  { permissions: { net: true }, ignore: Oden.build.os !== "linux" },
   async function createHttpClientLocalAddress() {
-    const client = Deno.createHttpClient({
+    const client = Oden.createHttpClient({
       localAddress: "127.0.0.2",
     });
     const response = await fetch("http://localhost:4545/local_addr", {
@@ -1357,13 +1357,13 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchCustomClientUserAgent(): Promise<
     void
   > {
     const data = "Hello World";
-    const client = Deno.createHttpClient({});
+    const client = Oden.createHttpClient({});
     const response = await fetch("http://localhost:4545/echo_server", {
       client,
       method: "POST",
@@ -1371,7 +1371,7 @@ Deno.test(
     });
     assertEquals(
       response.headers.get("user-agent"),
-      `Deno/${Deno.version.deno}`,
+      `Oden/${Oden.version.oden}`,
     );
     await response.text();
     client.close();
@@ -1379,27 +1379,27 @@ Deno.test(
 );
 
 // Regression test for https://github.com/denoland/deno/issues/29347
-// `Deno.createHttpClient` used to scribble `caCerts` and `proxy.transport`
+// `Oden.createHttpClient` used to scribble `caCerts` and `proxy.transport`
 // onto the caller's options object, so reusing a single options object
 // across multiple calls would either throw on the second call (the proxy
 // URL no longer matched the auto-rewritten `transport: "http"`) or leave
 // the user with surprising state.
-Deno.test(function createHttpClientDoesNotMutateOptions() {
+Oden.test(function createHttpClientDoesNotMutateOptions() {
   const proxy = { url: "socks5h://127.0.0.1:1080" };
   const options = { proxy };
 
-  const c1 = Deno.createHttpClient(options);
+  const c1 = Oden.createHttpClient(options);
   c1.close();
   // The user's options must be unchanged...
   assertEquals(options, { proxy: { url: "socks5h://127.0.0.1:1080" } });
   assertEquals(proxy, { url: "socks5h://127.0.0.1:1080" });
   // ...so a second call with the same options object still works.
-  const c2 = Deno.createHttpClient(options);
+  const c2 = Oden.createHttpClient(options);
   c2.close();
   assertEquals(options, { proxy: { url: "socks5h://127.0.0.1:1080" } });
 });
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
@@ -1434,7 +1434,7 @@ Deno.test(
       "foo: Bar\r\n",
       "accept: */*\r\n",
       "accept-language: *\r\n",
-      `user-agent: Deno/${Deno.version.deno}\r\n`,
+      `user-agent: Oden/${Oden.version.oden}\r\n`,
       "accept-encoding: gzip,br\r\n",
       `host: ${addr}\r\n`,
       `transfer-encoding: chunked\r\n\r\n`,
@@ -1446,21 +1446,21 @@ Deno.test(
   },
 );
 
-Deno.test({}, function fetchWritableRespProps() {
+Oden.test({}, function fetchWritableRespProps() {
   const original = new Response("https://deno.land", {
     status: 404,
-    headers: { "x-deno": "foo" },
+    headers: { "x-oden": "foo" },
   });
   const new_ = new Response("https://deno.land", original);
   assertEquals(original.status, new_.status);
-  assertEquals(new_.headers.get("x-deno"), "foo");
+  assertEquals(new_.headers.get("x-oden"), "foo");
 });
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchFilterOutCustomHostHeader() {
     const addr = `127.0.0.1:${listenPort}`;
-    const server = Deno.serve({ port: listenPort }, (req) => {
+    const server = Oden.serve({ port: listenPort }, (req) => {
       return new Response(`Host header was ${req.headers.get("Host")}`);
     });
     const response = await fetch(`http://${addr}/`, {
@@ -1471,7 +1471,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchNoServerReadableStreamBody() {
     const completed = Promise.withResolvers<void>();
@@ -1499,7 +1499,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchHeadRespBody() {
     const res = await fetch("http://localhost:4545/echo_server", {
@@ -1509,29 +1509,29 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function fetchClientCertWrongPrivateKey(): Promise<void> {
     await assertRejects(async () => {
-      const client = Deno.createHttpClient({
+      const client = Oden.createHttpClient({
         cert: "bad data",
-        key: await Deno.readTextFile(
+        key: await Oden.readTextFile(
           "tests/testdata/tls/localhost.key",
         ),
       });
       await fetch("https://localhost:5552/assets/fixture.json", {
         client,
       });
-    }, Deno.errors.InvalidData);
+    }, Oden.errors.InvalidData);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function fetchClientCertBadPrivateKey(): Promise<void> {
     await assertRejects(async () => {
-      const client = Deno.createHttpClient({
-        cert: await Deno.readTextFile(
+      const client = Oden.createHttpClient({
+        cert: await Oden.readTextFile(
           "tests/testdata/tls/localhost.crt",
         ),
         key: "bad data",
@@ -1539,16 +1539,16 @@ Deno.test(
       await fetch("https://localhost:5552/assets/fixture.json", {
         client,
       });
-    }, Deno.errors.InvalidData);
+    }, Oden.errors.InvalidData);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function fetchClientCertNotPrivateKey(): Promise<void> {
     await assertRejects(async () => {
-      const client = Deno.createHttpClient({
-        cert: await Deno.readTextFile(
+      const client = Oden.createHttpClient({
+        cert: await Oden.readTextFile(
           "tests/testdata/tls/localhost.crt",
         ),
         key: "",
@@ -1556,20 +1556,20 @@ Deno.test(
       await fetch("https://localhost:5552/assets/fixture.json", {
         client,
       });
-    }, Deno.errors.InvalidData);
+    }, Oden.errors.InvalidData);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true } },
   function createHttpClientMismatchedCertAndKey() {
     assertThrows(
       () =>
-        Deno.createHttpClient({
-          cert: Deno.readTextFileSync(
+        Oden.createHttpClient({
+          cert: Oden.readTextFileSync(
             "tests/testdata/tls/localhost.crt",
           ),
-          key: Deno.readTextFileSync("tests/testdata/tls/RootCA.key"),
+          key: Oden.readTextFileSync("tests/testdata/tls/RootCA.key"),
         }),
       TypeError,
       "keys may not be consistent: KeyMismatch",
@@ -1577,18 +1577,18 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function fetchCustomClientPrivateKey(): Promise<
     void
   > {
     const data = "Hello World";
-    const caCert = await Deno.readTextFile("tests/testdata/tls/RootCA.crt");
-    const client = Deno.createHttpClient({
-      cert: await Deno.readTextFile(
+    const caCert = await Oden.readTextFile("tests/testdata/tls/RootCA.crt");
+    const client = Oden.createHttpClient({
+      cert: await Oden.readTextFile(
         "tests/testdata/tls/localhost.crt",
       ),
-      key: await Deno.readTextFile(
+      key: await Oden.readTextFile(
         "tests/testdata/tls/localhost.key",
       ),
       caCerts: [caCert],
@@ -1600,14 +1600,14 @@ Deno.test(
     });
     assertEquals(
       response.headers.get("user-agent"),
-      `Deno/${Deno.version.deno}`,
+      `Oden/${Oden.version.oden}`,
     );
     await response.text();
     client.close();
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchAbortWhileUploadStreaming(): Promise<void> {
     const abortController = new AbortController();
@@ -1634,7 +1634,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchAbortWhileUploadStreamingWithReason(): Promise<void> {
     const abortController = new AbortController();
@@ -1660,7 +1660,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchAbortWhileUploadStreamingWithPrimitiveReason(): Promise<
     void
@@ -1687,7 +1687,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchHeaderValueShouldNotPanic() {
     for (let i = 0; i < 0x21; i++) {
@@ -1709,7 +1709,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchHeaderNameShouldNotPanic() {
     const validTokens =
@@ -1735,11 +1735,11 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true, read: true } },
   async function fetchSupportsHttpsOverIpAddress() {
-    const caCert = await Deno.readTextFile("tests/testdata/tls/RootCA.pem");
-    const client = Deno.createHttpClient({ caCerts: [caCert] });
+    const caCert = await Oden.readTextFile("tests/testdata/tls/RootCA.pem");
+    const client = Oden.createHttpClient({ caCerts: [caCert] });
     const res = await fetch("https://localhost:5546/http_version", { client });
     assert(res.ok);
     assertEquals(await res.text(), "HTTP/1.1");
@@ -1747,11 +1747,11 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true, read: true } },
   async function fetchSupportsHttp1Only() {
-    const caCert = await Deno.readTextFile("tests/testdata/tls/RootCA.pem");
-    const client = Deno.createHttpClient({ caCerts: [caCert] });
+    const caCert = await Oden.readTextFile("tests/testdata/tls/RootCA.pem");
+    const client = Oden.createHttpClient({ caCerts: [caCert] });
     const res = await fetch("https://localhost:5546/http_version", { client });
     assert(res.ok);
     assertEquals(await res.text(), "HTTP/1.1");
@@ -1759,11 +1759,11 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true, read: true } },
   async function fetchSupportsHttp2() {
-    const caCert = await Deno.readTextFile("tests/testdata/tls/RootCA.pem");
-    const client = Deno.createHttpClient({ caCerts: [caCert] });
+    const caCert = await Oden.readTextFile("tests/testdata/tls/RootCA.pem");
+    const client = Oden.createHttpClient({ caCerts: [caCert] });
     const res = await fetch("https://localhost:5547/http_version", { client });
     assert(res.ok);
     assertEquals(await res.text(), "HTTP/2.0");
@@ -1771,11 +1771,11 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true, read: true } },
   async function fetchHttp2MaxHeaderListSizeTooSmall() {
-    const caCert = await Deno.readTextFile("tests/testdata/tls/RootCA.pem");
-    const client = Deno.createHttpClient({
+    const caCert = await Oden.readTextFile("tests/testdata/tls/RootCA.pem");
+    const client = Oden.createHttpClient({
       caCerts: [caCert],
       http2MaxHeaderListSize: 64,
     });
@@ -1787,11 +1787,11 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true, read: true } },
   async function fetchHttp2MaxHeaderListSizeLargeEnough() {
-    const caCert = await Deno.readTextFile("tests/testdata/tls/RootCA.pem");
-    const client = Deno.createHttpClient({
+    const caCert = await Oden.readTextFile("tests/testdata/tls/RootCA.pem");
+    const client = Oden.createHttpClient({
       caCerts: [caCert],
       http2MaxHeaderListSize: 64 * 1024,
     });
@@ -1802,15 +1802,15 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true, read: true } },
   async function fetchHttp2LargeHeadersDefault() {
     // Regression test for https://github.com/denoland/deno/issues/36462:
     // responses with large header blocks (larger than hyper's old 16KB
     // SETTINGS_MAX_HEADER_LIST_SIZE default) must not be rejected with an
     // http2 PROTOCOL_ERROR when no explicit http2MaxHeaderListSize is set.
-    const caCert = await Deno.readTextFile("tests/testdata/tls/RootCA.pem");
-    const client = Deno.createHttpClient({ caCerts: [caCert] });
+    const caCert = await Oden.readTextFile("tests/testdata/tls/RootCA.pem");
+    const client = Oden.createHttpClient({ caCerts: [caCert] });
     const res = await fetch("https://localhost:5547/large_headers", { client });
     assert(res.ok);
     assertEquals(await res.text(), "ok");
@@ -1818,10 +1818,10 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true, read: true } },
   async function fetchForceHttp1OnHttp2Server() {
-    const client = Deno.createHttpClient({ http2: false, http1: true });
+    const client = Oden.createHttpClient({ http2: false, http1: true });
     await assertRejects(
       () => fetch("http://localhost:5549/http_version", { client }),
       TypeError,
@@ -1830,10 +1830,10 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true, read: true } },
   async function fetchForceHttp2OnHttp1Server() {
-    const client = Deno.createHttpClient({ http2: true, http1: false });
+    const client = Oden.createHttpClient({ http2: true, http1: false });
     await assertRejects(
       () => fetch("http://localhost:5548/http_version", { client }),
       TypeError,
@@ -1842,11 +1842,11 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true, read: true } },
   async function fetchPrefersHttp2() {
-    const caCert = await Deno.readTextFile("tests/testdata/tls/RootCA.pem");
-    const client = Deno.createHttpClient({ caCerts: [caCert] });
+    const caCert = await Oden.readTextFile("tests/testdata/tls/RootCA.pem");
+    const client = Oden.createHttpClient({ caCerts: [caCert] });
     const res = await fetch("https://localhost:5545/http_version", { client });
     assert(res.ok);
     assertEquals(await res.text(), "HTTP/2.0");
@@ -1854,10 +1854,10 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true, read: true } },
   async function createHttpClientAllowHost() {
-    const client = Deno.createHttpClient({
+    const client = Oden.createHttpClient({
       allowHost: true,
     });
     const res = await fetch("http://localhost:4545/echo_server", {
@@ -1873,58 +1873,58 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function createHttpClientExplicitResourceManagement() {
-    using client = Deno.createHttpClient({});
+    using client = Oden.createHttpClient({});
     const response = await fetch("http://localhost:4545/assets/fixture.json", {
       client,
     });
     const json = await response.json();
-    assertEquals(json.name, "deno");
+    assertEquals(json.name, "oden");
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function createHttpClientExplicitResourceManagementDoubleClose() {
-    using client = Deno.createHttpClient({});
+    using client = Oden.createHttpClient({});
     const response = await fetch("http://localhost:4545/assets/fixture.json", {
       client,
     });
     const json = await response.json();
-    assertEquals(json.name, "deno");
+    assertEquals(json.name, "oden");
     // Close the client even though we declared it with `using` to confirm that
     // the cleanup done as per `Symbol.dispose` will not throw any errors.
     client.close();
   },
 );
 
-Deno.test({ permissions: { read: false } }, async function fetchFilePerm() {
+Oden.test({ permissions: { read: false } }, async function fetchFilePerm() {
   await assertRejects(async () => {
     await fetch(import.meta.resolve("../testdata/subdir/json_1.json"));
-  }, Deno.errors.NotCapable);
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test(
-  { permissions: { read: true }, ignore: Deno.build.os !== "linux" },
+Oden.test(
+  { permissions: { read: true }, ignore: Oden.build.os !== "linux" },
   async function fetchSpecialFilePerm() {
     await assertRejects(async () => {
       await fetch("file:///proc/self/environ");
-    }, Deno.errors.NotCapable);
+    }, Oden.errors.NotCapable);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: false } },
   async function fetchFilePermDoesNotExist() {
     await assertRejects(async () => {
       await fetch(import.meta.resolve("./bad.json"));
-    }, Deno.errors.NotCapable);
+    }, Oden.errors.NotCapable);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true } },
   async function fetchFileBadMethod() {
     await assertRejects(
@@ -1942,7 +1942,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true } },
   async function fetchFileDoesNotExist() {
     const url = import.meta.resolve("./bad.json");
@@ -1956,21 +1956,21 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true } },
   async function fetchFile() {
     const res = await fetch(
       import.meta.resolve("../testdata/subdir/json_1.json"),
     );
     assert(res.ok);
-    const fixture = await Deno.readTextFile(
+    const fixture = await Oden.readTextFile(
       "tests/testdata/subdir/json_1.json",
     );
     assertEquals(await res.text(), fixture);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchContentLengthPost() {
     const response = await fetch("http://localhost:4545/content_length", {
@@ -1981,7 +1981,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchContentLengthPut() {
     const response = await fetch("http://localhost:4545/content_length", {
@@ -1992,7 +1992,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchContentLengthPatch() {
     const response = await fetch("http://localhost:4545/content_length", {
@@ -2003,7 +2003,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchContentLengthPostWithStringBody() {
     const response = await fetch("http://localhost:4545/content_length", {
@@ -2015,7 +2015,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchContentLengthPostWithBufferBody() {
     const response = await fetch("http://localhost:4545/content_length", {
@@ -2027,7 +2027,7 @@ Deno.test(
   },
 );
 
-Deno.test(async function staticResponseJson() {
+Oden.test(async function staticResponseJson() {
   const data = { hello: "world" };
   const resp = Response.json(data);
   assertEquals(resp.status, 200);
@@ -2036,12 +2036,12 @@ Deno.test(async function staticResponseJson() {
   assertEquals(res, data);
 });
 
-function invalidServer(addr: string, body: Uint8Array): Deno.Listener {
+function invalidServer(addr: string, body: Uint8Array): Oden.Listener {
   const [hostname, port] = addr.split(":");
-  const listener = Deno.listen({
+  const listener = Oden.listen({
     hostname,
     port: Number(port),
-  }) as Deno.Listener;
+  }) as Oden.Listener;
 
   (async () => {
     for await (const conn of listener) {
@@ -2056,7 +2056,7 @@ function invalidServer(addr: string, body: Uint8Array): Deno.Listener {
   return listener;
 }
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchWithInvalidContentLengthAndTransferEncoding(): Promise<
     void
@@ -2085,7 +2085,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchWithInvalidContentLength(): Promise<
     void
@@ -2115,7 +2115,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchWithInvalidContentLength2(): Promise<
     void
@@ -2142,7 +2142,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchWithInvalidContentLength3(): Promise<
     void
@@ -2171,7 +2171,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchBlobUrl(): Promise<void> {
     const blob = new Blob(["ok"], { type: "text/plain" });
@@ -2186,7 +2186,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchResponseStreamIsLockedWhileReading() {
     const response = await fetch("http://localhost:4545/echo_server", {
@@ -2202,7 +2202,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchConstructorClones() {
     const req = new Request("https://example.com", {
@@ -2227,7 +2227,7 @@ Deno.test(
   },
 );
 
-Deno.test(function requestConstructorDoesNotNormalizePatchMethod() {
+Oden.test(function requestConstructorDoesNotNormalizePatchMethod() {
   assertEquals(
     new Request("https://example.com", { method: "patch" }).method,
     "patch",
@@ -2238,12 +2238,12 @@ Deno.test(function requestConstructorDoesNotNormalizePatchMethod() {
   );
 });
 
-Deno.test(
+Oden.test(
   // TODO(bartlomieju): reenable this test
   // https://github.com/denoland/deno/issues/18350
-  { ignore: Deno.build.os === "windows", permissions: { net: true } },
+  { ignore: Oden.build.os === "windows", permissions: { net: true } },
   async function fetchRequestBodyErrorCatchable() {
-    const listener = Deno.listen({ hostname: "127.0.0.1", port: listenPort });
+    const listener = Oden.listen({ hostname: "127.0.0.1", port: listenPort });
     const server = (async () => {
       const conn = await listener.accept();
       listener.close();
@@ -2294,7 +2294,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchRequestBodyEmptyStream() {
     const body = new ReadableStream({
@@ -2326,7 +2326,7 @@ Deno.test(
   },
 );
 
-Deno.test("Request with subarray TypedArray body", async () => {
+Oden.test("Request with subarray TypedArray body", async () => {
   const body = new Uint8Array([1, 2, 3, 4, 5]).subarray(1);
   const req = new Request("https://example.com", { method: "POST", body });
   const actual = await req.bytes();
@@ -2334,7 +2334,7 @@ Deno.test("Request with subarray TypedArray body", async () => {
   assertEquals(actual, expected);
 });
 
-Deno.test("Response with subarray TypedArray body", async () => {
+Oden.test("Response with subarray TypedArray body", async () => {
   const body = new Uint8Array([1, 2, 3, 4, 5]).subarray(1);
   const req = new Response(body);
   const actual = await req.bytes();
@@ -2343,16 +2343,16 @@ Deno.test("Response with subarray TypedArray body", async () => {
 });
 
 // Regression test for https://github.com/denoland/deno/issues/24697
-Deno.test("URL authority is used as 'Authorization' header", async () => {
+Oden.test("URL authority is used as 'Authorization' header", async () => {
   const deferred = Promise.withResolvers<string | null | undefined>();
   const ac = new AbortController();
 
-  const server = Deno.serve({ port: 4502, signal: ac.signal }, (req) => {
+  const server = Oden.serve({ port: 4502, signal: ac.signal }, (req) => {
     deferred.resolve(req.headers.get("authorization"));
     return new Response("Hello world");
   });
 
-  const res = await fetch("http://deno:land@localhost:4502");
+  const res = await fetch("http://oden:land@localhost:4502");
   await res.text();
   const authHeader = await deferred.promise;
   ac.abort();
@@ -2360,7 +2360,7 @@ Deno.test("URL authority is used as 'Authorization' header", async () => {
   assertEquals(authHeader, "Basic ZGVubzpsYW5k");
 });
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function errorMessageIncludesUrlAndDetailsWithNoTcpInfo() {
     const err = await assertRejects(
@@ -2377,10 +2377,10 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function errorMessageIncludesUrlAndDetailsWithTcpInfo() {
-    const listener = Deno.listen({ port: listenPort });
+    const listener = Oden.listen({ port: listenPort });
     // A single connection is enough: a failure on a freshly established
     // connection is never retried.
     // Immediately close the connection to simulate a connection error.
@@ -2410,7 +2410,7 @@ Deno.test(
 // complete, fetch must reject with Node's error shape: `TypeError: "fetch
 // failed"` whose `.cause` carries the low-level detail, rather than leaking
 // the raw reqwest message into `.message` with an undefined `.cause`.
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchConnectionClosedBeforeMessageComplete() {
     const { default: http } = await import("node:http");
@@ -2441,7 +2441,7 @@ Deno.test(
   },
 );
 
-Deno.test("fetch async iterable", async () => {
+Oden.test("fetch async iterable", async () => {
   const iterable = (async function* () {
   yield new Uint8Array([1, 2, 3, 4, 5]);
   yield new Uint8Array([6, 7, 8, 9, 10]);
@@ -2452,7 +2452,7 @@ Deno.test("fetch async iterable", async () => {
   assertEquals(actual, expected);
 });
 
-Deno.test("fetch iterable", async () => {
+Oden.test("fetch iterable", async () => {
   const iterable = (function* () {
   yield new Uint8Array([1, 2, 3, 4, 5]);
   yield new Uint8Array([6, 7, 8, 9, 10]);
@@ -2463,21 +2463,21 @@ Deno.test("fetch iterable", async () => {
   assertEquals(actual, expected);
 });
 
-Deno.test("fetch string object", async () => {
+Oden.test("fetch string object", async () => {
   const res = new Response(Object("hello"));
   assertEquals(await res.text(), "hello");
 });
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true, read: true, write: true },
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
   },
   async function fetchUnixSocket() {
-    const tempDir = await Deno.makeTempDir();
+    const tempDir = await Oden.makeTempDir();
     const socketPath = `${tempDir}/unix.sock`;
 
-    await using _server = Deno.serve({
+    await using _server = Oden.serve({
       path: socketPath,
       transport: "unix",
       onListen: () => {},
@@ -2494,8 +2494,8 @@ Deno.test(
 
     // Canonicalize the path, because permission checks are done so that
     // the symlink doesn't change in between the calls.
-    const resolvedPath = await Deno.realPath(socketPath);
-    using client = Deno.createHttpClient({
+    const resolvedPath = await Oden.realPath(socketPath);
+    using client = Oden.createHttpClient({
       proxy: {
         transport: "unix",
         path: resolvedPath,
@@ -2517,28 +2517,28 @@ Deno.test(
 // `--allow-net=unix:<path>` rule in addition to filesystem access on the
 // socket path. Filesystem read/write alone must not let a custom client route
 // fetch traffic to a local Unix socket.
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
     permissions: { read: true, write: true },
   },
   function fetchUnixProxyRequiresAllowNet() {
     const socketPath = tmpUnixSocketPath();
     assertThrows(
       () =>
-        Deno.createHttpClient({
+        Oden.createHttpClient({
           proxy: { transport: "unix", path: socketPath },
         }),
-      Deno.errors.NotCapable,
+      Oden.errors.NotCapable,
     );
   },
 );
 
 // The scoped form must match the exact path: an `--allow-net=unix:<path>` rule
 // for a different socket does not grant the Unix proxy access to this one.
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
     permissions: {
       read: true,
       write: true,
@@ -2549,10 +2549,10 @@ Deno.test(
     const socketPath = tmpUnixSocketPath();
     assertThrows(
       () =>
-        Deno.createHttpClient({
+        Oden.createHttpClient({
           proxy: { transport: "unix", path: socketPath },
         }),
-      Deno.errors.NotCapable,
+      Oden.errors.NotCapable,
     );
   },
 );
@@ -2563,31 +2563,31 @@ Deno.test(
 // resolved socket path matches the rule exactly. The `localhost` grant is also
 // required: routing through the Unix proxy still issues `fetch()` against the
 // request URL, whose host (`localhost`) goes through the normal net check.
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
     permissions: { read: true, write: true, run: true },
   },
   async function fetchUnixProxyScopedAllowNetGrantsAccess() {
-    const folder = Deno.realPathSync(Deno.makeTempDirSync());
+    const folder = Oden.realPathSync(Oden.makeTempDirSync());
     const socketPath = `${folder}/socket`;
-    const scriptPath = Deno.makeTempFileSync({ suffix: ".js" });
-    Deno.writeTextFileSync(
+    const scriptPath = Oden.makeTempFileSync({ suffix: ".js" });
+    Oden.writeTextFileSync(
       scriptPath,
       `
-      await using _server = Deno.serve({
+      await using _server = Oden.serve({
         path: ${JSON.stringify(socketPath)},
         transport: "unix",
         onListen: () => {},
       }, () => new Response("OK"));
-      using client = Deno.createHttpClient({
+      using client = Oden.createHttpClient({
         proxy: { transport: "unix", path: ${JSON.stringify(socketPath)} },
       });
       const resp = await fetch("http://localhost/", { client });
       console.log(await resp.text());
       `,
     );
-    const [status, output] = await execCode3(Deno.execPath(), [
+    const [status, output] = await execCode3(Oden.execPath(), [
       "run",
       "--allow-read",
       "--allow-write",
@@ -2599,15 +2599,15 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
     permissions: { write: true, run: true },
   },
   async function fetchEnvUnixProxyRequiresUnixPermissions() {
     const socketPath = tmpUnixSocketPath();
-    const scriptPath = Deno.makeTempFileSync({ suffix: ".js" });
-    Deno.writeTextFileSync(
+    const scriptPath = Oden.makeTempFileSync({ suffix: ".js" });
+    Oden.writeTextFileSync(
       scriptPath,
       `
       try {
@@ -2621,8 +2621,8 @@ Deno.test(
     );
 
     async function run(extraPermissions: string[]) {
-      const { code, stdout, stderr } = await new Deno.Command(
-        Deno.execPath(),
+      const { code, stdout, stderr } = await new Oden.Command(
+        Oden.execPath(),
         {
           args: [
             "run",
@@ -2657,12 +2657,12 @@ Deno.test(
 // Regression test for https://github.com/denoland/deno/issues/29281
 // A server advertising `Content-Encoding: gzip` (or br) while returning an
 // empty body should not fail decompression with "unexpected end of file".
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchEmptyBodyWithContentEncoding() {
     for (const encoding of ["gzip", "br"]) {
       const ac = new AbortController();
-      const server = Deno.serve(
+      const server = Oden.serve(
         { port: listenPort, signal: ac.signal, onListen() {} },
         () =>
           new Response(new Uint8Array(), {
@@ -2683,7 +2683,7 @@ Deno.test(
 // Regression test for https://github.com/denoland/deno/issues/20548
 // `content-encoding` and `content-length` response headers must stay visible
 // when the body is transparently decompressed; only the body is decoded.
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchPreservesContentEncodingHeader() {
     const compressed = await new Response(
@@ -2692,7 +2692,7 @@ Deno.test(
       ),
     ).bytes();
     const ac = new AbortController();
-    const server = Deno.serve(
+    const server = Oden.serve(
       { port: listenPort, signal: ac.signal, onListen() {} },
       () =>
         new Response(compressed, {
@@ -2722,7 +2722,7 @@ Deno.test(
 // (`return fetch(...)` proxying), the retained `content-encoding` and
 // `content-length` headers describe the original wire body, not the decoded
 // one, and must not be forwarded with it.
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function fetchProxyingDecompressedResponseStripsWireHeaders() {
     const compressed = await new Response(
@@ -2731,7 +2731,7 @@ Deno.test(
       ),
     ).bytes();
     const ac = new AbortController();
-    const upstream = Deno.serve(
+    const upstream = Oden.serve(
       { port: listenPort, signal: ac.signal, onListen() {} },
       () =>
         new Response(compressed, {
@@ -2742,7 +2742,7 @@ Deno.test(
         }),
     );
     const { promise: proxyPort, resolve } = Promise.withResolvers<number>();
-    const proxy = Deno.serve(
+    const proxy = Oden.serve(
       {
         port: 0,
         signal: ac.signal,
@@ -2764,14 +2764,14 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
   function createHttpClientThrowsWhenProxyTransportMismatch() {
     assertThrows(
       () => {
-        Deno.createHttpClient({
+        Oden.createHttpClient({
           proxy: {
             transport: "socks5", // Mismatch with "http://" URL
             url: "http://localhost:8080",
@@ -2783,7 +2783,7 @@ Deno.test(
 
     assertThrows(
       () => {
-        Deno.createHttpClient({
+        Oden.createHttpClient({
           proxy: {
             transport: "http", // Mismatch with "https://" URL
             url: "https://localhost:8080",
@@ -2795,7 +2795,7 @@ Deno.test(
 
     assertThrows(
       () => {
-        Deno.createHttpClient({
+        Oden.createHttpClient({
           proxy: {
             transport: "https", // Mismatch with "socks5://" URL
             url: "socks5://localhost:1080",
@@ -2807,17 +2807,17 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
   },
   function createHttpClientRejectsUnixSchemeInProxyUrl() {
     assertThrows(
       () => {
-        Deno.createHttpClient({
+        Oden.createHttpClient({
           proxy: {
-            url: "unix://tmp/%2E%2E/tmp/deno-proxy.sock",
+            url: "unix://tmp/%2E%2E/tmp/oden-proxy.sock",
           },
         });
       },
@@ -2827,64 +2827,64 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
   function createHttpClientSocks5ProxyAcceptsSocks5Url() {
     // Test that socks5 transport accepts socks5:// URLs
-    using client = Deno.createHttpClient({
+    using client = Oden.createHttpClient({
       proxy: {
         transport: "socks5",
         url: "socks5://localhost:1080",
       },
     });
-    assert(client instanceof Deno.HttpClient);
+    assert(client instanceof Oden.HttpClient);
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
   },
   function createHttpClientSocks5ProxyAcceptsSocks5hUrl() {
     // Test that socks5 transport accepts socks5h:// URLs
-    using client = Deno.createHttpClient({
+    using client = Oden.createHttpClient({
       proxy: {
         transport: "socks5",
         url: "socks5h://localhost:1080",
       },
     });
-    assert(client instanceof Deno.HttpClient);
+    assert(client instanceof Oden.HttpClient);
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true },
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
   },
   function createHttpClientWithVsockProxy() {
     // Test that creating an HttpClient with vsock proxy succeeds
-    using client = Deno.createHttpClient({
+    using client = Oden.createHttpClient({
       proxy: {
         transport: "vsock",
         cid: 2,
         port: 80,
       },
     });
-    assert(client instanceof Deno.HttpClient);
+    assert(client instanceof Oden.HttpClient);
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { net: true, read: true, write: true },
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
   },
   async function fetchTcpProxy() {
     const started = Promise.withResolvers<number>();
-    await using _server = Deno.serve({
+    await using _server = Oden.serve({
       transport: "tcp",
       port: 0,
       onListen: ({ port }) => started.resolve(port),
@@ -2901,7 +2901,7 @@ Deno.test(
 
     const port = await started.promise;
 
-    using client = Deno.createHttpClient({
+    using client = Oden.createHttpClient({
       proxy: {
         transport: "tcp",
         hostname: "localhost",

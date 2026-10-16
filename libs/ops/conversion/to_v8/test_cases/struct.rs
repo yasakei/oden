@@ -1,7 +1,7 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![deny(warnings)]
-deno_ops_compile_test_runner::prelude!();
+oden_ops_compile_test_runner::prelude!();
 
 #[derive(ToV8)]
 pub struct Struct {
@@ -15,7 +15,7 @@ pub struct Struct {
 
 #[derive(ToV8)]
 pub struct LifetimeStruct<'a> {
-  a: deno_core::v8::Local<'a, deno_core::v8::Value>,
+  a: oden_core::v8::Local<'a, oden_core::v8::Value>,
   b: u8,
 }
 

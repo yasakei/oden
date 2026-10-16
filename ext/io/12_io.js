@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Interfaces 100% copied from Go.
 // Documentation liberally lifted from them too.
@@ -28,7 +28,7 @@ const EMPTY_OPTIONS = ObjectFreeze(ObjectSetPrototypeOf({}, null));
 let _streamsImpl;
 function lazyStreams() {
   return _streamsImpl ??
-    (_streamsImpl = core.loadExtScript("ext:deno_web/06_streams.js"));
+    (_streamsImpl = core.loadExtScript("ext:oden_web/06_streams.js"));
 }
 
 // Seek whence values.

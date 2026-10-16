@@ -1,0 +1,9 @@
+{
+  "name": "@odentest/hoisted-cycle-trigger",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@odentest/hoisted-cycle-a": "1.0.0",
+    "@odentest/hoisted-cycle-b": "1.0.0"
+  }
+}

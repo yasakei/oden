@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "denoVersion": "[WILDLINE].[WILDLINE].[WILDLINE]",
-  "denoDir": "[WILDCARD]",
+  "odenVersion": "[WILDLINE].[WILDLINE].[WILDLINE]",
+  "odenDir": "[WILDCARD]",
   "modulesCache": "[WILDCARD]remote",
   "npmCache": "[WILDCARD]npm",
   "typescriptCache": "[WILDCARD]gen",

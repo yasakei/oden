@@ -1,14 +1,14 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::ffi::CStr;
 use std::ffi::c_char;
 use std::ffi::c_void;
 use std::ptr;
 
-use deno_core::OpState;
-use deno_core::op2;
-use deno_core::v8;
-use deno_permissions::PermissionsContainer;
+use oden_core::OpState;
+use oden_core::op2;
+use oden_core::v8;
+use oden_permissions::PermissionsContainer;
 
 #[derive(Debug, thiserror::Error, deno_error::JsError)]
 #[class(type)]
@@ -49,7 +49,7 @@ pub enum ReprError {
   InvalidPointer,
   #[class(inherit)]
   #[error(transparent)]
-  Permission(#[from] deno_permissions::PermissionCheckError),
+  Permission(#[from] oden_permissions::PermissionCheckError),
 }
 
 #[op2(fast, stack_trace)]

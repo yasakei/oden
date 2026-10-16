@@ -1,32 +1,32 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Utilities shared between `build.rs` and the rest of the crate.
 
-use deno_core::Extension;
-use deno_core::extension;
+use oden_core::Extension;
+use oden_core::extension;
 
 extension!(runtime,
   deps = [
-    deno_webidl,
-    deno_tls,
-    deno_web,
-    deno_fetch,
-    deno_cache,
-    deno_websocket,
-    deno_webstorage,
-    deno_crypto,
-    deno_node,
-    deno_ffi,
-    deno_net,
-    deno_napi,
-    deno_http,
-    deno_io,
-    deno_fs,
-    deno_bundle_runtime
+    oden_webidl,
+    oden_tls,
+    oden_web,
+    oden_fetch,
+    oden_cache,
+    oden_websocket,
+    oden_webstorage,
+    oden_crypto,
+    oden_node,
+    oden_ffi,
+    oden_net,
+    oden_napi,
+    oden_http,
+    oden_io,
+    oden_fs,
+    oden_bundle_runtime
   ],
-  esm_entry_point = "ext:runtime/90_deno_ns.js",
+  esm_entry_point = "ext:runtime/90_oden_ns.js",
   esm = [
     dir "js",
-    "90_deno_ns.js",
+    "90_oden_ns.js",
     "97_navigator_user_agent_data.js",
     "98_global_scope_shared.js",
     "98_global_scope_window.js",
@@ -46,13 +46,13 @@ extension!(runtime,
   customizer = |ext: &mut Extension| {
     #[cfg(not(feature = "exclude_runtime_main_js"))]
     {
-      use deno_core::ExtensionFileSource;
+      use oden_core::ExtensionFileSource;
       // `flags.js` is an ad-hoc inline source that lives only in the snapshot
       // (it's evaluated during snapshot creation and reachable through the
       // snapshot blob at runtime).
       ext.esm_files.to_mut().push(ExtensionFileSource::loaded_from_memory_during_snapshot(
-        "ext:deno_features/flags.js",
-        deno_features::JS_SOURCE,
+        "ext:oden_features/flags.js",
+        oden_features::JS_SOURCE,
       ));
       // 99_main.js is the snapshot's ESM entry point; its source is loaded
       // from disk only during snapshot creation, so we don't duplicate it in

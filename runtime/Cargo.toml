@@ -1,13 +1,13 @@
-# Copyright 2018-2026 the Deno authors. MIT license.
+# Copyright 2018-2026 the Oden authors. MIT license.
 
 [package]
-name = "deno_runtime"
+name = "oden_runtime"
 version = "0.267.0"
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Provides the deno runtime library"
+description = "Provides the oden runtime library"
 
 [features]
 # "fake" feature that allows to generate docs on docs.rs
@@ -25,7 +25,7 @@ transpile = ["deno_ast"]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(tokio_unstable)'] }
 
 [lib]
-name = "deno_runtime"
+name = "oden_runtime"
 path = "lib.rs"
 
 [dependencies]
@@ -34,41 +34,41 @@ base64.workspace = true
 boxed_error.workspace = true
 color-print.workspace = true
 deno_ast = { workspace = true, optional = true }
-deno_bundle_runtime.workspace = true
-deno_cache.workspace = true
-deno_canvas.workspace = true
-deno_core.workspace = true
-deno_cron.workspace = true
-deno_crypto.workspace = true
+oden_bundle_runtime.workspace = true
+oden_cache.workspace = true
+oden_canvas.workspace = true
+oden_core.workspace = true
+oden_cron.workspace = true
+oden_crypto.workspace = true
 deno_error.workspace = true
-deno_features.workspace = true
-deno_fetch.workspace = true
-deno_ffi.workspace = true
-deno_fs = { workspace = true, features = ["sync_fs"] }
-deno_http.workspace = true
-deno_image.workspace = true
-deno_inspector_server.workspace = true
-deno_io.workspace = true
-deno_kv.workspace = true
-deno_napi.workspace = true
-deno_net.workspace = true
-deno_node.workspace = true
-deno_node_crypto.workspace = true
-deno_node_sqlite.workspace = true
-deno_os.workspace = true
+oden_features.workspace = true
+oden_fetch.workspace = true
+oden_ffi.workspace = true
+oden_fs = { workspace = true, features = ["sync_fs"] }
+oden_http.workspace = true
+oden_image.workspace = true
+oden_inspector_server.workspace = true
+oden_io.workspace = true
+oden_kv.workspace = true
+oden_napi.workspace = true
+oden_net.workspace = true
+oden_node.workspace = true
+oden_node_crypto.workspace = true
+oden_node_sqlite.workspace = true
+oden_os.workspace = true
 deno_path_util.workspace = true
-deno_permissions.workspace = true
-deno_process.workspace = true
-deno_resolver = { workspace = true, features = ["sync"] }
-deno_signals.workspace = true
-deno_telemetry.workspace = true
+oden_permissions.workspace = true
+oden_process.workspace = true
+oden_resolver = { workspace = true, features = ["sync"] }
+oden_signals.workspace = true
+oden_telemetry.workspace = true
 deno_terminal.workspace = true
-deno_tls.workspace = true
-deno_web.workspace = true
-deno_webgpu.workspace = true
-deno_webidl.workspace = true
-deno_websocket.workspace = true
-deno_webstorage.workspace = true
+oden_tls.workspace = true
+oden_web.workspace = true
+oden_webgpu.workspace = true
+oden_webidl.workspace = true
+oden_websocket.workspace = true
+oden_webstorage.workspace = true
 ed25519-dalek.workspace = true
 encoding_rs.workspace = true
 faster-hex.workspace = true

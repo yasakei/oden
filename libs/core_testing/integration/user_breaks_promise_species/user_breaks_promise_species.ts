@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // https://github.com/denoland/deno_core/issues/742
 console.log("1");
 Object.defineProperty(Promise, Symbol.species, { value: 0 });

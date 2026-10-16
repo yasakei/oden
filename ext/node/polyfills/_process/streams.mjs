@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and Node.js contributors. All rights reserved. MIT license.
 
 import { core, primordials } from "ext:core/mod.js";
@@ -13,28 +13,28 @@ const {
   ObjectPrototypeIsPrototypeOf,
 } = primordials;
 
-const { Buffer } = core.loadExtScript("ext:deno_node/internal/buffer.mjs");
+const { Buffer } = core.loadExtScript("ext:oden_node/internal/buffer.mjs");
 const {
   clearLine,
   clearScreenDown,
   cursorTo,
   moveCursor,
-} = core.loadExtScript("ext:deno_node/internal/readline/callbacks.mjs");
-const { nextTick } = core.loadExtScript("ext:deno_node/_next_tick.ts");
+} = core.loadExtScript("ext:oden_node/internal/readline/callbacks.mjs");
+const { nextTick } = core.loadExtScript("ext:oden_node/_next_tick.ts");
 const lazyStream = core.createLazyLoader("node:stream");
 // `node:tty`'s module body calls `setReadStream(...)` to register the TTY
 // ReadStream class with this file. We used to rely on `node:tty` being
 // loaded eagerly at snapshot from 01_require.js; now it's lazy, so the TTY
 // branch of `initStdin` has to force-load it before using `readStream`.
 const lazyTty = core.createLazyLoader("node:tty");
-const io = core.loadExtScript("ext:deno_io/12_io.js");
+const io = core.loadExtScript("ext:oden_io/12_io.js");
 const { guessHandleType } = core.loadExtScript(
-  "ext:deno_node/internal_binding/util.ts",
+  "ext:oden_node/internal_binding/util.ts",
 );
-const { codeMap } = core.loadExtScript("ext:deno_node/internal_binding/uv.ts");
+const { codeMap } = core.loadExtScript("ext:oden_node/internal_binding/uv.ts");
 import { op_bootstrap_color_depth } from "ext:core/ops";
 const { validateInteger } = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
 
 // https://github.com/nodejs/node/blob/00738314828074243c9a52a228ab4c68b04259ef/lib/internal/bootstrap/switches/is_main_thread.js#L41
@@ -52,13 +52,13 @@ export function createWritableStdioStream(writer, name, warmup = false) {
     write(buf, enc, cb) {
       if (!writer) {
         this.destroy(
-          new Error(`Deno.${name} is not available in this environment`),
+          new Error(`Oden.${name} is not available in this environment`),
         );
         return;
       }
       // TODO(fraidev): This try/catch is a workaround. When process.stdout
       // is a pipe (not a TTY), Node.js backs it with a real fd-based net.Socket
-      // so BrokenPipe flows naturally through stream_wrap.ts as EPIPE. Deno
+      // so BrokenPipe flows naturally through stream_wrap.ts as EPIPE. Oden
       // always uses createWritableStdioStream(io.stdout) regardless of pipe/TTY,
       // so BrokenPipe throws synchronously here instead. Once net.Socket supports
       // being created from a raw fd (new Socket({ fd: 1 })), process.stdout/stderr
@@ -69,16 +69,16 @@ export function createWritableStdioStream(writer, name, warmup = false) {
           : Buffer.from(buf, enc);
         // Handle partial writes - writeSync may not write all bytes at once
         // (e.g., when stdout is a pipe and the pipe buffer is near capacity).
-        // deno-lint-ignore deno-internal/prefer-primordials
+        // deno-lint-ignore oden-internal/prefer-primordials
         while (data.byteLength > 0) {
           const nwritten = writer.writeSync(data);
-          // deno-lint-ignore deno-internal/prefer-primordials
+          // deno-lint-ignore oden-internal/prefer-primordials
           if (nwritten >= data.byteLength) break;
           data = TypedArrayPrototypeSlice(data, nwritten);
         }
       } catch (e) {
         if (
-          ObjectPrototypeIsPrototypeOf(Deno.errors.BrokenPipe.prototype, e)
+          ObjectPrototypeIsPrototypeOf(Oden.errors.BrokenPipe.prototype, e)
         ) {
           const err = new Error("write EPIPE");
           err.code = "EPIPE";
@@ -104,10 +104,10 @@ export function createWritableStdioStream(writer, name, warmup = false) {
   });
   let fd = -1;
 
-  // deno-lint-ignore deno-internal/prefer-primordials
+  // deno-lint-ignore oden-internal/prefer-primordials
   if (writer instanceof io.Stdout) {
     fd = io.STDOUT_RID;
-    // deno-lint-ignore deno-internal/prefer-primordials
+    // deno-lint-ignore oden-internal/prefer-primordials
   } else if (writer instanceof io.Stderr) {
     fd = io.STDERR_RID;
   }
@@ -119,7 +119,7 @@ export function createWritableStdioStream(writer, name, warmup = false) {
   let getIsTTY = () => writer?.isTerminal();
   const getColumns = () =>
     stream._columns ||
-    (writer?.isTerminal() ? Deno.consoleSize?.().columns : undefined);
+    (writer?.isTerminal() ? Oden.consoleSize?.().columns : undefined);
 
   ObjectDefineProperties(stream, {
     columns: {
@@ -135,7 +135,7 @@ export function createWritableStdioStream(writer, name, warmup = false) {
       __proto__: null,
       enumerable: true,
       configurable: true,
-      get: () => writer?.isTerminal() ? Deno.consoleSize?.().rows : undefined,
+      get: () => writer?.isTerminal() ? Oden.consoleSize?.().rows : undefined,
     },
     isTTY: {
       __proto__: null,
@@ -152,7 +152,7 @@ export function createWritableStdioStream(writer, name, warmup = false) {
       enumerable: true,
       configurable: true,
       value: () =>
-        writer?.isTerminal() ? ObjectValues(Deno.consoleSize?.()) : undefined,
+        writer?.isTerminal() ? ObjectValues(Oden.consoleSize?.()) : undefined,
     },
     getColorDepth: {
       __proto__: null,
@@ -216,7 +216,7 @@ const _read = function (size) {
   io.stdin?.[io.REF]();
   const p = Buffer.alloc(size || 16 * 1024);
   PromisePrototypeThen(io.stdin?.read(p), (length) => {
-    // deno-lint-ignore deno-internal/prefer-primordials
+    // deno-lint-ignore oden-internal/prefer-primordials
     this.push(length === null ? null : TypedArrayPrototypeSlice(p, 0, length));
   }, (error) => {
     this.destroy(error);
@@ -314,7 +314,7 @@ export const initStdin = (warmup = false) => {
       // Provide a dummy contentless input for e.g. non-console
       // Windows applications.
       stdin = new (lazyStream().Readable)({ read() {} });
-      // deno-lint-ignore deno-internal/prefer-primordials
+      // deno-lint-ignore oden-internal/prefer-primordials
       stdin.push(null);
     }
   }

@@ -1,6 +1,6 @@
-Deno.test("foo", () => {
+Oden.test("foo", () => {
   reportError(new Error("foo"));
   console.log(1);
 });
 
-Deno.test("bar", () => {});
+Oden.test("bar", () => {});

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 //
 // Adapted from Node.js. Copyright Joyent, Inc. and other Node contributors.
 //
@@ -36,9 +36,9 @@ const {
   PromisePrototypeThen,
 } = primordials;
 
-const { nextTick } = core.loadExtScript("ext:deno_node/_next_tick.ts");
+const { nextTick } = core.loadExtScript("ext:oden_node/_next_tick.ts");
 const { validateFunction } = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
 
 class NodeFalsyValueRejectionError extends Error {

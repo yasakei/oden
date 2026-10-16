@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // deno-lint-ignore-file
 
 import { core, primordials } from "ext:core/mod.js";
@@ -7,8 +7,8 @@ import {
   pledgePermissions,
   restorePermissions,
 } from "ext:cli/40_test_common.js";
-const { Console } = core.loadExtScript("ext:deno_web/01_console.js");
-const { setExitHandler } = core.loadExtScript("ext:deno_os/30_os.js");
+const { Console } = core.loadExtScript("ext:oden_web/01_console.js");
+const { setExitHandler } = core.loadExtScript("ext:oden_os/30_os.js");
 const {
   op_register_bench,
   op_bench_get_origin,
@@ -60,13 +60,13 @@ const registerBenchIdRetBufU8 = new Uint8Array(registerBenchIdRetBuf.buffer);
 // As long as we're using one isolate per test, we can cache the origin since it won't change
 let cachedOrigin = undefined;
 
-// Main bench function provided by Deno.
+// Main bench function provided by Oden.
 function bench(
   nameOrFnOrOptions,
   optionsOrFn,
   maybeFn,
 ) {
-  // No-op if we're not running in `deno bench` subcommand.
+  // No-op if we're not running in `oden bench` subcommand.
   if (typeof op_register_bench !== "function") {
     return;
   }
@@ -143,10 +143,10 @@ function bench(
       throw new TypeError("The bench function must have a name");
     }
     if (optionsOrFn != undefined) {
-      throw new TypeError("Unexpected second argument to Deno.bench()");
+      throw new TypeError("Unexpected second argument to Oden.bench()");
     }
     if (maybeFn != undefined) {
-      throw new TypeError("Unexpected third argument to Deno.bench()");
+      throw new TypeError("Unexpected third argument to Oden.bench()");
     }
     benchDesc = {
       ...defaults,
@@ -500,4 +500,4 @@ function benchNow() {
   return op_bench_now();
 }
 
-globalThis.Deno.bench = bench;
+globalThis.Oden.bench = bench;

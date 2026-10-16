@@ -1,18 +1,18 @@
-# Copyright 2018-2026 the Deno authors. MIT license.
+# Copyright 2018-2026 the Oden authors. MIT license.
 
 [package]
-name = "denort"
+name = "odenrt"
 version = "2.9.7"
 authors.workspace = true
-default-run = "denort"
+default-run = "odenrt"
 edition.workspace = true
 license.workspace = true
 publish = false
 repository.workspace = true
-description = "Provides the denort executable"
+description = "Provides the odenrt executable"
 
 [[bin]]
-name = "denort"
+name = "odenrt"
 path = "main.rs"
 doc = false
 
@@ -26,33 +26,33 @@ harness = false
 
 [features]
 default = ["v8"]
-quickjs = ["deno_core/quickjs", "v8/quickjs"]
-v8 = ["deno_core/v8", "v8/v8"]
+quickjs = ["oden_core/quickjs", "v8/quickjs"]
+v8 = ["oden_core/v8", "v8/v8"]
 
 [build-dependencies]
-deno_runtime.workspace = true
-deno_core.workspace = true
+oden_runtime.workspace = true
+oden_core.workspace = true
 v8.workspace = true
 
 [dependencies]
 async-trait.workspace = true
 bincode.workspace = true
 deno_ast = { workspace = true, features = ["cjs"] }
-deno_cache_dir = { workspace = true, features = ["sync"] }
-deno_config = { workspace = true, features = ["sync", "workspace"] }
-deno_core.workspace = true
+oden_cache_dir = { workspace = true, features = ["sync"] }
+oden_config = { workspace = true, features = ["sync", "workspace"] }
+oden_core.workspace = true
 deno_error.workspace = true
-deno_lib.workspace = true
+oden_lib.workspace = true
 deno_media_type = { workspace = true, features = ["data_url", "decoding"] }
-deno_node.workspace = true
-deno_npm.workspace = true
-deno_npmrc.workspace = true
-deno_package_json = { workspace = true, features = ["sync"] }
+oden_node.workspace = true
+oden_npm.workspace = true
+oden_npmrc.workspace = true
+oden_package_json = { workspace = true, features = ["sync"] }
 deno_path_util.workspace = true
-deno_resolver = { workspace = true, features = ["sync"] }
-deno_runtime.workspace = true
+oden_resolver = { workspace = true, features = ["sync"] }
+oden_runtime.workspace = true
 deno_semver.workspace = true
-deno_snapshots.workspace = true
+oden_snapshots.workspace = true
 deno_terminal.workspace = true
 import_map.workspace = true
 indexmap.workspace = true
@@ -73,7 +73,7 @@ v8.workspace = true
 [target.'cfg(windows)'.dependencies]
 junction.workspace = true
 memmap2.workspace = true
-deno_subprocess_windows.workspace = true
+oden_subprocess_windows.workspace = true
 
 [dev-dependencies]
 sys_traits = { workspace = true, features = ["memory"] }

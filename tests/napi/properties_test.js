@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { assertEquals, loadTestLibrary } from "./common.js";
 
 const properties = loadTestLibrary();
 
-Deno.test("napi properties", () => {
+Oden.test("napi properties", () => {
   assertEquals(properties.test_property_rw, 1);
   properties.test_property_rw = 2;
   assertEquals(properties.test_property_rw, 2);

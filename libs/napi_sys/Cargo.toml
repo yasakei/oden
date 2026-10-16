@@ -1,4 +1,4 @@
-# Copyright 2018-2026 the Deno authors. MIT license.
+# Copyright 2018-2026 the Oden authors. MIT license.
 
 # Forked from https://github.com/napi-rs/napi-rs/tree/main/crates/napi-sys
 # to avoid build-time dependency on Node.js binaries and to maintain
@@ -11,7 +11,7 @@ edition.workspace = true
 license.workspace = true
 publish = false
 repository.workspace = true
-description = "Node-API FFI bindings for Deno's NAPI test suite"
+description = "Node-API FFI bindings for Oden's NAPI test suite"
 
 [target.'cfg(windows)'.dependencies]
 libloading = "0.7"

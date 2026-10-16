@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::collections::BTreeMap;
@@ -10,12 +10,12 @@ use super::ResourceHandleFd;
 use super::ResourceHandleSocket;
 
 /// A `ResourceId` is an integer value referencing a resource. It could be
-/// considered to be the Deno equivalent of a `file descriptor` in POSIX like
+/// considered to be the Oden equivalent of a `file descriptor` in POSIX like
 /// operating systems. Elsewhere in the code base it is commonly abbreviated
 /// to `rid`.
 // TODO: use `u64` instead?
 pub type ResourceId = u32;
-/// Map-like data structure storing Deno's resources (equivalent to file
+/// Map-like data structure storing Oden's resources (equivalent to file
 /// descriptors).
 ///
 /// Provides basic methods for element access. A resource can be of any type.
@@ -169,7 +169,7 @@ impl ResourceTable {
   /// # Example
   ///
   /// ```
-  /// # use deno_core::ResourceTable;
+  /// # use oden_core::ResourceTable;
   /// # let resource_table = ResourceTable::default();
   /// let resource_names = resource_table.names().collect::<Vec<_>>();
   /// ```

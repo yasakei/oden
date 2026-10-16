@@ -13,7 +13,7 @@
     "if": "unix",
     "args": [
       "eval",
-      "Deno.mkdirSync('sub_dir');"
+      "Oden.mkdirSync('sub_dir');"
     ],
     "output": "[WILDCARD]"
   }, {

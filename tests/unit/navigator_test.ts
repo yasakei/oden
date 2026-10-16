@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   assert,
   assertEquals,
@@ -7,16 +7,16 @@ import {
   assertThrows,
 } from "./test_util.ts";
 
-Deno.test(function navigatorNumCpus() {
+Oden.test(function navigatorNumCpus() {
   assert(navigator.hardwareConcurrency > 0);
 });
 
-Deno.test(function navigatorUserAgent() {
-  const pattern = /Deno\/\d+\.\d+\.\d+/;
+Oden.test(function navigatorUserAgent() {
+  const pattern = /Oden\/\d+\.\d+\.\d+/;
   assert(pattern.test(navigator.userAgent));
 });
 
-Deno.test(function navigatorUserAgentData() {
+Oden.test(function navigatorUserAgentData() {
   const uaData = navigator.userAgentData;
   assert(uaData instanceof NavigatorUAData);
 
@@ -24,30 +24,30 @@ Deno.test(function navigatorUserAgentData() {
   assertEquals(uaData.mobile, false);
   assert(Array.isArray(uaData.brands));
   assert(uaData.brands.length > 0);
-  const deno = uaData.brands.find((b) => b.brand === "Deno");
-  assert(deno !== undefined, "expected a Deno brand");
-  assert(/^\d+$/.test(deno!.version), "brand version should be the major");
+  const oden = uaData.brands.find((b) => b.brand === "Oden");
+  assert(oden !== undefined, "expected a Oden brand");
+  assert(/^\d+$/.test(oden!.version), "brand version should be the major");
   assert(typeof uaData.platform === "string" && uaData.platform.length > 0);
 });
 
-Deno.test(function navigatorUserAgentDataIsSingleton() {
+Oden.test(function navigatorUserAgentDataIsSingleton() {
   assert(navigator.userAgentData === navigator.userAgentData);
 });
 
-Deno.test(function navigatorUserAgentDataIllegalConstructor() {
+Oden.test(function navigatorUserAgentDataIllegalConstructor() {
   assertThrows(
     () => new NavigatorUAData(),
     TypeError,
   );
 });
 
-Deno.test(function navigatorUserAgentDataToJSON() {
+Oden.test(function navigatorUserAgentDataToJSON() {
   const json = navigator.userAgentData.toJSON();
   assertEquals(Object.keys(json).sort(), ["brands", "mobile", "platform"]);
   assertEquals(json.mobile, false);
 });
 
-Deno.test(async function navigatorUserAgentDataHighEntropyValues() {
+Oden.test(async function navigatorUserAgentDataHighEntropyValues() {
   const values = await navigator.userAgentData.getHighEntropyValues([
     "architecture",
     "bitness",
@@ -69,24 +69,24 @@ Deno.test(async function navigatorUserAgentDataHighEntropyValues() {
   assertEquals(values.platformVersion, "");
   assert(/^\d+\.\d+\.\d+/.test(values.uaFullVersion!));
   assert(Array.isArray(values.fullVersionList));
-  const deno = values.fullVersionList!.find((b) => b.brand === "Deno");
-  assert(deno !== undefined);
-  assert(/^\d+\.\d+\.\d+/.test(deno!.version));
+  const oden = values.fullVersionList!.find((b) => b.brand === "Oden");
+  assert(oden !== undefined);
+  assert(/^\d+\.\d+\.\d+/.test(oden!.version));
 });
 
-Deno.test(async function navigatorUserAgentDataIgnoresUnknownHints() {
+Oden.test(async function navigatorUserAgentDataIgnoresUnknownHints() {
   const values = await navigator.userAgentData.getHighEntropyValues([
     "notARealHint",
   ]);
   assertEquals(Object.keys(values).sort(), ["brands", "mobile", "platform"]);
 });
 
-Deno.test(async function navigatorUserAgentDataEmptyHints() {
+Oden.test(async function navigatorUserAgentDataEmptyHints() {
   const values = await navigator.userAgentData.getHighEntropyValues([]);
   assertEquals(Object.keys(values).sort(), ["brands", "mobile", "platform"]);
 });
 
-Deno.test(async function navigatorUserAgentDataRequiresArgument() {
+Oden.test(async function navigatorUserAgentDataRequiresArgument() {
   await assertRejects(
     // @ts-expect-error: testing missing required argument
     () => navigator.userAgentData.getHighEntropyValues(),
@@ -94,8 +94,8 @@ Deno.test(async function navigatorUserAgentDataRequiresArgument() {
   );
 });
 
-Deno.test(function navigatorUserAgentDataInspect() {
-  const out = Deno.inspect(navigator.userAgentData);
+Oden.test(function navigatorUserAgentDataInspect() {
+  const out = Oden.inspect(navigator.userAgentData);
   assertStringIncludes(out, "NavigatorUAData");
   assertStringIncludes(out, "brands");
   assertStringIncludes(out, "platform");

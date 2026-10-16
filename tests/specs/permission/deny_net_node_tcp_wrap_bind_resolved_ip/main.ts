@@ -16,14 +16,14 @@ function tryBind(name: string, address: string, bind6 = false) {
     const err = bind6 ? handle.bind6(address, 0, 0) : handle.bind(address, 0);
     console.log(`FAIL: ${name} was not denied (err=${err})`);
   } catch (error) {
-    if (!(error instanceof Deno.errors.NotCapable)) throw error;
+    if (!(error instanceof Oden.errors.NotCapable)) throw error;
     console.log(`PASS: ${name} denied`);
   } finally {
     handle.close();
   }
 }
 
-if (Deno.args[0] === "numeric") {
+if (Oden.args[0] === "numeric") {
   // Decimal and hex representations of 127.0.0.1 resolve on Unix. Windows
   // returns a resolver error before reaching the post-resolution check.
   tryBind("numeric 2130706433", "2130706433");

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use serde_json::json;
 use test_util as util;
@@ -41,7 +41,7 @@ fn conditionally_loads_type_graph() {
 fn opt_out_top_level_exclude_via_bench_unexclude() {
   let context = TestContextBuilder::new().use_temp_cwd().build();
   let temp_dir = context.temp_dir().path();
-  temp_dir.join("deno.json").write_json(&json!({
+  temp_dir.join("oden.json").write_json(&json!({
     "bench": {
       "exclude": [ "!excluded.bench.ts" ]
     },
@@ -50,13 +50,13 @@ fn opt_out_top_level_exclude_via_bench_unexclude() {
 
   temp_dir
     .join("main.bench.ts")
-    .write("Deno.bench('test1', () => {});");
+    .write("Oden.bench('test1', () => {});");
   temp_dir
     .join("excluded.bench.ts")
-    .write("Deno.bench('test2', () => {});");
+    .write("Oden.bench('test2', () => {});");
   temp_dir
     .join("actually_excluded.bench.ts")
-    .write("Deno.bench('test3', () => {});");
+    .write("Oden.bench('test3', () => {});");
 
   let output = context.new_command().arg("bench").run();
   output.assert_exit_code(0);

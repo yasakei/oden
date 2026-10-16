@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assertEquals, assertThrows, delay } from "./test_util.ts";
 
-Deno.test(
-  { ignore: Deno.build.os !== "windows" },
+Oden.test(
+  { ignore: Oden.build.os !== "windows" },
   function windowsUnsupportedSignalsTest() {
     // These signals are Unix-only and not supported on Windows at all.
     const unsupported = [
@@ -19,7 +19,7 @@ Deno.test(
     for (const sig of unsupported) {
       assertThrows(
         () => {
-          Deno.addSignalListener(sig as Deno.Signal, () => {});
+          Oden.addSignalListener(sig as Oden.Signal, () => {});
         },
         Error,
         `Invalid signal: ${sig}`,
@@ -28,29 +28,29 @@ Deno.test(
   },
 );
 
-Deno.test(
-  { ignore: Deno.build.os !== "windows" },
+Oden.test(
+  { ignore: Oden.build.os !== "windows" },
   function windowsForbiddenSignalsTest() {
     // These signals exist on Windows but are forbidden to listen for
     // (uncatchable/fatal signals).
     assertThrows(
-      () => Deno.addSignalListener("SIGKILL", () => {}),
+      () => Oden.addSignalListener("SIGKILL", () => {}),
       TypeError,
       "Binding to signal 'SIGKILL' is not allowed",
     );
     assertThrows(
-      () => Deno.addSignalListener("SIGABRT", () => {}),
+      () => Oden.addSignalListener("SIGABRT", () => {}),
       TypeError,
       "Binding to signal 'SIGABRT' is not allowed",
     );
   },
 );
 
-Deno.test(
-  { ignore: Deno.build.os !== "windows" },
+Oden.test(
+  { ignore: Oden.build.os !== "windows" },
   function windowsSupportedSignalsTest() {
     // These signals should be registerable on Windows.
-    const supported: Deno.Signal[] = [
+    const supported: Oden.Signal[] = [
       "SIGINT",
       "SIGBREAK",
       "SIGHUP",
@@ -60,15 +60,15 @@ Deno.test(
     ];
     for (const sig of supported) {
       const listener = () => {};
-      Deno.addSignalListener(sig, listener);
-      Deno.removeSignalListener(sig, listener);
+      Oden.addSignalListener(sig, listener);
+      Oden.removeSignalListener(sig, listener);
     }
   },
 );
 
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
     permissions: { run: true },
   },
   async function signalListenerTest() {
@@ -79,24 +79,24 @@ Deno.test(
     // This test needs to be careful that it doesn't accidentally aggregate multiple
     // signals into one. Sending two or more SIGxxx before the handler can be run will
     // result in signal coalescing.
-    Deno.addSignalListener("SIGUSR1", listener);
+    Oden.addSignalListener("SIGUSR1", listener);
     // Sends SIGUSR1 3 times.
     for (let i = 1; i <= 3; i++) {
       await delay(1);
-      Deno.kill(Deno.pid, "SIGUSR1");
+      Oden.kill(Oden.pid, "SIGUSR1");
       while (c < i) {
         await delay(20);
       }
     }
-    Deno.removeSignalListener("SIGUSR1", listener);
+    Oden.removeSignalListener("SIGUSR1", listener);
     await delay(100);
     assertEquals(c, 3);
   },
 );
 
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
     permissions: { run: true },
   },
   async function multipleSignalListenerTest() {
@@ -110,24 +110,24 @@ Deno.test(
     // This test needs to be careful that it doesn't accidentally aggregate multiple
     // signals into one. Sending two or more SIGxxx before the handler can be run will
     // result in signal coalescing.
-    Deno.addSignalListener("SIGUSR2", listener0);
-    Deno.addSignalListener("SIGUSR2", listener1);
+    Oden.addSignalListener("SIGUSR2", listener0);
+    Oden.addSignalListener("SIGUSR2", listener1);
 
     // Sends SIGUSR2 3 times.
     for (let i = 1; i <= 3; i++) {
       await delay(1);
-      Deno.kill(Deno.pid, "SIGUSR2");
+      Oden.kill(Oden.pid, "SIGUSR2");
       while (c.length < i * 2) {
         await delay(20);
       }
     }
 
-    Deno.removeSignalListener("SIGUSR2", listener1);
+    Oden.removeSignalListener("SIGUSR2", listener1);
 
     // Sends SIGUSR2 3 times.
     for (let i = 1; i <= 3; i++) {
       await delay(1);
-      Deno.kill(Deno.pid, "SIGUSR2");
+      Oden.kill(Oden.pid, "SIGUSR2");
       while (c.length < 6 + i) {
         await delay(20);
       }
@@ -139,20 +139,20 @@ Deno.test(
     const irrelevant = () => {
       count++;
     };
-    Deno.addSignalListener("SIGUSR1", irrelevant);
+    Oden.addSignalListener("SIGUSR1", irrelevant);
     for (const _ of Array(3)) {
       await delay(20);
-      Deno.kill(Deno.pid, "SIGUSR1");
+      Oden.kill(Oden.pid, "SIGUSR1");
     }
     while (count < 3) {
       await delay(20);
     }
-    Deno.removeSignalListener("SIGUSR1", irrelevant);
+    Oden.removeSignalListener("SIGUSR1", irrelevant);
 
     // No change
     assertEquals(c, "010101000");
 
-    Deno.removeSignalListener("SIGUSR2", listener0);
+    Oden.removeSignalListener("SIGUSR2", listener0);
 
     await delay(100);
 
@@ -163,30 +163,30 @@ Deno.test(
 );
 
 // This tests that pending op_signal_poll doesn't block the runtime from exiting the process.
-Deno.test(
+Oden.test(
   {
     permissions: { run: true, read: true },
   },
   async function canExitWhileListeningToSignal() {
-    const { code } = await new Deno.Command(Deno.execPath(), {
+    const { code } = await new Oden.Command(Oden.execPath(), {
       args: [
         "eval",
-        "Deno.addSignalListener('SIGINT', () => {})",
+        "Oden.addSignalListener('SIGINT', () => {})",
       ],
     }).output();
     assertEquals(code, 0);
   },
 );
 
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
     permissions: { run: true },
   },
   async function workerSignalListenerIsRemovedOnTerminate() {
     const childCode = `
       const workerCode = \`
-        Deno.addSignalListener("SIGTERM", () => {});
+        Oden.addSignalListener("SIGTERM", () => {});
         self.postMessage("registered");
         setInterval(() => {}, 1000);
       \`;
@@ -203,7 +203,7 @@ Deno.test(
       setInterval(() => {}, 1000);
     `;
 
-    const child = new Deno.Command(Deno.execPath(), {
+    const child = new Oden.Command(Oden.execPath(), {
       args: ["eval", childCode],
       stdout: "piped",
       stderr: "piped",
@@ -245,15 +245,15 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os !== "windows",
+    ignore: Oden.build.os !== "windows",
     permissions: { run: true },
   },
   function windowsThrowsOnNegativeProcessIdTest() {
     assertThrows(
       () => {
-        Deno.kill(-1, "SIGKILL");
+        Oden.kill(-1, "SIGKILL");
       },
       TypeError,
       "Invalid pid",
@@ -261,17 +261,17 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os !== "windows",
+    ignore: Oden.build.os !== "windows",
     permissions: { run: true },
   },
   function noOpenSystemIdleProcessTest() {
-    let signal: Deno.Signal = "SIGKILL";
+    let signal: Oden.Signal = "SIGKILL";
 
     assertThrows(
       () => {
-        Deno.kill(0, signal);
+        Oden.kill(0, signal);
       },
       TypeError,
       `Invalid pid`,
@@ -280,7 +280,7 @@ Deno.test(
     signal = "SIGTERM";
     assertThrows(
       () => {
-        Deno.kill(0, signal);
+        Oden.kill(0, signal);
       },
       TypeError,
       `Invalid pid`,
@@ -288,78 +288,78 @@ Deno.test(
   },
 );
 
-Deno.test(function signalInvalidHandlerTest() {
+Oden.test(function signalInvalidHandlerTest() {
   assertThrows(() => {
     // deno-lint-ignore no-explicit-any
-    Deno.addSignalListener("SIGINT", "handler" as any);
+    Oden.addSignalListener("SIGINT", "handler" as any);
   });
   assertThrows(() => {
     // deno-lint-ignore no-explicit-any
-    Deno.removeSignalListener("SIGINT", "handler" as any);
+    Oden.removeSignalListener("SIGINT", "handler" as any);
   });
 });
 
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
     permissions: { run: true },
   },
   function signalForbiddenSignalTest() {
     assertThrows(
-      () => Deno.addSignalListener("SIGKILL", () => {}),
+      () => Oden.addSignalListener("SIGKILL", () => {}),
       TypeError,
       "Binding to signal 'SIGKILL' is not allowed",
     );
     assertThrows(
-      () => Deno.addSignalListener("SIGSTOP", () => {}),
+      () => Oden.addSignalListener("SIGSTOP", () => {}),
       TypeError,
       "Binding to signal 'SIGSTOP' is not allowed",
     );
     assertThrows(
-      () => Deno.addSignalListener("SIGILL", () => {}),
+      () => Oden.addSignalListener("SIGILL", () => {}),
       TypeError,
       "Binding to signal 'SIGILL' is not allowed",
     );
     assertThrows(
-      () => Deno.addSignalListener("SIGFPE", () => {}),
+      () => Oden.addSignalListener("SIGFPE", () => {}),
       TypeError,
       "Binding to signal 'SIGFPE' is not allowed",
     );
     assertThrows(
-      () => Deno.addSignalListener("SIGSEGV", () => {}),
+      () => Oden.addSignalListener("SIGSEGV", () => {}),
       TypeError,
       "Binding to signal 'SIGSEGV' is not allowed",
     );
   },
 );
 
-Deno.test(
-  { ignore: Deno.build.os !== "linux" },
+Oden.test(
+  { ignore: Oden.build.os !== "linux" },
   function signalAliasLinux() {
     const i = () => {};
-    Deno.addSignalListener("SIGUNUSED", i);
-    Deno.addSignalListener("SIGPOLL", i);
+    Oden.addSignalListener("SIGUNUSED", i);
+    Oden.addSignalListener("SIGPOLL", i);
 
-    Deno.removeSignalListener("SIGUNUSED", i);
-    Deno.removeSignalListener("SIGPOLL", i);
+    Oden.removeSignalListener("SIGUNUSED", i);
+    Oden.removeSignalListener("SIGPOLL", i);
   },
 );
 
-Deno.test(
+Oden.test(
   {
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
     permissions: { run: true },
   },
   function killWithSignalZero() {
     // This should not throw for the current process
-    Deno.kill(Deno.pid, 0);
+    Oden.kill(Oden.pid, 0);
 
     // Test with a non-existent PID (very high number unlikely to exist)
     assertThrows(
       () => {
-        Deno.kill(999999, 0);
+        Oden.kill(999999, 0);
       },
-      Deno.errors.NotFound,
+      Oden.errors.NotFound,
     );
   },
 );

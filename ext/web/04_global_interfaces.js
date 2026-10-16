@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // @ts-check
 /// <reference path="../../core/internal.d.ts" />
@@ -10,7 +10,7 @@ const {
   SymbolToStringTag,
   TypeError,
 } = primordials;
-const { EventTarget } = core.loadExtScript("ext:deno_web/02_event.js");
+const { EventTarget } = core.loadExtScript("ext:oden_web/02_event.js");
 
 const illegalConstructorKey = Symbol("illegalConstructorKey");
 

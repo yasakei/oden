@@ -1,4 +1,4 @@
-// Copyright 2020 the Deno authors. All rights reserved. MIT license.
+// Copyright 2020 the Oden authors. All rights reserved. MIT license.
 
 function oneWorker(i: number) {
   return new Promise<void>((resolve) => {

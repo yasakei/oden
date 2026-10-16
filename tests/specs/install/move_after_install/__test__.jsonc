@@ -14,7 +14,7 @@
     {
       "args": [
         "eval",
-        "Deno.renameSync('test-project', 'test-project-moved')"
+        "Oden.renameSync('test-project', 'test-project-moved')"
       ],
       "output": ""
     },

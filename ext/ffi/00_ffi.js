@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core, internals, primordials } = __bootstrap;
@@ -62,7 +62,7 @@ const {
   SafeWeakMap,
 } = primordials;
 
-const { pathFromURL } = core.loadExtScript("ext:deno_web/00_infra.js");
+const { pathFromURL } = core.loadExtScript("ext:oden_web/00_infra.js");
 
 /**
  * @param {BufferSource} source
@@ -393,7 +393,7 @@ function getTypeSizeAndAlignment(type, cache = new SafeMap()) {
 
 class UnsafeCallback {
   #refcount;
-  // Internal promise only meant to keep Deno from exiting
+  // Internal promise only meant to keep Oden from exiting
   #refpromise;
   #rid;
   definition;

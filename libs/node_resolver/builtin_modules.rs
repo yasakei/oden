@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 pub trait IsBuiltInNodeModuleChecker: std::fmt::Debug {
   /// e.g. `is_builtin_node_module("assert")`
@@ -6,22 +6,22 @@ pub trait IsBuiltInNodeModuleChecker: std::fmt::Debug {
 }
 
 /// An implementation of IsBuiltInNodeModuleChecker that uses
-/// the list of built-in node_modules that are supported by Deno
-/// in the `deno_node` crate (ext/node).
+/// the list of built-in node_modules that are supported by Oden
+/// in the `oden_node` crate (ext/node).
 #[derive(Debug)]
-pub struct DenoIsBuiltInNodeModuleChecker;
+pub struct OdenIsBuiltInNodeModuleChecker;
 
-impl IsBuiltInNodeModuleChecker for DenoIsBuiltInNodeModuleChecker {
+impl IsBuiltInNodeModuleChecker for OdenIsBuiltInNodeModuleChecker {
   #[inline(always)]
   fn is_builtin_node_module(&self, module_name: &str) -> bool {
-    DENO_SUPPORTED_BUILTIN_NODE_MODULES
+    ODEN_SUPPORTED_BUILTIN_NODE_MODULES
       .binary_search(&module_name)
       .is_ok()
   }
 }
 
-/// Collection of built-in node_modules supported by Deno.
-pub static DENO_SUPPORTED_BUILTIN_NODE_MODULES: &[&str] = &[
+/// Collection of built-in node_modules supported by Oden.
+pub static ODEN_SUPPORTED_BUILTIN_NODE_MODULES: &[&str] = &[
   // NOTE(bartlomieju): keep this list in sync with `ext/node/polyfills/01_require.js`
   "_http_agent",
   "_http_common",
@@ -99,8 +99,8 @@ mod test {
 
   #[test]
   fn test_builtins_are_sorted() {
-    let mut builtins_list = DENO_SUPPORTED_BUILTIN_NODE_MODULES.to_vec();
+    let mut builtins_list = ODEN_SUPPORTED_BUILTIN_NODE_MODULES.to_vec();
     builtins_list.sort();
-    assert_eq!(DENO_SUPPORTED_BUILTIN_NODE_MODULES, builtins_list);
+    assert_eq!(ODEN_SUPPORTED_BUILTIN_NODE_MODULES, builtins_list);
   }
 }

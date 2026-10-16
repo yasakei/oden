@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // deno-lint-ignore-file ban-types no-explicit-any
 
@@ -11,7 +11,7 @@ declare global {
     captureStackTrace(targetObject: object, constructorOpt?: Function): void;
   }
 
-  namespace Deno {
+  namespace Oden {
     export const core: typeof __bootstrap.core;
   }
 
@@ -36,8 +36,8 @@ export namespace core {
 
   /**
    * Enables collection of stack traces for sanitizers. This allows for
-   * debugging of where a given async op was started. Deno CLI uses this for
-   * improving error message in sanitizer errors for `deno test`.
+   * debugging of where a given async op was started. Oden CLI uses this for
+   * improving error message in sanitizer errors for `oden test`.
    *
    * **NOTE:** enabling tracing has a significant negative performance impact.
    */
@@ -53,7 +53,7 @@ export namespace core {
 
   /**
    * Returns a map containing traces for all ongoing async ops. The key is the promise id.
-   * Tracing only occurs when `Deno.core.setLeakTracingEnabled()` was previously
+   * Tracing only occurs when `Oden.core.setLeakTracingEnabled()` was previously
    * enabled.
    */
   function getAllLeakTraces(): Map<number, string>;
@@ -142,7 +142,7 @@ export namespace core {
    *     and an exception. Invalidates the resource.
    *   - `op_wasm_streaming_set_url`. Sets a source URL for the wasm module.
    *     Takes the rid and a string.
-   *   - To indicate the end of the resource, use `Deno.core.close()` with the
+   *   - To indicate the end of the resource, use `Oden.core.close()` with the
    *     rid.
    */
   function setWasmStreamingCallback(

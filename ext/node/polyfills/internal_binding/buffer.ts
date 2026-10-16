@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 (function () {
 const { core, primordials } = __bootstrap;
 const { Encodings } = core.loadExtScript(
-  "ext:deno_node/internal_binding/_node.ts",
+  "ext:oden_node/internal_binding/_node.ts",
 );
 
 const {
@@ -21,7 +21,7 @@ function fill(
   end,
 ) {
   // Ignore primordial: `fill` is a method from Node.js Buffer.
-  // deno-lint-ignore deno-internal/prefer-primordials
+  // deno-lint-ignore oden-internal/prefer-primordials
   return buffer.fill(value, start, end);
 }
 

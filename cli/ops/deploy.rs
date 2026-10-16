@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_core::op2;
+use oden_core::op2;
 use deno_error::JsErrorBox;
 
 use crate::tools::deploy::get_token_entry;
 
-deno_core::extension!(
-  deno_deploy,
+oden_core::extension!(
+  oden_deploy,
   ops = [
     op_deploy_token_get,
     op_deploy_token_set,

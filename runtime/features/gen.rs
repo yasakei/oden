@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 /// Don't modify this file manually.
 ///
@@ -42,7 +42,7 @@ pub static UNSTABLE_FEATURES: &[UnstableFeatureDefinition] = &[
   UnstableFeatureDefinition {
     name: "cron",
     flag_name: "unstable-cron",
-    help_text: "Enable unstable `Deno.cron` API",
+    help_text: "Enable unstable `Oden.cron` API",
     show_in_help: true,
     id: 4,
     kind: UnstableFeatureKind::Runtime,
@@ -114,7 +114,7 @@ pub static UNSTABLE_FEATURES: &[UnstableFeatureDefinition] = &[
   UnstableFeatureDefinition {
     name: "no-legacy-abort",
     flag_name: "unstable-no-legacy-abort",
-    help_text: "Enable abort signal in Deno.serve without legacy behavior. This will not abort the server when the request is handled successfully.",
+    help_text: "Enable abort signal in Oden.serve without legacy behavior. This will not abort the server when the request is handled successfully.",
     show_in_help: true,
     id: 13,
     kind: UnstableFeatureKind::Runtime,
@@ -226,11 +226,11 @@ pub struct UnstableEnvVarNames {
   pub subdomain_wildcards: &'static str,
 }
 pub static UNSTABLE_ENV_VAR_NAMES: UnstableEnvVarNames = UnstableEnvVarNames {
-  bare_node_builtins: "DENO_UNSTABLE_BARE_NODE_BUILTINS",
-  lazy_dynamic_imports: "DENO_UNSTABLE_LAZY_DYNAMIC_IMPORTS",
-  lockfile_v5: "DENO_UNSTABLE_LOCKFILE_V5",
-  npm_lazy_caching: "DENO_UNSTABLE_NPM_LAZY_CACHING",
-  raw_imports: "DENO_UNSTABLE_RAW_IMPORTS",
-  sloppy_imports: "DENO_UNSTABLE_SLOPPY_IMPORTS",
-  subdomain_wildcards: "DENO_UNSTABLE_SUBDOMAIN_WILDCARDS",
+  bare_node_builtins: "ODEN_UNSTABLE_BARE_NODE_BUILTINS",
+  lazy_dynamic_imports: "ODEN_UNSTABLE_LAZY_DYNAMIC_IMPORTS",
+  lockfile_v5: "ODEN_UNSTABLE_LOCKFILE_V5",
+  npm_lazy_caching: "ODEN_UNSTABLE_NPM_LAZY_CACHING",
+  raw_imports: "ODEN_UNSTABLE_RAW_IMPORTS",
+  sloppy_imports: "ODEN_UNSTABLE_SLOPPY_IMPORTS",
+  subdomain_wildcards: "ODEN_UNSTABLE_SUBDOMAIN_WILDCARDS",
 };

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 //
 // Adapted from Node.js. Copyright Joyent, Inc. and other Node contributors.
 //
@@ -24,9 +24,9 @@
 (function () {
 const { core, primordials } = __bootstrap;
 const bindingTypes = core.loadExtScript(
-  "ext:deno_node/internal_binding/types.ts",
+  "ext:oden_node/internal_binding/types.ts",
 );
-const cryptoKeys = core.loadExtScript("ext:deno_node/internal/crypto/_keys.ts");
+const cryptoKeys = core.loadExtScript("ext:oden_node/internal/crypto/_keys.ts");
 const {
   ArrayBufferIsView,
   TypedArrayPrototypeGetSymbolToStringTag,

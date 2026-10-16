@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core, primordials } = __bootstrap;
@@ -11,7 +11,7 @@ const {
 } = primordials;
 
 const { Buffer, kMaxLength } = core.loadExtScript(
-  "ext:deno_node/internal/buffer.mjs",
+  "ext:oden_node/internal/buffer.mjs",
 );
 const {
   emitAfter,
@@ -20,13 +20,13 @@ const {
   emitInit,
   executionAsyncId,
   newAsyncId,
-} = core.loadExtScript("ext:deno_node/internal/async_hooks.ts");
+} = core.loadExtScript("ext:oden_node/internal/async_hooks.ts");
 const {
   validateFunction,
   validateNumber,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
 const { ERR_OUT_OF_RANGE } = core.loadExtScript(
-  "ext:deno_node/internal/errors.ts",
+  "ext:oden_node/internal/errors.ts",
 );
 
 const lazyProcess = core.createLazyLoader("node:process");
@@ -63,7 +63,7 @@ function generateRandomBytes(size: number) {
       generated += MAX_RANDOM_VALUES
     ) {
       globalThis.crypto.getRandomValues(
-        // deno-lint-ignore deno-internal/prefer-primordials -- Buffer.prototype.slice (Node Buffer method, not TypedArray slice)
+        // deno-lint-ignore oden-internal/prefer-primordials -- Buffer.prototype.slice (Node Buffer method, not TypedArray slice)
         bytes.slice(generated, generated + MAX_RANDOM_VALUES),
       );
     }

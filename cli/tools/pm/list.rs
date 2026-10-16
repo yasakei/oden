@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use deno_cache_dir::GlobalOrLocalHttpCache;
-use deno_cache_dir::file_fetcher::CacheSetting;
-use deno_core::anyhow::bail;
-use deno_core::error::AnyError;
+use oden_cache_dir::GlobalOrLocalHttpCache;
+use oden_cache_dir::file_fetcher::CacheSetting;
+use oden_core::anyhow::bail;
+use oden_core::error::AnyError;
 use deno_semver::package::PackageKind;
 use deno_semver::package::PackageReq;
 use deno_terminal::colors;
@@ -59,7 +59,7 @@ struct DepGraph {
 }
 
 impl DepGraph {
-  fn from_lockfile_content(content: &deno_lockfile::PackagesContent) -> Self {
+  fn from_lockfile_content(content: &oden_lockfile::PackagesContent) -> Self {
     let mut forward: HashMap<PkgId, Vec<PkgId>> = HashMap::new();
     let mut npm_by_base: HashMap<String, String> = HashMap::new();
 
@@ -326,9 +326,9 @@ pub async fn list(
     factory.jsr_version_resolver()?.clone(),
   ));
 
-  if !cli_options.start_dir.has_deno_or_pkg_json() {
+  if !cli_options.start_dir.has_oden_or_pkg_json() {
     bail!(
-      "No deno.json or package.json in \"{}\".",
+      "No oden.json or package.json in \"{}\".",
       cli_options.initial_cwd().display(),
     );
   }

@@ -1,34 +1,34 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 
 import { core, primordials } from "ext:core/mod.js";
 const { Promise } = primordials;
 const { Readline } = core.loadExtScript(
-  "ext:deno_node/internal/readline/promises.mjs",
+  "ext:oden_node/internal/readline/promises.mjs",
 );
 
 const {
   Interface: _Interface,
   kQuestion,
   kQuestionCancel,
-} = core.loadExtScript("ext:deno_node/internal/readline/interface.mjs");
-const { AbortError } = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/readline/interface.mjs");
+const { AbortError } = core.loadExtScript("ext:oden_node/internal/errors.ts");
 const { validateAbortSignal } = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
 
-const { kEmptyObject } = core.loadExtScript("ext:deno_node/internal/util.mjs");
-import type { Abortable } from "ext:deno_node/_events.d.ts";
+const { kEmptyObject } = core.loadExtScript("ext:oden_node/internal/util.mjs");
+import type { Abortable } from "ext:oden_node/_events.d.ts";
 import type {
   AsyncCompleter,
   Completer,
   ReadLineOptions,
-} from "ext:deno_node/_readline_shared_types.d.ts";
+} from "ext:oden_node/_readline_shared_types.d.ts";
 
 import type {
   ReadableStream,
   WritableStream,
-} from "ext:deno_node/_global.d.ts";
+} from "ext:oden_node/_global.d.ts";
 
 /**
  * The `readline/promise` module provides an API for reading lines of input from a Readable stream one line at a time.

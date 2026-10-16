@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::path::PathBuf;
 
 /// A process that currently holds an open handle to one of the files we tried
 /// to remove. Used to give the user an actionable message (for example, that a
-/// running Deno language server is keeping cache files locked) when `deno
+/// running Oden language server is keeping cache files locked) when `oden
 /// clean` cannot delete part of the cache on Windows.
 pub struct LockingProcess {
   pub pid: u32,
@@ -12,8 +12,8 @@ pub struct LockingProcess {
   pub name: String,
   /// Full path to the process image, when it could be resolved.
   pub exe: Option<PathBuf>,
-  /// Whether the process image looks like a `deno` executable.
-  pub is_deno: bool,
+  /// Whether the process image looks like a `oden` executable.
+  pub is_oden: bool,
 }
 
 /// Returns the processes that currently hold open handles to any of `paths`.
@@ -121,12 +121,12 @@ pub fn processes_locking_files(paths: &[PathBuf]) -> Vec<LockingProcess> {
         let pid = info.Process.dwProcessId;
         let name = wide_to_string(&info.strAppName);
         let exe = process_image_path(pid);
-        let is_deno = exe.as_deref().is_some_and(is_deno_exe);
+        let is_oden = exe.as_deref().is_some_and(is_oden_exe);
         result.push(LockingProcess {
           pid,
           name,
           exe,
-          is_deno,
+          is_oden,
         });
       }
     }
@@ -143,11 +143,11 @@ fn wide_to_string(buf: &[u16]) -> String {
 }
 
 #[cfg(windows)]
-fn is_deno_exe(path: &std::path::Path) -> bool {
+fn is_oden_exe(path: &std::path::Path) -> bool {
   path
     .file_stem()
     .and_then(|stem| stem.to_str())
-    .is_some_and(|stem| stem.eq_ignore_ascii_case("deno"))
+    .is_some_and(|stem| stem.eq_ignore_ascii_case("oden"))
 }
 
 /// Resolves the full image path for a process id, or `None` if it cannot be

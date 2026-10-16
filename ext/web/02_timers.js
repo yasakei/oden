@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Web timers (setTimeout/setInterval) built directly on core.createTimer.
 // Adds WHATWG-specific behavior on top:
@@ -30,7 +30,7 @@ const {
   indirectEval,
 } = primordials;
 
-const webidl = core.loadExtScript("ext:deno_webidl/00_webidl.js");
+const webidl = core.loadExtScript("ext:oden_webidl/00_webidl.js");
 
 // Map numeric timer IDs to internal core timer objects so clearTimeout /
 // clearInterval / refTimer / unrefTimer can look them up by id.

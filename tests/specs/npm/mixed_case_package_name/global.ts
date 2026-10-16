@@ -1,2 +1,2 @@
-import value from "npm:@denotest/MixedCase";
+import value from "npm:@odentest/MixedCase";
 console.log(value);

@@ -1,21 +1,21 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cell::RefCell;
 use std::num::NonZeroU64;
 
-use deno_core::GarbageCollected;
-use deno_core::WebIDL;
-use deno_core::cppgc::Ref;
-use deno_core::op2;
-use deno_core::v8;
-use deno_core::v8::Local;
-use deno_core::v8::Value;
-use deno_core::webidl::ContextFn;
-use deno_core::webidl::IntOptions;
-use deno_core::webidl::Nullable;
-use deno_core::webidl::WebIdlConverter;
-use deno_core::webidl::WebIdlError;
+use oden_core::GarbageCollected;
+use oden_core::WebIDL;
+use oden_core::cppgc::Ref;
+use oden_core::op2;
+use oden_core::v8;
+use oden_core::v8::Local;
+use oden_core::v8::Value;
+use oden_core::webidl::ContextFn;
+use oden_core::webidl::IntOptions;
+use oden_core::webidl::Nullable;
+use oden_core::webidl::WebIdlConverter;
+use oden_core::webidl::WebIdlError;
 
 use crate::Instance;
 use crate::buffer::GPUBuffer;
@@ -36,7 +36,7 @@ pub struct GPURenderPassEncoder {
 
 // SAFETY: we're sure this can be GCed
 unsafe impl GarbageCollected for GPURenderPassEncoder {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"GPURenderPassEncoder"
   }

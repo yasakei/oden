@@ -3,7 +3,7 @@
   "steps": [{
     "args": [
       "eval",
-      "Deno.writeTextFileSync('.gitignore', 'gitignored.ts')"
+      "Oden.writeTextFileSync('.gitignore', 'gitignored.ts')"
     ],
     "output": "[WILDCARD]"
   }, {

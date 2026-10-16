@@ -1,13 +1,13 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 
 use deno_media_type::MediaType;
-use deno_resolver::loader::LoadedModuleSource;
-use deno_runtime::deno_core::FastString;
-use deno_runtime::deno_core::ModuleSourceCode;
-use deno_runtime::deno_core::ModuleType;
-use deno_runtime::deno_core::RequestedModuleType;
+use oden_resolver::loader::LoadedModuleSource;
+use oden_runtime::oden_core::FastString;
+use oden_runtime::oden_core::ModuleSourceCode;
+use oden_runtime::oden_core::ModuleType;
+use oden_runtime::oden_core::RequestedModuleType;
 
 pub fn module_type_from_media_and_requested_type(
   media_type: MediaType,
@@ -50,24 +50,24 @@ pub fn loaded_module_source_to_module_source_code(
   }
 }
 
-pub fn as_deno_resolver_requested_module_type(
+pub fn as_oden_resolver_requested_module_type(
   value: &RequestedModuleType,
-) -> deno_resolver::loader::RequestedModuleType<'_> {
+) -> oden_resolver::loader::RequestedModuleType<'_> {
   match value {
     RequestedModuleType::None => {
-      deno_resolver::loader::RequestedModuleType::None
+      oden_resolver::loader::RequestedModuleType::None
     }
     RequestedModuleType::Json => {
-      deno_resolver::loader::RequestedModuleType::Json
+      oden_resolver::loader::RequestedModuleType::Json
     }
     RequestedModuleType::Text => {
-      deno_resolver::loader::RequestedModuleType::Text
+      oden_resolver::loader::RequestedModuleType::Text
     }
     RequestedModuleType::Bytes => {
-      deno_resolver::loader::RequestedModuleType::Bytes
+      oden_resolver::loader::RequestedModuleType::Bytes
     }
     RequestedModuleType::Other(text) => {
-      deno_resolver::loader::RequestedModuleType::Other(text)
+      oden_resolver::loader::RequestedModuleType::Other(text)
     }
   }
 }

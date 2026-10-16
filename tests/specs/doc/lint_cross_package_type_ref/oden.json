@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "@odentest/lint-public-base": "jsr:@odentest/lint-public-base@^0.1.0"
+  }
+}

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 
 // deno-lint-ignore-file ban-untagged-todo
@@ -6,11 +6,11 @@
 (function () {
 const { core, primordials } = __bootstrap;
 const { ERR_INVALID_ARG_TYPE } = core.loadExtScript(
-  "ext:deno_node/internal/errors.ts",
+  "ext:oden_node/internal/errors.ts",
 );
-const { nextTick } = core.loadExtScript("ext:deno_node/_next_tick.ts");
+const { nextTick } = core.loadExtScript("ext:oden_node/_next_tick.ts");
 const { validateFunction } = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
 
 const {
@@ -36,7 +36,7 @@ const {
   SymbolHasInstance,
 } = primordials;
 const { WeakReference } = core.loadExtScript(
-  "ext:deno_node/internal/util.mjs",
+  "ext:oden_node/internal/util.mjs",
 );
 
 // Can't delete when weakref count reaches 0 as it could increment again.
@@ -284,7 +284,7 @@ function assertChannel(value, name) {
   // Channel defines a custom [Symbol.hasInstance] (accepting both Channel and
   // ActiveChannel prototypes), so this instanceof must stay to preserve that
   // behavior; ObjectPrototypeIsPrototypeOf would bypass it.
-  // deno-lint-ignore deno-internal/prefer-primordials
+  // deno-lint-ignore oden-internal/prefer-primordials
   if (!(value instanceof Channel)) {
     throw new ERR_INVALID_ARG_TYPE(name, ["Channel"], value);
   }

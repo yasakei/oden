@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::rc::Rc;
 
@@ -16,7 +16,7 @@ pub enum CronHandlerImpl {
 
 impl CronHandlerImpl {
   pub fn create_from_env() -> Self {
-    match std::env::var("DENO_UNSTABLE_CRON_SOCK") {
+    match std::env::var("ODEN_UNSTABLE_CRON_SOCK") {
       Ok(socket_addr) => Self::Socket(SocketCronHandler::new(socket_addr)),
       Err(_) => Self::Local(LocalCronHandler::new()),
     }
@@ -37,7 +37,7 @@ impl CronHandler for CronHandlerImpl {
   ///
   /// Never downgrades from Socket → Local.
   fn maybe_reload(&self) -> Option<Box<dyn CronHandler>> {
-    let current_sock = std::env::var("DENO_UNSTABLE_CRON_SOCK").ok();
+    let current_sock = std::env::var("ODEN_UNSTABLE_CRON_SOCK").ok();
 
     match (self, current_sock) {
       // Local → Socket: upgrade

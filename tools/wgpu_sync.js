@@ -1,5 +1,5 @@
-#!/usr/bin/env -S deno run --unstable --allow-read --allow-write --allow-run --config=tests/config/deno.json
-// Copyright 2018-2026 the Deno authors. MIT license.
+#!/usr/bin/env -S oden run --unstable --allow-read --allow-write --allow-run --config=tests/config/oden.json
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { join, ROOT_PATH } from "./util.js";
 
@@ -9,7 +9,7 @@ const V_WGPU = "29.0.1";
 const TARGET_DIR = join(ROOT_PATH, "ext", "webgpu");
 
 async function bash(subcmd, opts = {}) {
-  const { success, code } = await new Deno.Command("bash", {
+  const { success, code } = await new Oden.Command("bash", {
     ...opts,
     args: ["-c", subcmd],
     stdout: "inherit",
@@ -18,7 +18,7 @@ async function bash(subcmd, opts = {}) {
 
   // Exit process on failure
   if (!success) {
-    Deno.exit(code);
+    Oden.exit(code);
   }
 }
 
@@ -27,34 +27,34 @@ async function clearTargetDir() {
 }
 
 async function checkoutUpstream() {
-  // Path of deno_webgpu inside the TAR
+  // Path of oden_webgpu inside the TAR
   const tarPrefix = `${REPO.replace("/", "-")}-${
     COMMIT.slice(0, 7)
-  }/deno_webgpu/`;
+  }/oden_webgpu/`;
   const cmd =
     `curl -L https://api.github.com/repos/${REPO}/tarball/${COMMIT} | tar -C '${TARGET_DIR}' -xzvf - --strip=2 '${tarPrefix}'`;
   // console.log(cmd);
   await bash(cmd);
 }
 
-async function denoWebgpuVersion() {
+async function odenWebgpuVersion() {
   const coreCargo = join(ROOT_PATH, "Cargo.toml");
-  const contents = await Deno.readTextFile(coreCargo);
+  const contents = await Oden.readTextFile(coreCargo);
   return contents.match(
-    /^deno_webgpu = { version = "(\d+\.\d+\.\d+)", path = ".\/ext\/webgpu" }$/m,
+    /^oden_webgpu = { version = "(\d+\.\d+\.\d+)", path = ".\/ext\/webgpu" }$/m,
   )[1];
 }
 
 async function patchFile(path, patcher) {
-  const data = await Deno.readTextFile(path);
+  const data = await Oden.readTextFile(path);
   const patched = patcher(data);
-  await Deno.writeTextFile(path, patched);
+  await Oden.writeTextFile(path, patched);
 }
 
 async function patchReadme() {
   const sourceSection = `## Source
 
-The canonical source is considered to be https://github.com/gfx-rs/wgpu@trunk/deno_webgpu,
+The canonical source is considered to be https://github.com/gfx-rs/wgpu@trunk/oden_webgpu,
 even though they are maintained separately but synced occasionally using the script
 https://github.com/denoland/deno/blob/main/tools/wgpu_sync.js
 `;
@@ -80,12 +80,12 @@ https://github.com/denoland/deno/blob/main/tools/wgpu_sync.js
 }
 
 async function patchCargo() {
-  const vDenoWebgpu = await denoWebgpuVersion();
+  const vOdenWebgpu = await odenWebgpuVersion();
   await patchFile(
     join(TARGET_DIR, "Cargo.toml"),
     (data) =>
       data
-        .replace(/^version = .*/m, `version = "${vDenoWebgpu}"`)
+        .replace(/^version = .*/m, `version = "${vOdenWebgpu}"`)
         .replace(/^authors = .*/m, `authors.workspace = true`)
         .replace(/^license = .*/m, `license.workspace = true`)
         .replace(/^repository = .*/m, `repository.workspace = true`)

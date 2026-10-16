@@ -1,4 +1,4 @@
 aliased value: from-import-map
 relative value: from-import-map
-aliased url resolves through deno: true
-relative url resolves through deno: true
+aliased url resolves through oden: true
+relative url resolves through oden: true

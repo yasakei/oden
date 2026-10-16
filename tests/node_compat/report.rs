@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 
@@ -13,8 +13,8 @@ use crate::tests_path;
 #[derive(Debug, Serialize)]
 struct TestReport {
   date: String,
-  #[serde(rename = "denoVersion")]
-  deno_version: String,
+  #[serde(rename = "odenVersion")]
+  oden_version: String,
   os: String,
   arch: String,
   #[serde(rename = "nodeVersion")]
@@ -62,7 +62,7 @@ pub struct CollectedResult {
 pub fn generate_report(results: &HashMap<String, CollectedResult>) {
   let node_version = read_node_version();
   let date = chrono::Utc::now().format("%Y-%m-%d").to_string();
-  let deno_version = get_deno_version();
+  let oden_version = get_oden_version();
   let os = std::env::consts::OS.to_string();
   let arch = std::env::consts::ARCH.to_string();
   let run_id = std::env::var("GITHUB_RUN_ID").ok();
@@ -103,7 +103,7 @@ pub fn generate_report(results: &HashMap<String, CollectedResult>) {
   let total = results.len() - ignore_count;
   let report = TestReport {
     date,
-    deno_version,
+    oden_version,
     os,
     arch,
     node_version,
@@ -119,17 +119,17 @@ pub fn generate_report(results: &HashMap<String, CollectedResult>) {
   report_path.write(json);
 }
 
-fn get_deno_version() -> String {
-  let output = std::process::Command::new(util::deno_exe_path().as_path())
+fn get_oden_version() -> String {
+  let output = std::process::Command::new(util::oden_exe_path().as_path())
     .arg("-v")
     .output()
     .ok()
     .unwrap();
 
   let stdout = String::from_utf8_lossy(&output.stdout);
-  // Parse: "deno 2.x.x (...)"
+  // Parse: "oden 2.x.x (...)"
   let line = stdout.lines().next().unwrap();
-  let version = line.strip_prefix("deno ").unwrap();
+  let version = line.strip_prefix("oden ").unwrap();
   let version = version.split_whitespace().next().unwrap();
   version.to_string()
 }
@@ -147,23 +147,23 @@ fn read_node_version() -> String {
 
   // The report is only meaningful if the runtime under test claims to be the
   // same Node version the suite was vendored from. These are bumped in two
-  // different places (`deno_node::NODE_VERSION` and the submodule), so without
-  // this the report can silently claim a version Deno does not emulate.
+  // different places (`oden_node::NODE_VERSION` and the submodule), so without
+  // this the report can silently claim a version Oden does not emulate.
   let emulated_version = get_emulated_node_version();
   assert_eq!(
     suite_version, emulated_version,
-    "node_compat suite is vendored from Node {suite_version} but Deno reports \
+    "node_compat suite is vendored from Node {suite_version} but Oden reports \
      process.versions.node = {emulated_version}. Update \
-     `deno_node::NODE_VERSION` to match the submodule."
+     `oden_node::NODE_VERSION` to match the submodule."
   );
 
   suite_version
 }
 
 /// The Node version the runtime under test reports, i.e.
-/// `deno_node::NODE_VERSION` as observed through `process.versions.node`.
+/// `oden_node::NODE_VERSION` as observed through `process.versions.node`.
 fn get_emulated_node_version() -> String {
-  let output = std::process::Command::new(util::deno_exe_path().as_path())
+  let output = std::process::Command::new(util::oden_exe_path().as_path())
     .arg("eval")
     .arg("--quiet")
     .arg("console.log(process.versions.node)")

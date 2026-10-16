@@ -1,2 +1,2 @@
-import { hello } from "@denotest/lib";
+import { hello } from "@odentest/lib";
 console.log(hello());

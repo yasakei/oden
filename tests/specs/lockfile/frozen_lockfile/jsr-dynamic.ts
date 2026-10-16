@@ -1,2 +1,2 @@
 const scheme = "jsr:";
-const { add } = await import(scheme + "@denotest/add@1");
+const { add } = await import(scheme + "@odentest/add@1");

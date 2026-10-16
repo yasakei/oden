@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 pub mod dns;
 mod fs_fetch_handler;
@@ -31,43 +31,43 @@ use bytes::Bytes;
 // Re-export data_url
 pub use data_url;
 use data_url::DataUrl;
-use deno_core::AsyncRefCell;
-use deno_core::AsyncResult;
-use deno_core::BufView;
-use deno_core::CancelFuture;
-use deno_core::CancelHandle;
-use deno_core::CancelTryFuture;
-use deno_core::Canceled;
-use deno_core::FromV8;
-use deno_core::OpState;
-use deno_core::RcRef;
-use deno_core::Resource;
-use deno_core::ResourceId;
-use deno_core::ToV8;
-use deno_core::convert::ByteString;
-use deno_core::convert::Uint8Array;
-use deno_core::futures::FutureExt;
-use deno_core::futures::Stream;
-use deno_core::futures::StreamExt;
-use deno_core::futures::TryFutureExt;
-use deno_core::futures::stream::Peekable;
-use deno_core::op2;
-use deno_core::url;
-use deno_core::url::Url;
-use deno_core::v8;
+use oden_core::AsyncRefCell;
+use oden_core::AsyncResult;
+use oden_core::BufView;
+use oden_core::CancelFuture;
+use oden_core::CancelHandle;
+use oden_core::CancelTryFuture;
+use oden_core::Canceled;
+use oden_core::FromV8;
+use oden_core::OpState;
+use oden_core::RcRef;
+use oden_core::Resource;
+use oden_core::ResourceId;
+use oden_core::ToV8;
+use oden_core::convert::ByteString;
+use oden_core::convert::Uint8Array;
+use oden_core::futures::FutureExt;
+use oden_core::futures::Stream;
+use oden_core::futures::StreamExt;
+use oden_core::futures::TryFutureExt;
+use oden_core::futures::stream::Peekable;
+use oden_core::op2;
+use oden_core::url;
+use oden_core::url::Url;
+use oden_core::v8;
 use deno_error::JsErrorBox;
-pub use deno_fs::FsError;
+pub use oden_fs::FsError;
 use deno_path_util::PathToUrlError;
-use deno_permissions::OpenAccessKind;
-use deno_permissions::PermissionCheckError;
-use deno_permissions::PermissionsContainer;
-use deno_tls::Proxy;
-use deno_tls::RootCertStoreProvider;
-use deno_tls::SocketUse;
-use deno_tls::TlsKey;
-use deno_tls::TlsKeys;
-use deno_tls::TlsKeysHolder;
-use deno_tls::rustls::RootCertStore;
+use oden_permissions::OpenAccessKind;
+use oden_permissions::PermissionCheckError;
+use oden_permissions::PermissionsContainer;
+use oden_tls::Proxy;
+use oden_tls::RootCertStoreProvider;
+use oden_tls::SocketUse;
+use oden_tls::TlsKey;
+use oden_tls::TlsKeys;
+use oden_tls::TlsKeysHolder;
+use oden_tls::rustls::RootCertStore;
 pub use fs_fetch_handler::FsFetchHandler;
 use http::Extensions;
 use http::HeaderMap;
@@ -115,9 +115,9 @@ pub struct Options {
   /// A callback to customize HTTP client configuration.
   ///
   /// The settings applied with this hook may be overridden by the options
-  /// provided through `Deno.createHttpClient()` API. For instance, if the hook
+  /// provided through `Oden.createHttpClient()` API. For instance, if the hook
   /// calls [`hyper_util::client::legacy::Builder::pool_max_idle_per_host`] with
-  /// a value of 99, and a user calls `Deno.createHttpClient({ poolMaxIdlePerHost: 42 })`,
+  /// a value of 99, and a user calls `Oden.createHttpClient({ poolMaxIdlePerHost: 42 })`,
   /// the value that will take effect is 42.
   ///
   /// For more info on what can be configured, see [`hyper_util::client::legacy::Builder`].
@@ -156,8 +156,8 @@ impl Default for Options {
   }
 }
 
-deno_core::extension!(deno_fetch,
-  deps = [ deno_webidl, deno_web ],
+oden_core::extension!(oden_fetch,
+  deps = [ oden_webidl, oden_web ],
   ops = [
     op_fetch,
     op_fetch_send,
@@ -187,7 +187,7 @@ deno_core::extension!(deno_fetch,
 pub enum FetchError {
   #[class(inherit)]
   #[error(transparent)]
-  Resource(#[from] deno_core::error::ResourceError),
+  Resource(#[from] oden_core::error::ResourceError),
   #[class(inherit)]
   #[error(transparent)]
   Permission(#[from] PermissionCheckError),
@@ -196,7 +196,7 @@ pub enum FetchError {
   NetworkError,
   #[class(type)]
   #[error("Error fetching file '{0}': {1}")]
-  FileFetch(String, deno_fs::FsError),
+  FileFetch(String, oden_fs::FsError),
   #[class(type)]
   #[error("Fetching files only supports the GET method: received {0}")]
   FsNotGet(Method),
@@ -262,16 +262,16 @@ pub enum FetchError {
   Other(JsErrorBox),
 }
 
-impl From<deno_fs::FsError> for FetchError {
-  fn from(value: deno_fs::FsError) -> Self {
+impl From<oden_fs::FsError> for FetchError {
+  fn from(value: oden_fs::FsError) -> Self {
     match value {
-      deno_fs::FsError::Io(_)
-      | deno_fs::FsError::FileBusy
-      | deno_fs::FsError::NotSupported => FetchError::NetworkError,
-      deno_fs::FsError::PermissionCheck(err) => {
+      oden_fs::FsError::Io(_)
+      | oden_fs::FsError::FileBusy
+      | oden_fs::FsError::NotSupported => FetchError::NetworkError,
+      oden_fs::FsError::PermissionCheck(err) => {
         FetchError::PermissionCheck(err)
       }
-      deno_fs::FsError::JoinError(err) => {
+      oden_fs::FsError::JoinError(err) => {
         FetchError::Other(JsErrorBox::from_err(err))
       }
     }
@@ -731,7 +731,7 @@ pub enum FetchResponseReader {
 
 impl Default for FetchResponseReader {
   fn default() -> Self {
-    let stream: BytesStream = Box::pin(deno_core::futures::stream::empty());
+    let stream: BytesStream = Box::pin(oden_core::futures::stream::empty());
     Self::BodyReader(stream.peekable())
   }
 }
@@ -883,11 +883,11 @@ pub fn op_fetch_custom_client(
             HttpClientCreateError::InvalidProxyUrl,
           ));
         }
-        permissions.check_net_url(&url, "Deno.createHttpClient()")?;
+        permissions.check_net_url(&url, "Oden.createHttpClient()")?;
       }
       Proxy::Tcp { hostname, port } => {
         permissions
-          .check_net(&(hostname, Some(*port)), "Deno.createHttpClient()")?;
+          .check_net(&(hostname, Some(*port)), "Oden.createHttpClient()")?;
       }
       Proxy::Unix {
         path: original_path,
@@ -897,7 +897,7 @@ pub fn op_fetch_custom_client(
           .check_open(
             Cow::Borrowed(path),
             OpenAccessKind::ReadWriteNoFollow,
-            Some("Deno.createHttpClient()"),
+            Some("Oden.createHttpClient()"),
           )?
           .into_path();
         // Unix sockets are an outbound network primitive, so a Unix proxy
@@ -905,14 +905,14 @@ pub fn op_fetch_custom_client(
         // filesystem check above, mirroring the direct Unix socket ops.
         permissions.check_net_unix_socket(
           &resolved_path,
-          Some("Deno.createHttpClient()"),
+          Some("Oden.createHttpClient()"),
         )?;
         if path != resolved_path {
           *original_path = resolved_path.to_string_lossy().into_owned();
         }
       }
       Proxy::Vsock { cid, port } => {
-        permissions.check_net_vsock(*cid, *port, "Deno.createHttpClient()")?;
+        permissions.check_net_vsock(*cid, *port, "Oden.createHttpClient()")?;
       }
     }
   }
@@ -972,7 +972,7 @@ pub struct CreateHttpClientOptions {
   pub proxy: Option<Proxy>,
   pub dns_resolver: dns::Resolver,
   /// When set, every connection runs the net-deny check against the IP it
-  /// actually connected to, mirroring `Deno.connect`.
+  /// actually connected to, mirroring `Oden.connect`.
   pub permissions: Option<PermissionsContainer>,
   /// Which deny list `permissions` is checked against. Clients that load
   /// modules use `Import`; everything else uses `Net`.
@@ -1014,7 +1014,7 @@ impl Default for CreateHttpClientOptions {
 #[class(type)]
 pub enum HttpClientCreateError {
   #[error(transparent)]
-  Tls(deno_tls::TlsError),
+  Tls(oden_tls::TlsError),
   #[error("Illegal characters in User-Agent: received {0}")]
   InvalidUserAgent(String),
   #[error("Invalid address: {0}")]
@@ -1047,14 +1047,14 @@ pub fn create_http_client(
   options: CreateHttpClientOptions,
 ) -> Result<Client, HttpClientCreateError> {
   let mut tls_config =
-    deno_tls::create_client_config(deno_tls::TlsClientConfigOptions {
+    oden_tls::create_client_config(oden_tls::TlsClientConfigOptions {
       root_cert_store: options.root_cert_store,
       ca_certs: options.ca_certs,
       unsafely_ignore_certificate_errors: options
         .unsafely_ignore_certificate_errors,
       unsafely_disable_hostname_verification: false,
       cert_chain_and_key: options.client_cert_chain_and_key.into(),
-      socket_use: deno_tls::SocketUse::Http,
+      socket_use: oden_tls::SocketUse::Http,
     })
     .map_err(HttpClientCreateError::Tls)?;
 
@@ -1105,7 +1105,7 @@ pub fn create_http_client(
   // talk to. https://github.com/denoland/deno/issues/36462
   //
   // Apply this *before* the builder hook so an embedder can still override it,
-  // and apply the explicit `Deno.createHttpClient({ http2MaxHeaderListSize })`
+  // and apply the explicit `Oden.createHttpClient({ http2MaxHeaderListSize })`
   // option *after* the hook below, giving precedence: default < hook < option.
   builder.http2_max_header_list_size(DEFAULT_HTTP2_MAX_HEADER_LIST_SIZE);
 
@@ -1181,7 +1181,7 @@ pub fn create_http_client(
     );
   }
 
-  // An explicit `Deno.createHttpClient({ http2MaxHeaderListSize })` takes
+  // An explicit `Oden.createHttpClient({ http2MaxHeaderListSize })` takes
   // precedence over both the default above and the builder hook.
   if let Some(http2_max_header_list_size) = options.http2_max_header_list_size {
     builder.http2_max_header_list_size(http2_max_header_list_size);
@@ -1733,7 +1733,7 @@ where
 {
   type Response = TrackedIo<C::Response>;
   type Error = C::Error;
-  type Future = deno_core::futures::future::MapOk<
+  type Future = oden_core::futures::future::MapOk<
     C::Future,
     fn(C::Response) -> TrackedIo<C::Response>,
   >;
@@ -1969,7 +1969,7 @@ impl CheckoutTracker {
   }
 }
 
-/// Deno.fetch's retry policy.
+/// Oden.fetch's retry policy.
 #[derive(Clone, Debug)]
 struct FetchRetry;
 

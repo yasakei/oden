@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // NOTE to all: use **cached** prepared statements when interfacing with SQLite.
 
 use std::path::PathBuf;
 
-use deno_core::GarbageCollected;
-use deno_core::OpState;
-use deno_core::op2;
+use oden_core::GarbageCollected;
+use oden_core::OpState;
+use oden_core::op2;
 pub use rusqlite;
 use rusqlite::Connection;
 use rusqlite::OptionalExtension;
@@ -33,8 +33,8 @@ struct OriginStorageDir(PathBuf);
 
 const MAX_STORAGE_BYTES: usize = 10 * 1024 * 1024;
 
-deno_core::extension!(deno_webstorage,
-  deps = [ deno_webidl ],
+oden_core::extension!(oden_webstorage,
+  deps = [ oden_webidl ],
   ops = [
     op_webstorage_iterate_keys,
   ],
@@ -126,7 +126,7 @@ struct Storage {
 
 // SAFETY: we're sure this can be GCed
 unsafe impl GarbageCollected for Storage {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"Storage"

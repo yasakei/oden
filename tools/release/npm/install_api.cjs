@@ -1,5 +1,5 @@
 // @ts-check
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 "use strict";
 
 const fs = require("fs");
@@ -11,10 +11,10 @@ let cachedIsMusl = undefined;
 module.exports = {
   replaceBinEntry,
   runInstall() {
-    const denoFileName = os.platform() === "win32" ? "deno.exe" : "deno";
+    const odenFileName = os.platform() === "win32" ? "oden.exe" : "oden";
     const targetExecutablePath = path.join(
       __dirname,
-      denoFileName,
+      odenFileName,
     );
 
     if (fs.existsSync(targetExecutablePath)) {
@@ -23,26 +23,26 @@ module.exports = {
 
     const target = getTarget();
     const sourcePackagePath = path.dirname(
-      require.resolve("@deno/" + target + "/package.json"),
+      require.resolve("@oden/" + target + "/package.json"),
     );
-    const sourceExecutablePath = path.join(sourcePackagePath, denoFileName);
+    const sourceExecutablePath = path.join(sourcePackagePath, odenFileName);
 
     if (!fs.existsSync(sourceExecutablePath)) {
       throw new Error(
-        "Could not find executable for @deno/" + target + " at " +
+        "Could not find executable for @oden/" + target + " at " +
           sourceExecutablePath,
       );
     }
 
     try {
-      if (process.env.DENO_SIMULATED_READONLY_FILE_SYSTEM === "1") {
+      if (process.env.ODEN_SIMULATED_READONLY_FILE_SYSTEM === "1") {
         console.warn("Simulating readonly file system for testing.");
         throw new Error("Throwing for testing purposes.");
       }
 
       // in order to make things faster the next time we run and to allow the
-      // deno vscode extension to easily pick this up, copy the executable
-      // into the deno package folder
+      // oden vscode extension to easily pick this up, copy the executable
+      // into the oden package folder
       hardLinkOrCopy(sourceExecutablePath, targetExecutablePath);
       if (os.platform() !== "win32") {
         // chmod +x
@@ -52,7 +52,7 @@ module.exports = {
     } catch (err) {
       // this may fail on readonly file systems... in this case, fall
       // back to using the resolved package path
-      if (process.env.DENO_DEBUG === "1") {
+      if (process.env.ODEN_DEBUG === "1") {
         console.warn(
           "Failed to copy executable from " +
             sourceExecutablePath + " to " + targetExecutablePath +
@@ -173,19 +173,19 @@ function replaceBinEntry(exePath) {
   if (os.platform() === "win32") {
     // Rewrite .cmd and .ps1 wrappers to invoke the native binary directly
     fs.writeFileSync(
-      path.join(binDir, "deno.cmd"),
+      path.join(binDir, "oden.cmd"),
       '@"%~dp0' + relative + '" %*\r\n',
     );
     fs.writeFileSync(
-      path.join(binDir, "deno.ps1"),
+      path.join(binDir, "oden.ps1"),
       '& "$PSScriptRoot/' + relative.replace(/\\/g, "/") +
         '" $args\r\nexit $LASTEXITCODE\r\n',
     );
   } else {
     // Replace symlink to point directly at the native binary
-    const binDeno = path.join(binDir, "deno");
-    fs.unlinkSync(binDeno);
-    fs.symlinkSync(relative, binDeno);
+    const binOden = path.join(binDir, "oden");
+    fs.unlinkSync(binOden);
+    fs.symlinkSync(relative, binOden);
   }
 }
 
@@ -228,13 +228,13 @@ function isBinDirForThisPackage(binDir) {
     if (os.platform() === "win32") {
       // Verify the .cmd wrapper references our bin.cjs
       const content = fs.readFileSync(
-        path.join(binDir, "deno.cmd"),
+        path.join(binDir, "oden.cmd"),
         "utf8",
       );
       return content.includes("bin.cjs");
     } else {
       // Verify the symlink points into our package directory
-      const linkTarget = fs.readlinkSync(path.join(binDir, "deno"));
+      const linkTarget = fs.readlinkSync(path.join(binDir, "oden"));
       const resolved = path.resolve(binDir, linkTarget);
       return resolved.endsWith("bin.cjs");
     }

@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and Node.js contributors. All rights reserved. MIT license.
 
 // TODO(petamoriken): enable prefer-primordials for node polyfills
-// deno-lint-ignore-file no-explicit-any deno-internal/prefer-primordials
+// deno-lint-ignore-file no-explicit-any oden-internal/prefer-primordials
 
 (function () {
 const { core, primordials } = __bootstrap;
@@ -11,9 +11,9 @@ const {
   PrivateKeyObject,
   PublicKeyObject,
   SecretKeyObject,
-} = core.loadExtScript("ext:deno_node/internal/crypto/keys.ts");
+} = core.loadExtScript("ext:oden_node/internal/crypto/keys.ts");
 const { kAesKeyLengths } = core.loadExtScript(
-  "ext:deno_node/internal/crypto/util.ts",
+  "ext:oden_node/internal/crypto/util.ts",
 );
 const {
   ERR_CRYPTO_INCOMPATIBLE_KEY_OPTIONS,
@@ -23,12 +23,12 @@ const {
   ERR_INCOMPATIBLE_OPTION_PAIR,
   ERR_INVALID_ARG_VALUE,
   ERR_MISSING_OPTION,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
 const { getCiphers } = core.loadExtScript(
-  "ext:deno_node/internal/crypto/util.ts",
+  "ext:oden_node/internal/crypto/util.ts",
 );
 const { getHashes } = core.loadExtScript(
-  "ext:deno_node/internal/crypto/hash.ts",
+  "ext:oden_node/internal/crypto/hash.ts",
 );
 const {
   validateBuffer,
@@ -39,11 +39,11 @@ const {
   validateOneOf,
   validateString,
   validateUint32,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
 
 const lazyProcess = core.createLazyLoader("node:process");
 
-const { promisify } = core.loadExtScript("ext:deno_node/util.ts");
+const { promisify } = core.loadExtScript("ext:oden_node/util.ts");
 
 const {
   op_node_generate_dh_group_key,

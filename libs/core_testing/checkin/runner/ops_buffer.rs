@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_core::JsBuffer;
-use deno_core::OpState;
-use deno_core::op2;
+use oden_core::JsBuffer;
+use oden_core::OpState;
+use oden_core::op2;
 
 use super::TestData;
 

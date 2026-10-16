@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::fmt;
@@ -119,7 +119,7 @@ impl AuthDomain {
 
 impl AuthTokens {
   pub fn new_from_sys<TSys: EnvVar>(sys: &TSys) -> Self {
-    Self::new(sys.env_var("DENO_AUTH_TOKENS").ok())
+    Self::new(sys.env_var("ODEN_AUTH_TOKENS").ok())
   }
 
   /// Create a new set of tokens based on the provided string. It is intended

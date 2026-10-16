@@ -1,0 +1,5 @@
+{
+  "tasks": {
+    "backend": "oden run -A ./backend/mod.ts"
+  }
+}

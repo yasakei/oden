@@ -1,24 +1,24 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
 use boxed_error::Boxed;
-use deno_cache_dir::GlobalHttpCacheRc;
-use deno_cache_dir::GlobalHttpCacheSys;
-use deno_cache_dir::HttpCacheRc;
-use deno_cache_dir::file_fetcher::AuthTokens;
-use deno_cache_dir::file_fetcher::BlobStore;
-use deno_cache_dir::file_fetcher::CacheSetting;
-use deno_cache_dir::file_fetcher::CachedOrRedirect;
-use deno_cache_dir::file_fetcher::FetchCachedError;
-use deno_cache_dir::file_fetcher::File;
-use deno_cache_dir::file_fetcher::FileFetcherSys;
-use deno_cache_dir::file_fetcher::FileOrRedirect;
-use deno_cache_dir::file_fetcher::HttpClient;
-use deno_cache_dir::file_fetcher::TooManyRedirectsError;
-use deno_cache_dir::file_fetcher::UnsupportedSchemeError;
+use oden_cache_dir::GlobalHttpCacheRc;
+use oden_cache_dir::GlobalHttpCacheSys;
+use oden_cache_dir::HttpCacheRc;
+use oden_cache_dir::file_fetcher::AuthTokens;
+use oden_cache_dir::file_fetcher::BlobStore;
+use oden_cache_dir::file_fetcher::CacheSetting;
+use oden_cache_dir::file_fetcher::CachedOrRedirect;
+use oden_cache_dir::file_fetcher::FetchCachedError;
+use oden_cache_dir::file_fetcher::File;
+use oden_cache_dir::file_fetcher::FileFetcherSys;
+use oden_cache_dir::file_fetcher::FileOrRedirect;
+use oden_cache_dir::file_fetcher::HttpClient;
+use oden_cache_dir::file_fetcher::TooManyRedirectsError;
+use oden_cache_dir::file_fetcher::UnsupportedSchemeError;
 use deno_error::JsError;
 use deno_error::JsErrorBox;
 use deno_graph::source::CacheInfo;
@@ -27,9 +27,9 @@ use deno_graph::source::LoadFuture;
 use deno_graph::source::LoadResponse;
 use deno_graph::source::Loader;
 use deno_graph::source::LoaderChecksum;
-use deno_permissions::CheckSpecifierKind;
-use deno_permissions::PermissionCheckError;
-use deno_permissions::PermissionsContainer;
+use oden_permissions::CheckSpecifierKind;
+use oden_permissions::PermissionCheckError;
+use oden_permissions::PermissionsContainer;
 use futures::FutureExt;
 use futures::future::LocalBoxFuture;
 use http::header;
@@ -38,7 +38,7 @@ use thiserror::Error;
 use url::Url;
 
 use crate::loader::MemoryFilesRc;
-use crate::npm::DenoInNpmPackageChecker;
+use crate::npm::OdenInNpmPackageChecker;
 
 #[derive(Debug, Boxed, JsError)]
 pub struct FetchError(pub Box<FetchErrorKind>);
@@ -60,7 +60,7 @@ pub struct FetchNoFollowError(pub Box<FetchNoFollowErrorKind>);
 pub enum FetchNoFollowErrorKind {
   #[error(transparent)]
   #[class(inherit)]
-  FetchNoFollow(#[from] deno_cache_dir::file_fetcher::FetchNoFollowError),
+  FetchNoFollow(#[from] oden_cache_dir::file_fetcher::FetchNoFollowError),
   #[error(transparent)]
   #[class(generic)]
   PermissionCheck(#[from] PermissionCheckError),
@@ -75,10 +75,10 @@ pub struct GetCachedSourceOrLocalError(
 pub enum GetCachedSourceOrLocalErrorKind {
   #[error(transparent)]
   #[class(inherit)]
-  FetchLocal(#[from] deno_cache_dir::file_fetcher::FetchLocalError),
+  FetchLocal(#[from] oden_cache_dir::file_fetcher::FetchLocalError),
   #[error(transparent)]
   #[class(inherit)]
-  FetchCached(#[from] deno_cache_dir::file_fetcher::FetchCachedError),
+  FetchCached(#[from] oden_cache_dir::file_fetcher::FetchCachedError),
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -100,7 +100,7 @@ pub struct FetchOptions<'a> {
   pub maybe_cache_setting: Option<&'a CacheSetting>,
 }
 
-pub type FetchLocalOptions = deno_cache_dir::file_fetcher::FetchLocalOptions;
+pub type FetchLocalOptions = oden_cache_dir::file_fetcher::FetchLocalOptions;
 
 pub struct FetchNoFollowOptions<'a> {
   pub local: FetchLocalOptions,
@@ -111,15 +111,15 @@ pub struct FetchNoFollowOptions<'a> {
 }
 
 impl<'a> FetchNoFollowOptions<'a> {
-  fn into_deno_cache_dir_options(
+  fn into_oden_cache_dir_options(
     self,
-  ) -> deno_cache_dir::file_fetcher::FetchNoFollowOptions<'a> {
-    deno_cache_dir::file_fetcher::FetchNoFollowOptions {
+  ) -> oden_cache_dir::file_fetcher::FetchNoFollowOptions<'a> {
+    oden_cache_dir::file_fetcher::FetchNoFollowOptions {
       local: self.local,
       maybe_auth: self.maybe_auth,
       maybe_checksum: self
         .maybe_checksum
-        .map(|c| deno_cache_dir::Checksum::new(c.as_str())),
+        .map(|c| oden_cache_dir::Checksum::new(c.as_str())),
       maybe_accept: self.maybe_accept,
       maybe_cache_setting: self.maybe_cache_setting,
     }
@@ -134,7 +134,7 @@ pub trait PermissionedFileFetcherSys:
 
 #[allow(clippy::disallowed_types, reason = "definition")]
 type PermissionedFileFetcherRc<TBlobStore, TSys, THttpClient> =
-  deno_maybe_sync::MaybeArc<
+  oden_maybe_sync::MaybeArc<
     PermissionedFileFetcher<TBlobStore, TSys, THttpClient>,
   >;
 
@@ -151,7 +151,7 @@ pub struct PermissionedFileFetcher<
   THttpClient: HttpClient,
 > {
   file_fetcher:
-    deno_cache_dir::file_fetcher::FileFetcher<TBlobStore, TSys, THttpClient>,
+    oden_cache_dir::file_fetcher::FileFetcher<TBlobStore, TSys, THttpClient>,
   memory_files: MemoryFilesRc,
 }
 
@@ -170,13 +170,13 @@ impl<
     options: PermissionedFileFetcherOptions,
   ) -> Self {
     let auth_tokens = AuthTokens::new_from_sys(&sys);
-    let file_fetcher = deno_cache_dir::file_fetcher::FileFetcher::new(
+    let file_fetcher = oden_cache_dir::file_fetcher::FileFetcher::new(
       blob_store,
       sys,
       http_cache,
       http_client,
       memory_files.clone(),
-      deno_cache_dir::file_fetcher::FileFetcherOptions {
+      oden_cache_dir::file_fetcher::FileFetcherOptions {
         allow_remote: options.allow_remote,
         cache_setting: options.cache_setting,
         auth_tokens,
@@ -315,7 +315,7 @@ impl<
       .file_fetcher
       .ensure_cached_no_follow(
         &specifier,
-        options.into_deno_cache_dir_options(),
+        options.into_oden_cache_dir_options(),
       )
       .await
       .map_err(|err| FetchNoFollowErrorKind::FetchNoFollow(err).into_box())
@@ -335,7 +335,7 @@ impl<
       .file_fetcher
       .fetch_no_follow(
         &checked_specifier,
-        options.into_deno_cache_dir_options(),
+        options.into_oden_cache_dir_options(),
       )
       .await
       .map_err(|err| FetchNoFollowErrorKind::FetchNoFollow(err).into_box())?;
@@ -369,7 +369,7 @@ impl<
           })?;
         let checked_path = permissions.check_open(
           Cow::Owned(path),
-          deno_permissions::OpenAccessKind::Read,
+          oden_permissions::OpenAccessKind::Read,
           Some(file_api_name),
         )?;
         let checked_specifier =
@@ -434,16 +434,16 @@ pub trait GraphLoaderReporter: Send + Sync {
   fn on_load(
     &self,
     specifier: &Url,
-    loaded_from: deno_cache_dir::file_fetcher::LoadedFrom,
+    loaded_from: oden_cache_dir::file_fetcher::LoadedFrom,
   ) {
   }
 }
 
 #[allow(clippy::disallowed_types, reason = "definition")]
 pub type GraphLoaderReporterRc =
-  deno_maybe_sync::MaybeArc<dyn GraphLoaderReporter>;
+  oden_maybe_sync::MaybeArc<dyn GraphLoaderReporter>;
 
-pub struct DenoGraphLoaderOptions {
+pub struct OdenGraphLoaderOptions {
   pub file_header_overrides: HashMap<Url, HashMap<String, String>>,
   /// Whether to include npm package sources in the graph.
   ///
@@ -457,16 +457,16 @@ pub struct DenoGraphLoaderOptions {
 }
 
 #[sys_traits::auto_impl]
-pub trait DenoGraphLoaderSys:
+pub trait OdenGraphLoaderSys:
   GlobalHttpCacheSys + PermissionedFileFetcherSys + sys_traits::FsCanonicalize
 {
 }
 
-/// A "wrapper" for the FileFetcher and DiskCache for the Deno CLI that provides
+/// A "wrapper" for the FileFetcher and DiskCache for the Oden CLI that provides
 /// an implementation of `deno_graph::source::Loader`.
-pub struct DenoGraphLoader<
+pub struct OdenGraphLoader<
   TBlobStore: BlobStore,
-  TSys: DenoGraphLoaderSys,
+  TSys: OdenGraphLoaderSys,
   THttpClient: HttpClient,
 > {
   file_header_overrides: HashMap<Url, HashMap<String, String>>,
@@ -477,7 +477,7 @@ pub struct DenoGraphLoader<
   file_content_overrides: Option<HashMap<Url, std::sync::Arc<[u8]>>>,
   file_fetcher: PermissionedFileFetcherRc<TBlobStore, TSys, THttpClient>,
   global_http_cache: GlobalHttpCacheRc<TSys>,
-  in_npm_pkg_checker: DenoInNpmPackageChecker,
+  in_npm_pkg_checker: OdenInNpmPackageChecker,
   permissions: Option<PermissionsContainer>,
   file_permission_api_name: Option<&'static str>,
   sys: TSys,
@@ -488,16 +488,16 @@ pub struct DenoGraphLoader<
 
 impl<
   TBlobStore: BlobStore + 'static,
-  TSys: DenoGraphLoaderSys + 'static,
+  TSys: OdenGraphLoaderSys + 'static,
   THttpClient: HttpClient + 'static,
-> DenoGraphLoader<TBlobStore, TSys, THttpClient>
+> OdenGraphLoader<TBlobStore, TSys, THttpClient>
 {
   pub fn new(
     file_fetcher: PermissionedFileFetcherRc<TBlobStore, TSys, THttpClient>,
     global_http_cache: GlobalHttpCacheRc<TSys>,
-    in_npm_pkg_checker: DenoInNpmPackageChecker,
+    in_npm_pkg_checker: OdenInNpmPackageChecker,
     sys: TSys,
-    options: DenoGraphLoaderOptions,
+    options: OdenGraphLoaderOptions,
   ) -> Self {
     Self {
       file_fetcher,
@@ -534,12 +534,12 @@ impl<
   }
 
   /// The cache information takes a bit of time to fetch and it's
-  /// not always necessary. It should only be enabled for deno info.
+  /// not always necessary. It should only be enabled for oden info.
   pub fn enable_loading_cache_info(&mut self) {
     self.cache_info_enabled = true;
   }
 
-  /// Only use this for `deno info`.
+  /// Only use this for `oden info`.
   fn get_local_path(&self, specifier: &Url) -> Option<PathBuf> {
     // TODO(@kitsonk) fix when deno_graph does not query cache for synthetic
     // modules
@@ -625,7 +625,7 @@ impl<
           let err = err.into_kind();
           match err {
             FetchNoFollowErrorKind::FetchNoFollow(err) => {
-              use deno_cache_dir::file_fetcher::FetchNoFollowErrorKind::*;
+              use oden_cache_dir::file_fetcher::FetchNoFollowErrorKind::*;
               let err = err.into_kind();
               match err {
                 NotFound(_) => Ok(None),
@@ -675,9 +675,9 @@ impl<
 
 impl<
   TBlobStore: BlobStore + 'static,
-  TSys: DenoGraphLoaderSys + 'static,
+  TSys: OdenGraphLoaderSys + 'static,
   THttpClient: HttpClient + 'static,
-> Loader for DenoGraphLoader<TBlobStore, TSys, THttpClient>
+> Loader for OdenGraphLoader<TBlobStore, TSys, THttpClient>
 {
   fn cache_info_enabled(&self) -> bool {
     self.cache_info_enabled
@@ -796,7 +796,7 @@ trait LoadOrCacheStrategy {
 
 struct LoadStrategy<
   TBlobStore: BlobStore,
-  TSys: DenoGraphLoaderSys,
+  TSys: OdenGraphLoaderSys,
   THttpClient: HttpClient,
 > {
   file_fetcher: PermissionedFileFetcherRc<TBlobStore, TSys, THttpClient>,
@@ -805,7 +805,7 @@ struct LoadStrategy<
 }
 
 #[async_trait::async_trait(?Send)]
-impl<TBlobStore: BlobStore, TSys: DenoGraphLoaderSys, THttpClient: HttpClient>
+impl<TBlobStore: BlobStore, TSys: OdenGraphLoaderSys, THttpClient: HttpClient>
   LoadOrCacheStrategy for LoadStrategy<TBlobStore, TSys, THttpClient>
 {
   type Response = deno_graph::source::LoadResponse;
@@ -854,14 +854,14 @@ impl<TBlobStore: BlobStore, TSys: DenoGraphLoaderSys, THttpClient: HttpClient>
 
 struct CacheStrategy<
   TBlobStore: BlobStore,
-  TSys: DenoGraphLoaderSys,
+  TSys: OdenGraphLoaderSys,
   THttpClient: HttpClient,
 > {
   file_fetcher: PermissionedFileFetcherRc<TBlobStore, TSys, THttpClient>,
 }
 
 #[async_trait::async_trait(?Send)]
-impl<TBlobStore: BlobStore, TSys: DenoGraphLoaderSys, THttpClient: HttpClient>
+impl<TBlobStore: BlobStore, TSys: OdenGraphLoaderSys, THttpClient: HttpClient>
   LoadOrCacheStrategy for CacheStrategy<TBlobStore, TSys, THttpClient>
 {
   type Response = deno_graph::source::CacheResponse;
@@ -892,7 +892,7 @@ fn load_error(err: JsErrorBox) -> deno_graph::source::LoadError {
 }
 
 fn validate_scheme(specifier: &Url) -> Result<(), UnsupportedSchemeError> {
-  match deno_cache_dir::file_fetcher::is_valid_scheme(specifier.scheme()) {
+  match oden_cache_dir::file_fetcher::is_valid_scheme(specifier.scheme()) {
     true => Ok(()),
     false => Err(UnsupportedSchemeError {
       scheme: specifier.scheme().to_string(),
@@ -906,10 +906,10 @@ mod test {
   use std::collections::HashMap;
   use std::path::PathBuf;
 
-  use deno_cache_dir::file_fetcher::CacheSetting;
-  use deno_cache_dir::file_fetcher::NullBlobStore;
-  use deno_cache_dir::file_fetcher::SendError;
-  use deno_cache_dir::file_fetcher::SendResponse;
+  use oden_cache_dir::file_fetcher::CacheSetting;
+  use oden_cache_dir::file_fetcher::NullBlobStore;
+  use oden_cache_dir::file_fetcher::SendError;
+  use oden_cache_dir::file_fetcher::SendResponse;
   use deno_graph::source::CacheSetting as LoaderCacheSetting;
   use deno_graph::source::LoadResponse;
   use deno_graph::source::Loader;
@@ -925,7 +925,7 @@ mod test {
   struct TestHttpClient;
 
   #[async_trait::async_trait(?Send)]
-  impl deno_cache_dir::file_fetcher::HttpClient for TestHttpClient {
+  impl oden_cache_dir::file_fetcher::HttpClient for TestHttpClient {
     async fn send_no_follow(
       &self,
       _url: &Url,
@@ -937,23 +937,23 @@ mod test {
 
   fn create_test_loader(
     sys: InMemorySys,
-  ) -> DenoGraphLoader<NullBlobStore, InMemorySys, TestHttpClient> {
+  ) -> OdenGraphLoader<NullBlobStore, InMemorySys, TestHttpClient> {
     let cwd = get_cwd();
     let factory = WorkspaceFactory::new(
       sys.clone(),
       cwd.join("project"),
       WorkspaceFactoryOptions {
-        maybe_custom_deno_dir_root: Some(cwd.join("deno_dir")),
+        maybe_custom_oden_dir_root: Some(cwd.join("oden_dir")),
         config_discovery: ConfigDiscoveryOption::Disabled,
         ..Default::default()
       },
     );
     let global_http_cache = factory.global_http_cache().unwrap().clone();
     let memory_files =
-      deno_maybe_sync::new_rc(crate::loader::MemoryFiles::default());
-    let file_fetcher = deno_maybe_sync::new_rc(PermissionedFileFetcher::new(
+      oden_maybe_sync::new_rc(crate::loader::MemoryFiles::default());
+    let file_fetcher = oden_maybe_sync::new_rc(PermissionedFileFetcher::new(
       NullBlobStore,
-      deno_maybe_sync::new_rc(deno_cache_dir::GlobalOrLocalHttpCache::from(
+      oden_maybe_sync::new_rc(oden_cache_dir::GlobalOrLocalHttpCache::from(
         global_http_cache.clone(),
       )),
       TestHttpClient,
@@ -964,14 +964,14 @@ mod test {
         cache_setting: CacheSetting::Use,
       },
     ));
-    DenoGraphLoader::new(
+    OdenGraphLoader::new(
       file_fetcher,
       global_http_cache,
-      crate::npm::DenoInNpmPackageChecker::new(
+      crate::npm::OdenInNpmPackageChecker::new(
         crate::npm::CreateInNpmPkgCheckerOptions::Byonm,
       ),
       sys,
-      DenoGraphLoaderOptions {
+      OdenGraphLoaderOptions {
         file_header_overrides: HashMap::new(),
         permissions: None,
         file_permission_api_name: None,

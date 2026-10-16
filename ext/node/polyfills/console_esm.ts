@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { core, primordials } from "ext:core/mod.js";
 import { windowOrWorkerGlobalScope } from "ext:runtime/98_global_scope_shared.js";
-const { Console } = core.loadExtScript("ext:deno_node/console.ts");
+const { Console } = core.loadExtScript("ext:oden_node/console.ts");
 
 // Don't rely on global `console` because during bootstrapping, it is pointing
 // to the native `console` object provided by V8. Read via the property

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 /// FLAGS
 
 import { parseArgs } from "@std/cli/parse-args";
@@ -16,7 +16,7 @@ export const {
   ["inspect-brk"]: inspectBrk,
   ["no-ignore"]: noIgnore,
   binary,
-} = parseArgs(Deno.args, {
+} = parseArgs(Oden.args, {
   "--": true,
   boolean: [
     "all",
@@ -29,21 +29,21 @@ export const {
   string: ["json", "wptreport", "binary"],
 });
 
-export function denoBinary() {
+export function odenBinary() {
   if (binary) {
     return resolve(binary);
   }
-  const ext = Deno.build.os === "windows" ? ".exe" : "";
+  const ext = Oden.build.os === "windows" ? ".exe" : "";
   return join(
     ROOT_PATH,
-    `./target/${release ? "release" : "debug"}/deno${ext}`,
+    `./target/${release ? "release" : "debug"}/oden${ext}`,
   );
 }
 
 /// CI SKIP CACHE
 
 async function getWptSubmoduleHash(): Promise<string> {
-  const gitResult = await new Deno.Command("git", {
+  const gitResult = await new Oden.Command("git", {
     args: ["rev-parse", "HEAD"],
     cwd: join(ROOT_PATH, "tests", "wpt", "suite"),
     stdout: "piped",
@@ -54,9 +54,9 @@ async function getWptSubmoduleHash(): Promise<string> {
 
 export function checkWptCiHash() {
   return checkCiHash("wpt", async (hasher) => {
-    const hashDenoBinaryTask = hasher.hashFile(denoBinary());
+    const hashOdenBinaryTask = hasher.hashFile(odenBinary());
     const submoduleHash = await getWptSubmoduleHash();
-    await hashDenoBinaryTask;
+    await hashOdenBinaryTask;
     hasher.writeSync(submoduleHash);
   });
 }
@@ -104,7 +104,7 @@ export async function updateManifest() {
 }
 
 export function getManifest(): Manifest {
-  const manifestText = Deno.readTextFileSync(MANIFEST_PATH);
+  const manifestText = Oden.readTextFileSync(MANIFEST_PATH);
   return JSON.parse(manifestText);
 }
 
@@ -127,13 +127,13 @@ export interface Expectation {
 
 export function getExpectation(): Expectation {
   const expectation: Expectation = {};
-  for (const entry of Deno.readDirSync(EXPECTATIONS_DIR)) {
+  for (const entry of Oden.readDirSync(EXPECTATIONS_DIR)) {
     if (
       !entry.isFile || !entry.name.endsWith(".json") ||
       entry.name === "schema.json"
     ) continue;
     const suiteName = entry.name.slice(0, -".json".length);
-    const text = Deno.readTextFileSync(join(EXPECTATIONS_DIR, entry.name));
+    const text = Oden.readTextFileSync(join(EXPECTATIONS_DIR, entry.name));
     expectation[suiteName] = JSON.parse(text);
   }
   return expectation;
@@ -145,7 +145,7 @@ export function saveExpectation(
 ) {
   if (path) {
     // Write single merged file (used for tmp diff in `run` command)
-    Deno.writeTextFileSync(
+    Oden.writeTextFileSync(
       path,
       JSON.stringify(expectation, undefined, "  ") + "\n",
     );
@@ -154,7 +154,7 @@ export function saveExpectation(
 
   // Write each top-level key to its own file in the expectations directory
   const existingFiles = new Set<string>();
-  for (const entry of Deno.readDirSync(EXPECTATIONS_DIR)) {
+  for (const entry of Oden.readDirSync(EXPECTATIONS_DIR)) {
     if (entry.isFile && entry.name.endsWith(".json")) {
       existingFiles.add(entry.name);
     }
@@ -164,7 +164,7 @@ export function saveExpectation(
   for (const [key, value] of Object.entries(expectation)) {
     const fileName = `${key}.json`;
     writtenFiles.add(fileName);
-    Deno.writeTextFileSync(
+    Oden.writeTextFileSync(
       join(EXPECTATIONS_DIR, fileName),
       JSON.stringify(value, undefined, "  ") + "\n",
     );
@@ -173,7 +173,7 @@ export function saveExpectation(
   // Remove files for keys no longer present (but never remove schema.json)
   for (const fileName of existingFiles) {
     if (!writtenFiles.has(fileName) && fileName !== "schema.json") {
-      Deno.removeSync(join(EXPECTATIONS_DIR, fileName));
+      Oden.removeSync(join(EXPECTATIONS_DIR, fileName));
     }
   }
 }
@@ -204,12 +204,12 @@ export function assert(condition: unknown, message: string): asserts condition {
   }
 }
 
-export function runPy<T extends Omit<Deno.CommandOptions, "cwd">>(
+export function runPy<T extends Omit<Oden.CommandOptions, "cwd">>(
   args: string[],
   options: T,
-): Deno.ChildProcess {
-  const cmd = Deno.build.os == "windows" ? "python.exe" : "python3";
-  return new Deno.Command(cmd, {
+): Oden.ChildProcess {
+  const cmd = Oden.build.os == "windows" ? "python.exe" : "python3";
+  return new Oden.Command(cmd, {
     args,
     stdout: "inherit",
     stderr: "inherit",
@@ -219,7 +219,7 @@ export function runPy<T extends Omit<Deno.CommandOptions, "cwd">>(
 }
 
 export async function runGitDiff(args: string[]): Promise<void> {
-  await new Deno.Command("git", {
+  await new Oden.Command("git", {
     args: ["diff", ...args],
     stdout: "inherit",
     stderr: "inherit",
@@ -236,14 +236,14 @@ export async function checkPy3Available() {
   assert(
     output.includes("Python 3.11"),
     `The ${
-      Deno.build.os == "windows" ? "python.exe" : "python3"
+      Oden.build.os == "windows" ? "python.exe" : "python3"
     } in your path is not Python 3.11.x. See https://github.com/web-platform-tests/wpt/issues/44427 for more details.`,
   );
 }
 
 export async function cargoBuild() {
   if (binary) return;
-  const { success } = await new Deno.Command("cargo", {
+  const { success } = await new Oden.Command("cargo", {
     args: ["build", ...(release ? ["--release"] : [])],
     cwd: ROOT_PATH,
     stdout: "inherit",
@@ -272,20 +272,20 @@ export async function generateRunInfo(): Promise<unknown> {
     "freebsd": "freebsd",
     "openbsd": "openbsd",
   };
-  const proc = await new Deno.Command("git", {
+  const proc = await new Oden.Command("git", {
     args: ["rev-parse", "HEAD"],
     cwd: join(ROOT_PATH, "tests", "wpt", "suite"),
     stderr: "inherit",
   }).output();
   const revision = (new TextDecoder().decode(proc.stdout)).trim();
-  const proc2 = await new Deno.Command(denoBinary(), {
-    args: ["eval", "console.log(JSON.stringify(Deno.version))"],
+  const proc2 = await new Oden.Command(odenBinary(), {
+    args: ["eval", "console.log(JSON.stringify(Oden.version))"],
     cwd: join(ROOT_PATH, "tests", "wpt", "suite"),
   }).output();
   const version = JSON.parse(new TextDecoder().decode(proc2.stdout));
   const runInfo = {
-    "os": oses[Deno.build.os],
-    "processor": Deno.build.arch,
+    "os": oses[Oden.build.os],
+    "processor": Oden.build.arch,
     "version": "unknown",
     "os_version": "unknown",
     "bits": 64,
@@ -295,10 +295,10 @@ export async function generateRunInfo(): Promise<unknown> {
     "linux_distro": "unknown",
     "revision": revision,
     "python_version": 3,
-    "product": "deno",
+    "product": "oden",
     "debug": false,
-    "browser_version": version.deno,
-    "browser_channel": version.deno.includes("+") ? "canary" : "stable",
+    "browser_version": version.oden,
+    "browser_channel": version.oden.includes("+") ? "canary" : "stable",
     "verify": false,
     "wasm": false,
     "headless": true,

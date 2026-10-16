@@ -1,0 +1,4 @@
+{
+  "name": "@odentest/add",
+  "exports": "./mod.ts"
+}

@@ -1,0 +1,5 @@
+{
+  "tasks": {
+    "build": "oden run -A build.ts"
+  }
+}

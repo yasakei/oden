@@ -1,3 +1,3 @@
-import "@denotest3/gitlab-pkg";
+import "@odentest3/gitlab-pkg";
 
 console.log("ok");

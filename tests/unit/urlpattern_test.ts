@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assert, assertEquals, assertThrows } from "./test_util.ts";
 import { assertType, IsExact } from "@std/testing/types";
 
-Deno.test(function urlPatternFromString() {
+Oden.test(function urlPatternFromString() {
   const pattern = new URLPattern("https://deno.land/foo/:bar");
   assertEquals(pattern.protocol, "https");
   assertEquals(pattern.hostname, "deno.land");
@@ -20,7 +20,7 @@ Deno.test(function urlPatternFromString() {
   assertType<IsExact<typeof val, string | undefined>>(true);
 });
 
-Deno.test(function urlPatternFromStringWithBase() {
+Oden.test(function urlPatternFromStringWithBase() {
   const pattern = new URLPattern("/foo/:bar", "https://deno.land");
   assertEquals(pattern.protocol, "https");
   assertEquals(pattern.hostname, "deno.land");
@@ -34,7 +34,7 @@ Deno.test(function urlPatternFromStringWithBase() {
   assertEquals(match.pathname.groups, { bar: "x" });
 });
 
-Deno.test(function urlPatternFromInit() {
+Oden.test(function urlPatternFromInit() {
   const pattern = new URLPattern({
     pathname: "/foo/:bar",
   });
@@ -49,7 +49,7 @@ Deno.test(function urlPatternFromInit() {
   assert(pattern.test({ pathname: "/foo/x" }));
 });
 
-Deno.test(function urlPatternWithPrototypePollution() {
+Oden.test(function urlPatternWithPrototypePollution() {
   const originalExec = RegExp.prototype.exec;
   try {
     RegExp.prototype.exec = () => {
@@ -64,17 +64,17 @@ Deno.test(function urlPatternWithPrototypePollution() {
   }
 });
 
-Deno.test(function urlPatternFlagsRegression() {
+Oden.test(function urlPatternFlagsRegression() {
   new URLPattern({ pathname: "/install(\.sh|\.ps1)" });
 });
 
-Deno.test(function urlPatternIgnoreCase() {
+Oden.test(function urlPatternIgnoreCase() {
   const p = new URLPattern({ pathname: "/test" }, { ignoreCase: true });
   assert(p.test("/test", "http://localhost"));
   assert(p.test("/TeSt", "http://localhost"));
 });
 
-Deno.test(function urlPatternInvalidNameError() {
+Oden.test(function urlPatternInvalidNameError() {
   // A ":" not followed by a valid group name (e.g. file-router syntax such as
   // `[:slug]` expanding to `::slug`) should produce an actionable error that
   // echoes the offending component, points a caret at it, and includes a hint.
@@ -93,7 +93,7 @@ Deno.test(function urlPatternInvalidNameError() {
   );
 });
 
-Deno.test(function urlPatternInvalidNameErrorFromString() {
+Oden.test(function urlPatternInvalidNameErrorFromString() {
   // For a constructor string we cannot reliably map the position back to the
   // full input, but the input and hint should still be surfaced.
   const err = assertThrows(

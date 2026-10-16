@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::path::PathBuf;
@@ -105,13 +105,13 @@ fn format_dir_import_message(
 pub trait NpmModuleLoaderSys: NodeCodeTranslatorSys {}
 
 #[allow(clippy::disallowed_types, reason = "definition")]
-pub type DenoNpmModuleLoaderRc<TSys> =
-  deno_maybe_sync::MaybeArc<DenoNpmModuleLoader<TSys>>;
+pub type OdenNpmModuleLoaderRc<TSys> =
+  oden_maybe_sync::MaybeArc<OdenNpmModuleLoader<TSys>>;
 
-pub type DenoNpmModuleLoader<TSys> = NpmModuleLoader<
-  crate::cjs::analyzer::DenoCjsCodeAnalyzer<TSys>,
-  crate::npm::DenoInNpmPackageChecker,
-  node_resolver::DenoIsBuiltInNodeModuleChecker,
+pub type OdenNpmModuleLoader<TSys> = NpmModuleLoader<
+  crate::cjs::analyzer::OdenCjsCodeAnalyzer<TSys>,
+  crate::npm::OdenInNpmPackageChecker,
+  node_resolver::OdenIsBuiltInNodeModuleChecker,
   crate::npm::NpmResolver<TSys>,
   TSys,
 >;

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::path::PathBuf;
@@ -18,10 +18,10 @@ use deno_ast::diagnostics::DiagnosticSnippetHighlightStyle;
 use deno_ast::diagnostics::DiagnosticSourcePos;
 use deno_ast::diagnostics::DiagnosticSourceRange;
 use deno_ast::swc::common::util::take::Take;
-use deno_core::anyhow::anyhow;
-use deno_core::error::AnyError;
-use deno_core::parking_lot::Mutex;
-use deno_core::url::Url;
+use oden_core::anyhow::anyhow;
+use oden_core::error::AnyError;
+use oden_core::parking_lot::Mutex;
+use oden_core::url::Url;
 use deno_graph::fast_check::FastCheckDiagnostic;
 use deno_semver::Version;
 

@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
-#![allow(dead_code, reason = "conversion functions used by the deno CLI crate")]
+// Copyright 2018-2026 the Oden authors. MIT license.
+#![allow(dead_code, reason = "conversion functions used by the oden CLI crate")]
 
 //! Converts a raw `ParseResult` into the typed `Flags` struct.
 //!
 //! Each subcommand has a dedicated conversion function that extracts
 //! the relevant parsed arguments and builds the corresponding
-//! `DenoSubcommand` variant plus any shared `Flags` fields.
+//! `OdenSubcommand` variant plus any shared `Flags` fields.
 
 use std::net::IpAddr;
 use std::net::SocketAddr;
@@ -14,7 +14,7 @@ use std::num::NonZeroU8;
 use std::num::NonZeroU32;
 use std::num::NonZeroUsize;
 
-use deno_permissions::SysDescriptor;
+use oden_permissions::SysDescriptor;
 use deno_semver::jsr::JsrDepPackageReq;
 use deno_semver::package::PackageKind;
 
@@ -110,10 +110,10 @@ fn parse_socket_addr(s: &str) -> Result<SocketAddr, CliError> {
 // ============================================================
 
 /// Parse command-line arguments and convert directly to `Flags`.
-/// This is the main entry point matching Deno's `flags_from_vec`.
+/// This is the main entry point matching Oden's `flags_from_vec`.
 pub fn flags_from_vec(args: Vec<String>) -> Result<Flags, CliError> {
   // Strip a trailing `\r` from each argument so that a shebang in a script
-  // saved with CRLF line endings (e.g. `#!/usr/bin/env -S deno run -A\r`)
+  // saved with CRLF line endings (e.g. `#!/usr/bin/env -S oden run -A\r`)
   // doesn't poison the final shebang argument with a stray carriage return.
   let args: Vec<String> = args
     .into_iter()
@@ -124,7 +124,7 @@ pub fn flags_from_vec(args: Vec<String>) -> Result<Flags, CliError> {
       a
     })
     .collect();
-  let parsed = crate::parse::parse(&crate::defs::DENO_ROOT, &args)?;
+  let parsed = crate::parse::parse(&crate::defs::ODEN_ROOT, &args)?;
 
   // If --version was set at the root level (not as a subcommand flag like
   // `upgrade --version <value>`), return DisplayVersion.
@@ -136,7 +136,7 @@ pub fn flags_from_vec(args: Vec<String>) -> Result<Flags, CliError> {
 
   // If --help was set, generate help text
   if parsed.contains("help") {
-    let root = &crate::defs::DENO_ROOT;
+    let root = &crate::defs::ODEN_ROOT;
     let cmd = if let Some(ref sub) = parsed.subcommand {
       root.find_subcommand(sub).unwrap_or(root)
     } else {
@@ -145,7 +145,7 @@ pub fn flags_from_vec(args: Vec<String>) -> Result<Flags, CliError> {
     let help_text = crate::help::render_help(cmd);
     let mut flags = Flags::default();
     global_args_parse(&parsed, &mut flags);
-    flags.subcommand = DenoSubcommand::Help(HelpFlags { help: help_text });
+    flags.subcommand = OdenSubcommand::Help(HelpFlags { help: help_text });
     return Ok(flags);
   }
 
@@ -237,7 +237,7 @@ pub fn convert(result: ParseResult) -> Result<Flags, CliError> {
   // Validate --location scheme (must be http/https), mirroring clap's
   // location value_parser. No-op when `--location` was not provided.
   if let Some(loc) = result.get_one("location") {
-    let url = deno_core::url::Url::parse(loc).map_err(|_| {
+    let url = oden_core::url::Url::parse(loc).map_err(|_| {
       CliError::new(CliErrorKind::InvalidValue, "Failed to parse URL")
     })?;
     if !["http", "https"].contains(&url.scheme()) {
@@ -351,7 +351,7 @@ fn default_parse(
           })
           .filter_map(|a| {
             // Try to find the long flag name
-            let root = &crate::defs::DENO_ROOT;
+            let root = &crate::defs::ODEN_ROOT;
             let cmd = root.find_subcommand("run").unwrap_or(root);
             cmd
               .all_args()
@@ -370,7 +370,7 @@ fn default_parse(
         );
         // Only claim `<subcommand> <flag>` exists when that subcommand
         // actually accepts the flag (see issue #27336).
-        let accepts_flag = crate::defs::DENO_ROOT
+        let accepts_flag = crate::defs::ODEN_ROOT
           .find_subcommand(script)
           .is_some_and(|sub| {
             sub
@@ -384,7 +384,7 @@ fn default_parse(
       }
     }
 
-    // Bare run - same as `deno run` but with bare=true
+    // Bare run - same as `oden run` but with bare=true
     runtime_args_parse(result, flags, true, true)?;
     ext_arg_parse(result, flags);
     flags.tunnel = result.get_bool("tunnel");
@@ -404,7 +404,7 @@ fn default_parse(
       ));
     }
     flags.watch = watch;
-    flags.subcommand = DenoSubcommand::Run(RunFlags {
+    flags.subcommand = OdenSubcommand::Run(RunFlags {
       script: script.to_string(),
       bare: true,
       coverage_dir,
@@ -434,7 +434,7 @@ fn default_parse(
     if has_run_flags && !has_v8_help {
       return Err(CliError::new(
         CliErrorKind::MissingRequired,
-        "[SCRIPT_ARG] may only be omitted with --v8-flags=--help, else to use the repl with arguments, please use the `deno repl` subcommand\n\nUsage: deno [OPTIONS] [COMMAND] [SCRIPT_ARG]...",
+        "[SCRIPT_ARG] may only be omitted with --v8-flags=--help, else to use the repl with arguments, please use the `oden repl` subcommand\n\nUsage: oden [OPTIONS] [COMMAND] [SCRIPT_ARG]...",
       ));
     }
 
@@ -591,8 +591,8 @@ fn permission_args_parse(result: &ParseResult, flags: &mut Flags) {
     #[allow(clippy::print_stderr, reason = "can't use log crate yet")]
     {
       eprintln!(
-        "{} `allow-hrtime` and `deny-hrtime` have been removed in Deno 2, as high resolution time is now always allowed",
-        deno_runtime::colors::yellow("Warning")
+        "{} `allow-hrtime` and `deny-hrtime` have been removed in Oden 2, as high resolution time is now always allowed",
+        oden_runtime::colors::yellow("Warning")
       );
     }
   }
@@ -721,7 +721,7 @@ fn reload_arg_parse(result: &ParseResult, flags: &mut Flags) {
 fn lock_args_parse(result: &ParseResult, flags: &mut Flags) {
   if result.contains("lock") {
     flags.lock =
-      Some(result.get_one("lock").unwrap_or("deno.lock").to_string());
+      Some(result.get_one("lock").unwrap_or("oden.lock").to_string());
   }
   if result.get_bool("no-lock") {
     flags.no_lock = true;
@@ -810,7 +810,7 @@ fn unsafely_ignore_certificate_errors_parse(
 
 fn min_dep_age_arg_parse(result: &ParseResult, flags: &mut Flags) {
   if let Some(age) = result.get_one("min-dep-age") {
-    flags.minimum_dependency_age = deno_config::parse_minutes_duration_or_date(
+    flags.minimum_dependency_age = oden_config::parse_minutes_duration_or_date(
       &sys_traits::impls::RealSys,
       age,
     )
@@ -826,7 +826,7 @@ fn cached_only_arg_parse(result: &ParseResult, flags: &mut Flags) {
 
 fn location_arg_parse(result: &ParseResult, flags: &mut Flags) {
   if let Some(loc) = result.get_one("location") {
-    flags.location = deno_core::url::Url::parse(loc).ok().map(|mut url| {
+    flags.location = oden_core::url::Url::parse(loc).ok().map(|mut url| {
       // Mirror clap's location value_parser, which strips any credentials.
       let _ = url.set_username("");
       let _ = url.set_password(None);
@@ -1307,7 +1307,7 @@ fn validate_permission_args(
     // Only check if this is not the REPL default (where allow_all is auto-set)
     if !matches!(
       flags.subcommand,
-      DenoSubcommand::Repl(ReplFlags {
+      OdenSubcommand::Repl(ReplFlags {
         is_default_command: true,
         ..
       })
@@ -1383,9 +1383,9 @@ fn run_parse(
 
   flags.tunnel = result.get_bool("tunnel");
   if result.get_bool("use-env-proxy") {
-    // Node's --use-env-proxy is process-wide. Deno's node polyfills read the
+    // Node's --use-env-proxy is process-wide. Oden's node polyfills read the
     // same env variable as the Node tests when selecting global proxy config.
-    // SAFETY: CLI parsing runs before worker startup and before Deno starts
+    // SAFETY: CLI parsing runs before worker startup and before Oden starts
     // any threads that could concurrently read the process environment.
     unsafe { std::env::set_var("NODE_USE_ENV_PROXY", "1") };
   } else if result.get_bool("no-use-env-proxy") {
@@ -1402,7 +1402,7 @@ fn run_parse(
 
   if let Some(script) = result.get_one("script_arg") {
     let mut watch = watch_arg_parse_with_paths(result);
-    // `deno watch` is an alias for `deno run --watch-hmr`, so enable hot
+    // `oden watch` is an alias for `oden run --watch-hmr`, so enable hot
     // module replacement watching by default when no explicit watch flag
     // was passed.
     if force_hmr {
@@ -1428,23 +1428,23 @@ fn run_parse(
       ));
     }
     flags.watch = watch;
-    flags.subcommand = DenoSubcommand::Run(RunFlags {
+    flags.subcommand = OdenSubcommand::Run(RunFlags {
       script: script.to_string(),
       bare: false,
       coverage_dir,
       print_task_list: false,
     });
   } else if !flags.v8_flags.is_empty() {
-    // `deno run --v8-flags=--help` with no script
-    flags.subcommand = DenoSubcommand::Run(RunFlags {
+    // `oden run --v8-flags=--help` with no script
+    flags.subcommand = OdenSubcommand::Run(RunFlags {
       script: "_".to_string(),
       bare: false,
       coverage_dir: None,
       print_task_list: false,
     });
   } else {
-    // `deno run` with no script - show available tasks
-    flags.subcommand = DenoSubcommand::Run(RunFlags {
+    // `oden run` with no script - show available tasks
+    flags.subcommand = OdenSubcommand::Run(RunFlags {
       script: String::new(),
       bare: false,
       coverage_dir: None,
@@ -1482,7 +1482,7 @@ fn serve_parse(
   let parallel = result.get_bool("parallel");
 
   flags.watch = watch_arg_parse_with_paths(result);
-  flags.subcommand = DenoSubcommand::Serve(ServeFlags {
+  flags.subcommand = OdenSubcommand::Serve(ServeFlags {
     script,
     port,
     host,
@@ -1506,7 +1506,7 @@ fn eval_parse(result: &ParseResult, flags: &mut Flags) -> Result<(), CliError> {
     .map(|s| s.to_string())
     .unwrap_or_default();
 
-  flags.subcommand = DenoSubcommand::Eval(EvalFlags { print, code });
+  flags.subcommand = OdenSubcommand::Eval(EvalFlags { print, code });
   Ok(())
 }
 
@@ -1556,7 +1556,7 @@ fn fmt_parse(result: &ParseResult, flags: &mut Flags) {
   let unstable_sql = result.get_bool("unstable-sql");
 
   flags.watch = watch_arg_parse_with_paths(result);
-  flags.subcommand = DenoSubcommand::Fmt(FmtFlags {
+  flags.subcommand = OdenSubcommand::Fmt(FmtFlags {
     check: result.get_bool("check"),
     fail_fast: result.get_bool("fail-fast"),
     files: FileFlags { include, ignore },
@@ -1602,7 +1602,7 @@ fn lint_parse(result: &ParseResult, flags: &mut Flags) {
   let compact = result.get_bool("compact");
 
   flags.watch = watch_arg_parse_with_paths(result);
-  flags.subcommand = DenoSubcommand::Lint(LintFlags {
+  flags.subcommand = OdenSubcommand::Lint(LintFlags {
     files: FileFlags {
       include: files,
       ignore,
@@ -1623,7 +1623,7 @@ fn test_parse(result: &ParseResult, flags: &mut Flags) -> Result<(), CliError> {
   runtime_args_parse(result, flags, true, true)?;
   ext_arg_parse(result, flags);
 
-  // deno test always uses --no-prompt
+  // oden test always uses --no-prompt
   flags.permissions.no_prompt = true;
 
   let ignore = result
@@ -1714,7 +1714,7 @@ fn test_parse(result: &ParseResult, flags: &mut Flags) -> Result<(), CliError> {
   };
 
   flags.watch = watch_arg_parse_with_paths(result);
-  flags.subcommand = DenoSubcommand::Test(TestFlags {
+  flags.subcommand = OdenSubcommand::Test(TestFlags {
     no_run,
     doc,
     coverage_dir,
@@ -1796,7 +1796,7 @@ fn upgrade_parse(
 
   let (version_or_hash_or_channel, pr, branch) =
     if positional.as_deref() == Some("pr") {
-      // "deno upgrade pr <number>" - second positional is the PR number
+      // "oden upgrade pr <number>" - second positional is the PR number
       let pr_str = pr_number_positional
         .as_deref()
         .or_else(|| result.get_one("pr"));
@@ -1804,7 +1804,7 @@ fn upgrade_parse(
         None => {
           return Err(CliError::new(
             CliErrorKind::MissingRequired,
-            "missing PR number for 'deno upgrade pr'",
+            "missing PR number for 'oden upgrade pr'",
           ));
         }
         Some(s) => {
@@ -1834,7 +1834,7 @@ fn upgrade_parse(
       }
     };
 
-  flags.subcommand = DenoSubcommand::Upgrade(UpgradeFlags {
+  flags.subcommand = OdenSubcommand::Upgrade(UpgradeFlags {
     dry_run,
     force,
     release_candidate,
@@ -1860,7 +1860,7 @@ fn cache_parse(result: &ParseResult, flags: &mut Flags) {
     .get_many("files")
     .map(|v| v.iter().map(|s| s.to_string()).collect())
     .unwrap_or_default();
-  flags.subcommand = DenoSubcommand::Cache(CacheFlags { files });
+  flags.subcommand = OdenSubcommand::Cache(CacheFlags { files });
 }
 
 fn check_parse(result: &ParseResult, flags: &mut Flags) {
@@ -1881,7 +1881,7 @@ fn check_parse(result: &ParseResult, flags: &mut Flags) {
   }
 
   flags.watch = watch_arg_parse(result);
-  flags.subcommand = DenoSubcommand::Check(CheckFlags {
+  flags.subcommand = OdenSubcommand::Check(CheckFlags {
     files,
     doc: result.get_bool("doc"),
     doc_only: result.get_bool("doc-only"),
@@ -1906,7 +1906,7 @@ fn info_parse(result: &ParseResult, flags: &mut Flags) {
   allow_and_deny_import_parse(result, flags);
 
   let json = result.get_bool("json");
-  flags.subcommand = DenoSubcommand::Info(InfoFlags {
+  flags.subcommand = OdenSubcommand::Info(InfoFlags {
     file: result.get_one("file").map(|s| s.to_string()),
     json,
   });
@@ -1981,7 +1981,7 @@ fn doc_parse(result: &ParseResult, flags: &mut Flags) -> Result<(), CliError> {
     None
   };
 
-  flags.subcommand = DenoSubcommand::Doc(DocFlags {
+  flags.subcommand = OdenSubcommand::Doc(DocFlags {
     source_files,
     json,
     lint,
@@ -2032,7 +2032,7 @@ fn task_parse(result: &ParseResult, flags: &mut Flags) -> Result<(), CliError> {
     None => None,
   };
 
-  flags.subcommand = DenoSubcommand::Task(TaskFlags {
+  flags.subcommand = OdenSubcommand::Task(TaskFlags {
     cwd: result.get_one("cwd").map(|s| s.to_string()),
     task: task_name,
     is_run: false,
@@ -2071,7 +2071,7 @@ fn bench_parse(
   let no_run = result.get_bool("no-run");
 
   flags.watch = watch_arg_parse_with_paths(result);
-  flags.subcommand = DenoSubcommand::Bench(BenchFlags {
+  flags.subcommand = OdenSubcommand::Bench(BenchFlags {
     files: FileFlags { include, ignore },
     filter,
     json,
@@ -2115,7 +2115,7 @@ fn compile_parse(
   let args = result.trailing.clone();
 
   flags.watch = watch_arg_parse(result);
-  flags.subcommand = DenoSubcommand::Compile(CompileFlags {
+  flags.subcommand = OdenSubcommand::Compile(CompileFlags {
     source_file,
     output,
     args,
@@ -2183,7 +2183,7 @@ fn coverage_parse(
 
   let output = result.get_one("output").map(|s| s.to_string());
 
-  flags.subcommand = DenoSubcommand::Coverage(CoverageFlags {
+  flags.subcommand = OdenSubcommand::Coverage(CoverageFlags {
     files: FileFlags {
       include: files,
       ignore,
@@ -2227,12 +2227,12 @@ fn repl_parse(
     json,
   };
 
-  // If user runs bare `deno`, allow all permissions.
+  // If user runs bare `oden`, allow all permissions.
   if repl_flags.is_default_command {
     flags.permissions.allow_all = true;
   }
 
-  flags.subcommand = DenoSubcommand::Repl(repl_flags);
+  flags.subcommand = OdenSubcommand::Repl(repl_flags);
   Ok(())
 }
 
@@ -2256,7 +2256,7 @@ fn install_parse(
     let args = result.trailing.clone();
 
     flags.subcommand =
-      DenoSubcommand::Install(InstallFlags::Global(InstallFlagsGlobal {
+      OdenSubcommand::Install(InstallFlags::Global(InstallFlagsGlobal {
         name,
         module_urls,
         args,
@@ -2291,7 +2291,7 @@ fn install_parse(
         return Err(CliError::new(
           CliErrorKind::InvalidValue,
           "Note: Permission flags can only be used in a global setting\n\
-             Use `deno install -g --allow-net jsr:@std/fs` instead",
+             Use `oden install -g --allow-net jsr:@std/fs` instead",
         ));
       }
     }
@@ -2312,7 +2312,7 @@ fn install_parse(
       .get_many("cmd")
       .map(|v| v.iter().map(|s| s.to_string()).collect())
       .unwrap_or_default();
-    flags.subcommand = DenoSubcommand::Install(InstallFlags::Local(
+    flags.subcommand = OdenSubcommand::Install(InstallFlags::Local(
       InstallFlagsLocal::Entrypoints(InstallEntrypointsFlags {
         entrypoints,
         lockfile_only,
@@ -2328,7 +2328,7 @@ fn install_parse(
       if matches!(flags.config_flag, ConfigFlag::Disabled) {
         return Err(CliError::new(
           CliErrorKind::InvalidValue,
-          "deno install can't be used to add packages if `--no-config` is passed.",
+          "oden install can't be used to add packages if `--no-config` is passed.",
         )
         .with_suggestion(
           "to cache the packages without adding to a config, pass the `--entrypoint` flag",
@@ -2341,7 +2341,7 @@ fn install_parse(
         // Default to npm when neither --npm nor --jsr is provided.
         Some(DefaultRegistry::Npm)
       };
-      flags.subcommand = DenoSubcommand::Install(InstallFlags::Local(
+      flags.subcommand = OdenSubcommand::Install(InstallFlags::Local(
         InstallFlagsLocal::Add(AddFlags {
           packages: packages.iter().map(|s| s.to_string()).collect(),
           dev,
@@ -2356,7 +2356,7 @@ fn install_parse(
         npm_target,
       ));
     } else {
-      flags.subcommand = DenoSubcommand::Install(InstallFlags::Local(
+      flags.subcommand = OdenSubcommand::Install(InstallFlags::Local(
         InstallFlagsLocal::TopLevel(InstallTopLevelFlags {
           lockfile_only,
           production,
@@ -2366,7 +2366,7 @@ fn install_parse(
       ));
     }
   } else {
-    flags.subcommand = DenoSubcommand::Install(InstallFlags::Local(
+    flags.subcommand = OdenSubcommand::Install(InstallFlags::Local(
       InstallFlagsLocal::TopLevel(InstallTopLevelFlags {
         lockfile_only,
         production,
@@ -2398,7 +2398,7 @@ fn uninstall_parse(result: &ParseResult, flags: &mut Flags) {
     })
   };
 
-  flags.subcommand = DenoSubcommand::Uninstall(UninstallFlags { kind });
+  flags.subcommand = OdenSubcommand::Uninstall(UninstallFlags { kind });
 }
 
 fn completions_parse(result: &ParseResult, flags: &mut Flags) {
@@ -2412,11 +2412,11 @@ fn completions_parse(result: &ParseResult, flags: &mut Flags) {
     && matches!(shell.as_str(), "bash" | "fish" | "zsh")
   {
     flags.subcommand =
-      DenoSubcommand::Completions(CompletionsFlags::Dynamic { shell });
+      OdenSubcommand::Completions(CompletionsFlags::Dynamic { shell });
     return;
   }
-  let buf = crate::completions::generate(&shell, &crate::defs::DENO_ROOT);
-  flags.subcommand = DenoSubcommand::Completions(CompletionsFlags::Static(
+  let buf = crate::completions::generate(&shell, &crate::defs::ODEN_ROOT);
+  flags.subcommand = OdenSubcommand::Completions(CompletionsFlags::Static(
     buf.into_boxed_slice(),
   ));
 }
@@ -2479,7 +2479,7 @@ fn init_parse(result: &ParseResult, flags: &mut Flags) -> Result<(), CliError> {
     ));
   }
 
-  flags.subcommand = DenoSubcommand::Init(InitFlags {
+  flags.subcommand = OdenSubcommand::Init(InitFlags {
     package,
     package_args,
     dir,
@@ -2507,7 +2507,7 @@ fn create_parse(
 
   let package = normalize_create_package_name(package, use_npm, use_jsr)?;
 
-  flags.subcommand = DenoSubcommand::Init(InitFlags {
+  flags.subcommand = OdenSubcommand::Init(InitFlags {
     package: Some(package),
     package_args,
     dir: None,
@@ -2559,7 +2559,7 @@ fn normalize_create_package_name(
   } else {
     Err(CliError::new(
       CliErrorKind::InvalidValue,
-      "Missing `jsr:` or `npm:` prefix. For example: `deno create npm:vite`.",
+      "Missing `jsr:` or `npm:` prefix. For example: `oden create npm:vite`.",
     ))
   }
 }
@@ -2572,7 +2572,7 @@ fn jupyter_parse(result: &ParseResult, flags: &mut Flags) {
   let name = result.get_one("name").map(|s| s.to_string());
   let force = result.get_bool("force");
 
-  flags.subcommand = DenoSubcommand::Jupyter(JupyterFlags {
+  flags.subcommand = OdenSubcommand::Jupyter(JupyterFlags {
     install,
     kernel,
     conn_file,
@@ -2588,7 +2588,7 @@ fn publish_parse(result: &ParseResult, flags: &mut Flags) {
   check_arg_parse(result, flags);
   config_args_parse(result, flags);
 
-  flags.subcommand = DenoSubcommand::Publish(PublishFlags {
+  flags.subcommand = OdenSubcommand::Publish(PublishFlags {
     token: result.get_one("token").map(|s| s.to_string()),
     dry_run: result.get_bool("dry-run"),
     allow_slow_types: result.get_bool("allow-slow-types"),
@@ -2613,11 +2613,11 @@ fn add_parse(result: &ParseResult, flags: &mut Flags) {
     Some(DefaultRegistry::Jsr)
   } else {
     // Default to npm when neither --npm nor --jsr is provided, so
-    // `deno add express` works without requiring an `npm:` prefix.
+    // `oden add express` works without requiring an `npm:` prefix.
     Some(DefaultRegistry::Npm)
   };
 
-  flags.subcommand = DenoSubcommand::Add(AddFlags {
+  flags.subcommand = OdenSubcommand::Add(AddFlags {
     packages,
     dev,
     optional: result.get_bool("save-optional"),
@@ -2642,7 +2642,7 @@ fn pack_parse(result: &ParseResult, flags: &mut Flags) {
     .get_many("ignore")
     .map(|v| v.iter().map(|s| s.to_string()).collect())
     .unwrap_or_default();
-  flags.subcommand = DenoSubcommand::Pack(PackFlags {
+  flags.subcommand = OdenSubcommand::Pack(PackFlags {
     files: FileFlags { include, ignore },
     output: result.get_one("output").map(|s| s.to_string()),
     dry_run: result.get_bool("dry-run"),
@@ -2667,7 +2667,7 @@ fn desktop_parse(
     .map(|v| v.iter().map(|s| s.to_string()).collect::<Vec<_>>())
     .unwrap_or_default()
     .into_iter();
-  // The entrypoint is optional: bare `deno desktop` defaults to "." so
+  // The entrypoint is optional: bare `oden desktop` defaults to "." so
   // framework detection runs against the current directory.
   let source_file = script.next().unwrap_or_else(|| ".".to_string());
   let args = script.collect();
@@ -2698,7 +2698,7 @@ fn desktop_parse(
     .map(|v| v.iter().map(|s| s.to_string()).collect())
     .unwrap_or_default();
 
-  flags.subcommand = DenoSubcommand::Desktop(DesktopFlags {
+  flags.subcommand = OdenSubcommand::Desktop(DesktopFlags {
     source_file,
     output: result.get_one("output").map(|s| s.to_string()),
     args,
@@ -2728,7 +2728,7 @@ fn desktop_parse(
 fn ci_parse(result: &ParseResult, flags: &mut Flags) {
   env_file_arg_parse(result, flags);
   flags.frozen_lockfile = Some(true);
-  flags.subcommand = DenoSubcommand::Ci(CiFlags {
+  flags.subcommand = OdenSubcommand::Ci(CiFlags {
     production: result.get_bool("prod"),
     skip_types: result.get_bool("skip-types"),
   });
@@ -2763,7 +2763,7 @@ fn bump_version_parse(
   } else {
     None
   };
-  flags.subcommand = DenoSubcommand::BumpVersion(VersionFlags {
+  flags.subcommand = OdenSubcommand::BumpVersion(VersionFlags {
     increment,
     workspace,
     start: result.get_one("start").map(|s| s.to_string()),
@@ -2786,7 +2786,7 @@ fn transpile_parse(result: &ParseResult, flags: &mut Flags) {
     Some("separate") => SourceMapMode::Separate,
     _ => SourceMapMode::None,
   };
-  flags.subcommand = DenoSubcommand::Transpile(TranspileFlags {
+  flags.subcommand = OdenSubcommand::Transpile(TranspileFlags {
     files,
     output: result.get_one("output").map(|s| s.to_string()),
     output_dir: result.get_one("outdir").map(|s| s.to_string()),
@@ -2799,7 +2799,7 @@ fn why_parse(result: &ParseResult, flags: &mut Flags) {
   lock_args_parse(result, flags);
   env_file_arg_parse(result, flags);
   let package = result.get_one("package").map(|s| s.to_string());
-  flags.subcommand = DenoSubcommand::Why(WhyFlags {
+  flags.subcommand = OdenSubcommand::Why(WhyFlags {
     package: package.unwrap_or_default(),
   });
 }
@@ -2812,19 +2812,19 @@ fn remove_parse(result: &ParseResult, flags: &mut Flags) {
     .map(|v| v.iter().map(|s| s.to_string()).collect())
     .unwrap_or_default();
 
-  // `deno remove --global <name>...` is an alias for `deno uninstall
+  // `oden remove --global <name>...` is an alias for `oden uninstall
   // --global <name>...`: it removes globally installed executables rather
   // than dependencies from the configuration file, so route it through the
   // same subcommand the uninstaller uses.
   if result.get_bool("global") {
     let root = result.get_one("root").map(|s| s.to_string());
-    flags.subcommand = DenoSubcommand::Uninstall(UninstallFlags {
+    flags.subcommand = OdenSubcommand::Uninstall(UninstallFlags {
       kind: UninstallKind::Global(UninstallFlagsGlobal { packages, root }),
     });
     return;
   }
 
-  flags.subcommand = DenoSubcommand::Remove(RemoveFlags {
+  flags.subcommand = OdenSubcommand::Remove(RemoveFlags {
     packages,
     lockfile_only: result.get_bool("lockfile-only"),
     package_json: result.get_bool("package-json"),
@@ -2852,7 +2852,7 @@ fn outdated_parse(result: &ParseResult, flags: &mut Flags, is_update: bool) {
     OutdatedKind::PrintOutdated { compatible }
   };
 
-  flags.subcommand = DenoSubcommand::Outdated(OutdatedFlags {
+  flags.subcommand = OdenSubcommand::Outdated(OutdatedFlags {
     filters,
     recursive,
     kind,
@@ -2874,7 +2874,7 @@ fn clean_parse(result: &ParseResult, flags: &mut Flags) {
   }
   let dry_run = result.get_bool("dry-run");
 
-  flags.subcommand = DenoSubcommand::Clean(CleanFlags {
+  flags.subcommand = OdenSubcommand::Clean(CleanFlags {
     except_paths,
     dry_run,
   });
@@ -2885,7 +2885,7 @@ fn list_parse(result: &ParseResult, flags: &mut Flags) {
     .get_many("filters")
     .map(|v| v.iter().map(|s| s.to_string()).collect())
     .unwrap_or_default();
-  flags.subcommand = DenoSubcommand::List(ListFlags {
+  flags.subcommand = OdenSubcommand::List(ListFlags {
     recursive: result.get_bool("recursive"),
     depth: result
       .get_one("depth")
@@ -2899,7 +2899,7 @@ fn list_parse(result: &ParseResult, flags: &mut Flags) {
 
 fn link_parse(result: &ParseResult, flags: &mut Flags) {
   lock_args_parse(result, flags);
-  flags.subcommand = DenoSubcommand::Link(LinkFlags {
+  flags.subcommand = OdenSubcommand::Link(LinkFlags {
     paths: result
       .get_many("paths")
       .map(|v| v.iter().map(|s| s.to_string()).collect())
@@ -2910,7 +2910,7 @@ fn link_parse(result: &ParseResult, flags: &mut Flags) {
 
 fn sync_types_parse(result: &ParseResult, flags: &mut Flags) {
   allow_and_deny_import_parse(result, flags);
-  flags.subcommand = DenoSubcommand::SyncTypes(SyncTypesFlags {
+  flags.subcommand = OdenSubcommand::SyncTypes(SyncTypesFlags {
     roots: result
       .get_many("roots")
       .map(|v| v.iter().map(|s| s.to_string()).collect())
@@ -2920,7 +2920,7 @@ fn sync_types_parse(result: &ParseResult, flags: &mut Flags) {
 
 fn unlink_parse(result: &ParseResult, flags: &mut Flags) {
   lock_args_parse(result, flags);
-  flags.subcommand = DenoSubcommand::Unlink(UnlinkFlags {
+  flags.subcommand = OdenSubcommand::Unlink(UnlinkFlags {
     names_or_paths: result
       .get_many("names_or_paths")
       .map(|v| v.iter().map(|s| s.to_string()).collect())
@@ -2930,7 +2930,7 @@ fn unlink_parse(result: &ParseResult, flags: &mut Flags) {
 }
 
 fn approve_scripts_parse(result: &ParseResult, flags: &mut Flags) {
-  flags.subcommand = DenoSubcommand::ApproveScripts(ApproveScriptsFlags {
+  flags.subcommand = OdenSubcommand::ApproveScripts(ApproveScriptsFlags {
     packages: result
       .get_many("packages")
       .map(|v| v.iter().map(|s| s.to_string()).collect())
@@ -2940,22 +2940,22 @@ fn approve_scripts_parse(result: &ParseResult, flags: &mut Flags) {
 }
 
 fn types_parse(flags: &mut Flags) {
-  flags.subcommand = DenoSubcommand::Types;
+  flags.subcommand = OdenSubcommand::Types;
 }
 
 fn lsp_parse(flags: &mut Flags) {
-  flags.subcommand = DenoSubcommand::Lsp;
+  flags.subcommand = OdenSubcommand::Lsp;
 }
 
 fn vendor_parse(flags: &mut Flags) {
-  flags.subcommand = DenoSubcommand::Vendor;
+  flags.subcommand = OdenSubcommand::Vendor;
 }
 
 fn deploy_parse(flags: &mut Flags, sandbox: bool) {
   // deploy/sandbox are passthrough - all args go into argv. Note that argv is
   // filled in by the shared trailing-arg handling in `flags_from_vec`, so this
   // must not copy `result.trailing` itself or every arg would be duplicated.
-  flags.subcommand = DenoSubcommand::Deploy(DeployFlags { sandbox });
+  flags.subcommand = OdenSubcommand::Deploy(DeployFlags { sandbox });
 }
 
 // ============================================================
@@ -3164,7 +3164,7 @@ fn node_inspect_addr(word: &str, flag: &str) -> Option<SocketAddr> {
 fn bundle_parse(result: &ParseResult, flags: &mut Flags) {
   compile_args_without_check_parse(result, flags);
   // `compile_args_without_check_parse` deliberately omits `--check`; apply it
-  // here so `deno bundle --check=all` type-checks (mirrors clap, #30159).
+  // here so `oden bundle --check=all` type-checks (mirrors clap, #30159).
   check_arg_parse(result, flags);
   // `bundle` resolves a module graph but never runs it, so the only
   // permissions it takes are the import ones.
@@ -3187,10 +3187,10 @@ fn bundle_parse(result: &ParseResult, flags: &mut Flags) {
     "external" => PackageHandling::External,
     _ => PackageHandling::Bundle,
   };
-  let platform_str = result.get_one("platform").unwrap_or("deno");
+  let platform_str = result.get_one("platform").unwrap_or("oden");
   let platform = match platform_str {
     "browser" => BundlePlatform::Browser,
-    _ => BundlePlatform::Deno,
+    _ => BundlePlatform::Oden,
   };
   // `--sourcemap` takes an optional value that must be attached with `=`, so a
   // bare `--sourcemap` means "linked" and never swallows the next argument.
@@ -3208,7 +3208,7 @@ fn bundle_parse(result: &ParseResult, flags: &mut Flags) {
     .map(|v| v.to_vec())
     .unwrap_or_default();
 
-  flags.subcommand = DenoSubcommand::Bundle(BundleFlags {
+  flags.subcommand = OdenSubcommand::Bundle(BundleFlags {
     entrypoints,
     output_path,
     output_dir,
@@ -3251,7 +3251,7 @@ fn audit_parse(
     .map(|v| v.to_vec())
     .unwrap_or_default();
 
-  flags.subcommand = DenoSubcommand::Audit(AuditFlags {
+  flags.subcommand = OdenSubcommand::Audit(AuditFlags {
     severity,
     dev: true,
     prod: true,
@@ -3272,10 +3272,10 @@ fn x_parse(result: &ParseResult, flags: &mut Flags) -> Result<(), CliError> {
       goto_script(result, flags)?
     } else {
       let name = match alias {
-        "dx" => DenoXShimName::Dx,
-        "denox" => DenoXShimName::Denox,
-        "dnx" => DenoXShimName::Dnx,
-        other => DenoXShimName::Other(other.to_string()),
+        "dx" => OdenXShimName::Dx,
+        "odenx" => OdenXShimName::Odenx,
+        "dnx" => OdenXShimName::Dnx,
+        other => OdenXShimName::Other(other.to_string()),
       };
       XFlagsKind::InstallAlias(name)
     }
@@ -3311,18 +3311,18 @@ fn x_parse(result: &ParseResult, flags: &mut Flags) -> Result<(), CliError> {
   if !flags.permissions.has_permission() && flags.permission_set.is_none() {
     flags.permissions.allow_all = true;
   }
-  flags.subcommand = DenoSubcommand::X(XFlags { kind });
+  flags.subcommand = OdenSubcommand::X(XFlags { kind });
   Ok(())
 }
 
 fn json_reference_parse(flags: &mut Flags) {
   // Build a JSON representation of all commands from our static definitions.
   // This replaces the clap-based json_reference_parse.
-  let root = &crate::defs::DENO_ROOT;
+  let root = &crate::defs::ODEN_ROOT;
   let json_str = serialize_command_def(root, true);
-  let json = deno_core::serde_json::from_str(&json_str)
-    .unwrap_or_else(|_| deno_core::serde_json::Value::Null);
-  flags.subcommand = DenoSubcommand::JSONReference(JSONReferenceFlags { json });
+  let json = oden_core::serde_json::from_str(&json_str)
+    .unwrap_or_else(|_| oden_core::serde_json::Value::Null);
+  flags.subcommand = OdenSubcommand::JSONReference(JSONReferenceFlags { json });
 }
 
 fn serialize_command_def(cmd: &crate::CommandDef, top_level: bool) -> String {
@@ -3451,11 +3451,11 @@ fn json_escape_option(s: Option<&str>) -> String {
 }
 
 fn help_subcommand_parse(result: &ParseResult, flags: &mut Flags) {
-  let root = &crate::defs::DENO_ROOT;
+  let root = &crate::defs::ODEN_ROOT;
   let sub_name = result.get_one("subcommand");
   let cmd = sub_name
     .and_then(|name| root.find_subcommand(name))
     .unwrap_or(root);
   let help_text = crate::help::render_help(cmd);
-  flags.subcommand = DenoSubcommand::Help(HelpFlags { help: help_text });
+  flags.subcommand = OdenSubcommand::Help(HelpFlags { help: help_text });
 }

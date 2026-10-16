@@ -1,0 +1,9 @@
+{
+  "workspace": [
+    "foo",
+    "bar"
+  ],
+  "tasks": {
+    "dev": "oden run --watch main.ts"
+  }
+}

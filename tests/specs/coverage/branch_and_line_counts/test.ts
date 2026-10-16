@@ -1,6 +1,6 @@
 import { f } from "./mod.ts";
 
-Deno.test("f", () => {
+Oden.test("f", () => {
   f(true);
   f(false);
 });

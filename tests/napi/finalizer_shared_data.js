@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Regression test for #36538. All the externals created here share the same
 // (null) `data` pointer while each carries its own finalize hint, which is the

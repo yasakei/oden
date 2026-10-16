@@ -1,5 +1,5 @@
-#!/usr/bin/env -S deno run --allow-read
+#!/usr/bin/env -S oden run --allow-read
 
-for (const item of Deno.readDirSync(".")) {
+for (const item of Oden.readDirSync(".")) {
   console.log(item.name);
 }

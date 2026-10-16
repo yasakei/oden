@@ -1,16 +1,16 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // deno-lint-ignore-file no-console
 
-const targetDir = Deno.execPath().replace(/[^\/\\]+$/, "");
+const targetDir = Oden.execPath().replace(/[^\/\\]+$/, "");
 const [libPrefix, libSuffix] = {
   darwin: ["lib", "dylib"],
   linux: ["lib", "so"],
   windows: ["", "dll"],
-}[Deno.build.os];
+}[Oden.build.os];
 const libPath = `${targetDir}/${libPrefix}test_ffi.${libSuffix}`;
 
-const dylib = Deno.dlopen(
+const dylib = Oden.dlopen(
   libPath,
   {
     store_function: {
@@ -49,7 +49,7 @@ const tripleLogCallback = () => {
   }, 100);
 };
 
-const callback = Deno.UnsafeCallback.threadSafe(
+const callback = Oden.UnsafeCallback.threadSafe(
   {
     parameters: [],
     result: "void",

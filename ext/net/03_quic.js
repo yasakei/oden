@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { core, internals, primordials } from "ext:core/mod.js";
 import {
   op_quic_connecting_0rtt,
@@ -44,8 +44,8 @@ const {
   readableStreamForRid,
   WritableStream,
   writableStreamForRid,
-} = core.loadExtScript("ext:deno_web/06_streams.js");
-const { loadTlsKeyPair } = core.loadExtScript("ext:deno_net/02_tls.js");
+} = core.loadExtScript("ext:oden_web/06_streams.js");
+const { loadTlsKeyPair } = core.loadExtScript("ext:oden_net/02_tls.js");
 const {
   BadResourcePrototype,
 } = core;
@@ -149,7 +149,7 @@ class QuicEndpoint {
   }
 
   listen(options) {
-    const keyPair = loadTlsKeyPair("Deno.QuicEndpoint.listen", {
+    const keyPair = loadTlsKeyPair("Oden.QuicEndpoint.listen", {
       cert: options.cert,
       key: options.key,
     });
@@ -572,7 +572,7 @@ function connectQuic(options) {
     new QuicEndpoint({
       [kRid]: op_quic_endpoint_create({ hostname: "::", port: 0 }, 0, false),
     });
-  const keyPair = loadTlsKeyPair("Deno.connectQuic", {
+  const keyPair = loadTlsKeyPair("Oden.connectQuic", {
     cert: options.cert,
     key: options.key,
   });

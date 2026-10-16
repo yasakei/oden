@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   assert,
   assertEquals,
@@ -6,7 +6,7 @@ import {
   assertThrows,
 } from "./test_util.ts";
 
-Deno.test(async function responseText() {
+Oden.test(async function responseText() {
   const response = new Response("hello world");
   const textPromise = response.text();
   assert(textPromise instanceof Promise);
@@ -15,7 +15,7 @@ Deno.test(async function responseText() {
   assertEquals(text, "hello world");
 });
 
-Deno.test(async function responseArrayBuffer() {
+Oden.test(async function responseArrayBuffer() {
   const response = new Response(new Uint8Array([1, 2, 3]));
   const arrayBufferPromise = response.arrayBuffer();
   assert(arrayBufferPromise instanceof Promise);
@@ -24,7 +24,7 @@ Deno.test(async function responseArrayBuffer() {
   assertEquals(new Uint8Array(arrayBuffer), new Uint8Array([1, 2, 3]));
 });
 
-Deno.test(async function responseJson() {
+Oden.test(async function responseJson() {
   const response = new Response('{"hello": "world"}');
   const jsonPromise = response.json();
   assert(jsonPromise instanceof Promise);
@@ -33,7 +33,7 @@ Deno.test(async function responseJson() {
   assertEquals(json, { hello: "world" });
 });
 
-Deno.test(async function responseBlob() {
+Oden.test(async function responseBlob() {
   const response = new Response(new Uint8Array([1, 2, 3]));
   const blobPromise = response.blob();
   assert(blobPromise instanceof Promise);
@@ -43,7 +43,7 @@ Deno.test(async function responseBlob() {
   assertEquals(await blob.arrayBuffer(), new Uint8Array([1, 2, 3]).buffer);
 });
 
-Deno.test(async function responseFormData() {
+Oden.test(async function responseFormData() {
   const input = new FormData();
   input.append("hello", "world");
   const response = new Response(input);
@@ -56,7 +56,7 @@ Deno.test(async function responseFormData() {
   assertEquals([...formData], [...input]);
 });
 
-Deno.test(function responseInvalidInit() {
+Oden.test(function responseInvalidInit() {
   // deno-lint-ignore ban-ts-comment
   // @ts-expect-error
   assertThrows(() => new Response("", 0));
@@ -66,17 +66,17 @@ Deno.test(function responseInvalidInit() {
   assertThrows(() => new Response("", { status: null }));
 });
 
-Deno.test(function responseNullInit() {
+Oden.test(function responseNullInit() {
   // deno-lint-ignore ban-ts-comment
   // @ts-expect-error
   const response = new Response("", null);
   assertEquals(response.status, 200);
 });
 
-Deno.test(function customInspectFunction() {
+Oden.test(function customInspectFunction() {
   const response = new Response();
   assertEquals(
-    Deno.inspect(response),
+    Oden.inspect(response),
     `Response {
   body: null,
   bodyUsed: false,
@@ -88,10 +88,10 @@ Deno.test(function customInspectFunction() {
   url: ""
 }`,
   );
-  assertStringIncludes(Deno.inspect(Response.prototype), "Response");
+  assertStringIncludes(Oden.inspect(Response.prototype), "Response");
 });
 
-Deno.test(async function responseBodyUsed() {
+Oden.test(async function responseBodyUsed() {
   const response = new Response("body");
   assert(!response.bodyUsed);
   await response.text();

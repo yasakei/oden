@@ -1,9 +1,9 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { createInterface, Interface } from "node:readline";
 import { assertInstanceOf } from "@std/assert";
 import { Readable, Writable } from "node:stream";
 
-Deno.test("[node/readline] createInstance", () => {
+Oden.test("[node/readline] createInstance", () => {
   const rl = createInterface({
     input: new Readable({ read() {} }),
     output: new Writable(),
@@ -14,7 +14,7 @@ Deno.test("[node/readline] createInstance", () => {
 });
 
 // Test for https://github.com/denoland/deno/issues/19183
-Deno.test("[node/readline] don't throw on rl.question()", () => {
+Oden.test("[node/readline] don't throw on rl.question()", () => {
   const rli = createInterface({
     input: new Readable({ read() {} }),
     output: new Writable({ write() {} }),

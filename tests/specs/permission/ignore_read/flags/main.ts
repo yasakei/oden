@@ -1,13 +1,13 @@
 try {
-  Deno.readTextFileSync("./deno.json");
+  Oden.readTextFileSync("./oden.json");
   console.log("loaded");
 } catch (err) {
-  console.log(err instanceof Deno.errors.NotFound);
+  console.log(err instanceof Oden.errors.NotFound);
 }
 
 try {
-  Deno.readTextFileSync("data.txt");
+  Oden.readTextFileSync("data.txt");
   console.log("loaded");
 } catch (err) {
-  console.log(err instanceof Deno.errors.NotFound);
+  console.log(err instanceof Oden.errors.NotFound);
 }

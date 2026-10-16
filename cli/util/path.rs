@@ -1,15 +1,15 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::path::Path;
 
 use deno_ast::MediaType;
 use deno_ast::ModuleSpecifier;
-use deno_config::glob::PathGlobMatch;
-use deno_config::glob::PathOrPattern;
-use deno_config::glob::PathOrPatternSet;
+use oden_config::glob::PathGlobMatch;
+use oden_config::glob::PathOrPattern;
+use oden_config::glob::PathOrPatternSet;
 
-/// Checks if the path has an extension Deno supports for script execution.
+/// Checks if the path has an extension Oden supports for script execution.
 pub fn is_script_ext(path: &Path) -> bool {
   if let Some(ext) = get_extension(path) {
     matches!(
@@ -21,7 +21,7 @@ pub fn is_script_ext(path: &Path) -> bool {
   }
 }
 
-/// Checks if the path has an extension Deno supports for importing.
+/// Checks if the path has an extension Oden supports for importing.
 pub fn is_importable_ext(path: &Path) -> bool {
   if let Some(ext) = get_extension(path) {
     matches!(
@@ -184,7 +184,7 @@ pub fn to_percent_decoded_str(s: &str) -> String {
 /// APIs do when opening a file: trailing spaces and dots are stripped from the
 /// final path component.
 ///
-/// Without this, `deno info ".\foo.tsx "` resolves to a `foo.tsx%20` specifier.
+/// Without this, `oden info ".\foo.tsx "` resolves to a `foo.tsx%20` specifier.
 /// The file still loads on Windows (the OS trims the trailing space when
 /// opening it), but the trailing `%20` causes the media type to be misdetected
 /// (e.g. as TypeScript instead of TSX), leading to a confusing parse error.

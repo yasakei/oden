@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! Node.js interop helpers exposed as static methods on the `CryptoKey`
 //! cppgc class.
@@ -8,7 +8,7 @@
 //! `ext/node/polyfills/internal/crypto/keys.ts`; declaring them on the
 //! cppgc class keeps the JS bootstrap a no-op (no extra ops).
 
-use deno_core::v8;
+use oden_core::v8;
 use deno_error::JsErrorBox;
 
 use crate::CryptoError;
@@ -41,7 +41,7 @@ pub fn export_node_key_material<'s>(
   scope: &mut v8::PinScope<'s, '_>,
   key: v8::Local<'s, v8::Value>,
 ) -> Result<v8::Local<'s, v8::Value>, CryptoError> {
-  let ptr = deno_core::cppgc::try_unwrap_cppgc_object::<CryptoKey>(scope, key)
+  let ptr = oden_core::cppgc::try_unwrap_cppgc_object::<CryptoKey>(scope, key)
     .ok_or_else(|| {
       CryptoError::Other(JsErrorBox::type_error("Argument is not a CryptoKey"))
     })?;

@@ -1,0 +1,6 @@
+{
+  "workspace": ["./packages/a"],
+  "catalog": {
+    "@odentest/esm-basic": "^1.0.0"
+  }
+}

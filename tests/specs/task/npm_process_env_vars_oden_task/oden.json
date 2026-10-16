@@ -1,0 +1,5 @@
+{
+  "tasks": {
+    "env": "oden eval \"console.log('command:' + Oden.env.get('npm_command')); console.log('execpath:' + Oden.env.get('npm_execpath')); console.log('node_execpath:' + Oden.env.get('npm_node_execpath'))\""
+  }
+}

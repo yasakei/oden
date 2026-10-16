@@ -2,20 +2,20 @@ import { spawn } from "node:child_process";
 import process from "node:process";
 
 if (process.env.SPAWNED_CHILD === "1") {
-  // Child process: verify no Deno flags were injected into argv.
+  // Child process: verify no Oden flags were injected into argv.
   // Before the fix, child_process.spawn would translate Node args
-  // into Deno args (run -A --unstable-node-globals etc.) when the
+  // into Oden args (run -A --unstable-node-globals etc.) when the
   // spawn target was a compiled binary.
   const appArgs = process.argv.slice(2);
-  const denoFlags = appArgs.filter(
+  const odenFlags = appArgs.filter(
     (a) =>
       a === "run" ||
       a === "-A" ||
       a.startsWith("--unstable-") ||
       a.startsWith("--v8-flags="),
   );
-  if (denoFlags.length > 0) {
-    console.log("FAIL: unexpected Deno flags in argv: " + denoFlags.join(", "));
+  if (odenFlags.length > 0) {
+    console.log("FAIL: unexpected Oden flags in argv: " + odenFlags.join(", "));
     process.exit(1);
   }
 

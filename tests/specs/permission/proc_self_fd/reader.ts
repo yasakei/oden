@@ -1,1 +1,1 @@
-console.log(Deno.readTextFileSync(Deno.args[0]));
+console.log(Oden.readTextFileSync(Oden.args[0]));

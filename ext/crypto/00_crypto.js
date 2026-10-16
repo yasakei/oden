@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // This module is intentionally thin: every WebCrypto algorithm body
 // (`SubtleCrypto.{digest,encrypt,decrypt,sign,verify,deriveBits,deriveKey,
@@ -33,9 +33,9 @@ const {
   SymbolFor,
 } = primordials;
 
-const webidl = core.loadExtScript("ext:deno_webidl/00_webidl.js");
+const webidl = core.loadExtScript("ext:oden_webidl/00_webidl.js");
 const { createFilteredInspectProxy } = core.loadExtScript(
-  "ext:deno_web/01_console.js",
+  "ext:oden_web/01_console.js",
 );
 const { kKeyObject } = internals;
 
@@ -67,11 +67,11 @@ function applyWebIdlInterfaceShape(interface_) {
 // `CryptoKey` is the cppgc-wrapped Rust class imported above; the `type`,
 // `extractable`, `usages` and `algorithm` getters and the underlying state
 // all live in Rust (`ext/crypto/crypto_key.rs`). The JS shim only attaches
-// the `Deno.privateCustomInspect` symbol to the prototype.
+// the `Oden.privateCustomInspect` symbol to the prototype.
 const CryptoKeyPrototype = CryptoKey.prototype;
 ObjectDefineProperty(
   CryptoKeyPrototype,
-  SymbolFor("Deno.privateCustomInspect"),
+  SymbolFor("Oden.privateCustomInspect"),
   {
     __proto__: null,
     value: function (inspect, inspectOptions) {
@@ -212,10 +212,10 @@ makeAsyncForwarder("decapsulateBits", "decapsulateBits", 3);
 makeAsyncForwarder("decapsulateKey", "decapsulateKey", 6);
 
 // `SubtleCrypto`'s prototype keeps a single privateCustomInspect helper so
-// `Deno.inspect(crypto.subtle)` prints `SubtleCrypto {}` rather than the
+// `Oden.inspect(crypto.subtle)` prints `SubtleCrypto {}` rather than the
 // internal cppgc shape.
 ObjectAssign(SubtleCryptoPrototype, {
-  [SymbolFor("Deno.privateCustomInspect")](inspect, inspectOptions) {
+  [SymbolFor("Oden.privateCustomInspect")](inspect, inspectOptions) {
     return `${this.constructor.name} ${inspect({}, inspectOptions)}`;
   },
 });
@@ -277,7 +277,7 @@ ObjectDefineProperty(CryptoPrototype, "randomUUID", {
   enumerable: true,
   configurable: true,
 });
-ObjectDefineProperty(CryptoPrototype, SymbolFor("Deno.privateCustomInspect"), {
+ObjectDefineProperty(CryptoPrototype, SymbolFor("Oden.privateCustomInspect"), {
   __proto__: null,
   value: function (inspect, inspectOptions) {
     return inspect(

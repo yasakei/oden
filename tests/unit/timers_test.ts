@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // deno-lint-ignore-file no-console
 
@@ -11,7 +11,7 @@ import {
   unreachable,
 } from "./test_util.ts";
 
-Deno.test(async function functionParameterBindingSuccess() {
+Oden.test(async function functionParameterBindingSuccess() {
   const { promise, resolve } = Promise.withResolvers<void>();
   let count = 0;
 
@@ -30,7 +30,7 @@ Deno.test(async function functionParameterBindingSuccess() {
 
 // TODO(bartlomieju): this test is not valid, because Node.js timers are
 // used as the default and they don't support string eval callbacks.
-Deno.test.ignore(async function stringifyAndEvalNonFunctions() {
+Oden.test.ignore(async function stringifyAndEvalNonFunctions() {
   // eval can only access global scope
   const global = globalThis as unknown as {
     globalPromise: ReturnType<typeof Promise.withResolvers<void>>;
@@ -55,7 +55,7 @@ Deno.test.ignore(async function stringifyAndEvalNonFunctions() {
   Reflect.deleteProperty(global, "globalCount");
 });
 
-Deno.test(async function timeoutSuccess() {
+Oden.test(async function timeoutSuccess() {
   const { promise, resolve } = Promise.withResolvers<void>();
   let count = 0;
   setTimeout(() => {
@@ -69,7 +69,7 @@ Deno.test(async function timeoutSuccess() {
 
 // TODO(bartlomieju): this test is not valid, because Node.js timers are
 // used as the default and they don't support string eval callbacks.
-Deno.test.ignore(async function timeoutEvalNoScopeLeak() {
+Oden.test.ignore(async function timeoutEvalNoScopeLeak() {
   // eval can only access global scope
   const global = globalThis as unknown as {
     globalPromise: ReturnType<typeof Promise.withResolvers<Error>>;
@@ -92,7 +92,7 @@ Deno.test.ignore(async function timeoutEvalNoScopeLeak() {
 
 // TODO(bartlomieju): this test is not valid, because Node.js timers are
 // used as the default and they don't support string eval callbacks.
-Deno.test.ignore(async function evalPrimordial() {
+Oden.test.ignore(async function evalPrimordial() {
   const global = globalThis as unknown as {
     globalPromise: ReturnType<typeof Promise.withResolvers<void>>;
   };
@@ -113,7 +113,7 @@ Deno.test.ignore(async function evalPrimordial() {
   globalThis.eval = originalEval;
 });
 
-Deno.test(async function timeoutCancelSuccess() {
+Oden.test(async function timeoutCancelSuccess() {
   let count = 0;
   const id = setTimeout(() => {
     count++;
@@ -124,7 +124,7 @@ Deno.test(async function timeoutCancelSuccess() {
   assertEquals(count, 0);
 });
 
-Deno.test(async function timeoutCancelMultiple() {
+Oden.test(async function timeoutCancelMultiple() {
   function uncalled(): never {
     throw new Error("This function should not be called.");
   }
@@ -149,7 +149,7 @@ Deno.test(async function timeoutCancelMultiple() {
   await delay(50);
 });
 
-Deno.test(async function timeoutCancelInvalidSilentFail() {
+Oden.test(async function timeoutCancelInvalidSilentFail() {
   // Expect no panic
   const { promise, resolve } = Promise.withResolvers<void>();
   let count = 0;
@@ -166,7 +166,7 @@ Deno.test(async function timeoutCancelInvalidSilentFail() {
   clearTimeout(2147483647);
 });
 
-Deno.test(async function intervalSuccess() {
+Oden.test(async function intervalSuccess() {
   const { promise, resolve } = Promise.withResolvers<void>();
   let count = 0;
   const id = setInterval(() => {
@@ -184,7 +184,7 @@ Deno.test(async function intervalSuccess() {
   await delay(0);
 });
 
-Deno.test(async function intervalCancelSuccess() {
+Oden.test(async function intervalCancelSuccess() {
   let count = 0;
   const id = setInterval(() => {
     count++;
@@ -194,7 +194,7 @@ Deno.test(async function intervalCancelSuccess() {
   assertEquals(count, 0);
 });
 
-Deno.test(async function intervalOrdering() {
+Oden.test(async function intervalOrdering() {
   const timers = [] as NodeJS.Timeout[];
   let timeouts = 0;
   function onTimeout() {
@@ -210,14 +210,14 @@ Deno.test(async function intervalOrdering() {
   assertEquals(timeouts, 1);
 });
 
-Deno.test(function intervalCancelInvalidSilentFail() {
+Oden.test(function intervalCancelInvalidSilentFail() {
   // Should silently fail (no panic)
   clearInterval(2147483647);
 });
 
 // If a repeating timer is dispatched, the next interval that should first is based on
 // when the timer is dispatched, not when the timer handler completes.
-Deno.test(async function callbackTakesLongerThanInterval() {
+Oden.test(async function callbackTakesLongerThanInterval() {
   const { promise, resolve } = Promise.withResolvers<void>();
   const output: number[] = [];
   let last = 0;
@@ -242,7 +242,7 @@ Deno.test(async function callbackTakesLongerThanInterval() {
 });
 
 // https://github.com/denoland/deno/issues/11398
-Deno.test(async function clearTimeoutAfterNextTimerIsDue1() {
+Oden.test(async function clearTimeoutAfterNextTimerIsDue1() {
   const { promise, resolve } = Promise.withResolvers<void>();
 
   setTimeout(() => {
@@ -259,7 +259,7 @@ Deno.test(async function clearTimeoutAfterNextTimerIsDue1() {
 });
 
 // https://github.com/denoland/deno/issues/11398
-Deno.test(async function clearTimeoutAfterNextTimerIsDue2() {
+Oden.test(async function clearTimeoutAfterNextTimerIsDue2() {
   const { promise, resolve } = Promise.withResolvers<void>();
 
   const timeout1 = setTimeout(unreachable, 100);
@@ -275,7 +275,7 @@ Deno.test(async function clearTimeoutAfterNextTimerIsDue2() {
   await promise;
 });
 
-Deno.test(async function fireCallbackImmediatelyWhenDelayOverMaxValue() {
+Oden.test(async function fireCallbackImmediatelyWhenDelayOverMaxValue() {
   let count = 0;
   setTimeout(() => {
     count++;
@@ -286,7 +286,7 @@ Deno.test(async function fireCallbackImmediatelyWhenDelayOverMaxValue() {
 
 // TODO(bartlomieju): this test is not valid, because Node.js timers are
 // used as the default and they bind `this` to the Timeout object.
-Deno.test.ignore(async function timeoutCallbackThis() {
+Oden.test.ignore(async function timeoutCallbackThis() {
   const { promise, resolve } = Promise.withResolvers<void>();
   let capturedThis: unknown;
   const obj = {
@@ -302,7 +302,7 @@ Deno.test.ignore(async function timeoutCallbackThis() {
 
 // TODO(bartlomieju): this test is not valid, because Node.js timers are
 // used as the default and they don't check `this` binding.
-Deno.test.ignore(async function timeoutBindThis() {
+Oden.test.ignore(async function timeoutBindThis() {
   const thisCheckPassed = [null, undefined, globalThis];
 
   const thisCheckFailed = [
@@ -352,7 +352,7 @@ Deno.test.ignore(async function timeoutBindThis() {
 
 // TODO(bartlomieju): this test is not valid, because Node.js timers are
 // used as the default and they use `+timeout` to convert, not webidl.
-Deno.test.ignore(function clearTimeoutShouldConvertToNumber() {
+Oden.test.ignore(function clearTimeoutShouldConvertToNumber() {
   let called = false;
   const obj = {
     valueOf(): number {
@@ -366,7 +366,7 @@ Deno.test.ignore(function clearTimeoutShouldConvertToNumber() {
 
 // TODO(bartlomieju): this test is not valid, because Node.js timers are
 // used as the default and they don't throw on BigInt delay.
-Deno.test.ignore(function setTimeoutShouldThrowWithBigint() {
+Oden.test.ignore(function setTimeoutShouldThrowWithBigint() {
   let hasThrown = 0;
   try {
     setTimeout(() => {}, (1n as unknown) as number);
@@ -383,7 +383,7 @@ Deno.test.ignore(function setTimeoutShouldThrowWithBigint() {
 
 // TODO(bartlomieju): this test is not valid, because Node.js timers are
 // used as the default and clearTimeout uses `+timeout` to convert.
-Deno.test.ignore(function clearTimeoutShouldThrowWithBigint() {
+Oden.test.ignore(function clearTimeoutShouldThrowWithBigint() {
   let hasThrown = 0;
   try {
     clearTimeout((1n as unknown) as number);
@@ -398,25 +398,25 @@ Deno.test.ignore(function clearTimeoutShouldThrowWithBigint() {
   assertEquals(hasThrown, 2);
 });
 
-Deno.test(function testFunctionName() {
+Oden.test(function testFunctionName() {
   assertEquals(clearTimeout.name, "clearTimeout");
   assertEquals(clearInterval.name, "clearInterval");
 });
 
 // TODO(bartlomieju): this test is not valid, because Node.js timers are
 // used as the default and they have different function parameter lengths.
-Deno.test.ignore(function testFunctionParamsLength() {
+Oden.test.ignore(function testFunctionParamsLength() {
   assertEquals(setTimeout.length, 1);
   assertEquals(setInterval.length, 1);
   assertEquals(clearTimeout.length, 0);
   assertEquals(clearInterval.length, 0);
 });
 
-Deno.test(function clearTimeoutAndClearIntervalNotBeEquals() {
+Oden.test(function clearTimeoutAndClearIntervalNotBeEquals() {
   assertNotEquals(clearTimeout, clearInterval);
 });
 
-Deno.test(async function timerOrdering() {
+Oden.test(async function timerOrdering() {
   const array: number[] = [];
   const { promise: donePromise, resolve } = Promise.withResolvers<void>();
 
@@ -445,7 +445,7 @@ Deno.test(async function timerOrdering() {
   assertEquals(array, [1, 2, 3, 4, 5, 6]);
 });
 
-Deno.test(async function timerBasicMicrotaskOrdering() {
+Oden.test(async function timerBasicMicrotaskOrdering() {
   let s = "";
   let count = 0;
   const { promise, resolve } = Promise.withResolvers<void>();
@@ -466,10 +466,10 @@ Deno.test(async function timerBasicMicrotaskOrdering() {
     }
   });
   await promise;
-  assertEquals(s, "deno");
+  assertEquals(s, "oden");
 });
 
-Deno.test(async function timerNestedMicrotaskOrdering() {
+Oden.test(async function timerNestedMicrotaskOrdering() {
   let s = "";
   const { promise, resolve } = Promise.withResolvers<void>();
   s += "0";
@@ -505,11 +505,11 @@ Deno.test(async function timerNestedMicrotaskOrdering() {
   assertEquals(s, "0123456789AB");
 });
 
-Deno.test(function testQueueMicrotask() {
+Oden.test(function testQueueMicrotask() {
   assertEquals(typeof queueMicrotask, "function");
 });
 
-Deno.test(async function timerIgnoresDateOverride() {
+Oden.test(async function timerIgnoresDateOverride() {
   const OriginalDate = Date;
   const { promise, resolve, reject } = Promise.withResolvers<void>();
   let hasThrown = 0;
@@ -545,20 +545,20 @@ Deno.test(async function timerIgnoresDateOverride() {
   assertEquals(hasThrown, 1);
 });
 
-Deno.test({
+Oden.test({
   name: "unrefTimer",
   permissions: { run: true, read: true },
   fn: async () => {
     const [statusCode, output] = await execCode(`
       const timer = setTimeout(() => console.log("1"), 1);
-      Deno.unrefTimer(timer);
+      Oden.unrefTimer(timer);
     `);
     assertEquals(statusCode, 0);
     assertEquals(output, "");
   },
 });
 
-Deno.test({
+Oden.test({
   name: "unrefTimer - mix ref and unref 1",
   permissions: { run: true, read: true },
   fn: async () => {
@@ -566,14 +566,14 @@ Deno.test({
       const timer1 = setTimeout(() => console.log("1"), 200);
       const timer2 = setTimeout(() => console.log("2"), 400);
       const timer3 = setTimeout(() => console.log("3"), 600);
-      Deno.unrefTimer(timer3);
+      Oden.unrefTimer(timer3);
     `);
     assertEquals(statusCode, 0);
     assertEquals(output, "1\n2\n");
   },
 });
 
-Deno.test({
+Oden.test({
   name: "unrefTimer - mix ref and unref 2",
   permissions: { run: true, read: true },
   fn: async () => {
@@ -581,15 +581,15 @@ Deno.test({
       const timer1 = setTimeout(() => console.log("1"), 200);
       const timer2 = setTimeout(() => console.log("2"), 400);
       const timer3 = setTimeout(() => console.log("3"), 600);
-      Deno.unrefTimer(timer1);
-      Deno.unrefTimer(timer2);
+      Oden.unrefTimer(timer1);
+      Oden.unrefTimer(timer2);
     `);
     assertEquals(statusCode, 0);
     assertEquals(output, "1\n2\n3\n");
   },
 });
 
-Deno.test({
+Oden.test({
   name: "unrefTimer - unref interval",
   permissions: { run: true, read: true },
   fn: async () => {
@@ -599,7 +599,7 @@ Deno.test({
         console.log("1");
         i++;
         if (i === 5) {
-          Deno.unrefTimer(timer1);
+          Oden.unrefTimer(timer1);
         }
       }, 10);
     `);
@@ -608,46 +608,46 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "unrefTimer - unref then ref 1",
   permissions: { run: true, read: true },
   fn: async () => {
     const [statusCode, output] = await execCode(`
       const timer1 = setTimeout(() => console.log("1"), 10);
-      Deno.unrefTimer(timer1);
-      Deno.refTimer(timer1);
+      Oden.unrefTimer(timer1);
+      Oden.refTimer(timer1);
     `);
     assertEquals(statusCode, 0);
     assertEquals(output, "1\n");
   },
 });
 
-Deno.test({
+Oden.test({
   name: "unrefTimer - unref then ref",
   permissions: { run: true, read: true },
   fn: async () => {
     const [statusCode, output] = await execCode(`
       const timer1 = setTimeout(() => {
         console.log("1");
-        Deno.refTimer(timer2);
+        Oden.refTimer(timer2);
       }, 10);
       const timer2 = setTimeout(() => console.log("2"), 20);
-      Deno.unrefTimer(timer2);
+      Oden.unrefTimer(timer2);
     `);
     assertEquals(statusCode, 0);
     assertEquals(output, "1\n2\n");
   },
 });
 
-Deno.test({
+Oden.test({
   name: "unrefTimer - invalid calls do nothing",
   fn: () => {
-    Deno.unrefTimer(NaN);
-    Deno.refTimer(NaN);
+    Oden.unrefTimer(NaN);
+    Oden.refTimer(NaN);
   },
 });
 
-Deno.test({
+Oden.test({
   name: "AbortSignal.timeout() with no listeners",
   permissions: { run: true, read: true },
   fn: async () => {
@@ -657,14 +657,14 @@ Deno.test({
       // This unref timer expires before the signal, and if it does expire, then
       // it means the signal has kept the event loop alive.
       const timer = setTimeout(() => console.log("Unexpected!"), 1500);
-      Deno.unrefTimer(timer);
+      Oden.unrefTimer(timer);
     `);
     assertEquals(statusCode, 0);
     assertEquals(output, "");
   },
 });
 
-Deno.test({
+Oden.test({
   name: "AbortSignal.timeout() with listeners",
   permissions: { run: true, read: true },
   fn: async () => {
@@ -677,7 +677,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "AbortSignal.timeout() with removed listeners",
   permissions: { run: true, read: true },
   fn: async () => {
@@ -692,7 +692,7 @@ Deno.test({
         signal.removeEventListener("abort", callback);
       }, 500);
 
-      Deno.unrefTimer(
+      Oden.unrefTimer(
         setTimeout(() => console.log("Unexpected: Unref timer"), 1500)
       );
     `);
@@ -701,7 +701,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "AbortSignal.timeout() with listener for a non-abort event",
   permissions: { run: true, read: true },
   fn: async () => {
@@ -712,7 +712,7 @@ Deno.test({
         console.log("Unexpected: someOtherEvent called");
       });
 
-      Deno.unrefTimer(
+      Oden.unrefTimer(
         setTimeout(() => console.log("Unexpected: Unref timer"), 1500)
       );
     `);
@@ -722,7 +722,7 @@ Deno.test({
 });
 
 // Regression test for https://github.com/denoland/deno/issues/19866
-Deno.test({
+Oden.test({
   name: "regression for #19866",
   fn: async () => {
     const timeoutsFired = [];
@@ -751,7 +751,7 @@ Deno.test({
 });
 
 // Regression test for https://github.com/denoland/deno/issues/20367
-Deno.test({
+Oden.test({
   name: "regression for #20367",
   fn: async () => {
     const { promise, resolve } = Promise.withResolvers<number>();
@@ -768,7 +768,7 @@ Deno.test({
 });
 
 // Regression test for https://github.com/denoland/deno/issues/20663
-Deno.test({
+Oden.test({
   name: "regression for #20663",
   fn: () => {
     AbortSignal.timeout(2000);

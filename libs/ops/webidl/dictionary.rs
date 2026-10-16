@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use proc_macro2::Ident;
 use proc_macro2::Span;
@@ -71,7 +71,7 @@ pub fn get_body(
       // Type-alias to workaround https://github.com/rust-lang/rust/issues/86935
       quote! {
         {
-          type Alias<'a> = <#ty as ::deno_core::webidl::WebIdlConverter<'a>>::Options;
+          type Alias<'a> = <#ty as ::oden_core::webidl::WebIdlConverter<'a>>::Options;
           Alias {
             #(#inner),*,
             ..Default::default()
@@ -98,10 +98,10 @@ pub fn get_body(
       default.to_token_stream()
     } _ => {
       quote! {
-        return Err(::deno_core::webidl::WebIdlError::new(
+        return Err(::oden_core::webidl::WebIdlError::new(
           __prefix,
           __context.borrowed(),
-          ::deno_core::webidl::WebIdlErrorKind::DictionaryCannotConvertKey {
+          ::oden_core::webidl::WebIdlErrorKind::DictionaryCannotConvertKey {
             converter: #ident_string,
             key: #js_name,
           },
@@ -114,11 +114,11 @@ pub fn get_body(
         let __key = #key;
 
         if let Some(__value) = __obj.as_ref().and_then(|__obj| __obj.get(__scope, __key))#undefined_as_none {
-          ::deno_core::webidl::WebIdlConverter::convert(
+          ::oden_core::webidl::WebIdlConverter::convert(
             __scope,
             __value,
             __prefix.clone(),
-            ::deno_core::webidl::ContextFn::new_borrowed(&|| {
+            ::oden_core::webidl::ContextFn::new_borrowed(&|| {
               let mut __context_msg = #context_prefix.to_string();
               __context_msg.push_str(" (");
               __context_msg.push_str(&__context.call());
@@ -135,16 +135,16 @@ pub fn get_body(
   }).collect::<Result<Vec<_>, Error>>()?;
 
   let body = quote! {
-    let __obj: Option<::deno_core::v8::Local<::deno_core::v8::Object>> = if __value.is_undefined() || __value.is_null() {
+    let __obj: Option<::oden_core::v8::Local<::oden_core::v8::Object>> = if __value.is_undefined() || __value.is_null() {
       None
     } else {
       if let Ok(obj) = __value.try_into() {
         Some(obj)
       } else {
-        return Err(::deno_core::webidl::WebIdlError::new(
+        return Err(::oden_core::webidl::WebIdlError::new(
           __prefix,
           __context.borrowed(),
-          ::deno_core::webidl::WebIdlErrorKind::ConvertToConverterType("dictionary")
+          ::oden_core::webidl::WebIdlErrorKind::ConvertToConverterType("dictionary")
         ));
       }
     };

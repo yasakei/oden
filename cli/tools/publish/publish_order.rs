@@ -1,13 +1,13 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::collections::VecDeque;
 
 use deno_ast::ModuleSpecifier;
-use deno_config::workspace::JsrPackageConfig;
-use deno_core::anyhow::bail;
-use deno_core::error::AnyError;
+use oden_config::workspace::JsrPackageConfig;
+use oden_core::anyhow::bail;
+use oden_core::error::AnyError;
 use deno_graph::ModuleGraph;
 
 pub struct PublishOrderGraph {

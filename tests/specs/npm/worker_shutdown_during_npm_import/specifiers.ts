@@ -5,7 +5,7 @@ export default [
   "npm:ajv",
   "npm:has",
   "npm:picocolors",
-  "npm:@denotest/esm-basic",
-  "npm:@denotest/add",
-  "npm:@denotest/subtract",
+  "npm:@odentest/esm-basic",
+  "npm:@odentest/add",
+  "npm:@odentest/subtract",
 ];

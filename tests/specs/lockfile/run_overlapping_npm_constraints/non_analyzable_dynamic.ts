@@ -1,11 +1,11 @@
-import { add } from "npm:@denotest/add@*";
+import { add } from "npm:@odentest/add@*";
 
 function nonAnalyzable() {
-  return "npm:@denotest/add@0.5.0";
+  return "npm:@odentest/add@0.5.0";
 }
 
 // npm deduplication does not happen for dynamic because
-// the `npm:@denotest/add@1.0.0` module has already been
+// the `npm:@odentest/add@1.0.0` module has already been
 // executed
 const { sum } = await import(nonAnalyzable());
 

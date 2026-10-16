@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // deno-lint-ignore-file
 
 // Run using cargo test or `--v8-flags=--allow-natives-syntax`
@@ -13,25 +13,25 @@ import {
   assertFalse,
 } from "@std/assert";
 
-const targetDir = Deno.execPath().replace(/[^\/\\]+$/, "");
+const targetDir = Oden.execPath().replace(/[^\/\\]+$/, "");
 const [libPrefix, libSuffix] = {
   darwin: ["lib", "dylib"],
   linux: ["lib", "so"],
   windows: ["", "dll"],
-}[Deno.build.os];
+}[Oden.build.os];
 const libPath = `${targetDir}/${libPrefix}test_ffi.${libSuffix}`;
 
-const resourcesPre = Deno[Deno.internal].core.resources();
-const { getTurbocallTarget } = Deno[Deno.internal];
+const resourcesPre = Oden[Oden.internal].core.resources();
+const { getTurbocallTarget } = Oden[Oden.internal];
 
 // dlopen shouldn't panic
 assertThrows(() => {
-  Deno.dlopen("cli/src/main.rs", {});
+  Oden.dlopen("cli/src/main.rs", {});
 });
 
 assertThrows(
   () => {
-    Deno.dlopen(libPath, {
+    Oden.dlopen(libPath, {
       non_existent_symbol: {
         parameters: [],
         result: "void",
@@ -43,7 +43,7 @@ assertThrows(
 );
 
 assertThrows(() => {
-  Deno.dlopen(libPath, {
+  Oden.dlopen(libPath, {
     print_something: {
       parameters: [],
       result: { struct: [] }
@@ -54,7 +54,7 @@ assertThrows(() => {
 });
 
 assertThrows(() => {
-  Deno.dlopen(libPath, {
+  Oden.dlopen(libPath, {
     print_something: {
       parameters: [ { struct: [] } ],
       result: "void",
@@ -66,7 +66,7 @@ assertThrows(() => {
 
 const Empty = { struct: [] }
 assertThrows(() => {
-  Deno.dlopen(libPath, {
+  Oden.dlopen(libPath, {
     print_something: {
       parameters: [ { struct: [Empty] } ],
       result: "void",
@@ -83,7 +83,7 @@ const RectNested = [{ struct: Point }, { struct: Size }];
 const RectNestedCached = [{ struct: Size }, { struct: Size }];
 const Mixed = ["u8", "f32", { struct: Rect }, "usize", { struct: ["u32", "u32"] }];
 
-const dylib = Deno.dlopen(libPath, {
+const dylib = Oden.dlopen(libPath, {
   "printSomething": {
     name: "print_something",
     parameters: [],
@@ -327,11 +327,11 @@ const ptr0 = returnBuffer();
 assertFastCall("return_buffer");
 
 dylib.symbols.print_pointer(ptr0, 8);
-const ptrView = new Deno.UnsafePointerView(ptr0);
+const ptrView = new Oden.UnsafePointerView(ptr0);
 const into = new Uint8Array(6);
 const into2 = new Uint8Array(3);
-const into2ptr = Deno.UnsafePointer.of(into2);
-const into2ptrView = new Deno.UnsafePointerView(into2ptr);
+const into2ptr = Oden.UnsafePointer.of(into2);
+const into2ptrView = new Oden.UnsafePointerView(into2ptr);
 const into3 = new Uint8Array(3);
 const into4 = new Uint16Array(3);
 ptrView.copyInto(into4);
@@ -345,17 +345,17 @@ const string = new Uint8Array([
   ...new TextEncoder().encode("Hello from pointer!"),
   0,
 ]);
-const stringPtr = Deno.UnsafePointer.of(string);
-const stringPtrview = new Deno.UnsafePointerView(stringPtr);
+const stringPtr = Oden.UnsafePointer.of(string);
+const stringPtrview = new Oden.UnsafePointerView(stringPtr);
 console.log(stringPtrview.getCString());
 console.log(stringPtrview.getCString(11));
 console.log("false", dylib.symbols.is_null_ptr(ptr0));
 console.log("true", dylib.symbols.is_null_ptr(null));
-console.log("false", dylib.symbols.is_null_ptr(Deno.UnsafePointer.of(into)));
+console.log("false", dylib.symbols.is_null_ptr(Oden.UnsafePointer.of(into)));
 const emptyBuffer = new Uint8Array(0);
-console.log("true", dylib.symbols.is_null_ptr(Deno.UnsafePointer.of(emptyBuffer)));
+console.log("true", dylib.symbols.is_null_ptr(Oden.UnsafePointer.of(emptyBuffer)));
 const emptySlice = into.subarray(6);
-console.log("false", dylib.symbols.is_null_ptr(Deno.UnsafePointer.of(emptySlice)));
+console.log("false", dylib.symbols.is_null_ptr(Oden.UnsafePointer.of(emptySlice)));
 
 const { is_null_buf } = symbols;
 function isNullBuffer(buffer) { return is_null_buf(buffer); };
@@ -376,7 +376,7 @@ assertEquals(isNullBuffer(new Uint8Array()), true, "isNullBuffer(new Uint8Array(
 assertEquals(isNullBufferDeopt(new Uint8Array()), true, "isNullBufferDeopt(new Uint8Array()) !== true");
 
 // Externally backed ArrayBuffer has a non-null data pointer, even though its length is zero.
-const externalZeroBuffer = new Uint8Array(Deno.UnsafePointerView.getArrayBuffer(ptr0, 0));
+const externalZeroBuffer = new Uint8Array(Oden.UnsafePointerView.getArrayBuffer(ptr0, 0));
 // V8 Fast calls used to get null pointers for all zero-sized buffers no matter their external backing.
 assertEquals(isNullBuffer(externalZeroBuffer), false, "isNullBuffer(externalZeroBuffer) !== false");
 // V8's `Local<ArrayBuffer>->Data()` method also used to similarly return null pointers for all
@@ -386,14 +386,14 @@ assertEquals(isNullBufferDeopt(externalZeroBuffer), false, "isNullBufferDeopt(ex
 
 // The same pointer with a non-zero byte length for the buffer will return non-null pointers in
 // both Fast call and V8 API calls.
-const externalOneBuffer = new Uint8Array(Deno.UnsafePointerView.getArrayBuffer(ptr0, 1));
+const externalOneBuffer = new Uint8Array(Oden.UnsafePointerView.getArrayBuffer(ptr0, 1));
 assertEquals(isNullBuffer(externalOneBuffer), false, "isNullBuffer(externalOneBuffer) !== false");
 assertEquals(isNullBufferDeopt(externalOneBuffer), false, "isNullBufferDeopt(externalOneBuffer) !== false");
 
 // UnsafePointer.of uses an exact-pointer fallback for zero-length buffers and slices to ensure that it always gets
 // the underlying pointer right.
-assertNotEquals(Deno.UnsafePointer.of(externalZeroBuffer), null, "Deno.UnsafePointer.of(externalZeroBuffer) === null");
-assertNotEquals(Deno.UnsafePointer.of(externalOneBuffer), null, "Deno.UnsafePointer.of(externalOneBuffer) === null");
+assertNotEquals(Oden.UnsafePointer.of(externalZeroBuffer), null, "Oden.UnsafePointer.of(externalZeroBuffer) === null");
+assertNotEquals(Oden.UnsafePointer.of(externalOneBuffer), null, "Oden.UnsafePointer.of(externalOneBuffer) === null");
 
 // ==== SharedArrayBuffer TESTS ====
 // `SharedArrayBuffer`-backed buffers go through the same `buffer` marshalling
@@ -406,31 +406,31 @@ assertEquals(
   "isNullBufferDeopt(sabBuffer) !== false",
 );
 assertNotEquals(
-  Deno.UnsafePointer.of(sabBuffer),
+  Oden.UnsafePointer.of(sabBuffer),
   null,
-  "Deno.UnsafePointer.of(sabBuffer) === null",
+  "Oden.UnsafePointer.of(sabBuffer) === null",
 );
 // A bare `SharedArrayBuffer` is also accepted by `UnsafePointer.of`.
 assertNotEquals(
-  Deno.UnsafePointer.of(new SharedArrayBuffer(8)),
+  Oden.UnsafePointer.of(new SharedArrayBuffer(8)),
   null,
-  "Deno.UnsafePointer.of(new SharedArrayBuffer(8)) === null",
+  "Oden.UnsafePointer.of(new SharedArrayBuffer(8)) === null",
 );
 assertEquals(
-  Deno.UnsafePointer.of(new SharedArrayBuffer(0)),
+  Oden.UnsafePointer.of(new SharedArrayBuffer(0)),
   null,
-  "Deno.UnsafePointer.of(new SharedArrayBuffer(0)) !== null",
+  "Oden.UnsafePointer.of(new SharedArrayBuffer(0)) !== null",
 );
 
 const addU32Ptr = dylib.symbols.get_add_u32_ptr();
-const addU32 = new Deno.UnsafeFnPointer(addU32Ptr, {
+const addU32 = new Oden.UnsafeFnPointer(addU32Ptr, {
   parameters: ["u32", "u32"],
   result: "u32",
 });
 console.log(addU32.call(123, 456));
 
 const sleepBlockingPtr = dylib.symbols.get_sleep_blocking_ptr();
-const sleepNonBlocking = new Deno.UnsafeFnPointer(sleepBlockingPtr, {
+const sleepNonBlocking = new Oden.UnsafeFnPointer(sleepBlockingPtr, {
   nonblocking: true,
   parameters: ["u64"],
   result: "void",
@@ -563,11 +563,11 @@ assert(performance.now() - start < 100);
 await promise_2;
 
 // Test calls with callback parameters
-const logCallback = new Deno.UnsafeCallback(
+const logCallback = new Oden.UnsafeCallback(
   { parameters: [], result: "void" },
   () => console.log("logCallback"),
 );
-const logManyParametersCallback = new Deno.UnsafeCallback({
+const logManyParametersCallback = new Oden.UnsafeCallback({
   parameters: [
     "u8",
     "i8",
@@ -583,26 +583,26 @@ const logManyParametersCallback = new Deno.UnsafeCallback({
   ],
   result: "void",
 }, (u8, i8, u16, i16, u32, i32, u64, i64, f32, f64, pointer) => {
-  const view = new Deno.UnsafePointerView(pointer);
+  const view = new Oden.UnsafePointerView(pointer);
   const copy_buffer = new Uint8Array(8);
   view.copyInto(copy_buffer);
   console.log(u8, i8, u16, i16, u32, i32, u64, i64, f32, f64, ...copy_buffer);
 });
-const returnU8Callback = new Deno.UnsafeCallback(
+const returnU8Callback = new Oden.UnsafeCallback(
   { parameters: [], result: "u8" },
   () => 8,
 );
-const returnBufferCallback = new Deno.UnsafeCallback({
+const returnBufferCallback = new Oden.UnsafeCallback({
   parameters: [],
   result: "buffer",
 }, () => {
   return buffer;
 });
-const add10Callback = new Deno.UnsafeCallback({
+const add10Callback = new Oden.UnsafeCallback({
   parameters: ["u8"],
   result: "u8",
 }, (value) => value + 10);
-const throwCallback = new Deno.UnsafeCallback({
+const throwCallback = new Oden.UnsafeCallback({
   parameters: [],
   result: "void",
 }, () => {
@@ -639,7 +639,7 @@ testOptimized(
     12345.678910, 12345.678910, 12345.678910, 12345.678910, 12345.678910, 12345.678910, 12345.678910
   ),
   // V8 disables fast api for >8 args on Apple silicon (crbug.com/v8/13171).
-  // Deno's trampoline now produces a correctly-aligned wrapper on Apple
+  // Oden's trampoline now produces a correctly-aligned wrapper on Apple
   // silicon, so when V8 relaxes the guard this skip can be removed.
   process.platform === 'darwin' && process.arch === 'arm64' ? null : "log_many_parameters",
 );
@@ -664,13 +664,13 @@ testOptimized(
   addManyU16Fast,
   () => addManyU16Fast(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
   // V8 disables fast api for >8 args on Apple silicon (crbug.com/v8/13171).
-  // Deno's trampoline now produces a correctly-aligned wrapper on Apple
+  // Oden's trampoline now produces a correctly-aligned wrapper on Apple
   // silicon, so when V8 relaxes the guard this skip can be removed.
   process.platform === 'darwin' && process.arch === 'arm64' ? null : "add_many_u16",
 );
 
 
-const nestedCallback = new Deno.UnsafeCallback(
+const nestedCallback = new Oden.UnsafeCallback(
   { parameters: [], result: "void" },
   () => {
     dylib.symbols.call_stored_function_2(10);
@@ -682,7 +682,7 @@ dylib.symbols.store_function(null);
 dylib.symbols.store_function_2(null);
 
 let counter = 0;
-const addToFooCallback = new Deno.UnsafeCallback({
+const addToFooCallback = new Oden.UnsafeCallback({
   parameters: [],
   result: "void",
 }, () => counter++);
@@ -709,7 +709,7 @@ assert(
 assertEquals(
   Object.keys(dylib.symbols.static_ptr).length, 0
 );
-const view = new Deno.UnsafePointerView(dylib.symbols.static_ptr);
+const view = new Oden.UnsafePointerView(dylib.symbols.static_ptr);
 assertEquals(view.getUint32(), 42);
 
 // Test struct returning
@@ -741,7 +741,7 @@ assertEquals(rect_async.length, 4 * 8);
 assertEquals(Array.from(new Float64Array(rect_async.buffer)), [10, 20, 100, 200]);
 
 // Test complex, mixed struct returning and passing
-const mixedStruct = dylib.symbols.create_mixed(3, 12.515000343322754, rect_async, Deno.UnsafePointer.create(12456789), new Uint32Array([8, 32]));
+const mixedStruct = dylib.symbols.create_mixed(3, 12.515000343322754, rect_async, Oden.UnsafePointer.create(12456789), new Uint32Array([8, 32]));
 assertEquals(mixedStruct.length, 56);
 assertEquals(Array.from(mixedStruct.subarray(0, 4)), [3, 0, 0, 0]);
 assertEquals(new Float32Array(mixedStruct.buffer, 4, 1)[0], 12.515000343322754);
@@ -750,7 +750,7 @@ assertEquals(new BigUint64Array(mixedStruct.buffer, 40, 1)[0], 12456789n);
 assertEquals(new Uint32Array(mixedStruct.buffer, 48, 2), new Uint32Array([8, 32]));
 dylib.symbols.print_mixed(mixedStruct);
 
-const cb = new Deno.UnsafeCallback({
+const cb = new Oden.UnsafeCallback({
   parameters: [{ struct: Rect }],
   result: { struct: Rect },
 }, (innerRect) => {
@@ -758,7 +758,7 @@ const cb = new Deno.UnsafeCallback({
   return new Float64Array([innerRect[0] + 10, innerRect[1] + 10, innerRect[2] + 10, innerRect[3] + 10]);
 });
 
-const cbFfi = new Deno.UnsafeFnPointer(cb.pointer, cb.definition);
+const cbFfi = new Oden.UnsafeFnPointer(cb.pointer, cb.definition);
 const cbResult = new Float64Array(cbFfi.call(rect_async).buffer);
 assertEquals(Array.from(cbResult), [20, 30, 110, 210]);
 
@@ -776,27 +776,27 @@ assertEquals(view.getUint32(), 55);
 
 {
   // Test UnsafePointer APIs
-  assertEquals(Deno.UnsafePointer.create(0), null);
-  const createdPointer = Deno.UnsafePointer.create(1);
+  assertEquals(Oden.UnsafePointer.create(0), null);
+  const createdPointer = Oden.UnsafePointer.create(1);
   assertNotEquals(createdPointer, null);
   assertEquals(typeof createdPointer, "object");
-  assertEquals(Deno.UnsafePointer.value(null), 0n);
-  assertEquals(Deno.UnsafePointer.value(createdPointer), 1n);
-  assert(Deno.UnsafePointer.equals(null, null));
-  assertFalse(Deno.UnsafePointer.equals(null, createdPointer));
-  assertFalse(Deno.UnsafePointer.equals(Deno.UnsafePointer.create(2), createdPointer));
+  assertEquals(Oden.UnsafePointer.value(null), 0n);
+  assertEquals(Oden.UnsafePointer.value(createdPointer), 1n);
+  assert(Oden.UnsafePointer.equals(null, null));
+  assertFalse(Oden.UnsafePointer.equals(null, createdPointer));
+  assertFalse(Oden.UnsafePointer.equals(Oden.UnsafePointer.create(2), createdPointer));
   // Do not allow offsetting from null, `create` function should be used instead.
-  assertThrows(() => Deno.UnsafePointer.offset(null, 5));
-  const offsetPointer = Deno.UnsafePointer.offset(createdPointer, 5);
-  assertEquals(Deno.UnsafePointer.value(offsetPointer), 6n);
-  const zeroPointer = Deno.UnsafePointer.offset(offsetPointer, -6);
-  assertEquals(Deno.UnsafePointer.value(zeroPointer), 0n);
+  assertThrows(() => Oden.UnsafePointer.offset(null, 5));
+  const offsetPointer = Oden.UnsafePointer.offset(createdPointer, 5);
+  assertEquals(Oden.UnsafePointer.value(offsetPointer), 6n);
+  const zeroPointer = Oden.UnsafePointer.offset(offsetPointer, -6);
+  assertEquals(Oden.UnsafePointer.value(zeroPointer), 0n);
   assertEquals(zeroPointer, null);
 }
 
 // Test non-UTF-8 characters
 
-const charView = new Deno.UnsafePointerView(dylib.symbols.static_char);
+const charView = new Oden.UnsafePointerView(dylib.symbols.static_char);
 
 const charArrayBuffer = charView.getArrayBuffer(14);
 const uint8Array = new Uint8Array(charArrayBuffer);
@@ -820,9 +820,9 @@ for (const charBuffer of [
   Uint8Array.from([0xF8, 0xA1, 0xA1, 0xA1, 0xA1, 0x00]),
   Uint8Array.from([0xFC, 0xA1, 0xA1, 0xA1, 0xA1, 0xA1, 0x00]),
 ]) {
-  const charBufferPointer = Deno.UnsafePointer.of(charBuffer);
-  const charString = Deno.UnsafePointerView.getCString(charBufferPointer);
-  const charBufferPointerArrayBuffer = new Uint8Array(Deno.UnsafePointerView.getArrayBuffer(charBufferPointer, charBuffer.length - 1));
+  const charBufferPointer = Oden.UnsafePointer.of(charBuffer);
+  const charString = Oden.UnsafePointerView.getCString(charBufferPointer);
+  const charBufferPointerArrayBuffer = new Uint8Array(Oden.UnsafePointerView.getArrayBuffer(charBufferPointer, charBuffer.length - 1));
   assertEquals(charString, new TextDecoder().decode(charBufferPointerArrayBuffer));
   assertEquals([...charBuffer.subarray(0, charBuffer.length - 1)], [...charBufferPointerArrayBuffer]);
 }
@@ -864,7 +864,7 @@ assertEquals(
   nestedCallback.close();
   addToFooCallback.close();
 
-  const resourcesPost = Deno[Deno.internal].core.resources();
+  const resourcesPost = Oden[Oden.internal].core.resources();
 
   const preStr = JSON.stringify(resourcesPre, null, 2);
   const postStr = JSON.stringify(resourcesPost, null, 2);

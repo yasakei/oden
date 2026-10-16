@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -7,11 +7,11 @@ use std::path::Path;
 use std::path::PathBuf;
 
 use deno_error::JsErrorBox;
-use deno_runtime::deno_permissions::OpenAccessKind;
-use deno_runtime::deno_permissions::PermissionsContainer;
+use oden_runtime::oden_permissions::OpenAccessKind;
+use oden_runtime::oden_permissions::PermissionsContainer;
 use parking_lot::Mutex;
 
-use crate::sys::DenoLibSys;
+use crate::sys::OdenLibSys;
 
 #[derive(Debug)]
 pub enum NpmRegistryReadPermissionCheckerMode {
@@ -21,7 +21,7 @@ pub enum NpmRegistryReadPermissionCheckerMode {
 }
 
 #[derive(Debug)]
-pub struct NpmRegistryReadPermissionChecker<TSys: DenoLibSys> {
+pub struct NpmRegistryReadPermissionChecker<TSys: OdenLibSys> {
   sys: TSys,
   cache: Mutex<HashMap<PathBuf, PathBuf>>,
   mode: NpmRegistryReadPermissionCheckerMode,
@@ -37,7 +37,7 @@ struct EnsureRegistryReadPermissionError {
   source: std::io::Error,
 }
 
-impl<TSys: DenoLibSys> NpmRegistryReadPermissionChecker<TSys> {
+impl<TSys: OdenLibSys> NpmRegistryReadPermissionChecker<TSys> {
   pub fn new(sys: TSys, mode: NpmRegistryReadPermissionCheckerMode) -> Self {
     Self {
       sys,

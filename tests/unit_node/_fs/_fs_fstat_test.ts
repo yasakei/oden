@@ -1,18 +1,18 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { fstat, fstatSync } from "node:fs";
 import { fail } from "@std/assert";
 import { assertStats, assertStatsBigInt } from "../_test_utils.ts";
 import type { BigIntStats, Stats } from "node:fs";
 
-Deno.test({
+Oden.test({
   name: "ASYNC: get a file Stats",
-  // TODO(bartlomieju): this test is broken in Deno 2, because `file.rid` is undefined.
+  // TODO(bartlomieju): this test is broken in Oden 2, because `file.rid` is undefined.
   // The fs APIs should be rewritten to use actual FDs, not RIDs
   ignore: true,
   async fn() {
-    const filePath = await Deno.makeTempFile();
-    using file = await Deno.open(filePath);
+    const filePath = await Oden.makeTempFile();
+    using file = await Oden.open(filePath);
 
     await new Promise<Stats>((resolve, reject) => {
       // @ts-ignore (iuioiua) `file.rid` should no longer be needed once FDs are used
@@ -28,19 +28,19 @@ Deno.test({
         () => fail(),
       )
       .finally(() => {
-        Deno.removeSync(filePath);
+        Oden.removeSync(filePath);
       });
   },
 });
 
-Deno.test({
+Oden.test({
   name: "ASYNC: get a file BigInt Stats",
-  // TODO(bartlomieju): this test is broken in Deno 2, because `file.rid` is undefined.
+  // TODO(bartlomieju): this test is broken in Oden 2, because `file.rid` is undefined.
   // The fs APIs should be rewritten to use actual FDs, not RIDs
   ignore: true,
   async fn() {
-    const filePath = await Deno.makeTempFile();
-    using file = await Deno.open(filePath);
+    const filePath = await Oden.makeTempFile();
+    using file = await Oden.open(filePath);
 
     await new Promise<BigIntStats>((resolve, reject) => {
       fstat(
@@ -58,37 +58,37 @@ Deno.test({
         () => fail(),
       )
       .finally(() => {
-        Deno.removeSync(filePath);
+        Oden.removeSync(filePath);
       });
   },
 });
 
-Deno.test({
+Oden.test({
   name: "SYNC: get a file Stats",
-  // TODO(bartlomieju): this test is broken in Deno 2, because `file.rid` is undefined.
+  // TODO(bartlomieju): this test is broken in Oden 2, because `file.rid` is undefined.
   // The fs APIs should be rewritten to use actual FDs, not RIDs
   ignore: true,
   fn() {
-    const filePath = Deno.makeTempFileSync();
-    using file = Deno.openSync(filePath);
+    const filePath = Oden.makeTempFileSync();
+    using file = Oden.openSync(filePath);
 
     try {
       // @ts-ignore (iuioiua) `file.rid` should no longer be needed once FDs are used
       assertStats(fstatSync(file.rid), file.statSync());
     } finally {
-      Deno.removeSync(filePath);
+      Oden.removeSync(filePath);
     }
   },
 });
 
-Deno.test({
+Oden.test({
   name: "SYNC: get a file BigInt Stats",
-  // TODO(bartlomieju): this test is broken in Deno 2, because `file.rid` is undefined.
+  // TODO(bartlomieju): this test is broken in Oden 2, because `file.rid` is undefined.
   // The fs APIs should be rewritten to use actual FDs, not RIDs
   ignore: true,
   fn() {
-    const filePath = Deno.makeTempFileSync();
-    using file = Deno.openSync(filePath);
+    const filePath = Oden.makeTempFileSync();
+    using file = Oden.openSync(filePath);
 
     try {
       // HEAD
@@ -102,7 +102,7 @@ Deno.test({
       );
       //main
     } finally {
-      Deno.removeSync(filePath);
+      Oden.removeSync(filePath);
     }
   },
 });

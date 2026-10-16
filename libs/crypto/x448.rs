@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use ed448_goldilocks::EdwardsScalar;
 use ed448_goldilocks::MontgomeryPoint;

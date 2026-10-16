@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // @ts-check
 /// <reference path="../../core/internal.d.ts" />
-/// <reference path="../../core/lib.deno_core.d.ts" />
+/// <reference path="../../core/lib.oden_core.d.ts" />
 /// <reference path="../web/internal.d.ts" />
-/// <reference path="../../cli/tsc/dts/lib.deno_web.d.ts" />
+/// <reference path="../../cli/tsc/dts/lib.oden_web.d.ts" />
 
 (function () {
 const { core, primordials } = __bootstrap;
@@ -34,7 +34,7 @@ const {
   HTTP_WHITESPACE,
   HTTP_WHITESPACE_PREFIX_RE,
   HTTP_WHITESPACE_SUFFIX_RE,
-} = core.loadExtScript("ext:deno_web/00_infra.js");
+} = core.loadExtScript("ext:oden_web/00_infra.js");
 
 /**
  * @typedef MimeType

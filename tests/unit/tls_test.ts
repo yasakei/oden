@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   assert,
   assertEquals,
@@ -15,9 +15,9 @@ import { TextProtoReader } from "../testdata/run/textproto.ts";
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
-const cert = Deno.readTextFileSync("tests/testdata/tls/localhost.crt");
-const key = Deno.readTextFileSync("tests/testdata/tls/localhost.key");
-const caCerts = [Deno.readTextFileSync("tests/testdata/tls/RootCA.pem")];
+const cert = Oden.readTextFileSync("tests/testdata/tls/localhost.crt");
+const key = Oden.readTextFileSync("tests/testdata/tls/localhost.key");
+const caCerts = [Oden.readTextFileSync("tests/testdata/tls/RootCA.pem")];
 
 async function sleep(msec: number) {
   await new Promise((res, _rej) => setTimeout(res, msec));
@@ -30,25 +30,25 @@ function listenTls(
     cert?: string;
     key?: string;
   },
-): { listener: Deno.TlsListener; port: number; hostname: string } {
+): { listener: Oden.TlsListener; port: number; hostname: string } {
   const tlsOptions = { port: 0, hostname: "localhost", cert, key, ...options };
-  const listener = Deno.listenTls(tlsOptions);
+  const listener = Oden.listenTls(tlsOptions);
   return {
     listener,
-    port: (<Deno.NetAddr> listener.addr).port,
+    port: (<Oden.NetAddr> listener.addr).port,
     hostname: "localhost",
   };
 }
 
 function listenTcp(): {
-  listener: Deno.Listener;
+  listener: Oden.Listener;
   port: number;
   hostname: string;
 } {
-  const listener = Deno.listen({ port: 0, hostname: "localhost" });
+  const listener = Oden.listen({ port: 0, hostname: "localhost" });
   return {
     listener,
-    port: (<Deno.NetAddr> listener.addr).port,
+    port: (<Oden.NetAddr> listener.addr).port,
     hostname: "localhost",
   };
 }
@@ -57,37 +57,37 @@ function unreachable(): never {
   throw new Error("Unreachable code reached");
 }
 
-Deno.test({ permissions: { net: false } }, async function connectTLSNoPerm() {
+Oden.test({ permissions: { net: false } }, async function connectTLSNoPerm() {
   await assertRejects(async () => {
-    await Deno.connectTls({ hostname: "deno.land", port: 443 });
-  }, Deno.errors.NotCapable);
+    await Oden.connectTls({ hostname: "deno.land", port: 443 });
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function connectTLSInvalidHost() {
     await assertRejects(async () => {
-      await Deno.connectTls({ hostname: "256.0.0.0", port: 3567 });
+      await Oden.connectTls({ hostname: "256.0.0.0", port: 3567 });
     }, TypeError);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function startTlsWithoutExclusiveAccessToTcpConn() {
     const { listener, hostname, port } = listenTcp();
     const [serverConn, clientConn] = await Promise.all([
       listener.accept(),
-      Deno.connect({ hostname, port }),
+      Oden.connect({ hostname, port }),
     ]);
 
     const buf = new Uint8Array(128);
     const readPromise = clientConn.read(buf);
     // `clientConn` is being used by a pending promise (`readPromise`) so
-    // `Deno.startTls` cannot consume the connection.
+    // `Oden.startTls` cannot consume the connection.
     await assertRejects(
-      () => Deno.startTls(clientConn, { hostname }),
-      Deno.errors.Busy,
+      () => Oden.startTls(clientConn, { hostname }),
+      Oden.errors.Busy,
     );
 
     serverConn.close();
@@ -96,7 +96,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function dialAndListenTLS() {
     const { promise, resolve } = Promise.withResolvers<void>();
@@ -119,7 +119,7 @@ Deno.test(
       },
     );
 
-    const conn = await Deno.connectTls({ hostname, port, caCerts });
+    const conn = await Oden.connectTls({ hostname, port, caCerts });
     const w = new BufWriter(conn);
     const r = new BufReader(conn);
     const body = `GET / HTTP/1.1\r\nHost: ${hostname}:${port}\r\n\r\n`;
@@ -147,7 +147,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: false, net: true } },
   async function listenTlsWithCertAndKey() {
     const { promise, resolve } = Promise.withResolvers<void>();
@@ -170,7 +170,7 @@ Deno.test(
       },
     );
 
-    const conn = await Deno.connectTls({ hostname, port, caCerts });
+    const conn = await Oden.connectTls({ hostname, port, caCerts });
     const w = new BufWriter(conn);
     const r = new BufReader(conn);
     const body = `GET / HTTP/1.1\r\nHost: ${hostname}:${port}\r\n\r\n`;
@@ -198,15 +198,15 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsHostnameVerification() {
     const { promise, resolve } = Promise.withResolvers<void>();
 
-    const selfCert = Deno.readTextFileSync(
+    const selfCert = Oden.readTextFileSync(
       "tests/testdata/tls/self-signed-hostname.crt",
     );
-    const selfKey = Deno.readTextFileSync(
+    const selfKey = Oden.readTextFileSync(
       "tests/testdata/tls/self-signed-hostname.key",
     );
     const { listener, hostname, port } = listenTls({
@@ -225,7 +225,7 @@ Deno.test(
       },
     );
 
-    const conn = await Deno.connectTls({
+    const conn = await Oden.connectTls({
       hostname: "localhost",
       port,
       caCerts: [selfCert],
@@ -239,7 +239,7 @@ Deno.test(
         await w.write(encoder.encode(body));
         await w.flush();
       },
-      Deno.errors.InvalidData,
+      Oden.errors.InvalidData,
       'certificate not valid for name "localhost"; certificate is only valid for DnsName("valid.example.com")',
     );
     // Closie
@@ -249,15 +249,15 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsDisableHostnameVerification() {
     const { promise, resolve } = Promise.withResolvers<void>();
 
-    const selfCert = Deno.readTextFileSync(
+    const selfCert = Oden.readTextFileSync(
       "tests/testdata/tls/self-signed-hostname.crt",
     );
-    const selfKey = Deno.readTextFileSync(
+    const selfKey = Oden.readTextFileSync(
       "tests/testdata/tls/self-signed-hostname.key",
     );
     const { listener, hostname, port } = listenTls({
@@ -281,7 +281,7 @@ Deno.test(
       },
     );
 
-    const conn = await Deno.connectTls({
+    const conn = await Oden.connectTls({
       hostname: "localhost",
       port,
       caCerts: [selfCert],
@@ -315,14 +315,14 @@ Deno.test(
   },
 );
 
-async function tlsPair(): Promise<[Deno.Conn, Deno.Conn]> {
+async function tlsPair(): Promise<[Oden.Conn, Oden.Conn]> {
   const { listener, hostname, port } = listenTls();
 
   const acceptPromise = listener.accept();
-  const connectPromise = Deno.connectTls({
+  const connectPromise = Oden.connectTls({
     hostname,
     port,
-    caCerts: [Deno.readTextFileSync("tests/testdata/tls/RootCA.pem")],
+    caCerts: [Oden.readTextFileSync("tests/testdata/tls/RootCA.pem")],
   });
   const endpoints = await Promise.all([acceptPromise, connectPromise]);
 
@@ -333,19 +333,19 @@ async function tlsPair(): Promise<[Deno.Conn, Deno.Conn]> {
 
 async function tlsAlpn(
   useStartTls: boolean,
-): Promise<[Deno.TlsConn, Deno.TlsConn]> {
+): Promise<[Oden.TlsConn, Oden.TlsConn]> {
   const { listener, port } = listenTls({
-    alpnProtocols: ["deno", "rocks"],
+    alpnProtocols: ["oden", "rocks"],
   });
 
   const acceptPromise = listener.accept();
 
-  const caCerts = [Deno.readTextFileSync("tests/testdata/tls/RootCA.pem")];
+  const caCerts = [Oden.readTextFileSync("tests/testdata/tls/RootCA.pem")];
   const clientAlpnProtocols = ["rocks", "rises"];
-  let endpoints: [Deno.TlsConn, Deno.TlsConn];
+  let endpoints: [Oden.TlsConn, Oden.TlsConn];
 
   if (!useStartTls) {
-    const connectPromise = Deno.connectTls({
+    const connectPromise = Oden.connectTls({
       hostname: "localhost",
       port,
       caCerts,
@@ -353,11 +353,11 @@ async function tlsAlpn(
     });
     endpoints = await Promise.all([acceptPromise, connectPromise]);
   } else {
-    const client = await Deno.connect({
+    const client = await Oden.connect({
       hostname: "localhost",
       port,
     });
-    const connectPromise = Deno.startTls(client, {
+    const connectPromise = Oden.startTls(client, {
       hostname: "localhost",
       caCerts,
       alpnProtocols: clientAlpnProtocols,
@@ -370,7 +370,7 @@ async function tlsAlpn(
 }
 
 async function sendThenCloseWriteThenReceive(
-  conn: Deno.Conn,
+  conn: Oden.Conn,
   chunkCount: number,
   chunkSize: number,
 ) {
@@ -402,7 +402,7 @@ async function sendThenCloseWriteThenReceive(
 }
 
 async function receiveThenSend(
-  conn: Deno.Conn,
+  conn: Oden.Conn,
   chunkCount: number,
   chunkSize: number,
 ) {
@@ -430,7 +430,7 @@ async function receiveThenSend(
   conn.close();
 }
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsServerAlpnListenConnect() {
     const [serverConn, clientConn] = await tlsAlpn(false);
@@ -446,7 +446,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsServerAlpnListenStartTls() {
     const [serverConn, clientConn] = await tlsAlpn(true);
@@ -462,7 +462,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsServerStreamHalfCloseSendOneByte() {
     const [serverConn, clientConn] = await tlsPair();
@@ -473,7 +473,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsClientStreamHalfCloseSendOneByte() {
     const [serverConn, clientConn] = await tlsPair();
@@ -484,7 +484,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsServerStreamHalfCloseSendOneChunk() {
     const [serverConn, clientConn] = await tlsPair();
@@ -495,7 +495,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsClientStreamHalfCloseSendOneChunk() {
     const [serverConn, clientConn] = await tlsPair();
@@ -506,7 +506,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsServerStreamHalfCloseSendManyBytes() {
     const [serverConn, clientConn] = await tlsPair();
@@ -517,7 +517,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsClientStreamHalfCloseSendManyBytes() {
     const [serverConn, clientConn] = await tlsPair();
@@ -528,7 +528,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsServerStreamHalfCloseSendManyChunks() {
     const [serverConn, clientConn] = await tlsPair();
@@ -539,7 +539,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsClientStreamHalfCloseSendManyChunks() {
     const [serverConn, clientConn] = await tlsPair();
@@ -552,7 +552,7 @@ Deno.test(
 
 const largeAmount = 1 << 20 /* 1 MB */;
 
-async function sendAlotReceiveNothing(conn: Deno.Conn) {
+async function sendAlotReceiveNothing(conn: Oden.Conn) {
   // Start receive op.
   const readBuf = new Uint8Array(1024);
   const readPromise = conn.read(readBuf);
@@ -577,11 +577,11 @@ async function sendAlotReceiveNothing(conn: Deno.Conn) {
   // Read op should be canceled.
   await assertRejects(
     async () => await readPromise,
-    Deno.errors.Interrupted,
+    Oden.errors.Interrupted,
   );
 }
 
-async function receiveAlotSendNothing(conn: Deno.Conn) {
+async function receiveAlotSendNothing(conn: Oden.Conn) {
   const readBuf = new Uint8Array(1024);
   let n: number | null;
   let nread = 0;
@@ -614,7 +614,7 @@ async function receiveAlotSendNothing(conn: Deno.Conn) {
   conn.close();
 }
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsServerStreamCancelRead() {
     const [serverConn, clientConn] = await tlsPair();
@@ -625,7 +625,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsClientStreamCancelRead() {
     const [serverConn, clientConn] = await tlsPair();
@@ -636,7 +636,7 @@ Deno.test(
   },
 );
 
-async function sendReceiveEmptyBuf(conn: Deno.Conn) {
+async function sendReceiveEmptyBuf(conn: Oden.Conn) {
   const byteBuf = new Uint8Array([1]);
   const emptyBuf = new Uint8Array(0);
   let n: number | null;
@@ -660,7 +660,7 @@ async function sendReceiveEmptyBuf(conn: Deno.Conn) {
 
   await assertRejects(async () => {
     await conn.write(byteBuf);
-  }, Deno.errors.NotConnected);
+  }, Oden.errors.NotConnected);
 
   n = await conn.write(emptyBuf);
   assertStrictEquals(n, 0);
@@ -671,7 +671,7 @@ async function sendReceiveEmptyBuf(conn: Deno.Conn) {
   conn.close();
 }
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsStreamSendReceiveEmptyBuf() {
     const [serverConn, clientConn] = await tlsPair();
@@ -682,12 +682,12 @@ Deno.test(
   },
 );
 
-function immediateClose(conn: Deno.Conn) {
+function immediateClose(conn: Oden.Conn) {
   conn.close();
   return Promise.resolve();
 }
 
-async function closeWriteAndClose(conn: Deno.Conn) {
+async function closeWriteAndClose(conn: Oden.Conn) {
   await conn.closeWrite();
 
   if (await conn.read(new Uint8Array(1)) !== null) {
@@ -697,7 +697,7 @@ async function closeWriteAndClose(conn: Deno.Conn) {
   conn.close();
 }
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsServerStreamImmediateClose() {
     const [serverConn, clientConn] = await tlsPair();
@@ -708,7 +708,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsClientStreamImmediateClose() {
     const [serverConn, clientConn] = await tlsPair();
@@ -719,7 +719,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsClientAndServerStreamImmediateClose() {
     const [serverConn, clientConn] = await tlsPair();
@@ -741,15 +741,15 @@ async function tlsWithTcpFailureTestImpl(
 
   const [tlsServerConn, tcpServerConn] = await Promise.all([
     tls.listener.accept(),
-    Deno.connect({ hostname: tls.hostname, port: tls.port }),
+    Oden.connect({ hostname: tls.hostname, port: tls.port }),
   ]);
 
   const [tcpClientConn, tlsClientConn] = await Promise.all([
     tcp.listener.accept(),
-    Deno.connectTls({
+    Oden.connectTls({
       hostname: tcp.hostname,
       port: tcp.port,
-      caCerts: [Deno.readTextFileSync("tests/testdata/tls/RootCA.pem")],
+      caCerts: [Oden.readTextFileSync("tests/testdata/tls/RootCA.pem")],
     }),
   ]);
 
@@ -796,10 +796,10 @@ async function tlsWithTcpFailureTestImpl(
       let expectedError;
       switch (failureMode) {
         case "corruption":
-          expectedError = Deno.errors.InvalidData;
+          expectedError = Oden.errors.InvalidData;
           break;
         case "shutdown":
-          expectedError = Deno.errors.UnexpectedEof;
+          expectedError = Oden.errors.UnexpectedEof;
           break;
         default:
           unreachable();
@@ -819,11 +819,11 @@ async function tlsWithTcpFailureTestImpl(
       const tlsTrafficPromise2 = Promise.all([
         assertRejects(
           () => sendBytes(tlsConn2, 0x02, 1),
-          Deno.errors.UnexpectedEof,
+          Oden.errors.UnexpectedEof,
         ),
         assertRejects(
           () => receiveBytes(tlsConn2, 0x01, 1),
-          Deno.errors.UnexpectedEof,
+          Oden.errors.UnexpectedEof,
         ),
       ]);
 
@@ -865,7 +865,7 @@ async function tlsWithTcpFailureTestImpl(
           await sendBytes(tcpConn1, 0xff, 1 << 14 /* 16 kB */);
           await assertRejects(
             () => receiveEof(tlsConn1),
-            Deno.errors.InvalidData,
+            Oden.errors.InvalidData,
           );
           tcpForwardingInterruptDeferred2.resolve();
           break;
@@ -874,7 +874,7 @@ async function tlsWithTcpFailureTestImpl(
             tcpConn1.closeWrite(),
             await assertRejects(
               () => receiveEof(tlsConn1),
-              Deno.errors.UnexpectedEof,
+              Oden.errors.UnexpectedEof,
             ),
             await tlsConn1.closeWrite(),
             await receiveEof(tlsConn2),
@@ -899,7 +899,7 @@ async function tlsWithTcpFailureTestImpl(
   tcpClientConn.close();
 
   async function sendBytes(
-    conn: Deno.Conn,
+    conn: Oden.Conn,
     byte: number,
     count: number,
   ) {
@@ -915,7 +915,7 @@ async function tlsWithTcpFailureTestImpl(
   }
 
   async function receiveBytes(
-    conn: Deno.Conn,
+    conn: Oden.Conn,
     byte: number,
     count: number,
   ) {
@@ -929,15 +929,15 @@ async function tlsWithTcpFailureTestImpl(
     }
   }
 
-  async function receiveEof(conn: Deno.Conn) {
+  async function receiveEof(conn: Oden.Conn) {
     const buf = new Uint8Array(1);
     const r = await conn.read(buf);
     assertStrictEquals(r, null);
   }
 
   async function forwardBytes(
-    source: Deno.Conn,
-    sink: Deno.Conn,
+    source: Oden.Conn,
+    sink: Oden.Conn,
     count: number,
     interruptPromise: ReturnType<typeof Promise.withResolvers<void>>,
   ) {
@@ -956,7 +956,7 @@ async function tlsWithTcpFailureTestImpl(
   }
 }
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsHandshakeWithTcpCorruptionImmediately() {
     await tlsWithTcpFailureTestImpl("handshake", 0, "corruption", false);
@@ -964,7 +964,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsHandshakeWithTcpShutdownImmediately() {
     await tlsWithTcpFailureTestImpl("handshake", 0, "shutdown", false);
@@ -972,7 +972,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsHandshakeWithTcpCorruptionAfter70Bytes() {
     await tlsWithTcpFailureTestImpl("handshake", 76, "corruption", false);
@@ -980,7 +980,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsHandshakeWithTcpShutdownAfter70bytes() {
     await tlsWithTcpFailureTestImpl("handshake", 77, "shutdown", false);
@@ -988,7 +988,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsHandshakeWithTcpCorruptionAfter200Bytes() {
     await tlsWithTcpFailureTestImpl("handshake", 200, "corruption", false);
@@ -996,7 +996,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsHandshakeWithTcpShutdownAfter200bytes() {
     await tlsWithTcpFailureTestImpl("handshake", 201, "shutdown", false);
@@ -1004,7 +1004,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsTrafficWithTcpCorruption() {
     await tlsWithTcpFailureTestImpl("traffic", Infinity, "corruption", false);
@@ -1012,7 +1012,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsTrafficWithTcpShutdown() {
     await tlsWithTcpFailureTestImpl("traffic", Infinity, "shutdown", false);
@@ -1021,7 +1021,7 @@ Deno.test(
 );
 
 function createHttpsListener(): {
-  listener: Deno.TlsListener;
+  listener: Oden.TlsListener;
   hostname: string;
   port: number;
 } {
@@ -1032,7 +1032,7 @@ function createHttpsListener(): {
   serve(listener);
   return { listener, hostname, port };
 
-  async function serve(listener: Deno.Listener) {
+  async function serve(listener: Oden.Listener) {
     for await (const conn of listener) {
       const EOL = "\r\n";
 
@@ -1076,7 +1076,7 @@ function createHttpsListener(): {
 }
 
 async function curl(url: string): Promise<string> {
-  const { success, code, stdout, stderr } = await new Deno.Command("curl", {
+  const { success, code, stdout, stderr } = await new Oden.Command("curl", {
     args: ["--insecure", url],
   }).output();
 
@@ -1088,7 +1088,7 @@ async function curl(url: string): Promise<string> {
   return new TextDecoder().decode(stdout);
 }
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true, run: true } },
   async function curlFakeHttpsServer() {
     const { listener, port } = createHttpsListener();
@@ -1111,7 +1111,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   // Ignored because gmail appears to reject us on CI sometimes
   { ignore: true, permissions: { read: true, net: true } },
   async function startTls() {
@@ -1119,7 +1119,7 @@ Deno.test(
     const port = 587;
     const encoder = new TextEncoder();
 
-    const conn = await Deno.connect({
+    const conn = await Oden.connect({
       hostname,
       port,
     });
@@ -1146,7 +1146,7 @@ Deno.test(
     // Received the message that the server is ready to establish TLS
     assertEquals(line, "220 2.0.0 Ready to start TLS");
 
-    const tlsConn = await Deno.startTls(conn, { hostname });
+    const tlsConn = await Oden.startTls(conn, { hostname });
     writer = new BufWriter(tlsConn);
     reader = new TextProtoReader(new BufReader(tlsConn));
 
@@ -1163,55 +1163,55 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function connectTLSBadCertKey(): Promise<void> {
     await assertRejects(async () => {
-      await Deno.connectTls({
+      await Oden.connectTls({
         hostname: "deno.land",
         port: 443,
         cert: "bad data",
-        key: Deno.readTextFileSync(
+        key: Oden.readTextFileSync(
           "tests/testdata/tls/localhost.key",
         ),
       });
-    }, Deno.errors.InvalidData);
+    }, Oden.errors.InvalidData);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function connectTLSBadKey(): Promise<void> {
     await assertRejects(async () => {
-      await Deno.connectTls({
+      await Oden.connectTls({
         hostname: "deno.land",
         port: 443,
-        cert: Deno.readTextFileSync(
+        cert: Oden.readTextFileSync(
           "tests/testdata/tls/localhost.crt",
         ),
         key: "bad data",
       });
-    }, Deno.errors.InvalidData);
+    }, Oden.errors.InvalidData);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function connectTLSNotKey(): Promise<void> {
     await assertRejects(async () => {
-      await Deno.connectTls({
+      await Oden.connectTls({
         hostname: "deno.land",
         port: 443,
-        cert: Deno.readTextFileSync(
+        cert: Oden.readTextFileSync(
           "tests/testdata/tls/localhost.crt",
         ),
         key: "",
       });
-    }, Deno.errors.InvalidData);
+    }, Oden.errors.InvalidData);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function connectWithCert() {
     // The test_server running on port 4552 responds with 'PASS' if client
@@ -1219,16 +1219,16 @@ Deno.test(
     //   curl --key cli/tests/testdata/tls/localhost.key \
     //        --cert cli/tests/testdata/tls/localhost.crt \
     //        --cacert cli/tests/testdata/tls/RootCA.crt https://localhost:4552/
-    const conn = await Deno.connectTls({
+    const conn = await Oden.connectTls({
       hostname: "localhost",
       port: 4552,
-      cert: Deno.readTextFileSync(
+      cert: Oden.readTextFileSync(
         "tests/testdata/tls/localhost.crt",
       ),
-      key: Deno.readTextFileSync(
+      key: Oden.readTextFileSync(
         "tests/testdata/tls/localhost.key",
       ),
-      caCerts: [Deno.readTextFileSync("tests/testdata/tls/RootCA.pem")],
+      caCerts: [Oden.readTextFileSync("tests/testdata/tls/RootCA.pem")],
     });
     const result = decoder.decode(await readAll(conn));
     assertEquals(result, "PASS");
@@ -1236,13 +1236,13 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function connectTLSCaCerts() {
-    const conn = await Deno.connectTls({
+    const conn = await Oden.connectTls({
       hostname: "localhost",
       port: 4557,
-      caCerts: [Deno.readTextFileSync("tests/testdata/tls/RootCA.pem")],
+      caCerts: [Oden.readTextFileSync("tests/testdata/tls/RootCA.pem")],
     });
     const result = decoder.decode(await readAll(conn));
     assertEquals(result, "PASS");
@@ -1250,16 +1250,16 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function startTLSCaCerts() {
-    const plainConn = await Deno.connect({
+    const plainConn = await Oden.connect({
       hostname: "localhost",
       port: 4557,
     });
-    const conn = await Deno.startTls(plainConn, {
+    const conn = await Oden.startTls(plainConn, {
       hostname: "localhost",
-      caCerts: [Deno.readTextFileSync("tests/testdata/tls/RootCA.pem")],
+      caCerts: [Oden.readTextFileSync("tests/testdata/tls/RootCA.pem")],
     });
     const result = decoder.decode(await readAll(conn));
     assertEquals(result, "PASS");
@@ -1267,16 +1267,16 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsHandshakeSuccess() {
     const { listener, hostname, port } = listenTls();
 
     const acceptPromise = listener.accept();
-    const connectPromise = Deno.connectTls({
+    const connectPromise = Oden.connectTls({
       hostname,
       port,
-      caCerts: [await Deno.readTextFile("tests/testdata/tls/RootCA.crt")],
+      caCerts: [await Oden.readTextFile("tests/testdata/tls/RootCA.crt")],
     });
     const [conn1, conn2] = await Promise.all([acceptPromise, connectPromise]);
     listener.close();
@@ -1317,7 +1317,7 @@ Deno.test(
     conn1.close();
     conn2.close();
 
-    async function readFull(conn: Deno.Conn, buf: Uint8Array) {
+    async function readFull(conn: Oden.Conn, buf: Uint8Array) {
       let offset, n;
       for (offset = 0; offset < buf.length; offset += n) {
         n = await conn.read(buf.subarray(offset, buf.length));
@@ -1328,10 +1328,10 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, net: true } },
   async function tlsHandshakeFailure() {
-    let tls: { listener: Deno.TlsListener; port: number; hostname: string };
+    let tls: { listener: Oden.TlsListener; port: number; hostname: string };
 
     async function server() {
       for await (const conn of tls.listener) {
@@ -1339,7 +1339,7 @@ Deno.test(
           // Handshake fails because the client rejects the server certificate.
           await assertRejects(
             () => conn.handshake(),
-            Deno.errors.InvalidData,
+            Oden.errors.InvalidData,
             "received fatal alert",
           );
         }
@@ -1349,14 +1349,14 @@ Deno.test(
     }
 
     async function connectTlsClient() {
-      const conn = await Deno.connectTls({
+      const conn = await Oden.connectTls({
         hostname: tls.hostname,
         port: tls.port,
       });
       // Handshake fails because the server presents a self-signed certificate.
       await assertRejects(
         () => conn.handshake(),
-        Deno.errors.InvalidData,
+        Oden.errors.InvalidData,
         "invalid peer certificate: UnknownIssuer",
       );
       conn.close();
@@ -1366,18 +1366,18 @@ Deno.test(
     await Promise.all([server(), connectTlsClient()]);
 
     async function startTlsClient() {
-      const tcpConn = await Deno.connect({
+      const tcpConn = await Oden.connect({
         hostname: tls.hostname,
         port: tls.port,
       });
-      const tlsConn = await Deno.startTls(tcpConn, {
+      const tlsConn = await Oden.startTls(tcpConn, {
         hostname: "foo.land",
-        caCerts: [Deno.readTextFileSync("tests/testdata/tls/RootCA.pem")],
+        caCerts: [Oden.readTextFileSync("tests/testdata/tls/RootCA.pem")],
       });
       // Handshake fails because hostname doesn't match the certificate.
       await assertRejects(
         () => tlsConn.handshake(),
-        Deno.errors.InvalidData,
+        Oden.errors.InvalidData,
         "certificate not valid for name",
       );
       tlsConn.close();
@@ -1388,7 +1388,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function listenTlsWithReuseAddr() {
     const deferred1 = Promise.withResolvers<void>();
@@ -1399,34 +1399,34 @@ Deno.test(
       deferred1.resolve();
     });
 
-    const conn1 = await Deno.connectTls({ hostname, port, caCerts });
+    const conn1 = await Oden.connectTls({ hostname, port, caCerts });
     conn1.close();
     await deferred1.promise;
     listener1.close();
 
     const deferred2 = Promise.withResolvers<void>();
-    const listener2 = Deno.listenTls({ hostname, port, cert, key });
+    const listener2 = Oden.listenTls({ hostname, port, cert, key });
 
     listener2.accept().then((conn) => {
       conn.close();
       deferred2.resolve();
     });
 
-    const conn2 = await Deno.connectTls({ hostname, port, caCerts });
+    const conn2 = await Oden.connectTls({ hostname, port, caCerts });
     conn2.close();
     await deferred2.promise;
     listener2.close();
   },
 );
 
-Deno.test({
-  ignore: Deno.build.os !== "linux",
+Oden.test({
+  ignore: Oden.build.os !== "linux",
   permissions: { net: true },
 }, async function listenTlsReusePort() {
   const { listener: listener1, port, hostname } = listenTls({
     reusePort: true,
   });
-  const listener2 = Deno.listenTls({
+  const listener2 = Oden.listenTls({
     hostname,
     port,
     cert,
@@ -1454,29 +1454,29 @@ Deno.test({
         listener2.close();
       }).catch(() => {});
     }
-    const conn = await Deno.connectTls({ hostname, port, caCerts });
+    const conn = await Oden.connectTls({ hostname, port, caCerts });
     conn.close();
     await Promise.race([p1, p2]);
   }
 });
 
-Deno.test({
-  ignore: Deno.build.os === "linux",
+Oden.test({
+  ignore: Oden.build.os === "linux",
   permissions: { net: true },
 }, function listenTlsReusePortDoesNothing() {
   const { listener: listener1, hostname, port } = listenTls({
     reusePort: true,
   });
   assertThrows(() => {
-    Deno.listenTls({ hostname, port, cert, key, reusePort: true });
-  }, Deno.errors.AddrInUse);
+    Oden.listenTls({ hostname, port, cert, key, reusePort: true });
+  }, Oden.errors.AddrInUse);
   listener1.close();
 });
 
-Deno.test({
+Oden.test({
   permissions: { net: true },
 }, function listenTlsDoesNotThrowOnStringPort() {
-  const listener = Deno.listenTls({
+  const listener = Oden.listenTls({
     hostname: "localhost",
     // @ts-ignore String port is not allowed by typing, but it shouldn't throw
     // for backwards compatibility.
@@ -1487,42 +1487,42 @@ Deno.test({
   listener.close();
 });
 
-Deno.test(
+Oden.test(
   { permissions: { net: true, read: true } },
   function listenTLSInvalidCert() {
     assertThrows(() => {
-      Deno.listenTls({
+      Oden.listenTls({
         hostname: "localhost",
         port: 0,
-        cert: Deno.readTextFileSync("tests/testdata/tls/invalid.crt"),
-        key: Deno.readTextFileSync("tests/testdata/tls/localhost.key"),
+        cert: Oden.readTextFileSync("tests/testdata/tls/invalid.crt"),
+        key: Oden.readTextFileSync("tests/testdata/tls/localhost.key"),
       });
-    }, Deno.errors.InvalidData);
+    }, Oden.errors.InvalidData);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true, read: true } },
   function listenTLSInvalidKey() {
     assertThrows(() => {
-      Deno.listenTls({
+      Oden.listenTls({
         hostname: "localhost",
         port: 0,
-        cert: Deno.readTextFileSync("tests/testdata/tls/localhost.crt"),
-        key: Deno.readTextFileSync("tests/testdata/tls/invalid.key"),
+        cert: Oden.readTextFileSync("tests/testdata/tls/localhost.crt"),
+        key: Oden.readTextFileSync("tests/testdata/tls/invalid.key"),
       });
-    }, Deno.errors.InvalidData);
+    }, Oden.errors.InvalidData);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true, read: true } },
   function listenTLSEcKey() {
-    const listener = Deno.listenTls({
+    const listener = Oden.listenTls({
       hostname: "localhost",
       port: 0,
-      cert: Deno.readTextFileSync("tests/testdata/tls/localhost_ecc.crt"),
-      key: Deno.readTextFileSync("tests/testdata/tls/localhost_ecc.key"),
+      cert: Oden.readTextFileSync("tests/testdata/tls/localhost_ecc.crt"),
+      key: Oden.readTextFileSync("tests/testdata/tls/localhost_ecc.key"),
     });
     listener.close();
   },

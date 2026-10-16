@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assert, assertEquals } from "./test_util.ts";
 
 // deno-lint-ignore no-explicit-any
@@ -10,47 +10,47 @@ function testFirstArgument(arg1: any[], expectedSize: number) {
   assertEquals(file.type, "");
 }
 
-Deno.test(function fileEmptyFileBits() {
+Oden.test(function fileEmptyFileBits() {
   testFirstArgument([], 0);
 });
 
-Deno.test(function fileStringFileBits() {
+Oden.test(function fileStringFileBits() {
   testFirstArgument(["bits"], 4);
 });
 
-Deno.test(function fileUnicodeStringFileBits() {
+Oden.test(function fileUnicodeStringFileBits() {
   testFirstArgument(["𝓽𝓮𝔁𝓽"], 16);
 });
 
-Deno.test(function fileStringObjectFileBits() {
+Oden.test(function fileStringObjectFileBits() {
   testFirstArgument([new String("string object")], 13);
 });
 
-Deno.test(function fileEmptyBlobFileBits() {
+Oden.test(function fileEmptyBlobFileBits() {
   testFirstArgument([new Blob()], 0);
 });
 
-Deno.test(function fileBlobFileBits() {
+Oden.test(function fileBlobFileBits() {
   testFirstArgument([new Blob(["bits"])], 4);
 });
 
-Deno.test(function fileEmptyFileFileBits() {
+Oden.test(function fileEmptyFileFileBits() {
   testFirstArgument([new File([], "world.txt")], 0);
 });
 
-Deno.test(function fileFileFileBits() {
+Oden.test(function fileFileFileBits() {
   testFirstArgument([new File(["bits"], "world.txt")], 4);
 });
 
-Deno.test(function fileArrayBufferFileBits() {
+Oden.test(function fileArrayBufferFileBits() {
   testFirstArgument([new ArrayBuffer(8)], 8);
 });
 
-Deno.test(function fileTypedArrayFileBits() {
+Oden.test(function fileTypedArrayFileBits() {
   testFirstArgument([new Uint8Array([0x50, 0x41, 0x53, 0x53])], 4);
 });
 
-Deno.test(function fileVariousFileBits() {
+Oden.test(function fileVariousFileBits() {
   testFirstArgument(
     [
       "bits",
@@ -64,15 +64,15 @@ Deno.test(function fileVariousFileBits() {
   );
 });
 
-Deno.test(function fileNumberInFileBits() {
+Oden.test(function fileNumberInFileBits() {
   testFirstArgument([12], 2);
 });
 
-Deno.test(function fileArrayInFileBits() {
+Oden.test(function fileArrayInFileBits() {
   testFirstArgument([[1, 2, 3]], 5);
 });
 
-Deno.test(function fileObjectInFileBits() {
+Oden.test(function fileObjectInFileBits() {
   // "[object Object]"
   testFirstArgument([{}], 15);
 });
@@ -84,29 +84,29 @@ function testSecondArgument(arg2: any, expectedFileName: string) {
   assertEquals(file.name, expectedFileName);
 }
 
-Deno.test(function fileUsingFileName() {
+Oden.test(function fileUsingFileName() {
   testSecondArgument("dummy", "dummy");
 });
 
-Deno.test(function fileUsingNullFileName() {
+Oden.test(function fileUsingNullFileName() {
   testSecondArgument(null, "null");
 });
 
-Deno.test(function fileUsingNumberFileName() {
+Oden.test(function fileUsingNumberFileName() {
   testSecondArgument(1, "1");
 });
 
-Deno.test(function fileUsingEmptyStringFileName() {
+Oden.test(function fileUsingEmptyStringFileName() {
   testSecondArgument("", "");
 });
 
-Deno.test(function inspectFile() {
+Oden.test(function inspectFile() {
   assertEquals(
-    Deno.inspect(new File([], "file-name.txt")),
+    Oden.inspect(new File([], "file-name.txt")),
     `File { name: "file-name.txt", size: 0, type: "" }`,
   );
   assertEquals(
-    Deno.inspect(new File([], "file-name.txt", { type: "text/plain" })),
+    Oden.inspect(new File([], "file-name.txt", { type: "text/plain" })),
     `File { name: "file-name.txt", size: 0, type: "text/plain" }`,
   );
 });

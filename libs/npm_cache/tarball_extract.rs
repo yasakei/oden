@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashSet;
 use std::io::ErrorKind;
@@ -10,8 +10,8 @@ use std::path::PathBuf;
 
 use base64::Engine;
 use base64::prelude::BASE64_STANDARD;
-use deno_npm::registry::NpmPackageVersionDistInfo;
-use deno_npm::registry::NpmPackageVersionDistInfoIntegrity;
+use oden_npm::registry::NpmPackageVersionDistInfo;
+use oden_npm::registry::NpmPackageVersionDistInfoIntegrity;
 use deno_semver::package::PackageNv;
 use flate2::read::GzDecoder;
 use sys_traits::FsCanonicalize;

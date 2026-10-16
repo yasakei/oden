@@ -1,0 +1,13 @@
+{
+  "tasks": {
+    "build": {
+      "description": "Build the project",
+      "command": "oden build"
+    },
+    "test": {
+      "description": "Test the project",
+      "command": "oden test"
+    },
+    "dev": "echo dev"
+  }
+}

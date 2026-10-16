@@ -1,13 +1,13 @@
 // https://github.com/denoland/deno/pull/16970
-Deno.test("handle thrown error in async function", async () => {
-  const dirPath = Deno.makeTempDirSync();
+Oden.test("handle thrown error in async function", async () => {
+  const dirPath = Oden.makeTempDirSync();
   const filePath = `${dirPath}/file.txt`;
   try {
-    await Deno.stat(filePath);
+    await Oden.stat(filePath);
   } catch {
-    await Deno.writeTextFile(filePath, "");
+    await Oden.writeTextFile(filePath, "");
   } finally {
-    await Deno.remove(filePath);
-    await Deno.remove(dirPath);
+    await Oden.remove(filePath);
+    await Oden.remove(dirPath);
   }
 });

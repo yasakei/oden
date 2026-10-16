@@ -1,3 +1,3 @@
-Deno.bench("foo", function () {});
-Deno.bench("bar", function () {});
-Deno.bench("baz", function () {});
+Oden.bench("foo", function () {});
+Oden.bench("bar", function () {});
+Oden.bench("baz", function () {});

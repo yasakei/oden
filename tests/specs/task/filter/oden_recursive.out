@@ -1,0 +1,6 @@
+[UNORDERED_START]
+Task dev (@oden/bar) echo '@oden/bar'
+Task dev (@oden/foo) echo '@oden/foo'
+[@oden/bar#dev] @oden/bar
+[@oden/foo#dev] @oden/foo
+[UNORDERED_END]

@@ -1,0 +1,10 @@
+{
+  "name": "@odentest/binary-package",
+  "version": "1.0.0",
+  "main": "index.js",
+  "optionalDependencies": {
+    "@odentest/binary-package-linux": "1.0.0",
+    "@odentest/binary-package-mac": "1.0.0",
+    "@odentest/binary-package-windows": "1.0.0"
+  }
+}

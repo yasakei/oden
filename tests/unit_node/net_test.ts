@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import * as net from "node:net";
 import { assert, assertEquals } from "@std/assert";
@@ -12,7 +12,7 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 
-Deno.test("[node/net] close event emits after error event - when host is not found", async () => {
+Oden.test("[node/net] close event emits after error event - when host is not found", async () => {
   const socket = net.createConnection(27009, "doesnotexist");
   const events: ("error" | "close")[] = [];
   const errorEmitted = Promise.withResolvers<void>();
@@ -34,9 +34,9 @@ Deno.test("[node/net] close event emits after error event - when host is not fou
 // Regression for https://github.com/denoland/deno/issues/33879. When a handle
 // exposes `getAsyncId` borrowed from `TCP.prototype` (or any AsyncWrap-derived
 // prototype) but isn't itself a real AsyncWrap, Node silently falls back to a
-// fresh async id rather than throwing. The Deno op2 brand check throws
+// fresh async id rather than throwing. The Oden op2 brand check throws
 // `TypeError: expected AsyncWrap`, so `_getNewAsyncId` has to swallow that.
-Deno.test("[node/net] Socket falls back when handle.getAsyncId has wrong receiver", () => {
+Oden.test("[node/net] Socket falls back when handle.getAsyncId has wrong receiver", () => {
   const { TCP } = require("internal/test/binding").internalBinding("tcp_wrap");
   const socket = new net.Socket({
     handle: {
@@ -49,7 +49,7 @@ Deno.test("[node/net] Socket falls back when handle.getAsyncId has wrong receive
   socket.destroy();
 });
 
-Deno.test("[node/net] close event emits after error event - when connection is refused", async () => {
+Oden.test("[node/net] close event emits after error event - when connection is refused", async () => {
   const socket = net.createConnection(27009, "127.0.0.1");
   const events: ("error" | "close")[] = [];
   const errorEmitted = Promise.withResolvers<void>();
@@ -73,7 +73,7 @@ Deno.test("[node/net] close event emits after error event - when connection is r
 // SO_KEEPALIVE on the underlying socket instead of silently no-op'ing.
 // Libraries such as `tedious`/`mssql` enable keepalive right after connecting
 // to keep tunneled connections alive; losing it surfaced as ECONNRESET.
-Deno.test("[node/net] socket.setKeepAlive() reaches the handle", async () => {
+Oden.test("[node/net] socket.setKeepAlive() reaches the handle", async () => {
   const server = net.createServer((socket) => {
     socket.end();
   });
@@ -97,7 +97,7 @@ Deno.test("[node/net] socket.setKeepAlive() reaches the handle", async () => {
   server.close();
 });
 
-Deno.test("[node/net] the port is available immediately after close callback", async () => {
+Oden.test("[node/net] the port is available immediately after close callback", async () => {
   const deferred = Promise.withResolvers<void>();
 
   // This simulates what get-port@5.1.1 does.
@@ -124,15 +124,15 @@ Deno.test("[node/net] the port is available immediately after close callback", a
   await deferred.promise;
 });
 
-Deno.test("[node/net] net.connect().unref() works", async () => {
+Oden.test("[node/net] net.connect().unref() works", async () => {
   const ctl = new AbortController();
-  const server = Deno.serve({
+  const server = Oden.serve({
     signal: ctl.signal,
     port: 0, // any available port will do
     handler: () => new Response("hello"),
     onListen: async ({ port, hostname }) => {
-      hostname = Deno.build.os === "windows" ? "localhost" : hostname;
-      const { stdout, stderr } = await new Deno.Command(Deno.execPath(), {
+      hostname = Oden.build.os === "windows" ? "localhost" : hostname;
+      const { stdout, stderr } = await new Oden.Command(Oden.execPath(), {
         args: [
           "eval",
           `
@@ -157,7 +157,7 @@ Deno.test("[node/net] net.connect().unref() works", async () => {
   await server.finished;
 });
 
-Deno.test({
+Oden.test({
   name: "[node/net] throws permission error instead of unknown error",
   permissions: "none",
   fn: () => {
@@ -165,12 +165,12 @@ Deno.test({
       const s = new net.Server();
       s.listen(3000);
     } catch (e) {
-      assert(e instanceof Deno.errors.NotCapable);
+      assert(e instanceof Oden.errors.NotCapable);
     }
   },
 });
 
-Deno.test("[node/net] connection event has socket value", async () => {
+Oden.test("[node/net] connection event has socket value", async () => {
   const deferred = Promise.withResolvers<void>();
   const deferred2 = Promise.withResolvers<void>();
 
@@ -187,7 +187,7 @@ Deno.test("[node/net] connection event has socket value", async () => {
     // deno-lint-ignore no-explicit-any
     const { port } = server.address() as any;
 
-    const conn = await Deno.connect({
+    const conn = await Oden.connect({
       port,
       transport: "tcp",
     });
@@ -204,7 +204,7 @@ Deno.test("[node/net] connection event has socket value", async () => {
 
 /// We need to make sure that any shared buffers are never used concurrently by two reads.
 // https://github.com/denoland/deno/issues/20188
-Deno.test("[node/net] multiple Sockets should get correct server data", async () => {
+Oden.test("[node/net] multiple Sockets should get correct server data", async () => {
   const socketCount = 9;
 
   class TestSocket {
@@ -275,13 +275,13 @@ Deno.test("[node/net] multiple Sockets should get correct server data", async ()
   }
 });
 
-Deno.test("[node/net] BlockList doesn't leak resources", () => {
+Oden.test("[node/net] BlockList doesn't leak resources", () => {
   const blockList = new net.BlockList();
   blockList.addAddress("1.1.1.1");
   assert(blockList.check("1.1.1.1"));
 });
 
-Deno.test("[node/net] BlockList stores large ranges compactly", () => {
+Oden.test("[node/net] BlockList stores large ranges compactly", () => {
   const blockList = new net.BlockList();
   blockList.addRange("0.0.0.0", "255.255.255.255");
   assert(blockList.check("1.2.3.4"));
@@ -289,7 +289,7 @@ Deno.test("[node/net] BlockList stores large ranges compactly", () => {
   assertEquals(blockList.rules, ["Range: IPv4 0.0.0.0-255.255.255.255"]);
 });
 
-Deno.test("[node/net] net.Server can listen on the same port immediately after it's closed", async () => {
+Oden.test("[node/net] net.Server can listen on the same port immediately after it's closed", async () => {
   const serverClosed = Promise.withResolvers<void>();
   const server = net.createServer();
   server.on("error", (e) => {
@@ -308,7 +308,7 @@ Deno.test("[node/net] net.Server can listen on the same port immediately after i
   await serverClosed.promise;
 });
 
-Deno.test("dns.resolve with ttl", async () => {
+Oden.test("dns.resolve with ttl", async () => {
   const d1 = Promise.withResolvers();
   dns.resolve4("www.example.com", { ttl: true }, (err, addresses) => {
     if (err) {
@@ -335,7 +335,7 @@ Deno.test("dns.resolve with ttl", async () => {
   assert(typeof ret2[0] === "string");
 });
 
-Deno.test("[node/dns] dns.lookup (all=true) util promisify", async () => {
+Oden.test("[node/dns] dns.lookup (all=true) util promisify", async () => {
   const lookup = util.promisify(dns.lookup);
   const result = await lookup("localhost", { all: true });
   assert(Array.isArray(result));
@@ -343,7 +343,7 @@ Deno.test("[node/dns] dns.lookup (all=true) util promisify", async () => {
   assert(typeof result[0].family === "number");
 });
 
-Deno.test("[node/dns] resolve IPv6 addresses", async () => {
+Oden.test("[node/dns] resolve IPv6 addresses", async () => {
   const resolveResults = await dnsPromises.resolve("deno.land", "AAAA");
   for (const address of resolveResults) {
     await dnsPromises.lookup(address);
@@ -362,7 +362,7 @@ Deno.test("[node/dns] resolve IPv6 addresses", async () => {
   }
 });
 
-Deno.test("[node/net] Socket.remoteFamily returns string", async () => {
+Oden.test("[node/net] Socket.remoteFamily returns string", async () => {
   const deferred = Promise.withResolvers<void>();
   const server = net.createServer((socket) => {
     // Default-host listen() binds dual-stack, so IPv4 connections arrive

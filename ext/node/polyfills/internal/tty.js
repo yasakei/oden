@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and Node.js contributors. All rights reserved. MIT license.
 // Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
 
@@ -29,20 +29,20 @@ const {
   ERR_INVALID_FD,
   ERR_TTY_INIT_FAILED,
   errnoException,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
 const { validateInteger } = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
 import { op_tty_check_fd_permission, TTY } from "ext:core/ops";
-const { isatty } = core.loadExtScript("ext:deno_node/tty.js");
+const { isatty } = core.loadExtScript("ext:oden_node/tty.js");
 const lazyNet = core.createLazyLoader("node:net");
 const {
   clearLine,
   clearScreenDown,
   cursorTo,
   moveCursor,
-} = core.loadExtScript("ext:deno_node/internal/readline/callbacks.mjs");
-const { release } = core.loadExtScript("ext:deno_node/os.ts");
+} = core.loadExtScript("ext:oden_node/internal/readline/callbacks.mjs");
+const { release } = core.loadExtScript("ext:oden_node/os.ts");
 
 // Color depth constants
 const COLORS_2 = 1;
@@ -265,7 +265,7 @@ export function getColorDepth(env = process.env) {
 // Lazy SIGWINCH handling: only register the signal listener when at least one
 // WriteStream has a "resize" listener, and unregister when none do. This avoids
 // creating a persistent pending op that interferes with event loop exit / TLA
-// stall detection. Uses Deno.addSignalListener directly to avoid circular
+// stall detection. Uses Oden.addSignalListener directly to avoid circular
 // dependency with node:process.
 const sigwinchStreams = new SafeSet();
 let sigwinchRegistered = false;
@@ -280,7 +280,7 @@ function addSigwinchListener(stream) {
   SetPrototypeAdd(sigwinchStreams, stream);
   if (!sigwinchRegistered) {
     sigwinchRegistered = true;
-    Deno.addSignalListener("SIGWINCH", onSigwinch);
+    Oden.addSignalListener("SIGWINCH", onSigwinch);
   }
 }
 
@@ -288,7 +288,7 @@ function removeSigwinchListener(stream) {
   SetPrototypeDelete(sigwinchStreams, stream);
   if (SetPrototypeGetSize(sigwinchStreams) === 0 && sigwinchRegistered) {
     sigwinchRegistered = false;
-    Deno.removeSignalListener("SIGWINCH", onSigwinch);
+    Oden.removeSignalListener("SIGWINCH", onSigwinch);
   }
 }
 

@@ -1,3 +1,3 @@
--- deno-fmt-ignore-file
+-- oden-fmt-ignore-file
 
 foo%!

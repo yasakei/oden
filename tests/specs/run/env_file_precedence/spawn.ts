@@ -1,2 +1,2 @@
-console.log(`FOO=${Deno.env.get("FOO")}`);
-console.log(`BAR=${Deno.env.get("BAR")}`);
+console.log(`FOO=${Oden.env.get("FOO")}`);
+console.log(`BAR=${Oden.env.get("BAR")}`);

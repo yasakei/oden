@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 pub const STREAM_OPTION_EMPTY_PAYLOAD: i32 = 0x1;
 pub const STREAM_OPTION_GET_TRAILERS: i32 = 0x2;

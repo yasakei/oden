@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -42,7 +42,7 @@ const {
   allMethods,
   HTTPParser,
   methods,
-} = core.loadExtScript("ext:deno_node/internal_binding/http_parser.ts");
+} = core.loadExtScript("ext:oden_node/internal_binding/http_parser.ts");
 import { IncomingMessage, readStart, readStop } from "node:_http_incoming";
 
 const kIncomingMessage = Symbol("IncomingMessage");
@@ -180,7 +180,7 @@ function parserOnBody(b) {
     // Mark as consuming so resOnFinish does not auto-dump a
     // paused request that already had data delivered.
     stream._consuming = true;
-    // deno-lint-ignore deno-internal/prefer-primordials
+    // deno-lint-ignore oden-internal/prefer-primordials
     const ret = stream.push(b);
     if (!ret) {
       readStop(this.socket);
@@ -204,7 +204,7 @@ function parserOnMessageComplete() {
     }
 
     // For emit end event
-    // deno-lint-ignore deno-internal/prefer-primordials
+    // deno-lint-ignore oden-internal/prefer-primordials
     stream.push(null);
   }
 
@@ -253,7 +253,7 @@ function freeParser(parser, req, socket) {
 }
 
 const tokenRegExp = new SafeRegExp("^[\\^_`a-zA-Z\\-0-9!#$%&'*+.|~]+$");
-// deno-fmt-ignore
+// oden-fmt-ignore
 const validTokenChars = new Uint8Array([
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -383,7 +383,7 @@ function headerSegmentLatin1(rawPacket) {
 }
 
 function isLenient() {
-  // Deno doesn't have --insecure-http-parser flag (yet)
+  // Oden doesn't have --insecure-http-parser flag (yet)
   return false;
 }
 

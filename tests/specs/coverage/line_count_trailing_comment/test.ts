@@ -1,6 +1,6 @@
 import { noComment, withComment } from "./mod.ts";
 
-Deno.test("guards", () => {
+Oden.test("guards", () => {
   noComment({});
   withComment({});
 });

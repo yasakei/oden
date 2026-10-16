@@ -1,4 +1,4 @@
-Deno.bench({
+Oden.bench({
   name: "ignore",
   permissions: {
     read: true,

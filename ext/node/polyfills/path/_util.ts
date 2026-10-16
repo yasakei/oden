@@ -1,6 +1,6 @@
 // Copyright the Browserify authors. MIT License.
 // Ported from https://github.com/browserify/path-browserify/
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 (function () {
 const { core, primordials } = __bootstrap;
 const {
@@ -11,9 +11,9 @@ const {
   CHAR_LOWERCASE_Z,
   CHAR_UPPERCASE_A,
   CHAR_UPPERCASE_Z,
-} = core.loadExtScript("ext:deno_node/path/_constants.ts");
+} = core.loadExtScript("ext:oden_node/path/_constants.ts");
 const { ERR_INVALID_ARG_TYPE } = core.loadExtScript(
-  "ext:deno_node/internal/errors.ts",
+  "ext:oden_node/internal/errors.ts",
 );
 const {
   StringPrototypeCharCodeAt,

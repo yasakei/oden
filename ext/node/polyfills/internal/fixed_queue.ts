@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 
 import { primordials } from "ext:core/mod.js";
@@ -111,13 +111,13 @@ export class FixedQueue {
       // and sets it as the new main queue.
       this.head = this.head.next = new FixedCircularBuffer();
     }
-    // deno-lint-ignore deno-internal/prefer-primordials -- `push` is a method of `FixedCircularBuffer`
+    // deno-lint-ignore oden-internal/prefer-primordials -- `push` is a method of `FixedCircularBuffer`
     this.head.push(data);
   }
 
   shift() {
     const tail = this.tail;
-    // deno-lint-ignore deno-internal/prefer-primordials -- `shift` is a method of `FixedCircularBuffer`
+    // deno-lint-ignore oden-internal/prefer-primordials -- `shift` is a method of `FixedCircularBuffer`
     const next = tail.shift();
     if (tail.isEmpty() && tail.next !== null) {
       // If there is another queue, it forms the new tail.

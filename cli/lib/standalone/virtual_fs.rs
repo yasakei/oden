@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cmp::Ordering;
@@ -15,10 +15,10 @@ use std::time::SystemTime;
 
 use deno_path_util::normalize_path;
 use deno_path_util::strip_unc_prefix;
-use deno_runtime::colors;
-use deno_runtime::deno_core::anyhow::Context;
-use deno_runtime::deno_core::anyhow::bail;
-use deno_runtime::deno_core::error::AnyError;
+use oden_runtime::colors;
+use oden_runtime::oden_core::anyhow::Context;
+use oden_runtime::oden_core::anyhow::bail;
+use oden_runtime::oden_core::error::AnyError;
 use indexmap::IndexSet;
 use serde::Deserialize;
 use serde::Deserializer;
@@ -384,8 +384,8 @@ impl VfsEntry {
   }
 }
 
-pub static DENO_COMPILE_GLOBAL_NODE_MODULES_DIR_NAME: &str =
-  ".deno_compile_node_modules";
+pub static ODEN_COMPILE_GLOBAL_NODE_MODULES_DIR_NAME: &str =
+  ".oden_compile_node_modules";
 
 #[derive(Debug)]
 pub struct BuiltVfs {
@@ -575,7 +575,7 @@ impl VfsBuilder {
   /// Add a directory that might be the minimum root directory
   /// of the VFS.
   ///
-  /// For example, say the user has a deno.json and specifies an
+  /// For example, say the user has a oden.json and specifies an
   /// import map in a parent directory. The import map won't be
   /// included in the VFS, but its base will meaning we need to
   /// tell the VFS builder to include the base of the import map
@@ -1286,7 +1286,7 @@ impl VfsBuilder {
       }
       match current_dir.entries.iter().next().unwrap() {
         VfsEntry::Dir(dir) => {
-          if dir.name == DENO_COMPILE_GLOBAL_NODE_MODULES_DIR_NAME {
+          if dir.name == ODEN_COMPILE_GLOBAL_NODE_MODULES_DIR_NAME {
             // special directory we want to maintain
             break;
           }

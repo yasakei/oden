@@ -2,17 +2,17 @@
   "tempDir": true,
   "steps": [
     {
-      // No deno.lock or package-lock.json — `deno install` should seed
-      // deno.lock from pnpm-lock.yaml instead.
+      // No oden.lock or package-lock.json — `oden install` should seed
+      // oden.lock from pnpm-lock.yaml instead.
       "args": "install",
       "output": "install.out"
     },
     {
       "args": [
         "eval",
-        "console.log(Deno.readTextFileSync('deno.lock').trim())"
+        "console.log(Oden.readTextFileSync('oden.lock').trim())"
       ],
-      "output": "deno.lock.out"
+      "output": "oden.lock.out"
     },
     {
       "args": "run --cached-only main.js",

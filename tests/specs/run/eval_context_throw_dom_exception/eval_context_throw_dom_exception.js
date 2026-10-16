@@ -1,4 +1,4 @@
-const [, errorInfo] = Deno[Deno.internal].core.evalContext(
+const [, errorInfo] = Oden[Oden.internal].core.evalContext(
   'throw new DOMException("foo")',
   new URL("..", import.meta.url).href,
 );

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::ffi::OsStr;
 use std::io::Read;
@@ -15,8 +15,8 @@ type Inner = std::fs::File;
 
 impl IpcPipe {
   /// Connect to a local IPC endpoint.
-  /// - Unix: `addr` like `/tmp/deno.sock`
-  /// - Windows: `addr` like `\\.\pipe\deno-permission-broker`
+  /// - Unix: `addr` like `/tmp/oden.sock`
+  /// - Windows: `addr` like `\\.\pipe\oden-permission-broker`
   pub fn connect(addr: impl AsRef<OsStr>) -> io::Result<Self> {
     Self::connect_impl(addr.as_ref())
   }

@@ -2,6 +2,6 @@
   "name": "app",
   "version": "1.0.0",
   "dependencies": {
-    "@denotest/esm-basic": "1.0.0"
+    "@odentest/esm-basic": "1.0.0"
   }
 }

@@ -1,0 +1,5 @@
+{
+  "name": "@odentest/cjs-reexport-collision",
+  "version": "1.0.0",
+  "main": "./index.js"
+}

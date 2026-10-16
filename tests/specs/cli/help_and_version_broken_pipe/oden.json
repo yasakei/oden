@@ -1,0 +1,6 @@
+{
+  "tasks": {
+    "help": "oden help | echo",
+    "version": "oden --version | echo"
+  }
+}

@@ -9,7 +9,7 @@ assertFileContains(
 );
 
 const jsFiles: string[] = [];
-Deno.readDirSync("./dist").forEach((entry) => {
+Oden.readDirSync("./dist").forEach((entry) => {
   if (entry.name.endsWith(".js")) {
     jsFiles.push("./dist/" + entry.name);
   }

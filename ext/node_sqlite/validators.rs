@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 
-use deno_core::v8;
+use oden_core::v8;
 
 #[derive(Debug, thiserror::Error, deno_error::JsError)]
 #[property("code" = self.code())]

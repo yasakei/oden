@@ -1,0 +1,36 @@
+{
+  "name": "odentest-packagejson-missing-info",
+  "dist-tags": {
+    "latest": "1.0.0-missingbin"
+  },
+  "versions": {
+    "1.0.0-missingbin": {
+      "name": "odentest-packagejson-missing-info",
+      "version": "1.0.0-missingbin",
+      "bin": {
+        "odentest": "./bin/odentest.js"
+      },
+      "dist": {
+        "tarball": "http://localhost:4260/odentest-packagejson-missing-info/odentest-packagejson-missing-info-1.0.0-missingbin.tgz"
+      }
+    },
+    "0.7.0-bindinggyp": {
+      "name": "odentest-packagejson-missing-info",
+      "version": "0.7.0-bindinggyp",
+      "scripts": {
+        "install": "node-gyp rebuild"
+      },
+      "dist": {
+        "tarball": "http://localhost:4260/odentest-packagejson-missing-info/odentest-packagejson-missing-info-0.7.0-bindinggyp.tgz"
+      }
+    },
+    "0.2.5-missingdeprecated": {
+      "name": "odentest-packagejson-missing-info",
+      "version": "0.2.5-missingdeprecated",
+      "deprecated": "Use 0.5.0 or later",
+      "dist": {
+        "tarball": "http://localhost:4260/odentest-packagejson-missing-info/odentest-packagejson-missing-info-0.2.5-missingdeprecated.tgz"
+      }
+    }
+  }
+}

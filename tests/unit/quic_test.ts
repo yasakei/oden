@@ -1,52 +1,52 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { assert, assertEquals } from "./test_util.ts";
 
-const cert = Deno.readTextFileSync("tests/testdata/tls/localhost.crt");
-const key = Deno.readTextFileSync("tests/testdata/tls/localhost.key");
-const caCerts = [Deno.readTextFileSync("tests/testdata/tls/RootCA.pem")];
+const cert = Oden.readTextFileSync("tests/testdata/tls/localhost.crt");
+const key = Oden.readTextFileSync("tests/testdata/tls/localhost.key");
+const caCerts = [Oden.readTextFileSync("tests/testdata/tls/RootCA.pem")];
 
 interface Pair {
-  server: Deno.QuicConn;
-  client: Deno.QuicConn;
-  endpoint: Deno.QuicEndpoint;
+  server: Oden.QuicConn;
+  client: Oden.QuicConn;
+  endpoint: Oden.QuicEndpoint;
 }
 
-function trackedStreamResourceCount(conn: Deno.QuicConn): number {
-  // @ts-ignore Deno.internal is available to the unit test suite.
-  return Deno[Deno.internal].getQuicStreamResourceCount(conn);
+function trackedStreamResourceCount(conn: Oden.QuicConn): number {
+  // @ts-ignore Oden.internal is available to the unit test suite.
+  return Oden[Oden.internal].getQuicStreamResourceCount(conn);
 }
 
-async function pair(opt?: Deno.QuicTransportOptions): Promise<Pair> {
-  const endpoint = new Deno.QuicEndpoint({ hostname: "localhost" });
+async function pair(opt?: Oden.QuicTransportOptions): Promise<Pair> {
+  const endpoint = new Oden.QuicEndpoint({ hostname: "localhost" });
   const listener = endpoint.listen({
     cert,
     key,
-    alpnProtocols: ["deno-test"],
+    alpnProtocols: ["oden-test"],
     ...opt,
   });
   assertEquals(endpoint, listener.endpoint);
 
   const [server, client] = await Promise.all([
     listener.accept(),
-    Deno.connectQuic({
+    Oden.connectQuic({
       hostname: "localhost",
       port: endpoint.addr.port,
       caCerts,
-      alpnProtocols: ["deno-test"],
+      alpnProtocols: ["oden-test"],
       ...opt,
     }),
   ]);
 
-  assertEquals(server.protocol, "deno-test");
-  assertEquals(client.protocol, "deno-test");
+  assertEquals(server.protocol, "oden-test");
+  assertEquals(client.protocol, "oden-test");
   assertEquals(client.remoteAddr, endpoint.addr);
   assertEquals(server.serverName, "localhost");
 
   return { server, client, endpoint };
 }
 
-Deno.test("bidirectional stream", async () => {
+Oden.test("bidirectional stream", async () => {
   const { server, client, endpoint } = await pair();
 
   const encoded = (new TextEncoder()).encode("hi!");
@@ -71,7 +71,7 @@ Deno.test("bidirectional stream", async () => {
   endpoint.close();
 });
 
-Deno.test("unidirectional stream", async () => {
+Oden.test("unidirectional stream", async () => {
   const { server, client, endpoint } = await pair();
 
   const encoded = (new TextEncoder()).encode("hi!");
@@ -96,7 +96,7 @@ Deno.test("unidirectional stream", async () => {
   client.close();
 });
 
-Deno.test("completed streams release connection cleanup state", async () => {
+Oden.test("completed streams release connection cleanup state", async () => {
   const { server, client, endpoint } = await pair();
 
   const bi = await server.createBidirectionalStream();
@@ -119,7 +119,7 @@ Deno.test("completed streams release connection cleanup state", async () => {
   endpoint.close();
 });
 
-Deno.test("datagrams", async () => {
+Oden.test("datagrams", async () => {
   const { server, client, endpoint } = await pair();
 
   const encoded = (new TextEncoder()).encode("hi!");
@@ -133,7 +133,7 @@ Deno.test("datagrams", async () => {
   client.close();
 });
 
-Deno.test("closing", async () => {
+Oden.test("closing", async () => {
   const { server, client } = await pair();
 
   server.close({ closeCode: 42, reason: "hi!" });
@@ -141,7 +141,7 @@ Deno.test("closing", async () => {
   assertEquals(await client.closed, { closeCode: 42, reason: "hi!" });
 });
 
-Deno.test("max concurrent streams", async () => {
+Oden.test("max concurrent streams", async () => {
   const { server, client, endpoint } = await pair({
     maxConcurrentBidirectionalStreams: 1,
     maxConcurrentUnidirectionalStreams: 1,
@@ -171,20 +171,20 @@ Deno.test("max concurrent streams", async () => {
   client.close();
 });
 
-Deno.test("incoming", async () => {
-  const endpoint = new Deno.QuicEndpoint({ hostname: "localhost" });
+Oden.test("incoming", async () => {
+  const endpoint = new Oden.QuicEndpoint({ hostname: "localhost" });
   const listener = endpoint.listen({
     cert,
     key,
-    alpnProtocols: ["deno-test"],
+    alpnProtocols: ["oden-test"],
   });
 
   const connect = () =>
-    Deno.connectQuic({
+    Oden.connectQuic({
       hostname: "localhost",
       port: endpoint.addr.port,
       caCerts,
-      alpnProtocols: ["deno-test"],
+      alpnProtocols: ["oden-test"],
     });
 
   const c1p = connect();
@@ -192,20 +192,20 @@ Deno.test("incoming", async () => {
   const server = await i1.accept();
   const client = await c1p;
 
-  assertEquals(server.protocol, "deno-test");
-  assertEquals(client.protocol, "deno-test");
+  assertEquals(server.protocol, "oden-test");
+  assertEquals(client.protocol, "oden-test");
   assertEquals(client.remoteAddr, endpoint.addr);
 
   endpoint.close();
   client.close();
 });
 
-Deno.test("0rtt", async () => {
-  const sEndpoint = new Deno.QuicEndpoint({ hostname: "localhost" });
+Oden.test("0rtt", async () => {
+  const sEndpoint = new Oden.QuicEndpoint({ hostname: "localhost" });
   const listener = sEndpoint.listen({
     cert,
     key,
-    alpnProtocols: ["deno-test"],
+    alpnProtocols: ["oden-test"],
   });
 
   (async () => {
@@ -214,7 +214,7 @@ Deno.test("0rtt", async () => {
       try {
         incoming = await listener.incoming();
       } catch (e) {
-        if (e instanceof Deno.errors.BadResource) {
+        if (e instanceof Oden.errors.BadResource) {
           break;
         }
         throw e;
@@ -226,23 +226,23 @@ Deno.test("0rtt", async () => {
     }
   })();
 
-  const endpoint = new Deno.QuicEndpoint();
+  const endpoint = new Oden.QuicEndpoint();
 
-  const c1 = await Deno.connectQuic({
+  const c1 = await Oden.connectQuic({
     hostname: "localhost",
     port: sEndpoint.addr.port,
     caCerts,
-    alpnProtocols: ["deno-test"],
+    alpnProtocols: ["oden-test"],
     endpoint,
   });
 
   await c1.closed;
 
-  const c2 = Deno.connectQuic({
+  const c2 = Oden.connectQuic({
     hostname: "localhost",
     port: sEndpoint.addr.port,
     caCerts,
-    alpnProtocols: ["deno-test"],
+    alpnProtocols: ["oden-test"],
     zeroRtt: true,
     endpoint,
   });

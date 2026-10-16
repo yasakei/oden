@@ -1,2 +1,2 @@
-import { setValue } from "@denotest/esm-basic";
+import { setValue } from "@odentest/esm-basic";
 setValue(5);

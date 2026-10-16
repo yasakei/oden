@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cell::RefCell;
@@ -10,15 +10,15 @@ use std::rc::Rc;
 use std::sync::Arc;
 use std::time::Duration;
 
-use deno_config::glob::FilePatterns;
-use deno_config::glob::PathOrPatternSet;
-use deno_core::error::AnyError;
-use deno_core::futures::FutureExt;
-use deno_core::parking_lot::Mutex;
-use deno_core::url::Url;
-use deno_lib::util::result::js_error_downcast_ref;
-use deno_runtime::fmt_errors::format_js_error;
-use deno_signals;
+use oden_config::glob::FilePatterns;
+use oden_config::glob::PathOrPatternSet;
+use oden_core::error::AnyError;
+use oden_core::futures::FutureExt;
+use oden_core::parking_lot::Mutex;
+use oden_core::url::Url;
+use oden_lib::util::result::js_error_downcast_ref;
+use oden_runtime::fmt_errors::format_js_error;
+use oden_signals;
 use log::info;
 use notify::Error as NotifyError;
 use notify::RecommendedWatcher;
@@ -165,7 +165,7 @@ pub struct WatcherCommunicatorOptions {
   pub banner: String,
 }
 
-/// An interface to interact with Deno's CLI file watcher.
+/// An interface to interact with Oden's CLI file watcher.
 #[derive(Debug)]
 pub struct WatcherCommunicator {
   /// Send a list of paths that should be watched for changes.
@@ -274,8 +274,8 @@ where
     WatcherRestartMode::Automatic,
     move |flags, communicator, changed_paths| {
       // Tools driven by `watch_func` have no meaningful per-run exit code, so
-      // report 0 to `watch_recv`. Only `deno run` / `deno serve` surface a
-      // real exit code (e.g. one set via `Deno.exit()`).
+      // report 0 to `watch_recv`. Only `oden run` / `oden serve` surface a
+      // real exit code (e.g. one set via `Oden.exit()`).
       let operation_future = operation(flags, communicator, changed_paths)?;
       Ok(async move { operation_future.await.map(|()| 0) })
     },
@@ -351,7 +351,7 @@ where
   let changed_paths_ = changed_paths.clone();
   let watcher_ = watcher_communicator.clone();
 
-  deno_core::unsync::spawn(async move {
+  oden_core::unsync::spawn(async move {
     loop {
       let received_changed_paths = watcher_receiver.recv().await;
       changed_paths_
@@ -372,9 +372,9 @@ where
     }
 
     // The previous iteration of the watched program may have changed the
-    // process's working directory (e.g. via `Deno.chdir()`). Restore it
+    // process's working directory (e.g. via `Oden.chdir()`). Restore it
     // before starting the next run so that module resolution, watched
-    // paths, and `Deno.cwd()` all behave as they did on the first run.
+    // paths, and `Oden.cwd()` all behave as they did on the first run.
     if let Some(initial_cwd) = &initial_cwd {
       let _ = std::env::set_current_dir(initial_cwd);
     }
@@ -428,7 +428,7 @@ where
       // (https://github.com/denoland/deno/issues/35824). This branch is
       // reached when a JS signal listener prevented the default behavior,
       // in which case we shut down gracefully below.
-      _ = deno_signals::ctrl_c_allow_default() => {
+      _ = oden_signals::ctrl_c_allow_default() => {
         // Dispatch SIGINT (matching what Ctrl+C normally sends) and
         // SIGTERM to give JS code a chance for async cleanup. Some
         // libraries only listen for SIGINT, others for SIGTERM.
@@ -438,8 +438,8 @@ where
         //
         // Use bitwise OR (not `||`) to ensure both signals are always
         // raised regardless of whether the first one has handlers.
-        let has_handlers = deno_signals::raise(deno_signals::SIGINT)
-          | deno_signals::raise(deno_signals::SIGTERM);
+        let has_handlers = oden_signals::raise(oden_signals::SIGINT)
+          | oden_signals::raise(oden_signals::SIGTERM);
         if has_handlers {
           info!(
             "{} Waiting for graceful termination...",
@@ -457,7 +457,7 @@ where
         // Dispatch SIGTERM to give JS code a chance for async cleanup
         // before restarting. If handlers are registered, wait for the
         // operation to finish gracefully before restarting.
-        if deno_signals::raise(deno_signals::SIGTERM) {
+        if oden_signals::raise(oden_signals::SIGTERM) {
           info!(
             "{} Waiting for graceful termination...",
             colors::intense_blue(banner),
@@ -468,7 +468,7 @@ where
           )
           .await;
         }
-        deno_runtime::deno_inspector_server::notify_restart();
+        oden_runtime::oden_inspector_server::notify_restart();
         print_after_restart();
         continue;
       },
@@ -501,11 +501,11 @@ where
     // watched paths has changed.
     select! {
       _ = receiver_future => {},
-      _ = deno_signals::ctrl_c_allow_default() => {
+      _ = oden_signals::ctrl_c_allow_default() => {
         return Ok(());
       },
       _ = restart_rx.recv() => {
-        deno_runtime::deno_inspector_server::notify_restart();
+        oden_runtime::oden_inspector_server::notify_restart();
         print_after_restart();
         continue;
       },

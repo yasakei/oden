@@ -1,1 +1,1 @@
-console.log(await Deno.readTextFile(Deno.args[0]));
+console.log(await Oden.readTextFile(Oden.args[0]));

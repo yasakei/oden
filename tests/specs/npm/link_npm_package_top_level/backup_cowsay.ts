@@ -1,8 +1,8 @@
 try {
-  Deno.removeSync("./cowsay_backup", { recursive: true });
+  Oden.removeSync("./cowsay_backup", { recursive: true });
 } catch {}
 try {
-  Deno.mkdirSync("./cowsay_backup");
+  Oden.mkdirSync("./cowsay_backup");
 } catch {}
-Deno.copyFileSync("./cowsay/main.mjs", "./cowsay_backup/main.mjs");
-Deno.copyFileSync("./cowsay/package.json", "./cowsay_backup/package.json");
+Oden.copyFileSync("./cowsay/main.mjs", "./cowsay_backup/main.mjs");
+Oden.copyFileSync("./cowsay/package.json", "./cowsay_backup/package.json");

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::RefCell;
 use std::net::IpAddr;
@@ -7,13 +7,13 @@ use std::rc::Rc;
 #[cfg(target_family = "windows")]
 use std::sync::OnceLock;
 
-use deno_core::OpState;
-use deno_core::op2;
-use deno_core::unsync::spawn_blocking;
+use oden_core::OpState;
+use oden_core::op2;
+use oden_core::unsync::spawn_blocking;
 use deno_error::JsError;
-use deno_net::ops::NetPermToken;
-use deno_permissions::PermissionCheckError;
-use deno_permissions::PermissionsContainer;
+use oden_net::ops::NetPermToken;
+use oden_permissions::PermissionCheckError;
+use oden_permissions::PermissionsContainer;
 use socket2::SockAddr;
 
 #[derive(Debug, thiserror::Error, JsError)]

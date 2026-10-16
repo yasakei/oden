@@ -1,5 +1,5 @@
 try {
-  new Deno.Command("curl", {
+  new Oden.Command("curl", {
     env: {
       "LD_PRELOAD": "./libpreload.so",
     },
@@ -9,7 +9,7 @@ try {
 }
 
 try {
-  Deno.run({
+  Oden.run({
     cmd: ["curl"],
     env: {
       "LD_PRELOAD": "./libpreload.so",

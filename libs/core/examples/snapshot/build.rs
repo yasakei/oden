@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![allow(clippy::disallowed_methods, reason = "build script")]
 
@@ -6,9 +6,9 @@ use std::env;
 use std::fs;
 use std::path::PathBuf;
 
-use deno_core::extension;
-use deno_core::snapshot::CreateSnapshotOptions;
-use deno_core::snapshot::create_snapshot;
+use oden_core::extension;
+use oden_core::snapshot::CreateSnapshotOptions;
+use oden_core::snapshot::create_snapshot;
 
 fn main() {
   extension!(

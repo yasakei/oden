@@ -1,13 +1,13 @@
 {
   "typescript": {
-    "deno": true,
+    "oden": true,
     "functionExpression.flatIife": true
   },
   "markdown": {
-    "deno": true
+    "oden": true
   },
   "json": {
-    "deno": true
+    "oden": true
   },
   "yaml": {
     "quotes": "preferSingle"

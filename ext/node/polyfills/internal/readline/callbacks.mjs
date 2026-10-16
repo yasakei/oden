@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -30,14 +30,14 @@ const {
 const {
   ERR_INVALID_ARG_VALUE,
   ERR_INVALID_CURSOR_POS,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
 
 const { validateFunction } = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
 
 const { CSI } = core.loadExtScript(
-  "ext:deno_node/internal/readline/utils.mjs",
+  "ext:oden_node/internal/readline/utils.mjs",
 );
 
 const {

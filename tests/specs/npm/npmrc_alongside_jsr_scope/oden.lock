@@ -1,0 +1,17 @@
+{
+  "version": "5",
+  "specifiers": {
+    "npm:@odentest/basic@*": "1.0.0",
+    "npm:@jsr/odentest__add@*": "1.0.0"
+  },
+  "npm": {
+    "@odentest/basic@1.0.0": {
+      "integrity": "sha512-6LgHpDE2Kc2u8XDxSemP954yHF/vnGcKEjid1o7+8ilTOGv6yu6vXVmBu8WDRoIn42HsGq4FBmWlzlSg+flm5Q==",
+      "tarball": "http://localhost:4261/@odentest/basic/1.0.0.tgz"
+    },
+    "@jsr/odentest__add@1.0.0": {
+      "integrity": "sha512-dGbW0UBTLXIpQiOx/Vjw+7EIMBBBuvOpjXufQiHBem/dmtdtEY7uK/v6U65dZkwR8CcDEAowtb2pG5GG1yCV5Q==",
+      "tarball": "http://localhost:4269/@jsr/odentest__add/1.0.0.tgz"
+    }
+  }
+}

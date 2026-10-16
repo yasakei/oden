@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use proc_macro2::Ident;
 use proc_macro2::TokenStream;
@@ -70,12 +70,12 @@ pub struct GeneratorState {
 /// Quotes a set of generator_state fields, along with variables captured from
 /// the local environment.
 ///
-/// Example: this will extract `deno_core`, `info` and `scope` from `generator_state`
+/// Example: this will extract `oden_core`, `info` and `scope` from `generator_state`
 /// before invoking the [`quote!`] macro.
 ///
 /// ```nocompile
 ///  gs_quote!(generator_state(info, scope) =>
-///    (let mut #scope = unsafe { deno_core::v8::CallbackScope::new(&*#info) };)
+///    (let mut #scope = unsafe { oden_core::v8::CallbackScope::new(&*#info) };)
 ///  )
 /// ```
 macro_rules! gs_quote {
@@ -93,10 +93,10 @@ macro_rules! gs_quote {
 ///
 /// Example:
 ///
-/// Extracts `deno_core` from `generator_state` into a local variable. Equivalent to `let deno_core = &generator_state.deno_core`.
+/// Extracts `oden_core` from `generator_state` into a local variable. Equivalent to `let oden_core = &generator_state.oden_core`.
 ///
 /// ```nocompile
-/// gs_extract!(generator_state(deno_core))
+/// gs_extract!(generator_state(oden_core))
 /// ```
 macro_rules! gs_extract {
   ($generator_state:ident( $($idents:ident),* )) => {

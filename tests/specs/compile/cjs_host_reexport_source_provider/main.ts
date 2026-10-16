@@ -1,9 +1,9 @@
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
-const mode = Deno.args[0];
+const mode = Oden.args[0];
 const specifier = pathToFileURL(
-  join(Deno.cwd(), "allowed", `${mode}.cjs`),
+  join(Oden.cwd(), "allowed", `${mode}.cjs`),
 ).href;
 
 try {
@@ -12,7 +12,7 @@ try {
     console.log(module.value);
   } else {
     console.log("unexpected result");
-    Deno.exit(1);
+    Oden.exit(1);
   }
 } catch (err) {
   const message = err instanceof Error
@@ -21,11 +21,11 @@ try {
   if (
     mode === "denied" &&
     message.includes("Requires read access") &&
-    !message.includes("DENO_STANDALONE_CJS_SOURCE_CANARY")
+    !message.includes("ODEN_STANDALONE_CJS_SOURCE_CANARY")
   ) {
     console.log("blocked");
   } else {
     console.log("unexpected error");
-    Deno.exit(1);
+    Oden.exit(1);
   }
 }

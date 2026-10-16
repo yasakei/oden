@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import {
   assert,
@@ -44,7 +44,7 @@ const variants = [
 ] as const;
 
 for (const [name, pubLen, _privLen, sigLen] of variants) {
-  Deno.test(`webcrypto ${name} generate/sign/verify`, async () => {
+  Oden.test(`webcrypto ${name} generate/sign/verify`, async () => {
     const { publicKey, privateKey } = await crypto.subtle.generateKey(
       { name } as AnyAlg,
       true,
@@ -92,7 +92,7 @@ for (const [name, pubLen, _privLen, sigLen] of variants) {
     assert(!ok2);
   });
 
-  Deno.test(`webcrypto ${name} sign with empty context`, async () => {
+  Oden.test(`webcrypto ${name} sign with empty context`, async () => {
     const { publicKey, privateKey } = await crypto.subtle.generateKey(
       { name } as AnyAlg,
       true,
@@ -114,7 +114,7 @@ for (const [name, pubLen, _privLen, sigLen] of variants) {
     assert(ok);
   });
 
-  Deno.test(`webcrypto ${name} non-empty context unsupported`, async () => {
+  Oden.test(`webcrypto ${name} non-empty context unsupported`, async () => {
     const { privateKey } = await crypto.subtle.generateKey(
       { name } as AnyAlg,
       true,
@@ -133,7 +133,7 @@ for (const [name, pubLen, _privLen, sigLen] of variants) {
     );
   });
 
-  Deno.test(`webcrypto ${name} export raw-public / raw-seed`, async () => {
+  Oden.test(`webcrypto ${name} export raw-public / raw-seed`, async () => {
     const { publicKey, privateKey } = await crypto.subtle.generateKey(
       { name } as AnyAlg,
       true,
@@ -147,7 +147,7 @@ for (const [name, pubLen, _privLen, sigLen] of variants) {
     assertEquals(rawSeed.byteLength, 32);
   });
 
-  Deno.test(`webcrypto ${name} import raw-seed round-trip`, async () => {
+  Oden.test(`webcrypto ${name} import raw-seed round-trip`, async () => {
     const seed = new Uint8Array(32);
     crypto.getRandomValues(seed);
 
@@ -173,7 +173,7 @@ for (const [name, pubLen, _privLen, sigLen] of variants) {
     assertEquals(seed1, seed);
   });
 
-  Deno.test(`webcrypto ${name} pkcs8/spki round-trip + sign/verify`, async () => {
+  Oden.test(`webcrypto ${name} pkcs8/spki round-trip + sign/verify`, async () => {
     const orig = await crypto.subtle.generateKey(
       { name } as AnyAlg,
       true,
@@ -192,7 +192,7 @@ for (const [name, pubLen, _privLen, sigLen] of variants) {
     assert(ok);
   });
 
-  Deno.test(`webcrypto ${name} jwk round-trip + sign/verify`, async () => {
+  Oden.test(`webcrypto ${name} jwk round-trip + sign/verify`, async () => {
     const orig = await crypto.subtle.generateKey(
       { name } as AnyAlg,
       true,
@@ -243,7 +243,7 @@ for (const [name, pubLen, _privLen, sigLen] of variants) {
     assertEquals(privJwk2.pub, privJwk.pub);
   });
 
-  Deno.test(`webcrypto ${name} jwk import rejects mismatched pub`, async () => {
+  Oden.test(`webcrypto ${name} jwk import rejects mismatched pub`, async () => {
     const orig = await crypto.subtle.generateKey(
       { name } as AnyAlg,
       true,
@@ -273,7 +273,7 @@ for (const [name, pubLen, _privLen, sigLen] of variants) {
     );
   });
 
-  Deno.test(`webcrypto ${name} getPublicKey() returns matching public key`, async () => {
+  Oden.test(`webcrypto ${name} getPublicKey() returns matching public key`, async () => {
     const { publicKey, privateKey } = await crypto.subtle.generateKey(
       { name } as AnyAlg,
       true,
@@ -303,7 +303,7 @@ for (const [name, pubLen, _privLen, sigLen] of variants) {
     );
   });
 
-  Deno.test(`webcrypto ${name} getPublicKey() rejects invalid input`, async () => {
+  Oden.test(`webcrypto ${name} getPublicKey() rejects invalid input`, async () => {
     const { publicKey, privateKey } = await crypto.subtle.generateKey(
       { name } as AnyAlg,
       true,
@@ -321,7 +321,7 @@ for (const [name, pubLen, _privLen, sigLen] of variants) {
     );
   });
 
-  Deno.test(`webcrypto ${name} signatures are non-deterministic`, async () => {
+  Oden.test(`webcrypto ${name} signatures are non-deterministic`, async () => {
     const { privateKey } = await crypto.subtle.generateKey(
       { name } as AnyAlg,
       true,
@@ -340,7 +340,7 @@ for (const [name, pubLen, _privLen, sigLen] of variants) {
   });
 }
 
-Deno.test("webcrypto ML-DSA rejects invalid key usages", async () => {
+Oden.test("webcrypto ML-DSA rejects invalid key usages", async () => {
   await assertRejects(
     async () => {
       await crypto.subtle.generateKey(
@@ -353,7 +353,7 @@ Deno.test("webcrypto ML-DSA rejects invalid key usages", async () => {
   );
 });
 
-Deno.test("webcrypto ML-DSA import raw-seed rejects wrong length", async () => {
+Oden.test("webcrypto ML-DSA import raw-seed rejects wrong length", async () => {
   await assertRejects(
     async () => {
       await importKey(
@@ -368,7 +368,7 @@ Deno.test("webcrypto ML-DSA import raw-seed rejects wrong length", async () => {
   );
 });
 
-Deno.test("webcrypto ML-DSA import raw-public rejects wrong length", async () => {
+Oden.test("webcrypto ML-DSA import raw-public rejects wrong length", async () => {
   await assertRejects(
     async () => {
       await importKey(
@@ -383,7 +383,7 @@ Deno.test("webcrypto ML-DSA import raw-public rejects wrong length", async () =>
   );
 });
 
-Deno.test("webcrypto ML-DSA spki round-trips for all variants", async () => {
+Oden.test("webcrypto ML-DSA spki round-trips for all variants", async () => {
   for (const name of ["ML-DSA-44", "ML-DSA-65", "ML-DSA-87"]) {
     const { publicKey } = await crypto.subtle.generateKey(
       { name } as AnyAlg,
@@ -396,7 +396,7 @@ Deno.test("webcrypto ML-DSA spki round-trips for all variants", async () => {
   }
 });
 
-Deno.test("webcrypto ML-DSA jwk import rejects wrong kty", async () => {
+Oden.test("webcrypto ML-DSA jwk import rejects wrong kty", async () => {
   const { publicKey } = await crypto.subtle.generateKey(
     { name: "ML-DSA-65" } as AnyAlg,
     true,
@@ -413,7 +413,7 @@ Deno.test("webcrypto ML-DSA jwk import rejects wrong kty", async () => {
   );
 });
 
-Deno.test("webcrypto ML-DSA jwk import rejects mismatched alg", async () => {
+Oden.test("webcrypto ML-DSA jwk import rejects mismatched alg", async () => {
   const { publicKey } = await crypto.subtle.generateKey(
     { name: "ML-DSA-65" } as AnyAlg,
     true,
@@ -430,7 +430,7 @@ Deno.test("webcrypto ML-DSA jwk import rejects mismatched alg", async () => {
   );
 });
 
-Deno.test("webcrypto ML-DSA jwk import rejects bad private usage", async () => {
+Oden.test("webcrypto ML-DSA jwk import rejects bad private usage", async () => {
   const orig = await crypto.subtle.generateKey(
     { name: "ML-DSA-65" } as AnyAlg,
     true,

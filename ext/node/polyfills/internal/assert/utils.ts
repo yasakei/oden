@@ -1,27 +1,27 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Node.js contributors. All rights reserved. MIT License.
 
 // deno-lint-ignore-file ban-types
 (function () {
 const { core, primordials } = __bootstrap;
 const { AssertionError } = core.loadExtScript(
-  "ext:deno_node/internal/assert/assertion_error.js",
+  "ext:oden_node/internal/assert/assertion_error.js",
 );
-const { isError } = core.loadExtScript("ext:deno_node/internal/util.mjs");
+const { isError } = core.loadExtScript("ext:oden_node/internal/util.mjs");
 const {
   ERR_AMBIGUOUS_ARGUMENT,
   ERR_INVALID_ARG_TYPE,
   isErrorStackTraceLimitWritable,
 } = core.loadExtScript(
-  "ext:deno_node/internal/errors.ts",
+  "ext:oden_node/internal/errors.ts",
 );
 const { format } = core.loadExtScript(
-  "ext:deno_node/internal/util/inspect.mjs",
+  "ext:oden_node/internal/util/inspect.mjs",
 );
 const {
   getErrorSourceExpression,
 } = core.loadExtScript(
-  "ext:deno_node/internal/errors/error_source.ts",
+  "ext:oden_node/internal/errors/error_source.ts",
 );
 
 const {
@@ -77,18 +77,18 @@ const meta = [
 const escapeFn = (str: string) => meta[StringPrototypeCharCodeAt(str, 0)];
 
 function getErrMessage(fn: Function) {
-  // deno-lint-ignore deno-internal/prefer-primordials
+  // deno-lint-ignore oden-internal/prefer-primordials
   const tmpLimit = Error.stackTraceLimit;
   const errorStackTraceLimitIsWritable = isErrorStackTraceLimitWritable();
   // Make sure the limit is set to 1. Otherwise it could fail (<= 0) or it
   // does too much work.
-  // deno-lint-ignore deno-internal/prefer-primordials
+  // deno-lint-ignore oden-internal/prefer-primordials
   if (errorStackTraceLimitIsWritable) Error.stackTraceLimit = 1;
   // We only need the stack trace. To minimize the overhead use an object
   // instead of an error.
   const err = {};
   ErrorCaptureStackTrace(err, fn);
-  // deno-lint-ignore deno-internal/prefer-primordials
+  // deno-lint-ignore oden-internal/prefer-primordials
   if (errorStackTraceLimitIsWritable) Error.stackTraceLimit = tmpLimit;
 
   let source = getErrorSourceExpression(err as Error);

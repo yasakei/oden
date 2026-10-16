@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::hash::Hasher;
 
@@ -7,13 +7,13 @@ use std::hash::Hasher;
 pub struct FastInsecureHasher(twox_hash::XxHash64);
 
 impl FastInsecureHasher {
-  pub fn new_without_deno_version() -> Self {
+  pub fn new_without_oden_version() -> Self {
     Self(Default::default())
   }
 
-  pub fn new_deno_versioned() -> Self {
-    let mut hasher = Self::new_without_deno_version();
-    hasher.write_str(crate::version::DENO_VERSION_INFO.deno);
+  pub fn new_oden_versioned() -> Self {
+    let mut hasher = Self::new_without_oden_version();
+    hasher.write_str(crate::version::ODEN_VERSION_INFO.oden);
     hasher
   }
 

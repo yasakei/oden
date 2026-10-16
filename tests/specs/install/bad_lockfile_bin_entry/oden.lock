@@ -1,0 +1,18 @@
+{
+  "version": "5",
+  "specifiers": {
+    "npm:@odentest/add@1": "1.0.0"
+  },
+  "npm": {
+    "@odentest/add@1.0.0": {
+      "integrity": "sha512-uvNpnVPU/CC2Do/LNF3TkhoLGLLKC6jFDPiSnojuZCEwmoXJjS2+Sn+LYk7eUix4vsMKA9ctxaMhcfb6pdHQTQ==",
+      "tarball": "http://localhost:4260/@odentest/add/1.0.0.tgz",
+      "bin": true
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "npm:@odentest/add@1"
+    ]
+  }
+}

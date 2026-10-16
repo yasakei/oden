@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // deno-lint-ignore-file
 
@@ -19,7 +19,7 @@ import {
   op_require_break_on_next_statement,
   op_require_can_parse_as_esm,
   op_require_init_paths,
-  op_require_is_deno_dir_package,
+  op_require_is_oden_dir_package,
   op_require_is_maybe_cjs,
   op_require_is_request_relative,
   op_require_node_module_paths,
@@ -32,7 +32,7 @@ import {
   op_require_read_file,
   op_require_read_package_scope,
   op_require_real_path,
-  op_require_resolve_deno_dir,
+  op_require_resolve_oden_dir,
   op_require_resolve_exports,
   op_require_resolve_lookup_paths,
   op_require_stat,
@@ -97,7 +97,7 @@ const _httpServer = core.createLazyLoader("node:_http_server");
 // node:stream) into the snapshot.
 const assertStrict = core.createLazyLoader("node:assert/strict");
 const internalAsyncHooks = core.loadExtScript(
-  "ext:deno_node/internal/async_hooks.ts",
+  "ext:oden_node/internal/async_hooks.ts",
 );
 const {
   emitAfter: internalAsyncHooksEmitAfter,
@@ -105,7 +105,7 @@ const {
   emitDestroy: internalAsyncHooksEmitDestroy,
   emitInit: internalAsyncHooksEmitInit,
 } = internalAsyncHooks;
-const buffer = core.loadExtScript("ext:deno_node/internal/buffer.mjs").default;
+const buffer = core.loadExtScript("ext:oden_node/internal/buffer.mjs").default;
 // child_process, crypto, dgram are lazy-loaded via `lazyNodeModules` below.
 // Their scripts use `createLazyLoader(...)()` patterns to extend classes
 // from `node:stream`/`node:net`/etc. at module body time, which pulls the
@@ -117,8 +117,8 @@ const buffer = core.loadExtScript("ext:deno_node/internal/buffer.mjs").default;
 // `nodeClusterUniqueId` is set (see `__initCluster` below).
 import console from "node:console";
 const diagnosticsChannel =
-  core.loadExtScript("ext:deno_node/diagnostics_channel.js").default;
-const events = core.loadExtScript("ext:deno_node/_events.mjs").default;
+  core.loadExtScript("ext:oden_node/diagnostics_channel.js").default;
+const events = core.loadExtScript("ext:oden_node/_events.mjs").default;
 // fs/promises is lazy-loaded via `lazyNodeModules` below: its script body
 // does `createLazyLoader("node:fs")()` which loads `node:fs` (fs_esm.ts),
 // whose body in turn reads the lazy createReadStream/Utf8Stream getters
@@ -127,7 +127,7 @@ const events = core.loadExtScript("ext:deno_node/_events.mjs").default;
 // http/http2/https are lazy-loaded via `lazyNodeModules` below: their script
 // bodies eagerly chain into the entire node:_http_* / node:net / node:stream
 // graph, so running them at snapshot time defeats lazifying _http_*.
-// internal/child_process pulls deno_process/40_process.js -> 22_body
+// internal/child_process pulls oden_process/40_process.js -> 22_body
 // -> 06_streams (208 KB). Lazy-loaded via lazyNodeModules.
 // internal/assert/myers_diff, the whole internal/crypto/* family,
 // internal/dgram, internal/deps/undici/undici and internal/dns/promises are
@@ -135,20 +135,20 @@ const events = core.loadExtScript("ext:deno_node/_events.mjs").default;
 // they only exist to be handed out by `require()` - so evaluating them at
 // `node:module` init just made every CJS entry point pay their parse/compile
 // cost up front.
-const internalBuffer = core.loadExtScript("ext:deno_node/internal/buffer.mjs");
-const internalErrors = core.loadExtScript("ext:deno_node/internal/errors.ts");
+const internalBuffer = core.loadExtScript("ext:oden_node/internal/buffer.mjs");
+const internalErrors = core.loadExtScript("ext:oden_node/internal/errors.ts");
 const internalEventTarget = core.createLazyLoader(
-  "ext:deno_node/internal/event_target.mjs",
+  "ext:oden_node/internal/event_target.mjs",
 );
 const internalFsUtils = core.createLazyLoader(
-  "ext:deno_node/internal/fs/utils.mjs",
+  "ext:oden_node/internal/fs/utils.mjs",
 );
 // `internal/fs/promises.ts` evaluates `lazyFs()` at top-level, so triggering
 // its load during `setupBuiltinModules()` would re-enter the half-built
 // `node:fs` namespace. A Proxy defers evaluation until the first time the
 // requiring code reads a property; by then `node:fs` is fully initialized.
 const lazyInternalFsPromises = core.createLazyLoader(
-  "ext:deno_node/internal/fs/promises.ts",
+  "ext:oden_node/internal/fs/promises.ts",
 );
 let internalFsPromisesCache;
 const internalFsPromisesProxy = new Proxy(ObjectCreate(null), {
@@ -169,20 +169,20 @@ const internalFsPromisesProxy = new Proxy(ObjectCreate(null), {
 // internal/url are lazy-loaded via `lazyNodeModules` below - see the note
 // above the crypto family.
 const internalStreamsLazyTransform = core.createLazyLoader(
-  "ext:deno_node/internal/streams/lazy_transform.js",
+  "ext:oden_node/internal/streams/lazy_transform.js",
 );
-const internalUtil = core.loadExtScript("ext:deno_node/internal/util.mjs");
+const internalUtil = core.loadExtScript("ext:oden_node/internal/util.mjs");
 const internalUtilDebuglog = core.loadExtScript(
-  "ext:deno_node/internal/util/debuglog.ts",
+  "ext:oden_node/internal/util/debuglog.ts",
 );
 const internalUtilInspect = core.loadExtScript(
-  "ext:deno_node/internal/util/inspect.mjs",
+  "ext:oden_node/internal/util/inspect.mjs",
 );
 const internalValidators = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
 const internalConsole = core.loadExtScript(
-  "ext:deno_node/internal/console/constructor.mjs",
+  "ext:oden_node/internal/console/constructor.mjs",
 ).default;
 // os, punycode, string_decoder, timers, timers/promises, util/types and vm are
 // lazy via `lazyNodeModules` below - see the note above the crypto family.
@@ -208,27 +208,27 @@ const readline = core.createLazyLoader("node:readline");
 const readlinePromises = core.createLazyLoader("node:readline/promises");
 const repl = core.createLazyLoader("node:repl");
 const internalRepl = core.createLazyLoader(
-  "ext:deno_node/internal/repl.ts",
+  "ext:oden_node/internal/repl.ts",
 );
 // node:stream / node:net / node:tty and friends are lazy (see process.ts:
 // process.stdout/stderr/stdin are lazy getters now, so nothing forces the
 // stream/net/tty closure into the snapshot). stream/web pulls
-// ext:deno_web/14_compression.js -> 06_streams (208 KB) too.
+// ext:oden_web/14_compression.js -> 06_streams (208 KB) too.
 const tls = core.createLazyLoader("node:tls");
-const url = core.loadExtScript("ext:deno_node/url.ts");
-const util = core.loadExtScript("ext:deno_node/util.ts");
+const url = core.loadExtScript("ext:oden_node/url.ts");
+const util = core.loadExtScript("ext:oden_node/util.ts");
 // worker_threads must stay eager: it registers `internals.__initWorkerThreads`
 // / `internals.__isWorkerThread`, which the node process bootstrap calls
 // (`__initWorkerThreads` at startup). It also statically imports node:vm, so
 // vm stays in the snapshot regardless.
 const workerThreads = core.loadExtScript(
-  "ext:deno_node/worker_threads.ts",
+  "ext:oden_node/worker_threads.ts",
 );
 // zlib is lazy-loaded via `lazyNodeModules` below: zlib.js extends
 // `Transform` from `node:stream` at module body, so loading it eagerly
 // pulls the stream subtree into the snapshot.
 const internalOptions = core.loadExtScript(
-  "ext:deno_node/internal/options.ts",
+  "ext:oden_node/internal/options.ts",
 );
 const { getOptionValue } = internalOptions;
 
@@ -247,130 +247,130 @@ const lazyNodeModules = {
   // handed back by `require()`. Evaluating them at `node:module` init made
   // every CJS entry point (and anything that pulls in `require`) compile them
   // whether or not the program ever touches them.
-  "assert": () => core.loadExtScript("ext:deno_node/assert.ts").default,
+  "assert": () => core.loadExtScript("ext:oden_node/assert.ts").default,
   "async_hooks": () =>
-    core.loadExtScript("ext:deno_node/async_hooks.ts").default,
-  "cluster": () => core.loadExtScript("ext:deno_node/cluster.ts").default,
-  "constants": () => core.loadExtScript("ext:deno_node/constants.ts").default,
-  "dns": () => core.loadExtScript("ext:deno_node/dns.ts").default,
+    core.loadExtScript("ext:oden_node/async_hooks.ts").default,
+  "cluster": () => core.loadExtScript("ext:oden_node/cluster.ts").default,
+  "constants": () => core.loadExtScript("ext:oden_node/constants.ts").default,
+  "dns": () => core.loadExtScript("ext:oden_node/dns.ts").default,
   "dns/promises": () =>
-    core.loadExtScript("ext:deno_node/dns/promises.ts").default,
-  "domain": () => core.loadExtScript("ext:deno_node/domain.ts").default,
-  "fs": () => core.loadExtScript("ext:deno_node/fs.ts"),
-  "os": () => core.loadExtScript("ext:deno_node/os.ts").default,
-  "punycode": () => core.loadExtScript("ext:deno_node/punycode.ts").default,
+    core.loadExtScript("ext:oden_node/dns/promises.ts").default,
+  "domain": () => core.loadExtScript("ext:oden_node/domain.ts").default,
+  "fs": () => core.loadExtScript("ext:oden_node/fs.ts"),
+  "os": () => core.loadExtScript("ext:oden_node/os.ts").default,
+  "punycode": () => core.loadExtScript("ext:oden_node/punycode.ts").default,
   "string_decoder": () =>
-    core.loadExtScript("ext:deno_node/string_decoder.ts").default,
-  "timers": () => core.loadExtScript("ext:deno_node/timers.ts"),
+    core.loadExtScript("ext:oden_node/string_decoder.ts").default,
+  "timers": () => core.loadExtScript("ext:oden_node/timers.ts"),
   "timers/promises": () =>
-    core.loadExtScript("ext:deno_node/timers/promises.ts"),
+    core.loadExtScript("ext:oden_node/timers/promises.ts"),
   "util/types": () =>
-    core.loadExtScript("ext:deno_node/internal/util/types.ts"),
-  "vm": () => core.loadExtScript("ext:deno_node/vm.js").default,
+    core.loadExtScript("ext:oden_node/internal/util/types.ts"),
+  "vm": () => core.loadExtScript("ext:oden_node/vm.js").default,
   "internal/assert/myers_diff": () =>
-    core.loadExtScript("ext:deno_node/internal/assert/myers_diff.js").default,
+    core.loadExtScript("ext:oden_node/internal/assert/myers_diff.js").default,
   "internal/crypto/certificate": () =>
-    core.loadExtScript("ext:deno_node/internal/crypto/certificate.ts").default,
+    core.loadExtScript("ext:oden_node/internal/crypto/certificate.ts").default,
   "internal/crypto/diffiehellman": () =>
-    core.loadExtScript("ext:deno_node/internal/crypto/diffiehellman.ts")
+    core.loadExtScript("ext:oden_node/internal/crypto/diffiehellman.ts")
       .default,
   "internal/crypto/hash": () =>
-    core.loadExtScript("ext:deno_node/internal/crypto/hash.ts").default,
+    core.loadExtScript("ext:oden_node/internal/crypto/hash.ts").default,
   "internal/crypto/hkdf": () =>
-    core.loadExtScript("ext:deno_node/internal/crypto/hkdf.ts").default,
+    core.loadExtScript("ext:oden_node/internal/crypto/hkdf.ts").default,
   "internal/crypto/keygen": () =>
-    core.loadExtScript("ext:deno_node/internal/crypto/keygen.ts").default,
+    core.loadExtScript("ext:oden_node/internal/crypto/keygen.ts").default,
   "internal/crypto/keys": () =>
-    core.loadExtScript("ext:deno_node/internal/crypto/keys.ts").default,
+    core.loadExtScript("ext:oden_node/internal/crypto/keys.ts").default,
   "internal/crypto/pbkdf2": () =>
-    core.loadExtScript("ext:deno_node/internal/crypto/pbkdf2.ts").default,
+    core.loadExtScript("ext:oden_node/internal/crypto/pbkdf2.ts").default,
   "internal/crypto/random": () =>
-    core.loadExtScript("ext:deno_node/internal/crypto/random.ts").default,
+    core.loadExtScript("ext:oden_node/internal/crypto/random.ts").default,
   "internal/crypto/scrypt": () =>
-    core.loadExtScript("ext:deno_node/internal/crypto/scrypt.ts").default,
+    core.loadExtScript("ext:oden_node/internal/crypto/scrypt.ts").default,
   "internal/crypto/sig": () =>
-    core.loadExtScript("ext:deno_node/internal/crypto/sig.ts").default,
+    core.loadExtScript("ext:oden_node/internal/crypto/sig.ts").default,
   "internal/crypto/util": () =>
-    core.loadExtScript("ext:deno_node/internal/crypto/util.ts").default,
+    core.loadExtScript("ext:oden_node/internal/crypto/util.ts").default,
   "internal/crypto/x509": () =>
-    core.loadExtScript("ext:deno_node/internal/crypto/x509.ts").default,
+    core.loadExtScript("ext:oden_node/internal/crypto/x509.ts").default,
   "internal/dgram": () =>
-    core.loadExtScript("ext:deno_node/internal/dgram.ts").default,
+    core.loadExtScript("ext:oden_node/internal/dgram.ts").default,
   "internal/deps/undici/undici": () =>
-    core.loadExtScript("ext:deno_node/internal/deps/undici/undici.js").default,
+    core.loadExtScript("ext:oden_node/internal/deps/undici/undici.js").default,
   "internal/dns/promises": () =>
-    core.loadExtScript("ext:deno_node/internal/dns/promises.ts").default,
+    core.loadExtScript("ext:oden_node/internal/dns/promises.ts").default,
   "internal/priority_queue": () =>
-    core.loadExtScript("ext:deno_node/internal/priority_queue.ts").default,
+    core.loadExtScript("ext:oden_node/internal/priority_queue.ts").default,
   "internal/readline/utils": () =>
-    core.loadExtScript("ext:deno_node/internal/readline/utils.mjs").default,
+    core.loadExtScript("ext:oden_node/internal/readline/utils.mjs").default,
   "internal/streams/add-abort-signal": () =>
-    core.loadExtScript("ext:deno_node/internal/streams/add-abort-signal.js")
+    core.loadExtScript("ext:oden_node/internal/streams/add-abort-signal.js")
       .default,
   "internal/streams/state": () =>
-    core.loadExtScript("ext:deno_node/internal/streams/state.js").default,
+    core.loadExtScript("ext:oden_node/internal/streams/state.js").default,
   "internal/socketaddress": () =>
-    core.loadExtScript("ext:deno_node/internal/socketaddress.js"),
+    core.loadExtScript("ext:oden_node/internal/socketaddress.js"),
   "internal/test/binding": () =>
-    core.loadExtScript("ext:deno_node/internal/test/binding.ts"),
+    core.loadExtScript("ext:oden_node/internal/test/binding.ts"),
   "internal/timers": () =>
-    core.loadExtScript("ext:deno_node/internal/timers.mjs"),
-  "internal/url": () => core.loadExtScript("ext:deno_node/internal/url.ts"),
-  // Lazy so the WHATWG-streams adapter graph (stream/web -> deno_web
+    core.loadExtScript("ext:oden_node/internal/timers.mjs"),
+  "internal/url": () => core.loadExtScript("ext:oden_node/internal/url.ts"),
+  // Lazy so the WHATWG-streams adapter graph (stream/web -> oden_web
   // 06_streams, ~1.8MB of snapshot heap) is only loaded when something
   // actually requires these internals, not eagerly at node:module init.
   "internal/worker/js_transferable": () =>
-    core.loadExtScript("ext:deno_node/internal/worker/js_transferable.js"),
+    core.loadExtScript("ext:oden_node/internal/worker/js_transferable.js"),
   "internal/webstreams/adapters": () =>
-    core.loadExtScript("ext:deno_node/internal/webstreams/adapters.js"),
+    core.loadExtScript("ext:oden_node/internal/webstreams/adapters.js"),
   "internal/webstreams/readablestream": () =>
-    core.loadExtScript("ext:deno_node/internal/webstreams/readablestream.js"),
+    core.loadExtScript("ext:oden_node/internal/webstreams/readablestream.js"),
   "internal/webstreams/util": () =>
-    core.loadExtScript("ext:deno_node/internal/webstreams/util.js"),
+    core.loadExtScript("ext:oden_node/internal/webstreams/util.js"),
   "_http_agent": () => _httpAgent().default,
   "_http_common": () => _httpCommon().default,
   "_http_outgoing": () => _httpOutgoing().default,
   "_http_server": () => _httpServer().default,
-  "http": () => core.loadExtScript("ext:deno_node/http.ts"),
-  "http2": () => core.loadExtScript("ext:deno_node/http2.ts"),
-  "https": () => core.loadExtScript("ext:deno_node/https.ts"),
+  "http": () => core.loadExtScript("ext:oden_node/http.ts"),
+  "http2": () => core.loadExtScript("ext:oden_node/http2.ts"),
+  "https": () => core.loadExtScript("ext:oden_node/https.ts"),
   "internal/http": () =>
-    core.loadExtScript("ext:deno_node/internal/http.ts").default,
+    core.loadExtScript("ext:oden_node/internal/http.ts").default,
   "internal/http2/core": () =>
-    core.loadExtScript("ext:deno_node/internal/http2/core.ts").default,
+    core.loadExtScript("ext:oden_node/internal/http2/core.ts").default,
   "internal/http2/util": () =>
-    core.loadExtScript("ext:deno_node/internal/http2/util.ts").default,
+    core.loadExtScript("ext:oden_node/internal/http2/util.ts").default,
   "internal/streams/lazy_transform": () =>
     internalStreamsLazyTransform().default,
-  "child_process": () => core.loadExtScript("ext:deno_node/child_process.ts"),
-  "crypto": () => core.loadExtScript("ext:deno_node/crypto.ts").default,
-  "dgram": () => core.loadExtScript("ext:deno_node/dgram.ts").default,
-  "zlib": () => core.loadExtScript("ext:deno_node/zlib.js"),
+  "child_process": () => core.loadExtScript("ext:oden_node/child_process.ts"),
+  "crypto": () => core.loadExtScript("ext:oden_node/crypto.ts").default,
+  "dgram": () => core.loadExtScript("ext:oden_node/dgram.ts").default,
+  "zlib": () => core.loadExtScript("ext:oden_node/zlib.js"),
   "tls": () => tls().default,
   "internal/crypto/cipher": () =>
-    core.loadExtScript("ext:deno_node/internal/crypto/cipher.ts").default,
+    core.loadExtScript("ext:oden_node/internal/crypto/cipher.ts").default,
   "_tls_common": () =>
-    core.loadExtScript("ext:deno_node/_tls_common.ts").default,
-  "_tls_wrap": () => core.loadExtScript("ext:deno_node/_tls_wrap.js").default,
+    core.loadExtScript("ext:oden_node/_tls_common.ts").default,
+  "_tls_wrap": () => core.loadExtScript("ext:oden_node/_tls_wrap.js").default,
   "repl": () => repl().default,
   "internal/repl": () => internalRepl().default,
   "fs/promises": () =>
-    core.loadExtScript("ext:deno_node/fs/promises.ts").fsPromises,
+    core.loadExtScript("ext:oden_node/fs/promises.ts").fsPromises,
   "test/reporters": () =>
-    core.loadExtScript("ext:deno_node/test/reporters.ts").default,
+    core.loadExtScript("ext:oden_node/test/reporters.ts").default,
   "assert/strict": () => assertStrict().default,
   "internal/event_target": () => internalEventTarget().default,
   "internal/fs/utils": () => internalFsUtils().default,
   "readline": () => readline().default,
   "readline/promises": () => readlinePromises().default,
   "internal/child_process": () =>
-    core.loadExtScript("ext:deno_node/internal/child_process.ts").default,
-  "stream/web": () => core.loadExtScript("ext:deno_node/stream/web.js"),
+    core.loadExtScript("ext:oden_node/internal/child_process.ts").default,
+  "stream/web": () => core.loadExtScript("ext:oden_node/stream/web.js"),
   "internal/js_stream_socket": () =>
-    core.loadExtScript("ext:deno_node/internal/js_stream_socket.js").default,
-  "internal/net": () => core.loadExtScript("ext:deno_node/internal/net.ts"),
+    core.loadExtScript("ext:oden_node/internal/js_stream_socket.js").default,
+  "internal/net": () => core.loadExtScript("ext:oden_node/internal/net.ts"),
   "internal/tty": () =>
-    core.createLazyLoader("ext:deno_node/internal/tty.js")(),
+    core.createLazyLoader("ext:oden_node/internal/tty.js")(),
   "net": () => core.createLazyLoader("node:net")().default,
   // `process` must lazy-resolve to the real `node:process` default export
   // (the proxy at the top of this file is for internal use only). When
@@ -382,7 +382,7 @@ const lazyNodeModules = {
   // chunk, so keeping them out of the eager heap is the main startup win.
   "stream": () => core.createLazyLoader("node:stream")().default,
   "stream/consumers": () =>
-    core.loadExtScript("ext:deno_node/stream/consumers.js"),
+    core.loadExtScript("ext:oden_node/stream/consumers.js"),
   "stream/promises": () =>
     core.createLazyLoader("node:stream/promises")().default,
   "tty": () => core.createLazyLoader("node:tty")().default,
@@ -390,28 +390,28 @@ const lazyNodeModules = {
   // `nodeModules` map keeps their bodies (and transitive `loadExtScript`
   // closure) out of the snapshot heap, so they aren't deserialized at every
   // startup. Match the previous `.default`/no-`.default` shape exactly.
-  "inspector": () => core.loadExtScript("ext:deno_node/inspector.js"),
+  "inspector": () => core.loadExtScript("ext:oden_node/inspector.js"),
   "inspector/promises": () =>
-    core.loadExtScript("ext:deno_node/inspector/promises.js"),
-  "perf_hooks": () => core.loadExtScript("ext:deno_node/perf_hooks.js").default,
+    core.loadExtScript("ext:oden_node/inspector/promises.js"),
+  "perf_hooks": () => core.loadExtScript("ext:oden_node/perf_hooks.js").default,
   "querystring": () =>
-    core.loadExtScript("ext:deno_node/querystring.js").default,
-  "sqlite": () => core.loadExtScript("ext:deno_node/sqlite.ts"),
-  "test": () => core.loadExtScript("ext:deno_node/testing.ts").default,
+    core.loadExtScript("ext:oden_node/querystring.js").default,
+  "sqlite": () => core.loadExtScript("ext:oden_node/sqlite.ts"),
+  "test": () => core.loadExtScript("ext:oden_node/testing.ts").default,
   "trace_events": () =>
-    core.loadExtScript("ext:deno_node/trace_events.ts").default,
-  "v8": () => core.loadExtScript("ext:deno_node/v8.ts"),
-  "wasi": () => core.loadExtScript("ext:deno_node/wasi.ts").default,
+    core.loadExtScript("ext:oden_node/trace_events.ts").default,
+  "v8": () => core.loadExtScript("ext:oden_node/v8.ts"),
+  "wasi": () => core.loadExtScript("ext:oden_node/wasi.ts").default,
   "_stream_duplex": () =>
-    core.loadExtScript("ext:deno_node/internal/streams/duplex.js").default,
+    core.loadExtScript("ext:oden_node/internal/streams/duplex.js").default,
   "_stream_passthrough": () =>
-    core.loadExtScript("ext:deno_node/internal/streams/passthrough.js").default,
+    core.loadExtScript("ext:oden_node/internal/streams/passthrough.js").default,
   "_stream_readable": () =>
-    core.loadExtScript("ext:deno_node/internal/streams/readable.js").default,
+    core.loadExtScript("ext:oden_node/internal/streams/readable.js").default,
   "_stream_transform": () =>
-    core.loadExtScript("ext:deno_node/internal/streams/transform.js").default,
+    core.loadExtScript("ext:oden_node/internal/streams/transform.js").default,
   "_stream_writable": () =>
-    core.loadExtScript("ext:deno_node/internal/streams/writable.js").default,
+    core.loadExtScript("ext:oden_node/internal/streams/writable.js").default,
 };
 
 function defineLazyNativeModule(name, loader) {
@@ -734,7 +734,7 @@ function executeEsmResolveHookChain(specifier, context) {
         return { url: resolved, shortCircuit: true };
       } catch {
         // Last-ditch fallback so hooks can still observe purely synthetic
-        // specifiers that Deno's resolver rejects (e.g. ad-hoc URLs invented
+        // specifiers that Oden's resolver rejects (e.g. ad-hoc URLs invented
         // by user code).
         try {
           const resolved = new URL(spec, currentContext.parentURL).href;
@@ -1303,13 +1303,13 @@ Module._findPath = function (request, paths, isMain, parentPath) {
     if (usesLocalNodeModulesDir) {
       basePath = pathResolve(curPath, request);
     } else {
-      const isDenoDirPackage = op_require_is_deno_dir_package(
+      const isOdenDirPackage = op_require_is_oden_dir_package(
         curPath,
       );
       const isRelative = op_require_is_request_relative(
         request,
       );
-      basePath = (isDenoDirPackage && !isRelative)
+      basePath = (isOdenDirPackage && !isRelative)
         ? pathResolve(curPath, packageSpecifierSubPath(request))
         : pathResolve(curPath, request);
     }
@@ -1390,12 +1390,12 @@ Module._resolveLookupPaths = function (request, parent) {
   if (
     !usesLocalNodeModulesDir && parent?.filename && parent.filename.length > 0
   ) {
-    const denoDirPath = op_require_resolve_deno_dir(
+    const odenDirPath = op_require_resolve_oden_dir(
       request,
       parent.filename,
     );
-    if (denoDirPath) {
-      ArrayPrototypePush(paths, denoDirPath);
+    if (odenDirPath) {
+      ArrayPrototypePush(paths, odenDirPath);
     }
   }
   const lookupPathsResult = op_require_resolve_lookup_paths(
@@ -1629,7 +1629,7 @@ Module._load = function (request, parent, isMain) {
     //
     // Without this, the throw bubbles up to the ESM wrapper that loads the
     // main CJS module, becomes a module evaluation rejection, and is routed
-    // through Deno's unhandled-rejection path.
+    // through Oden's unhandled-rejection path.
     if (
       isMain &&
       parent === null &&
@@ -1849,10 +1849,10 @@ Module._resolveFilename = function (
 
   if (
     typeof request === "string" &&
-    (StringPrototypeEndsWith(request, "$deno$eval.cjs") ||
-      StringPrototypeEndsWith(request, "$deno$eval.cts") ||
-      StringPrototypeEndsWith(request, "$deno$stdin.cjs") ||
-      StringPrototypeEndsWith(request, "$deno$stdin.cts"))
+    (StringPrototypeEndsWith(request, "$oden$eval.cjs") ||
+      StringPrototypeEndsWith(request, "$oden$eval.cts") ||
+      StringPrototypeEndsWith(request, "$oden$stdin.cjs") ||
+      StringPrototypeEndsWith(request, "$oden$stdin.cts"))
   ) {
     return request;
   }
@@ -2526,7 +2526,7 @@ function findPackageJSONForBareSpecifier(packageName, base) {
   const basePath = basePathFromFileURLOrPath(base);
   const baseDir = stat(basePath) === 1 ? basePath : pathDirname(basePath);
   const parent = new Module("", null);
-  parent.filename = pathResolve(baseDir, "$deno$find_package_json.js");
+  parent.filename = pathResolve(baseDir, "$oden$find_package_json.js");
   parent.paths = Module._nodeModulePaths(baseDir);
   const lookupPaths = Module._resolveLookupPaths(packageName, parent);
 
@@ -3278,7 +3278,7 @@ Module.stripTypeScriptTypes = stripTypeScriptTypes;
 export function register(_specifier, _parentUrl, _options) {
   // TODO(@marvinhagemeister): Stub implementation for programs registering
   // TypeScript loaders. We don't support registering loaders for file
-  // types that Deno itself doesn't support at the moment.
+  // types that Oden itself doesn't support at the moment.
 
   return undefined;
 }
@@ -3345,8 +3345,8 @@ function initialize(args) {
 
     internals.__bootstrapNodeProcess(
       argv0,
-      Deno.args,
-      Deno.version,
+      Oden.args,
+      Oden.version,
       nodeDebug ?? "",
       false,
       runningOnMainThread,
@@ -3364,11 +3364,11 @@ function initialize(args) {
     // auto-run, so a forked IPC child does not yet get this setup -- known
     // follow-up; see process.ts bootstrap trigger.)
     if (op_node_has_child_ipc_pipe()) {
-      core.loadExtScript("ext:deno_node/child_process.ts");
+      core.loadExtScript("ext:oden_node/child_process.ts");
       internals.__setupChildProcessIpcChannel();
     }
     if (nodeClusterUniqueId) {
-      core.loadExtScript("ext:deno_node/cluster.ts");
+      core.loadExtScript("ext:oden_node/cluster.ts");
       internals.__initCluster(nodeClusterUniqueId, nodeClusterSchedPolicy);
     }
     // (stream-wrap GothamState registration moved to process.ts's
@@ -3417,7 +3417,7 @@ function preEnableTraceEvents() {
   }
   traceEventsPreEnabled = true;
   const traceCategoriesEnv = op_get_env_no_permission_check(
-    "DENO_NODE_TRACE_EVENT_CATEGORIES",
+    "ODEN_NODE_TRACE_EVENT_CATEGORIES",
   );
   if (!traceCategoriesEnv) {
     return;
@@ -3426,7 +3426,7 @@ function preEnableTraceEvents() {
   if (categories.length === 0) {
     return;
   }
-  const traceEvents = core.loadExtScript("ext:deno_node/trace_events.ts");
+  const traceEvents = core.loadExtScript("ext:oden_node/trace_events.ts");
   // Surface the flag through process.execArgv so test fixtures that probe it
   // (e.g. node's test-trace-events-api) see the same shape they would in Node.
   const proc = nativeModuleExports["process"];

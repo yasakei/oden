@@ -1,6 +1,6 @@
 {
   "tests": {
-    "uses_deno_no_flags": {
+    "uses_oden_no_flags": {
       "args": "task test",
       "output": "task_test.out"
     },

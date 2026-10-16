@@ -1,0 +1,6 @@
+{
+  "workspace": ["./subdir"],
+  "tasks": {
+    "test-all": "oden task --recursive test"
+  }
+}

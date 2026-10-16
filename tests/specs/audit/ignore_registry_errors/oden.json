@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "@odentest/using-vuln": "npm:@odentest/using-vuln@1.0.0",
+    "@odentest/with-vuln1": "npm:@odentest/with-vuln1@1.0.0"
+  }
+}

@@ -1,2 +1,2 @@
-import { add } from "npm:@denotest/type-commonjs";
+import { add } from "npm:@odentest/type-commonjs";
 console.log(add(1, 2));

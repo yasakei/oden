@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 use std::collections::HashSet;
@@ -6,10 +6,10 @@ use std::fmt::Write;
 use std::sync::Arc;
 
 use deno_ast::ModuleSpecifier;
-use deno_core::anyhow::bail;
-use deno_core::error::AnyError;
-use deno_core::serde_json;
-use deno_core::url;
+use oden_core::anyhow::bail;
+use oden_core::error::AnyError;
+use oden_core::serde_json;
+use oden_core::url;
 use deno_error::JsErrorClass;
 use deno_graph::Dependency;
 use deno_graph::GraphKind;
@@ -18,16 +18,16 @@ use deno_graph::ModuleError;
 use deno_graph::ModuleErrorKind;
 use deno_graph::ModuleGraph;
 use deno_graph::Resolution;
-use deno_lib::util::checksum;
-use deno_lib::version::DENO_VERSION_INFO;
-use deno_npm::NpmPackageId;
-use deno_npm::NpmResolutionPackage;
-use deno_npm::resolution::NpmResolutionSnapshot;
-use deno_npm_installer::graph::NpmCachingStrategy;
-use deno_npmrc::ResolvedNpmRc;
-use deno_print::drop_println;
-use deno_resolver::DenoResolveErrorKind;
-use deno_resolver::display::DisplayTreeNode;
+use oden_lib::util::checksum;
+use oden_lib::version::ODEN_VERSION_INFO;
+use oden_npm::NpmPackageId;
+use oden_npm::NpmResolutionPackage;
+use oden_npm::resolution::NpmResolutionSnapshot;
+use oden_npm_installer::graph::NpmCachingStrategy;
+use oden_npmrc::ResolvedNpmRc;
+use oden_print::drop_println;
+use oden_resolver::OdenResolveErrorKind;
+use oden_resolver::display::DisplayTreeNode;
 use deno_semver::npm::NpmPackageReqReference;
 use deno_semver::package::PackageReq;
 use deno_terminal::colors;
@@ -63,24 +63,24 @@ pub async fn info(
     let maybe_import_specifier = match resolver.resolve(
       &specifier,
       &cwd_url,
-      deno_resolver::workspace::ResolutionKind::Execution,
+      oden_resolver::workspace::ResolutionKind::Execution,
     ) {
       Ok(resolved) => match resolved {
-        deno_resolver::workspace::MappedResolution::Normal {
+        oden_resolver::workspace::MappedResolution::Normal {
           specifier,
           ..
         }
-        | deno_resolver::workspace::MappedResolution::WorkspaceJsrPackage {
+        | oden_resolver::workspace::MappedResolution::WorkspaceJsrPackage {
           specifier,
           ..
         } => Some(specifier),
-        deno_resolver::workspace::MappedResolution::WorkspaceNpmPackage {
+        oden_resolver::workspace::MappedResolution::WorkspaceNpmPackage {
           target_pkg_json,
           sub_path,
           ..
         } => Some(
           node_resolver
-            .resolve_package_subpath_from_deno_module(
+            .resolve_package_subpath_from_oden_module(
               target_pkg_json.clone().dir_path(),
               sub_path.as_deref(),
               Some(&cwd_url),
@@ -89,20 +89,20 @@ pub async fn info(
             )?
             .into_url()?,
         ),
-        deno_resolver::workspace::MappedResolution::PackageJson {
+        oden_resolver::workspace::MappedResolution::PackageJson {
           alias,
           sub_path,
           dep_result,
           ..
         } => match dep_result.as_ref().map_err(|e| e.clone())? {
-          deno_package_json::PackageJsonDepValue::File(_) => {
+          oden_package_json::PackageJsonDepValue::File(_) => {
             return Err(
-              DenoResolveErrorKind::UnsupportedPackageJsonFileSpecifier
+              OdenResolveErrorKind::UnsupportedPackageJsonFileSpecifier
                 .into_box()
                 .into(),
             );
           }
-          deno_package_json::PackageJsonDepValue::Workspace {
+          oden_package_json::PackageJsonDepValue::Workspace {
             name,
             version_req,
           } => {
@@ -113,7 +113,7 @@ pub async fn info(
               )?;
             Some(
               node_resolver
-                .resolve_package_subpath_from_deno_module(
+                .resolve_package_subpath_from_oden_module(
                   pkg_folder,
                   sub_path.as_deref(),
                   Some(&cwd_url),
@@ -123,14 +123,14 @@ pub async fn info(
                 .into_url()?,
             )
           }
-          deno_package_json::PackageJsonDepValue::Req(req) => {
+          oden_package_json::PackageJsonDepValue::Req(req) => {
             Some(ModuleSpecifier::parse(&format!(
               "npm:{}{}",
               req,
               sub_path.map(|s| format!("/{}", s)).unwrap_or_default()
             ))?)
           }
-          deno_package_json::PackageJsonDepValue::Catalog(catalog_name) => {
+          oden_package_json::PackageJsonDepValue::Catalog(catalog_name) => {
             match resolver.resolve_catalog_dep(alias, catalog_name) {
               Some(req) => Some(ModuleSpecifier::parse(&format!(
                 "npm:{}{}",
@@ -141,7 +141,7 @@ pub async fn info(
             }
           }
         },
-        deno_resolver::workspace::MappedResolution::PackageJsonImport {
+        oden_resolver::workspace::MappedResolution::PackageJsonImport {
           pkg_json,
         } => Some(
           node_resolver
@@ -210,10 +210,10 @@ pub async fn info(
         maybe_npm_info.as_ref().map(|(r, s)| (r.as_ref(), s)),
         &mut output,
       )?;
-      deno_print::drop_write_stdout(output.as_bytes());
+      oden_print::drop_write_stdout(output.as_bytes());
     }
   } else {
-    // If it was just "deno info" print location of caches and exit
+    // If it was just "oden info" print location of caches and exit
     print_cache_info(
       &factory,
       info_flags.json,
@@ -226,17 +226,17 @@ pub async fn info(
 fn print_cache_info(
   factory: &CliFactory,
   json: bool,
-  location: Option<&deno_core::url::Url>,
+  location: Option<&oden_core::url::Url>,
 ) -> Result<(), AnyError> {
-  let deno_version = DENO_VERSION_INFO.deno;
-  let dir = factory.deno_dir()?;
+  let oden_version = ODEN_VERSION_INFO.oden;
+  let dir = factory.oden_dir()?;
   let modules_cache = factory.global_http_cache()?.dir_path();
-  let npm_cache = factory.deno_dir()?.npm_folder_path();
+  let npm_cache = factory.oden_dir()?.npm_folder_path();
   let typescript_cache = &dir.gen_cache.location;
   let registry_cache = dir.registries_folder_path();
   let mut origin_dir = dir.origin_data_folder_path();
-  let deno_dir = dir.root_path_for_display().to_string();
-  let web_cache_dir = deno_lib::worker::get_cache_storage_dir(&origin_dir);
+  let oden_dir = dir.root_path_for_display().to_string();
+  let web_cache_dir = oden_lib::worker::get_cache_storage_dir(&origin_dir);
 
   if let Some(location) = &location {
     origin_dir =
@@ -248,8 +248,8 @@ fn print_cache_info(
   if json {
     let mut json_output = serde_json::json!({
       "version": JSON_SCHEMA_VERSION,
-      "denoVersion": deno_version,
-      "denoDir": deno_dir,
+      "odenVersion": oden_version,
+      "odenDir": oden_dir,
       "modulesCache": modules_cache,
       "npmCache": npm_cache,
       "typescriptCache": typescript_cache,
@@ -264,8 +264,8 @@ fn print_cache_info(
 
     display::write_json_to_stdout(&json_output)
   } else {
-    drop_println!("{} {}", colors::bold("Deno version:"), deno_version);
-    drop_println!("{} {}", colors::bold("DENO_DIR location:"), deno_dir);
+    drop_println!("{} {}", colors::bold("Oden version:"), oden_version);
+    drop_println!("{} {}", colors::bold("ODEN_DIR location:"), oden_dir);
     drop_println!(
       "{} {}",
       colors::bold("Remote modules cache:"),
@@ -313,7 +313,7 @@ fn add_npm_packages_to_json(
   npmrc: &ResolvedNpmRc,
 ) {
   let Some((npm_resolver, npm_snapshot)) = npm_info else {
-    return; // does not include byonm to deno info's output
+    return; // does not include byonm to oden info's output
   };
 
   // ideally deno_graph could handle this, but for now we just modify the json here
@@ -421,7 +421,7 @@ fn add_npm_packages_to_json(
     kv.insert("registryUrl".to_string(), registry_url.to_string().into());
 
     // the local path where the package is (or would be) cached, so tools can
-    // locate npm packages cached by Deno (e.g. https://github.com/denoland/deno/issues/17168)
+    // locate npm packages cached by Oden (e.g. https://github.com/denoland/deno/issues/17168)
     if let Ok(folder) = npm_resolver.resolve_pkg_folder_from_pkg_id(&pkg.id) {
       kv.insert(
         "localPath".to_string(),
@@ -443,7 +443,7 @@ fn add_npm_packages_to_json(
   }
 }
 
-/// Precached information about npm packages that are used in deno info.
+/// Precached information about npm packages that are used in oden info.
 #[derive(Default)]
 struct NpmInfo {
   package_sizes: HashMap<NpmPackageId, u64>,

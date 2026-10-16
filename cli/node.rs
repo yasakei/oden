@@ -1,24 +1,24 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_resolver::cjs::analyzer::DenoCjsCodeAnalyzer;
-use deno_resolver::npm::DenoInNpmPackageChecker;
-use node_resolver::DenoIsBuiltInNodeModuleChecker;
+use oden_resolver::cjs::analyzer::OdenCjsCodeAnalyzer;
+use oden_resolver::npm::OdenInNpmPackageChecker;
+use node_resolver::OdenIsBuiltInNodeModuleChecker;
 use node_resolver::analyze::CjsModuleExportAnalyzer;
 
 use crate::npm::CliNpmResolver;
 use crate::sys::CliSys;
 
-pub type CliCjsCodeAnalyzer = DenoCjsCodeAnalyzer<CliSys>;
+pub type CliCjsCodeAnalyzer = OdenCjsCodeAnalyzer<CliSys>;
 
 pub type CliCjsModuleExportAnalyzer = CjsModuleExportAnalyzer<
   CliCjsCodeAnalyzer,
-  DenoInNpmPackageChecker,
-  DenoIsBuiltInNodeModuleChecker,
+  OdenInNpmPackageChecker,
+  OdenIsBuiltInNodeModuleChecker,
   CliNpmResolver,
   CliSys,
 >;
-pub type CliNodeResolver<TSys = CliSys> = deno_runtime::deno_node::NodeResolver<
-  DenoInNpmPackageChecker,
+pub type CliNodeResolver<TSys = CliSys> = oden_runtime::oden_node::NodeResolver<
+  OdenInNpmPackageChecker,
   CliNpmResolver<TSys>,
   TSys,
 >;

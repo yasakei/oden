@@ -1,16 +1,16 @@
-Deno.test({
+Oden.test({
   name: "success",
   fn() {},
 });
 
-Deno.test({
+Oden.test({
   name: "fail",
   fn() {
     throw new Error("fail");
   },
 });
 
-Deno.test({
+Oden.test({
   name: "ignored",
   ignore: true,
   fn() {},

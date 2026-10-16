@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "run": "oden run main.ts"
+  },
+  // comment
+  "imports": {
+    "a": "./a.ts"
+  }
+}

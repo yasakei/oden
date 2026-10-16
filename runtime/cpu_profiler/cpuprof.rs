@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufWriter;
 use std::io::Write;
 
-use deno_core::serde_json;
+use oden_core::serde_json;
 use serde::Deserialize;
 
 // V8 CPU Profile data structures (shared with flamegraph module)

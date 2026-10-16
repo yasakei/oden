@@ -1,0 +1,1 @@
+error: Cannot link './empty': no oden.json found in directory. A linked package must contain a oden.json with a "name" field.

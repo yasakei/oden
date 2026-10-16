@@ -1,0 +1,7 @@
+{
+  "name": "@odentest/non-existent-dep",
+  "version": "1.0.0",
+  "dependencies": {
+    "@odentest/non-existent": "1.0"
+  }
+}

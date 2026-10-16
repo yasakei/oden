@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use proc_macro2::TokenStream;
 use quote::ToTokens;
@@ -52,10 +52,10 @@ use crate::op2::generate_op2;
 // }
 //
 // The generated OpMethodDecl that can be passed to
-// `deno_core::extension!` macro to register the object
+// `oden_core::extension!` macro to register the object
 //
 // ```rust
-// deno_core::extension!(
+// oden_core::extension!(
 //   ...,
 //   objects = [MyObject],
 // )
@@ -169,7 +169,7 @@ pub(crate) fn generate_impl_ops(
 
   let res = quote! {
       impl #self_ty {
-        pub const DECL: deno_core::_ops::OpMethodDecl = deno_core::_ops::OpMethodDecl {
+        pub const DECL: oden_core::_ops::OpMethodDecl = oden_core::_ops::OpMethodDecl {
           methods: &[
             #(
               #self_ty::#methods(),
@@ -181,7 +181,7 @@ pub(crate) fn generate_impl_ops(
             )*
           ],
           constructor: #constructor,
-          name: ::deno_core::__op_name_fast!(#self_ty),
+          name: ::oden_core::__op_name_fast!(#self_ty),
           type_name: || std::any::type_name::<#self_ty>(),
           #inherits_type_name
         };

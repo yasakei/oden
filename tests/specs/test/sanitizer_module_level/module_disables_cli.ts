@@ -1,6 +1,6 @@
 // CLI passes --sanitize-ops but module-level disables it
-Deno.test.sanitizer({ ops: false });
+Oden.test.sanitizer({ ops: false });
 
-Deno.test("timer leak allowed because module disables sanitizer", () => {
+Oden.test("timer leak allowed because module disables sanitizer", () => {
   setTimeout(() => {}, 10000);
 });

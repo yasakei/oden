@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 mod common;
 mod global;
@@ -9,13 +9,13 @@ use std::borrow::Cow;
 use std::path::Path;
 use std::path::PathBuf;
 
-use deno_config::deno_json::NodeModulesLinkerMode;
-use deno_npm::NpmPackageCacheFolderId;
-use deno_npm::NpmPackageId;
-use deno_npm::NpmSystemInfo;
-use deno_npm::resolution::PackageCacheFolderIdNotFoundError;
-use deno_npm::resolution::PackageNvNotFoundError;
-use deno_npm::resolution::PackageReqNotFoundError;
+use oden_config::oden_json::NodeModulesLinkerMode;
+use oden_npm::NpmPackageCacheFolderId;
+use oden_npm::NpmPackageId;
+use oden_npm::NpmSystemInfo;
+use oden_npm::resolution::PackageCacheFolderIdNotFoundError;
+use oden_npm::resolution::PackageNvNotFoundError;
+use oden_npm::resolution::PackageReqNotFoundError;
 use deno_path_util::fs::canonicalize_path_maybe_not_exists;
 use deno_semver::Version;
 use deno_semver::package::PackageReq;
@@ -35,7 +35,7 @@ use crate::NpmCacheDirRc;
 use crate::npmrc::ResolvedNpmRcRc;
 
 #[derive(Debug, thiserror::Error, deno_error::JsError)]
-pub enum ResolvePkgFolderFromDenoModuleError {
+pub enum ResolvePkgFolderFromOdenModuleError {
   #[class(inherit)]
   #[error(transparent)]
   PackageNvNotFound(#[from] PackageNvNotFoundError),
@@ -70,7 +70,7 @@ pub struct FailedCanonicalizingError {
 }
 
 #[derive(Debug, thiserror::Error, deno_error::JsError)]
-pub enum ManagedResolvePkgFolderFromDenoReqError {
+pub enum ManagedResolvePkgFolderFromOdenReqError {
   #[class(inherit)]
   #[error(transparent)]
   PackageReqNotFound(#[from] PackageReqNotFoundError),
@@ -104,7 +104,7 @@ pub trait ManagedNpmResolverSys: GlobalNpmPackageResolverSys + Clone {}
 
 #[allow(clippy::disallowed_types, reason = "definition")]
 pub type ManagedNpmResolverRc<TSys> =
-  deno_maybe_sync::MaybeArc<ManagedNpmResolver<TSys>>;
+  oden_maybe_sync::MaybeArc<ManagedNpmResolver<TSys>>;
 
 #[derive(Debug)]
 pub struct ManagedNpmResolver<TSys: ManagedNpmResolverSys> {
@@ -206,17 +206,17 @@ impl<TSys: ManagedNpmResolverSys> ManagedNpmResolver<TSys> {
     Ok(path)
   }
 
-  pub fn resolve_pkg_id_from_deno_module_req(
+  pub fn resolve_pkg_id_from_oden_module_req(
     &self,
     req: &PackageReq,
   ) -> Result<NpmPackageId, PackageReqNotFoundError> {
     self.resolution.resolve_pkg_id_from_pkg_req(req)
   }
 
-  pub fn resolve_pkg_folder_from_deno_module_req(
+  pub fn resolve_pkg_folder_from_oden_module_req(
     &self,
     req: &PackageReq,
-  ) -> Result<PathBuf, ManagedResolvePkgFolderFromDenoReqError> {
+  ) -> Result<PathBuf, ManagedResolvePkgFolderFromOdenReqError> {
     let pkg_id = self.resolution.resolve_pkg_id_from_pkg_req(req)?;
     Ok(self.resolve_pkg_folder_from_pkg_id(&pkg_id)?)
   }

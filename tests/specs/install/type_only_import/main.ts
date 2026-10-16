@@ -1,3 +1,3 @@
-import { foo } from "jsr:@denotest/type-only-import";
+import { foo } from "jsr:@odentest/type-only-import";
 
 console.log(foo.bar);

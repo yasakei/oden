@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::BTreeMap;
 use std::fs;
@@ -6,12 +6,12 @@ use std::path::Path;
 use std::sync::Arc;
 use std::time::SystemTime;
 
-use deno_cache_dir::ResolveDenoDirOptions;
-use deno_core::ModuleSpecifier;
-use deno_core::url::Url;
+use oden_cache_dir::ResolveOdenDirOptions;
+use oden_core::ModuleSpecifier;
+use oden_core::url::Url;
 use deno_path_util::url_to_file_path;
 
-use crate::cache::DenoDir;
+use crate::cache::OdenDir;
 use crate::cache::GlobalHttpCache;
 use crate::cache::HttpCache;
 use crate::cache::LocalLspHttpCache;
@@ -36,7 +36,7 @@ pub fn calculate_fs_version_at_path(path: impl AsRef<Path>) -> Option<String> {
 
 #[derive(Debug, Clone)]
 pub struct LspCache {
-  deno_dir: DenoDir,
+  oden_dir: OdenDir,
   global: Arc<GlobalHttpCache>,
   vendors_by_scope: BTreeMap<Arc<Url>, Option<Arc<LocalLspHttpCache>>>,
 }
@@ -60,19 +60,19 @@ impl LspCache {
         .ok()
     });
     let sys = CliSys::default();
-    let deno_dir_root = deno_cache_dir::resolve_deno_dir(
+    let oden_dir_root = oden_cache_dir::resolve_oden_dir(
       &sys,
-      ResolveDenoDirOptions {
+      ResolveOdenDirOptions {
         maybe_custom_root: global_cache_path.as_deref(),
         maybe_initial_cwd: None,
       },
     )
     .expect("should be infallible with absolute custom root");
-    let deno_dir = DenoDir::new(sys.clone(), deno_dir_root.into_owned());
+    let oden_dir = OdenDir::new(sys.clone(), oden_dir_root.into_owned());
     let global =
-      Arc::new(GlobalHttpCache::new(sys, deno_dir.remote_folder_path()));
+      Arc::new(GlobalHttpCache::new(sys, oden_dir.remote_folder_path()));
     Self {
-      deno_dir,
+      oden_dir,
       global,
       vendors_by_scope: Default::default(),
     }
@@ -94,8 +94,8 @@ impl LspCache {
       .collect();
   }
 
-  pub fn deno_dir(&self) -> &DenoDir {
-    &self.deno_dir
+  pub fn oden_dir(&self) -> &OdenDir {
+    &self.oden_dir
   }
 
   pub fn global(&self) -> &Arc<GlobalHttpCache> {
@@ -153,7 +153,7 @@ impl LspCache {
     let Ok(path) = url_to_file_path(specifier) else {
       return false;
     };
-    if path.starts_with(&self.deno_dir().root) {
+    if path.starts_with(&self.oden_dir().root) {
       return true;
     }
     let Some(vendor) = self
@@ -171,7 +171,7 @@ impl LspCache {
     let Ok(path) = url_to_file_path(specifier) else {
       return false;
     };
-    if path.starts_with(&self.deno_dir().root) {
+    if path.starts_with(&self.oden_dir().root) {
       return true;
     }
     false

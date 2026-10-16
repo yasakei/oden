@@ -1,23 +1,23 @@
-Deno.test("foo", () => {
+Oden.test("foo", () => {
   throw undefined;
 });
 
-Deno.test("bar", () => {
+Oden.test("bar", () => {
   throw null;
 });
 
-Deno.test("baz", () => {
+Oden.test("baz", () => {
   throw 123;
 });
 
-Deno.test("qux", () => {
+Oden.test("qux", () => {
   throw "Hello, world!";
 });
 
-Deno.test("quux", () => {
+Oden.test("quux", () => {
   throw [1, 2, 3];
 });
 
-Deno.test("quuz", () => {
+Oden.test("quuz", () => {
   throw { a: "Hello, world!", b: [1, 2, 3] };
 });

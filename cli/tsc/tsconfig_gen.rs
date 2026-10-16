@@ -1,32 +1,32 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-//! Generate `.deno/tsconfig.json` for use with stock TypeScript tooling
+//! Generate `.oden/tsconfig.json` for use with stock TypeScript tooling
 //! (tsc, tsgo).
 //!
-//! This module translates Deno's compiler options (from `deno.json`) into a
+//! This module translates Oden's compiler options (from `oden.json`) into a
 //! standard `tsconfig.json` that stock TypeScript understands. It also injects
-//! Deno type definitions so that the `Deno` namespace and other Deno-specific
+//! Oden type definitions so that the `Oden` namespace and other Oden-specific
 //! globals are available.
 
 use std::collections::BTreeMap;
 use std::path::Path;
 use std::path::PathBuf;
 
-use deno_core::serde_json;
-use deno_core::serde_json::Map;
-use deno_core::serde_json::Value;
-use deno_core::serde_json::json;
-use deno_core::url::Url;
+use oden_core::serde_json;
+use oden_core::serde_json::Map;
+use oden_core::serde_json::Value;
+use oden_core::serde_json::json;
+use oden_core::url::Url;
 
-use super::get_deno_ns_declaration_file_text;
+use super::get_oden_ns_declaration_file_text;
 use super::get_types_declaration_file_text;
 
-/// Whether Deno should honor a user's `tsconfig.json` at `project_root`.
+/// Whether Oden should honor a user's `tsconfig.json` at `project_root`.
 ///
-/// Mirrors Deno's own config resolution (see #29925): a `tsconfig.json` is only
-/// picked up when there's a sibling `deno.json`/`deno.jsonc`/`package.json` and
+/// Mirrors Oden's own config resolution (see #29925): a `tsconfig.json` is only
+/// picked up when there's a sibling `oden.json`/`oden.jsonc`/`package.json` and
 /// config discovery isn't disabled (`--no-config`). Otherwise the file is
-/// ignored - `deno check` type-checks with Deno's own defaults and must not read
+/// ignored - `oden check` type-checks with Oden's own defaults and must not read
 /// (or rewrite) the stray tsconfig.
 pub fn should_honor_user_tsconfig(
   project_root: &Path,
@@ -35,13 +35,13 @@ pub fn should_honor_user_tsconfig(
   if config_disabled {
     return false;
   }
-  ["deno.json", "deno.jsonc", "package.json"]
+  ["oden.json", "oden.jsonc", "package.json"]
     .iter()
     .any(|f| project_root.join(f).exists())
 }
 
-/// Build a throwaway "root" tsconfig for `deno check` that mirrors the user's
-/// committed `tsconfig.json` but prepends our generated `.deno/tsconfig.json` to
+/// Build a throwaway "root" tsconfig for `oden check` that mirrors the user's
+/// committed `tsconfig.json` but prepends our generated `.oden/tsconfig.json` to
 /// `extends` and carries the npm project `references` - WITHOUT mutating the
 /// user's file. `native_check` writes the returned value to a temp config in the
 /// project root and points tsc at it, so the user's own options (including
@@ -71,8 +71,8 @@ pub fn build_check_root_overlay(
   }
 
   // Read the generated config once (for its `types` and `references`).
-  let deno_tsconfig = project_root.join(".deno").join("tsconfig.json");
-  let deno_value = std::fs::read_to_string(&deno_tsconfig)
+  let oden_tsconfig = project_root.join(".oden").join("tsconfig.json");
+  let oden_value = std::fs::read_to_string(&oden_tsconfig)
     .ok()
     .and_then(|t| serde_json::from_str::<Value>(&t).ok());
 
@@ -82,25 +82,25 @@ pub fn build_check_root_overlay(
     // Prepend our generated config so the user's own config overrides it, while
     // our `paths` (which the user's config won't set) survive. TS 5.0+ resolves
     // array `extends` left-to-right with later entries overriding earlier ones.
-    let deno_generated = "./.deno/tsconfig.json";
+    let oden_generated = "./.oden/tsconfig.json";
     let extends = match obj.remove("extends") {
-      Some(Value::String(s)) => json!([deno_generated, s]),
+      Some(Value::String(s)) => json!([oden_generated, s]),
       Some(Value::Array(mut arr)) => {
-        if !arr.iter().any(|v| v.as_str() == Some(deno_generated)) {
-          arr.insert(0, json!(deno_generated));
+        if !arr.iter().any(|v| v.as_str() == Some(oden_generated)) {
+          arr.insert(0, json!(oden_generated));
         }
         Value::Array(arr)
       }
-      _ => json!([deno_generated]),
+      _ => json!([oden_generated]),
     };
     obj.insert("extends".to_string(), extends);
 
     // A user `compilerOptions.types` overrides the generated `types` through the
-    // `extends` chain, dropping our injected `deno`/`node` so every `Deno.*`
-    // reference would error TS2304. Deno always provides its own libs, so when
+    // `extends` chain, dropping our injected `oden`/`node` so every `Oden.*`
+    // reference would error TS2304. Oden always provides its own libs, so when
     // the user set `types` explicitly, merge the generated entries back in
     // (first, so they win) ahead of the user's.
-    if let Some(gen_types) = deno_value
+    if let Some(gen_types) = oden_value
       .as_ref()
       .and_then(|d| d.pointer("/compilerOptions/types"))
       .and_then(|t| t.as_array())
@@ -131,8 +131,8 @@ pub fn build_check_root_overlay(
   // `extends`). Merge them into any references the user authored (rather than
   // overwriting, which would drop a solution-style project's own references);
   // `set_root_npm_references` retains non-generated entries and rebases the
-  // `.deno/`-relative generated paths onto the project root.
-  if let Some(refs) = deno_value
+  // `.oden/`-relative generated paths onto the project root.
+  if let Some(refs) = oden_value
     .as_ref()
     .and_then(|d| d.get("references"))
     .and_then(|r| r.as_array())
@@ -151,23 +151,23 @@ pub fn build_check_root_overlay(
 /// Result of generating a tsconfig for stock TypeScript.
 #[derive(Debug)]
 pub struct GeneratedTsConfig {
-  /// Path to the generated `.deno/tsconfig.json`.
+  /// Path to the generated `.oden/tsconfig.json`.
   pub tsconfig_path: PathBuf,
 }
 
-/// Generate `.deno/tsconfig.json` and Deno type definitions for use with
+/// Generate `.oden/tsconfig.json` and Oden type definitions for use with
 /// stock TypeScript tooling.
 ///
-/// Writes Deno types to `.deno/types/deno/index.d.ts` (a private typeRoot
+/// Writes Oden types to `.oden/types/oden/index.d.ts` (a private typeRoot
 /// only the generated tsconfig points at). They deliberately do NOT go to
-/// `node_modules/@types/deno/`: TypeScript auto-discovers everything under
+/// `node_modules/@types/oden/`: TypeScript auto-discovers everything under
 /// `node_modules/@types/*` whenever `compilerOptions.types` is unset, which
-/// is exactly the state Deno's own type checker sees after the resolver
-/// filters our generated tsconfig out of the extends chain. With @types/deno
-/// auto-loaded into Deno's checker, every global also declared in
-/// `lib.deno.shared_globals.d.ts` would duplicate (TS2403).
+/// is exactly the state Oden's own type checker sees after the resolver
+/// filters our generated tsconfig out of the extends chain. With @types/oden
+/// auto-loaded into Oden's checker, every global also declared in
+/// `lib.oden.shared_globals.d.ts` would duplicate (TS2403).
 ///
-/// Generates `.deno/tsconfig.json` with compiler options and paths mappings
+/// Generates `.oden/tsconfig.json` with compiler options and paths mappings
 /// for npm:/jsr: specifiers. Also ensures a root `tsconfig.json` exists
 /// that extends it.
 #[allow(
@@ -176,9 +176,9 @@ pub struct GeneratedTsConfig {
 )]
 pub fn generate_tsconfig(
   project_root: &Path,
-  deno_compiler_options: Option<&Value>,
+  oden_compiler_options: Option<&Value>,
   resolved_compiler_options: Option<&Value>,
-  deno_imports: Option<&Value>,
+  oden_imports: Option<&Value>,
   files: &[String],
   http_modules: &BTreeMap<Url, String>,
   member_paths: &Map<String, Value>,
@@ -190,29 +190,29 @@ pub fn generate_tsconfig(
   has_local_wasm: bool,
   manage_root_tsconfig: bool,
 ) -> Result<GeneratedTsConfig, std::io::Error> {
-  // Write Deno type definitions to .deno/types/deno/ (private typeRoot).
-  let types_dir = project_root.join(".deno/types/deno");
+  // Write Oden type definitions to .oden/types/oden/ (private typeRoot).
+  let types_dir = project_root.join(".oden/types/oden");
   std::fs::create_dir_all(&types_dir)?;
   let no_types_shims =
-    no_types_npm_shims(project_root, deno_imports, npm_package_paths);
+    no_types_npm_shims(project_root, oden_imports, npm_package_paths);
   // When the effective `lib` includes `dom`, the web-platform globals come from
-  // the stock `dom` lib, so emit only the `Deno` namespace to avoid colliding
-  // with it (the userland `"lib": ["deno.ns", "dom"]` pattern).
+  // the stock `dom` lib, so emit only the `Oden` namespace to avoid colliding
+  // with it (the userland `"lib": ["oden.ns", "dom"]` pattern).
   let has_dom =
-    effective_lib_has_dom(deno_compiler_options, resolved_compiler_options);
-  write_deno_types(
+    effective_lib_has_dom(oden_compiler_options, resolved_compiler_options);
+  write_oden_types(
     &types_dir.join("index.d.ts"),
     node_types_root.is_some(),
     has_dom,
     &no_types_shims,
   )?;
 
-  // Write a package.json for the @types/deno package so the typeRoots lookup
+  // Write a package.json for the @types/oden package so the typeRoots lookup
   // resolves the directory as a package.
   std::fs::write(
     types_dir.join("package.json"),
     serde_json::to_string_pretty(&json!({
-      "name": "@types/deno",
+      "name": "@types/oden",
       "version": "0.0.0",
       "types": "index.d.ts"
     }))
@@ -222,9 +222,9 @@ pub fn generate_tsconfig(
   // Build tsconfig
   let tsconfig = build_tsconfig(
     project_root,
-    deno_compiler_options,
+    oden_compiler_options,
     resolved_compiler_options,
-    deno_imports,
+    oden_imports,
     files,
     http_modules,
     member_paths,
@@ -236,21 +236,21 @@ pub fn generate_tsconfig(
     has_local_wasm,
   );
 
-  // Write to .deno/tsconfig.json
-  let deno_dir = project_root.join(".deno");
-  std::fs::create_dir_all(&deno_dir)?;
-  // `.deno/` is a generated cache (materialized types, per-package projects).
-  // Mark it ignored so gitignore-respecting tooling - `deno publish`, git,
+  // Write to .oden/tsconfig.json
+  let oden_dir = project_root.join(".oden");
+  std::fs::create_dir_all(&oden_dir)?;
+  // `.oden/` is a generated cache (materialized types, per-package projects).
+  // Mark it ignored so gitignore-respecting tooling - `oden publish`, git,
   // formatters - skips it rather than treating it as project source.
-  std::fs::write(deno_dir.join(".gitignore"), "*\n")?;
-  let tsconfig_path = deno_dir.join("tsconfig.json");
+  std::fs::write(oden_dir.join(".gitignore"), "*\n")?;
+  let tsconfig_path = oden_dir.join("tsconfig.json");
   let content = serde_json::to_string_pretty(&tsconfig)
     .expect("failed to serialize tsconfig");
   std::fs::write(&tsconfig_path, &content)?;
 
-  // Ensure root tsconfig.json exists and extends .deno/tsconfig.json. `deno
-  // check` skips this when it will point tsc at `.deno/tsconfig.json` directly,
-  // so it never rewrites a user's committed tsconfig that Deno isn't honoring.
+  // Ensure root tsconfig.json exists and extends .oden/tsconfig.json. `oden
+  // check` skips this when it will point tsc at `.oden/tsconfig.json` directly,
+  // so it never rewrites a user's committed tsconfig that Oden isn't honoring.
   if manage_root_tsconfig {
     ensure_root_tsconfig(project_root, npm_project_references)?;
   }
@@ -258,9 +258,9 @@ pub fn generate_tsconfig(
   Ok(GeneratedTsConfig { tsconfig_path })
 }
 
-/// Ensure a root `tsconfig.json` exists that extends `.deno/tsconfig.json`.
+/// Ensure a root `tsconfig.json` exists that extends `.oden/tsconfig.json`.
 ///
-/// - No existing tsconfig: create one with `extends: "./.deno/tsconfig.json"`.
+/// - No existing tsconfig: create one with `extends: "./.oden/tsconfig.json"`.
 /// - Existing `extends` is a single string (or absent): coerce into an array
 ///   with our generated path FIRST, then the original entry. TS 5.0+ resolves
 ///   array extends left-to-right with later entries overriding earlier ones, so
@@ -277,11 +277,11 @@ fn ensure_root_tsconfig(
   npm_project_references: &[String],
 ) -> Result<(), std::io::Error> {
   let root_tsconfig_path = project_root.join("tsconfig.json");
-  let extends_path = "./.deno/tsconfig.json";
+  let extends_path = "./.oden/tsconfig.json";
 
   if !root_tsconfig_path.exists() {
     let mut tsconfig =
-      json!({ "_deno_generated": true, "extends": extends_path });
+      json!({ "_oden_generated": true, "extends": extends_path });
     set_root_npm_references(&mut tsconfig, npm_project_references);
     let content = serde_json::to_string_pretty(&tsconfig)
       .expect("failed to serialize tsconfig");
@@ -290,15 +290,15 @@ fn ensure_root_tsconfig(
 
   let content = std::fs::read_to_string(&root_tsconfig_path)?;
 
-  // A `_deno_generated: true` sentinel marks a root tsconfig that WE created (as
+  // A `_oden_generated: true` sentinel marks a root tsconfig that WE created (as
   // opposed to a user-authored one). Ours is safe to regenerate wholesale; a
   // user's is only ever augmented (see the byte-splice below) so we never lose
-  // their compiler options or comments. This also makes `deno check` idempotent:
+  // their compiler options or comments. This also makes `oden check` idempotent:
   // on the second run the root tsconfig is always the one we wrote, and without
   // the sentinel we'd have no way to tell it apart from a committed config.
-  if is_deno_generated_tsconfig(&content) {
+  if is_oden_generated_tsconfig(&content) {
     let mut tsconfig =
-      json!({ "_deno_generated": true, "extends": extends_path });
+      json!({ "_oden_generated": true, "extends": extends_path });
     set_root_npm_references(&mut tsconfig, npm_project_references);
     let content = serde_json::to_string_pretty(&tsconfig)
       .expect("failed to serialize tsconfig");
@@ -323,7 +323,7 @@ fn ensure_root_tsconfig(
       std::io::ErrorKind::InvalidData,
       format!(
         "existing {} is not valid JSON/JSONC: {e}. Fix or remove it and re-run \
-         `deno sync-types`.",
+         `oden sync-types`.",
         root_tsconfig_path.display()
       ),
     )
@@ -391,21 +391,21 @@ fn ensure_root_tsconfig(
   ensure_root_npm_references(&root_tsconfig_path, npm_project_references)
 }
 
-/// Whether a root `tsconfig.json`'s text carries the `_deno_generated: true`
+/// Whether a root `tsconfig.json`'s text carries the `_oden_generated: true`
 /// sentinel, i.e. we created it (rather than the user). Parsed as JSONC since
 /// tsconfig commonly has comments; an unparseable file is treated as not ours.
-fn is_deno_generated_tsconfig(content: &str) -> bool {
+fn is_oden_generated_tsconfig(content: &str) -> bool {
   jsonc_parser::parse_to_serde_value::<Value>(
     content,
     &jsonc_parser::ParseOptions::default(),
   )
   .ok()
-  .and_then(|v| v.get("_deno_generated").and_then(|s| s.as_bool()))
+  .and_then(|v| v.get("_oden_generated").and_then(|s| s.as_bool()))
   .unwrap_or(false)
 }
 
 fn root_npm_reference_path(path: &str) -> String {
-  format!("./.deno/{}", path.trim_start_matches("./"))
+  format!("./.oden/{}", path.trim_start_matches("./"))
 }
 
 fn is_generated_npm_reference(value: &Value) -> bool {
@@ -413,7 +413,7 @@ fn is_generated_npm_reference(value: &Value) -> bool {
     .get("path")
     .and_then(|v| v.as_str())
     .is_some_and(|path| {
-      path.starts_with("./.deno/npm/") || path.starts_with(".deno/npm/")
+      path.starts_with("./.oden/npm/") || path.starts_with(".oden/npm/")
     })
 }
 
@@ -506,20 +506,20 @@ fn ensure_root_npm_references(
 }
 
 /// Web-global types that `@types/node` also declares (globally, via `node:url`)
-/// and that must be owned by a single source. Deno ships the `URLPattern`
+/// and that must be owned by a single source. Oden ships the `URLPattern`
 /// *interface* but lets `@types/node` own the *constructor var* (a second
 /// unconditional `declare var URLPattern` would collide, TS2403). That split
 /// means `new URLPattern()` yields Node's type while `x: URLPattern`
-/// annotations use Deno's, and the shapes diverge (`@types/node`'s
-/// `URLPatternResult.inputs` is `URLPatternInput[]`, Deno's/the DOM lib's is the
+/// annotations use Oden's, and the shapes diverge (`@types/node`'s
+/// `URLPatternResult.inputs` is `URLPatternInput[]`, Oden's/the DOM lib's is the
 /// `[URLPatternInit] | [URLPatternInit, string]` tuple) -> TS2322.
 ///
-/// This is a deliberate hack: when generating types we drop Deno's declarations
+/// This is a deliberate hack: when generating types we drop Oden's declarations
 /// for the whole family so both the constructor and the instance type come from
 /// `@types/node`. It assumes the `@types/node` we always install provides these
 /// globals; a project pinning an `@types/node` that doesn't is on its own. The
-/// proper fix is dual-globals reconciliation in Deno's core libs (which also
-/// fixes `deno check`, broken on this today), not this generator.
+/// proper fix is dual-globals reconciliation in Oden's core libs (which also
+/// fixes `oden check`, broken on this today), not this generator.
 const NODE_OWNED_GLOBAL_TYPES: &[&str] = &[
   "URLPattern",
   "URLPatternInit",
@@ -532,12 +532,12 @@ const NODE_OWNED_GLOBAL_TYPES: &[&str] = &[
 ];
 
 /// Whether the project's effective `lib` includes the `dom` lib, from either the
-/// raw deno.json/tsconfig compiler options or Deno's resolved options.
+/// raw oden.json/tsconfig compiler options or Oden's resolved options.
 fn effective_lib_has_dom(
-  deno_compiler_options: Option<&Value>,
+  oden_compiler_options: Option<&Value>,
   resolved_compiler_options: Option<&Value>,
 ) -> bool {
-  [deno_compiler_options, resolved_compiler_options]
+  [oden_compiler_options, resolved_compiler_options]
     .into_iter()
     .flatten()
     .filter_map(|co| co.get("lib").and_then(|l| l.as_array()))
@@ -546,17 +546,17 @@ fn effective_lib_has_dom(
     .any(|l| l.eq_ignore_ascii_case("dom"))
 }
 
-/// Write the Deno type declarations to a `.d.ts` file. When `has_dom` is set the
-/// project opts into the `dom` lib, so emit only the `Deno` namespace and let
+/// Write the Oden type declarations to a `.d.ts` file. When `has_dom` is set the
+/// project opts into the `dom` lib, so emit only the `Oden` namespace and let
 /// `dom` own the web-platform globals (they'd otherwise collide).
-fn write_deno_types(
+fn write_oden_types(
   path: &Path,
   has_node_types: bool,
   has_dom: bool,
   no_types_shims: &[String],
 ) -> Result<(), std::io::Error> {
   let types_text = if has_dom {
-    get_deno_ns_declaration_file_text()
+    get_oden_ns_declaration_file_text()
   } else {
     get_types_declaration_file_text()
   };
@@ -579,17 +579,17 @@ fn write_deno_types(
     filtered
   };
 
-  // Deno's lib bundles the `Temporal` proposal types, which tsc now ships in
+  // Oden's lib bundles the `Temporal` proposal types, which tsc now ships in
   // `lib.esnext.temporal`. Under `skipLibCheck: false` the two copies collide as
-  // duplicate identifiers, so drop Deno's and defer to the stock lib (loaded via
+  // duplicate identifiers, so drop Oden's and defer to the stock lib (loaded via
   // the `esnext` lib).
   let filtered = strip_declare_namespace(&filtered, "Temporal");
 
-  // Ambient declaration so stock tsc resolves and types Deno's CSS module
+  // Ambient declaration so stock tsc resolves and types Oden's CSS module
   // imports. A side-effect `import "./x.css"` just needs the module to exist;
   // a `import sheet from "./x.css" with { type: "css" }` evaluates to a
-  // constructable `CSSStyleSheet`, matching Deno's runtime. `CSSStyleSheet` is
-  // provided by the deno.unstable lib included above. Without this, stock tsc
+  // constructable `CSSStyleSheet`, matching Oden's runtime. `CSSStyleSheet` is
+  // provided by the oden.unstable lib included above. Without this, stock tsc
   // reports TS2882/TS2307 for every CSS import.
   let css_ambient = "\n\ndeclare module \"*.css\" {\n  \
      const stylesheet: CSSStyleSheet;\n  \
@@ -597,7 +597,7 @@ fn write_deno_types(
      }\n";
 
   // Shorthand ambient declarations for imported npm packages that ship no
-  // types, so tsc treats them as `any` (like Deno) instead of TS7016. Their
+  // types, so tsc treats them as `any` (like Oden) instead of TS7016. Their
   // `paths` entries are omitted (see `generate_npm_paths`) so tsc falls through
   // to these ambients rather than loading the package's untyped `.js`.
   let no_types_ambient = if no_types_shims.is_empty() {
@@ -609,7 +609,7 @@ fn write_deno_types(
   std::fs::write(
     path,
     format!(
-      "// Auto-generated by Deno for stock TypeScript tooling.\n\
+      "// Auto-generated by Oden for stock TypeScript tooling.\n\
        // Do not edit — this file is regenerated as needed.\n\n\
        {filtered}{css_ambient}{no_types_ambient}"
     ),
@@ -617,7 +617,7 @@ fn write_deno_types(
 }
 
 /// Remove top-level `interface NAME {...}` and `type NAME = ...;` declarations
-/// (and their leading JSDoc block) for each NAME in `names`. Deno's lib types
+/// (and their leading JSDoc block) for each NAME in `names`. Oden's lib types
 /// are formatted with each top-level declaration's opening at column 0 and its
 /// closing `}` at column 0, which this relies on.
 fn strip_top_level_type_decls(text: &str, names: &[&str]) -> String {
@@ -632,7 +632,7 @@ fn strip_top_level_type_decls(text: &str, names: &[&str]) -> String {
       line.starts_with(&format!("type {n} =")) || line == format!("type {n}")
     });
     // A global constructor `declare var X: {...};` - stripped so `@types/node`
-    // owns the constructor too (Deno's is often a `globalThis extends ...`
+    // owns the constructor too (Oden's is often a `globalThis extends ...`
     // conditional that doesn't defer to node, colliding as TS2403).
     let is_var = names.iter().any(|n| {
       line.starts_with(&format!("declare var {n}:"))
@@ -690,7 +690,7 @@ fn strip_top_level_type_decls(text: &str, names: &[&str]) -> String {
 
 /// Remove a whole `declare namespace <name> { ... }` block (brace-matched) from
 /// `text`, along with the license/JSDoc comment block immediately preceding it.
-/// Used to drop types Deno's lib bundles that tsc now ships in its own libs
+/// Used to drop types Oden's lib bundles that tsc now ships in its own libs
 /// (e.g. `Temporal` in `lib.esnext.temporal`), which collide as duplicate
 /// identifiers under `skipLibCheck: false`.
 fn strip_declare_namespace(text: &str, name: &str) -> String {
@@ -733,10 +733,10 @@ fn strip_declare_namespace(text: &str, name: &str) -> String {
   out.join("\n")
 }
 
-/// Rebase a project-root-relative path onto `.deno/`, where the generated
+/// Rebase a project-root-relative path onto `.oden/`, where the generated
 /// tsconfig lives one level down: `.` -> `..`, `./src` -> `../src`,
 /// `src` -> `../src`, `../x` -> `../../x`. Absolute paths are left untouched.
-fn rebase_onto_deno_dir(path: &str) -> String {
+fn rebase_onto_oden_dir(path: &str) -> String {
   if path == "." {
     return "..".to_string();
   }
@@ -748,18 +748,18 @@ fn rebase_onto_deno_dir(path: &str) -> String {
 
 /// Build the tsconfig JSON object.
 ///
-/// The generated tsconfig lives at `.deno/tsconfig.json`, so all paths
+/// The generated tsconfig lives at `.oden/tsconfig.json`, so all paths
 /// are relative to that directory (e.g. `../node_modules/...` or an absolute
-/// path into Deno's global npm cache).
+/// path into Oden's global npm cache).
 #[allow(
   clippy::too_many_arguments,
   reason = "threads the independent inputs needed to generate a tsconfig"
 )]
 fn build_tsconfig(
   project_root: &Path,
-  deno_compiler_options: Option<&Value>,
+  oden_compiler_options: Option<&Value>,
   resolved_compiler_options: Option<&Value>,
-  deno_imports: Option<&Value>,
+  oden_imports: Option<&Value>,
   check_files: &[String],
   http_modules: &BTreeMap<Url, String>,
   member_paths: &Map<String, Value>,
@@ -772,25 +772,25 @@ fn build_tsconfig(
 ) -> Value {
   let mut compiler_options = base_compiler_options();
 
-  // When @types/node is available, load it alongside @types/deno so Node
+  // When @types/node is available, load it alongside @types/oden so Node
   // globals (timers, node: builtins, Buffer, URLPattern, ...) resolve. Add the
-  // selected local or npm-compat type root alongside the generated Deno types.
+  // selected local or npm-compat type root alongside the generated Oden types.
   if let Some(node_types_root) = node_types_root {
     compiler_options
       .insert("typeRoots".to_string(), json!(["./types", node_types_root]));
-    compiler_options.insert("types".to_string(), json!(["deno", "node"]));
+    compiler_options.insert("types".to_string(), json!(["oden", "node"]));
   }
 
-  // Merge user's deno.json compilerOptions (filtered to stock-tsc-compatible
+  // Merge user's oden.json compilerOptions (filtered to stock-tsc-compatible
   // options only)
-  if let Some(user_opts) = deno_compiler_options {
-    merge_deno_options(&mut compiler_options, user_opts);
+  if let Some(user_opts) = oden_compiler_options {
+    merge_oden_options(&mut compiler_options, user_opts);
   }
 
-  // Overlay Deno's *resolved* compiler options (when available). Unlike the raw
-  // deno.json above, these fold in Deno's source-kind defaults (e.g. `strict`
+  // Overlay Oden's *resolved* compiler options (when available). Unlike the raw
+  // oden.json above, these fold in Oden's source-kind defaults (e.g. `strict`
   // and `noImplicitOverride` default off when a user `tsconfig.json` is in play,
-  // but on for deno.json) and CLI overrides like `--check-js`, so they win.
+  // but on for oden.json) and CLI overrides like `--check-js`, so they win.
   if let Some(resolved) = resolved_compiler_options {
     merge_resolved_options(&mut compiler_options, resolved);
   }
@@ -810,13 +810,13 @@ fn build_tsconfig(
 
   // Generate "paths" for npm: and jsr: specifiers only
   let mut specifier_paths =
-    generate_npm_paths(project_root, deno_imports, npm_package_paths);
+    generate_npm_paths(project_root, oden_imports, npm_package_paths);
   let jsr_paths =
-    generate_jsr_paths(project_root, jsr_packages_dir, deno_imports);
+    generate_jsr_paths(project_root, jsr_packages_dir, oden_imports);
   specifier_paths.extend(jsr_paths);
-  let local_paths = generate_local_alias_paths(deno_imports);
+  let local_paths = generate_local_alias_paths(oden_imports);
   specifier_paths.extend(local_paths);
-  let http_alias_paths = generate_http_alias_paths(deno_imports, http_modules);
+  let http_alias_paths = generate_http_alias_paths(oden_imports, http_modules);
   specifier_paths.extend(http_alias_paths);
   let http_paths = generate_http_paths(http_modules);
   specifier_paths.extend(http_paths);
@@ -827,11 +827,11 @@ fn build_tsconfig(
     specifier_paths.insert(key.clone(), value.clone());
   }
 
-  // Merge user-defined paths from deno.json compilerOptions — these take
+  // Merge user-defined paths from oden.json compilerOptions — these take
   // priority over generated specifier mappings. The user's values are relative
-  // to the project root, but the generated tsconfig lives in `.deno/`, so each
+  // to the project root, but the generated tsconfig lives in `.oden/`, so each
   // value is rebased one level up (like every generated mapping above).
-  if let Some(user_paths) = deno_compiler_options
+  if let Some(user_paths) = oden_compiler_options
     .and_then(|co| co.get("paths"))
     .and_then(|p| p.as_object())
   {
@@ -841,7 +841,7 @@ fn build_tsconfig(
           arr
             .iter()
             .map(|v| match v.as_str() {
-              Some(s) => Value::String(rebase_onto_deno_dir(s)),
+              Some(s) => Value::String(rebase_onto_oden_dir(s)),
               None => v.clone(),
             })
             .collect(),
@@ -852,28 +852,28 @@ fn build_tsconfig(
     }
   }
 
-  // Rebase the user's `baseUrl` onto `.deno/` too (`.` -> `..`, `./src` ->
+  // Rebase the user's `baseUrl` onto `.oden/` too (`.` -> `..`, `./src` ->
   // `../src`), for the same reason.
-  if let Some(base_url) = deno_compiler_options
+  if let Some(base_url) = oden_compiler_options
     .and_then(|co| co.get("baseUrl"))
     .and_then(|b| b.as_str())
   {
     compiler_options
-      .insert("baseUrl".to_string(), json!(rebase_onto_deno_dir(base_url)));
+      .insert("baseUrl".to_string(), json!(rebase_onto_oden_dir(base_url)));
   }
 
-  // Rebase the user's `rootDirs` onto `.deno/` too. Like `paths`/`baseUrl` these
+  // Rebase the user's `rootDirs` onto `.oden/` too. Like `paths`/`baseUrl` these
   // hold project-root-relative directories that stock tsc would otherwise
   // resolve relative to the generated tsconfig (one level down), pointing them
   // at the wrong place.
-  if let Some(root_dirs) = deno_compiler_options
+  if let Some(root_dirs) = oden_compiler_options
     .and_then(|co| co.get("rootDirs"))
     .and_then(|r| r.as_array())
   {
     let rebased: Vec<Value> = root_dirs
       .iter()
       .map(|v| match v.as_str() {
-        Some(s) => Value::String(rebase_onto_deno_dir(s)),
+        Some(s) => Value::String(rebase_onto_oden_dir(s)),
         None => v.clone(),
       })
       .collect();
@@ -881,10 +881,10 @@ fn build_tsconfig(
   }
 
   // Local `.wasm` imports: their generated declarations were mirrored under
-  // `.deno/wasm/<rel>` (as `<name>.d.wasm.ts`). Overlay `.deno/wasm` on the
+  // `.oden/wasm/<rel>` (as `<name>.d.wasm.ts`). Overlay `.oden/wasm` on the
   // project root via `rootDirs` and enable `allowArbitraryExtensions` so tsc
   // resolves a relative `import "./foo.wasm"` (never matched by `paths`) to the
-  // mirror. `..` is the project root as seen from the generated `.deno/`
+  // mirror. `..` is the project root as seen from the generated `.oden/`
   // tsconfig; `./wasm` is the mirror dir. Both are appended to whatever
   // `rootDirs` the user already has (rebased above), so we don't clobber theirs.
   if has_local_wasm {
@@ -910,19 +910,19 @@ fn build_tsconfig(
   }
 
   // Merge the user's `compilerOptions.types`. Bare packages that resolve via
-  // typeRoots (`deno`/`node`/`@types/*`) stay in the `types` array; entries
+  // typeRoots (`oden`/`node`/`@types/*`) stay in the `types` array; entries
   // stock tsc can't resolve there (an imported npm package, a relative path) are
   // materialized as concrete `.d.ts` files added to the program below. See
   // `partition_user_types` / `merge_user_types`.
   let mut extra_type_files: Vec<String> = Vec::new();
-  if let Some(user_types) = deno_compiler_options
+  if let Some(user_types) = oden_compiler_options
     .and_then(|co| co.get("types"))
     .and_then(|t| t.as_array())
   {
     let (keep, files) = partition_user_types(
       project_root,
       user_types,
-      deno_imports,
+      oden_imports,
       npm_package_paths,
     );
     extra_type_files = files;
@@ -940,14 +940,14 @@ fn build_tsconfig(
     compiler_options.insert("paths".to_string(), json!(specifier_paths));
   }
 
-  // The `_deno_generated` sentinel lets Deno's own resolver identify this
+  // The `_oden_generated` sentinel lets Oden's own resolver identify this
   // tsconfig and exclude it from extends chains it processes — see
-  // libs/resolver/deno_json.rs. Stock tsc/tsgo ignore unknown top-level
+  // libs/resolver/oden_json.rs. Stock tsc/tsgo ignore unknown top-level
   // properties.
   let mut tsconfig = if check_files.is_empty() {
     // No specific files — check entire project. Mirror the project's own
-    // `exclude` (from deno.json) so we don't type-check paths Deno itself skips
-    // (test fixtures, generated output, etc.); the tsconfig lives in `.deno/`,
+    // `exclude` (from oden.json) so we don't type-check paths Oden itself skips
+    // (test fixtures, generated output, etc.); the tsconfig lives in `.oden/`,
     // so a project-root pattern `x` is rebased to `../x`.
     let mut exclude = vec![json!("../**/node_modules")];
     for pattern in excludes {
@@ -955,7 +955,7 @@ fn build_tsconfig(
       exclude.push(json!(rebased));
     }
     json!({
-      "_deno_generated": true,
+      "_oden_generated": true,
       "compilerOptions": compiler_options,
       "include": ["../**/*"],
       "exclude": exclude,
@@ -965,7 +965,7 @@ fn build_tsconfig(
     let files_array: Vec<Value> =
       check_files.iter().map(|f| json!(f)).collect();
     json!({
-      "_deno_generated": true,
+      "_oden_generated": true,
       "compilerOptions": compiler_options,
       "files": files_array,
     })
@@ -1003,26 +1003,26 @@ fn build_tsconfig(
 
 /// Generate tsconfig "paths" entries for npm: specifiers.
 ///
-/// Scans `deno.json` `"imports"` for entries like:
+/// Scans `oden.json` `"imports"` for entries like:
 ///   `"express": "npm:express@4"` -> `{ "npm:express": ["<resolved package>"] }`
 ///
 /// With a local `node_modules`, bare aliases continue to resolve through normal
 /// TypeScript package resolution. Without one, both aliases and npm specifiers
-/// map to the exact resolved package folders in Deno's global cache.
+/// map to the exact resolved package folders in Oden's global cache.
 /// Map import-map aliases that point at local files/directories (e.g.
 /// `"@/": "./"`, `"utils": "./src/utils.ts"`) to project-relative paths. The
-/// generated tsconfig lives in `.deno/`, so a project-root path `./x` becomes
+/// generated tsconfig lives in `.oden/`, so a project-root path `./x` becomes
 /// `../x`. Trailing-slash prefix aliases become `<alias>*` -> `../<base>*`.
 /// Map import-map aliases whose target is a mirrored http(s) URL to the local
 /// mirror file, so code (and `jsxImportSource`) that imports the *alias* — e.g.
 /// `lume/jsx-runtime` -> `https://.../jsx-runtime.ts` — resolves. Without this
 /// only the raw URL is mapped, not the alias the source actually uses.
 fn generate_http_alias_paths(
-  deno_imports: Option<&Value>,
+  oden_imports: Option<&Value>,
   http_modules: &BTreeMap<Url, String>,
 ) -> Map<String, Value> {
   let mut paths = Map::new();
-  let Some(imports) = deno_imports.and_then(|v| v.as_object()) else {
+  let Some(imports) = oden_imports.and_then(|v| v.as_object()) else {
     return paths;
   };
   for (alias, target) in imports {
@@ -1042,10 +1042,10 @@ fn generate_http_alias_paths(
 }
 
 fn generate_local_alias_paths(
-  deno_imports: Option<&Value>,
+  oden_imports: Option<&Value>,
 ) -> Map<String, Value> {
   let mut paths = Map::new();
-  let Some(imports) = deno_imports.and_then(|v| v.as_object()) else {
+  let Some(imports) = oden_imports.and_then(|v| v.as_object()) else {
     return paths;
   };
   for (alias, target) in imports {
@@ -1055,7 +1055,7 @@ fn generate_local_alias_paths(
     if !(target.starts_with("./") || target.starts_with("../")) {
       continue;
     }
-    // Re-base a project-root-relative path onto `.deno/` (one level down).
+    // Re-base a project-root-relative path onto `.oden/` (one level down).
     let rebased = format!("../{}", target.trim_start_matches("./"));
     if let Some(prefix) = alias.strip_suffix('/') {
       // Prefix alias: `@/` -> `./` becomes `@/*` -> `../*`.
@@ -1120,17 +1120,17 @@ fn package_ships_no_types(pkg_dir: &Path) -> bool {
 }
 
 /// Shorthand `declare module` lines for imported npm packages that ship no
-/// resolvable types, so stock tsc treats them as `any` (like Deno) instead of
+/// resolvable types, so stock tsc treats them as `any` (like Oden) instead of
 /// reporting TS7016. Only bare (non-subpath) imports of materialized packages
 /// that `package_ships_no_types` confirms are untyped are shimmed; their `paths`
 /// entries are skipped (see `generate_npm_paths`) so tsc uses these ambients.
 fn no_types_npm_shims(
   project_root: &Path,
-  deno_imports: Option<&Value>,
+  oden_imports: Option<&Value>,
   npm_package_paths: &BTreeMap<String, PathBuf>,
 ) -> Vec<String> {
   let mut shims: Vec<String> = Vec::new();
-  let Some(imports) = deno_imports.and_then(|v| v.as_object()) else {
+  let Some(imports) = oden_imports.and_then(|v| v.as_object()) else {
     return shims;
   };
   for (alias, target) in imports {
@@ -1173,12 +1173,12 @@ fn no_types_npm_shims(
 
 fn generate_npm_paths(
   project_root: &Path,
-  deno_imports: Option<&Value>,
+  oden_imports: Option<&Value>,
   npm_package_paths: &BTreeMap<String, PathBuf>,
 ) -> Map<String, Value> {
   let mut paths = Map::new();
 
-  if let Some(imports) = deno_imports.and_then(|v| v.as_object()) {
+  if let Some(imports) = oden_imports.and_then(|v| v.as_object()) {
     for (alias, target) in imports {
       let target_str = match target.as_str() {
         Some(s) if s.starts_with("npm:") => s,
@@ -1197,7 +1197,7 @@ fn generate_npm_paths(
         .unwrap_or_else(|| local_pkg_dir.clone());
       let is_global_cache = pkg_dir != local_pkg_dir;
       // Only map a package that is actually materialized under `node_modules`.
-      // With Deno's default global-cache mode, `deno install` may resolve npm
+      // With Oden's default global-cache mode, `oden install` may resolve npm
       // deps without a local `node_modules/<pkg>`; emitting a path to a
       // nonexistent directory just makes stock tsc fail. The caller warns when
       // this happens so the user knows to enable a node_modules directory.
@@ -1242,7 +1242,7 @@ fn generate_npm_paths(
         }
         None => {
           // A package that ships no types is shimmed as an ambient `any` module
-          // in the generated Deno types (see `no_types_npm_shims`). Skip its
+          // in the generated Oden types (see `no_types_npm_shims`). Skip its
           // path mappings so tsc falls through to that ambient instead of
           // loading the untyped `.js` and reporting TS7016.
           if package_ships_no_types(&pkg_dir) {
@@ -1251,7 +1251,7 @@ fn generate_npm_paths(
           // Bare `npm:preact`: in global-cache mode map straight to the
           // resolved types entry (`.d.ts`) so tsc doesn't have to match the
           // package's `exports` conditions itself - its bundler conditions
-          // exclude `node`/`deno`, which deno resolves, so a
+          // exclude `node`/`oden`, which oden resolves, so a
           // `exports: { "node": { "types": ... } }` package would otherwise be
           // TS2307. Fall back to the package directory when no types entry
           // resolves. In local `node_modules` mode tsc resolves the package
@@ -1314,11 +1314,11 @@ fn generate_npm_paths(
 fn generate_jsr_paths(
   project_root: &Path,
   jsr_packages_dir: &Path,
-  deno_imports: Option<&Value>,
+  oden_imports: Option<&Value>,
 ) -> Map<String, Value> {
   let mut paths = Map::new();
 
-  if let Some(imports) = deno_imports.and_then(|v| v.as_object()) {
+  if let Some(imports) = oden_imports.and_then(|v| v.as_object()) {
     for (alias, target) in imports {
       let target_str = match target.as_str() {
         Some(s) => s,
@@ -1457,7 +1457,7 @@ fn resolve_jsr_types_entry_for_config(
       }
     })?;
   if pkg_dir.starts_with(project_root.join("node_modules")) {
-    path_relative_to_deno_dir(pkg_dir, &resolved)
+    path_relative_to_oden_dir(pkg_dir, &resolved)
   } else {
     Some(resolved.to_string_lossy().replace('\\', "/"))
   }
@@ -1495,7 +1495,7 @@ pub fn resolve_package_source_entry_path(
   }
 }
 
-fn path_relative_to_deno_dir(
+fn path_relative_to_oden_dir(
   pkg_dir: &Path,
   resolved: &Path,
 ) -> Option<String> {
@@ -1533,7 +1533,7 @@ pub fn package_export_keys(pkg_dir: &Path) -> Vec<String> {
 
 fn resolve_jsr_types_entry(pkg_dir: &Path, export_key: &str) -> Option<String> {
   let resolved = resolve_package_types_entry_path(pkg_dir, export_key)?;
-  path_relative_to_deno_dir(pkg_dir, &resolved)
+  path_relative_to_oden_dir(pkg_dir, &resolved)
 }
 
 pub fn resolve_package_types_entry_path(
@@ -1614,7 +1614,7 @@ fn find_types_condition(map: &Map<String, Value>) -> Option<&str> {
 /// Generate tsconfig "paths" entries for http(s): specifiers.
 ///
 /// The installer returns a map from user-facing URL → local mirror path
-/// (already relative to `.deno/`). For X-TypeScript-Types-bearing modules
+/// (already relative to `.oden/`). For X-TypeScript-Types-bearing modules
 /// the local path points at the `.d.ts` rather than the JS source.
 ///
 /// With `moduleResolution: "bundler"`, stock tsc accepts colon-containing
@@ -1668,10 +1668,10 @@ pub fn parse_jsr_specifier(
   Some((scope.to_string(), name.to_string(), version))
 }
 
-/// Base compiler options for stock tsc that approximate Deno's defaults.
+/// Base compiler options for stock tsc that approximate Oden's defaults.
 fn base_compiler_options() -> Map<String, Value> {
   let obj = json!({
-    // Deno defaults
+    // Oden defaults
     "strict": true,
     "noImplicitOverride": true,
     "allowJs": true,
@@ -1689,23 +1689,23 @@ fn base_compiler_options() -> Map<String, Value> {
     // Allow .ts extensions in imports (TS 5.0+)
     "allowImportingTsExtensions": true,
 
-    // Standard libs (Deno-specific libs like deno.window are replaced by
-    // the @types/deno package under .deno/types/)
+    // Standard libs (Oden-specific libs like oden.window are replaced by
+    // the @types/oden package under .oden/types/)
     "lib": ["esnext"],
 
-    // typeRoots points at our private .deno/types/ dir; "types: [deno]"
+    // typeRoots points at our private .oden/types/ dir; "types: [oden]"
     // tells tsc to load exactly that and nothing else. Without this, tsc
     // would auto-include every @types/* in node_modules, which would
-    // collide with Deno's runtime types when this file is read by Deno's
+    // collide with Oden's runtime types when this file is read by Oden's
     // own checker.
     "typeRoots": ["./types"],
-    "types": ["deno"],
+    "types": ["oden"],
 
     // Skip checking node_modules types for speed. TypeScript's own default is
     // false, but turning it off currently surfaces a raft of duplicate-identifier
-    // conflicts between Deno's bundled libs and the stock dom/node/esnext libs
+    // conflicts between Oden's bundled libs and the stock dom/node/esnext libs
     // (Buffer/Uint8Array, FormData/DomIterable, NodeJS namespace, ...). Once
-    // Deno's core libs are stock-tsgo-clean this should flip to false to match
+    // Oden's core libs are stock-tsgo-clean this should flip to false to match
     // TypeScript and check `.d.ts` entrypoints.
     "skipLibCheck": true,
   });
@@ -1716,14 +1716,14 @@ fn base_compiler_options() -> Map<String, Value> {
   }
 }
 
-/// Merge user's deno.json compilerOptions into the base, filtering to only
+/// Merge user's oden.json compilerOptions into the base, filtering to only
 /// options that stock tsc understands.
-fn merge_deno_options(base: &mut Map<String, Value>, user_opts: &Value) {
+fn merge_oden_options(base: &mut Map<String, Value>, user_opts: &Value) {
   let Some(user_map) = user_opts.as_object() else {
     return;
   };
 
-  // Options from deno.json that map directly to tsconfig.json
+  // Options from oden.json that map directly to tsconfig.json
   const PASSTHROUGH_OPTIONS: &[&str] = &[
     "allowUnreachableCode",
     "allowUnusedLabels",
@@ -1748,7 +1748,7 @@ fn merge_deno_options(base: &mut Map<String, Value>, user_opts: &Value) {
     "noUnusedParameters",
     // NOTE: `paths`, `baseUrl`, `rootDirs` are deliberately NOT passed through
     // here - they hold project-root-relative paths that must be rebased onto
-    // `.deno/` (the generated tsconfig lives one level down). They're handled in
+    // `.oden/` (the generated tsconfig lives one level down). They're handled in
     // `build_tsconfig`.
     "skipLibCheck",
     "strict",
@@ -1780,14 +1780,14 @@ fn merge_deno_options(base: &mut Map<String, Value>, user_opts: &Value) {
   }
 }
 
-/// Type-checking options taken from Deno's *resolved* compiler options rather
-/// than the raw deno.json. These fold in Deno's source-kind defaults and CLI
+/// Type-checking options taken from Oden's *resolved* compiler options rather
+/// than the raw oden.json. These fold in Oden's source-kind defaults and CLI
 /// overrides (e.g. `--check-js`), so they win over the base and the raw pass.
 ///
 /// Deliberately excludes `skipLibCheck` (the base default matches TypeScript's,
 /// and the raw pass honors a user override) and the path-like options
 /// (`paths`/`baseUrl`/`rootDirs`), which come from the raw config so
-/// `build_tsconfig` can rebase them onto `.deno/`.
+/// `build_tsconfig` can rebase them onto `.oden/`.
 const RESOLVED_OPTION_KEYS: &[&str] = &[
   "allowUnreachableCode",
   "allowUnusedLabels",
@@ -1820,7 +1820,7 @@ const RESOLVED_OPTION_KEYS: &[&str] = &[
   "verbatimModuleSyntax",
 ];
 
-/// Overlay Deno's resolved compiler options (see `RESOLVED_OPTION_KEYS`) onto
+/// Overlay Oden's resolved compiler options (see `RESOLVED_OPTION_KEYS`) onto
 /// the base. `jsx` and `lib` need translation for stock tsc, so they're handled
 /// specially rather than copied verbatim.
 fn merge_resolved_options(base: &mut Map<String, Value>, resolved: &Value) {
@@ -1832,7 +1832,7 @@ fn merge_resolved_options(base: &mut Map<String, Value>, resolved: &Value) {
       base.insert(key.to_string(), value.clone());
     }
   }
-  // stock tsc doesn't know Deno's `precompile`; treat it as `react-jsx`.
+  // stock tsc doesn't know Oden's `precompile`; treat it as `react-jsx`.
   match map.get("jsx").and_then(|v| v.as_str()) {
     Some("precompile") => {
       base.insert("jsx".to_string(), json!("react-jsx"));
@@ -1847,14 +1847,14 @@ fn merge_resolved_options(base: &mut Map<String, Value>, resolved: &Value) {
   }
 }
 
-/// Keep only libs stock tsc recognizes, always including `esnext`. Deno-specific
-/// libs (`deno.*`) and the `node` pseudo-lib (provided instead via `@types/node`)
+/// Keep only libs stock tsc recognizes, always including `esnext`. Oden-specific
+/// libs (`oden.*`) and the `node` pseudo-lib (provided instead via `@types/node`)
 /// would make stock tsc error (TS6046), so they're dropped.
 fn filter_stock_libs(libs: &[Value]) -> Value {
   let mut out: Vec<Value> = vec![json!("esnext")];
   for lib in libs {
     if let Some(s) = lib.as_str()
-      && !s.starts_with("deno.")
+      && !s.starts_with("oden.")
       && s != "esnext"
       && s != "node"
     {
@@ -1872,7 +1872,7 @@ fn filter_stock_libs(libs: &[Value]) -> Value {
 /// name belongs here: unscoped (`node`) or scoped (`@types/react`). A subpath
 /// entry (`lume/types.ts`) can't resolve this way and would make stock tsc/tsgo
 /// fail the whole program build (TS2688), masking every real diagnostic, so it
-/// is dropped. Deno accepts such entries because it loads them as modules; the
+/// is dropped. Oden accepts such entries because it loads them as modules; the
 /// stock-tooling equivalent is that the (materialized) file is pulled into the
 /// program by the tsconfig `include` glob, which carries its ambient
 /// declarations and `/// <reference lib=... />` directives just the same.
@@ -1881,10 +1881,10 @@ fn filter_stock_libs(libs: &[Value]) -> Value {
 fn npm_types_pkg_dir(
   project_root: &Path,
   name: &str,
-  deno_imports: Option<&Value>,
+  oden_imports: Option<&Value>,
   npm_package_paths: &BTreeMap<String, PathBuf>,
 ) -> Option<PathBuf> {
-  let target = deno_imports?.as_object()?.get(name)?.as_str()?;
+  let target = oden_imports?.as_object()?.get(name)?.as_str()?;
   if !target.starts_with("npm:") {
     return None;
   }
@@ -1904,14 +1904,14 @@ fn npm_types_pkg_dir(
 /// Stock tsc resolves a `types` entry only as a package under
 /// `typeRoots`/`node_modules/@types`; it never consults `paths`, and a plain
 /// (non-`@types`) npm package or a relative path can't resolve that way at all,
-/// which fails the whole build with TS2688 and masks every real diagnostic. Deno
+/// which fails the whole build with TS2688 and masks every real diagnostic. Oden
 /// accepts these because it loads them as modules; the stock-tooling equivalent
 /// is to pull the actual declaration file into the program via `files`, which
 /// carries its ambient/global declarations just the same.
 fn partition_user_types(
   project_root: &Path,
   user_types: &[Value],
-  deno_imports: Option<&Value>,
+  oden_imports: Option<&Value>,
   npm_package_paths: &BTreeMap<String, PathBuf>,
 ) -> (Vec<Value>, Vec<String>) {
   let mut keep_in_types = Vec::new();
@@ -1922,10 +1922,10 @@ fn partition_user_types(
       continue;
     };
     // A relative/path-like entry (`./types.d.ts`) resolves relative to the
-    // generated tsconfig in `.deno/`, pointing at the wrong place; materialize
+    // generated tsconfig in `.oden/`, pointing at the wrong place; materialize
     // it as an absolute file instead.
     // A genuine relative/absolute path (`./types.d.ts`, `/abs/x.d.ts`)
-    // resolves relative to the generated tsconfig in `.deno/`, pointing at the
+    // resolves relative to the generated tsconfig in `.oden/`, pointing at the
     // wrong place; materialize it as an absolute file instead. A missing one is
     // left in so tsc reports it (TS6053), matching the user's intent.
     if s.starts_with('.') || s.starts_with('/') {
@@ -1955,14 +1955,14 @@ fn partition_user_types(
     }
     // A bare npm package the user imports: pull in its declaration file.
     if let Some(pkg_dir) =
-      npm_types_pkg_dir(project_root, s, deno_imports, npm_package_paths)
+      npm_types_pkg_dir(project_root, s, oden_imports, npm_package_paths)
       && let Some(dts) = resolve_package_types_entry_path(&pkg_dir, ".")
       && dts.exists()
     {
       type_files.push(dts.to_string_lossy().replace('\\', "/"));
       continue;
     }
-    // `deno`, `node`, `@types/*`: resolvable via typeRoots, keep as-is.
+    // `oden`, `node`, `@types/*`: resolvable via typeRoots, keep as-is.
     keep_in_types.push(entry.clone());
   }
   (keep_in_types, type_files)
@@ -2031,47 +2031,47 @@ interface AlsoKeep {
   }
 
   #[test]
-  fn test_merge_deno_options_passthrough() {
+  fn test_merge_oden_options_passthrough() {
     let mut base = base_compiler_options();
     let user = json!({
       "strict": false,
       "jsx": "react-jsx",
       "jsxImportSource": "preact",
     });
-    merge_deno_options(&mut base, &user);
+    merge_oden_options(&mut base, &user);
     assert_eq!(base.get("strict").unwrap(), &json!(false));
     assert_eq!(base.get("jsx").unwrap(), &json!("react-jsx"));
     assert_eq!(base.get("jsxImportSource").unwrap(), &json!("preact"));
   }
 
   #[test]
-  fn test_merge_deno_options_precompile_jsx() {
+  fn test_merge_oden_options_precompile_jsx() {
     let mut base = base_compiler_options();
     let user = json!({ "jsx": "precompile" });
-    merge_deno_options(&mut base, &user);
+    merge_oden_options(&mut base, &user);
     assert_eq!(base.get("jsx").unwrap(), &json!("react-jsx"));
   }
 
   #[test]
-  fn test_merge_deno_options_filters_deno_libs() {
+  fn test_merge_oden_options_filters_oden_libs() {
     let mut base = base_compiler_options();
-    let user = json!({ "lib": ["deno.window", "dom", "esnext"] });
-    merge_deno_options(&mut base, &user);
+    let user = json!({ "lib": ["oden.window", "dom", "esnext"] });
+    merge_oden_options(&mut base, &user);
     let lib = base.get("lib").unwrap().as_array().unwrap();
     assert!(lib.contains(&json!("esnext")));
     assert!(lib.contains(&json!("dom")));
-    assert!(!lib.iter().any(|v| v.as_str() == Some("deno.window")));
+    assert!(!lib.iter().any(|v| v.as_str() == Some("oden.window")));
   }
 
   #[test]
-  fn test_merge_deno_options_ignores_unknown() {
+  fn test_merge_oden_options_ignores_unknown() {
     let mut base = base_compiler_options();
     let user = json!({
       "strict": false,
       "unknownOption": true,
       "target": "es2020",
     });
-    merge_deno_options(&mut base, &user);
+    merge_oden_options(&mut base, &user);
     assert_eq!(base.get("strict").unwrap(), &json!(false));
     // unknownOption and target should not pass through
     assert!(base.get("unknownOption").is_none());
@@ -2081,7 +2081,7 @@ interface AlsoKeep {
 
   #[test]
   fn test_merge_user_types() {
-    let mut base = vec![json!("deno"), json!("node")];
+    let mut base = vec![json!("oden"), json!("node")];
     let user = vec![
       // unscoped bare package -> resolves via typeRoots/node_modules, kept
       json!("react"),
@@ -2101,7 +2101,7 @@ interface AlsoKeep {
     assert_eq!(
       base,
       vec![
-        json!("deno"),
+        json!("oden"),
         json!("node"),
         json!("react"),
         json!("@types/react"),
@@ -2243,7 +2243,7 @@ interface AlsoKeep {
     assert!(!paths.contains_key("npm:chalk/*"));
     assert!(!paths.contains_key("chalk/*"));
 
-    // Paths should be relative to .deno/
+    // Paths should be relative to .oden/
     assert_eq!(
       paths.get("npm:chalk").unwrap(),
       &json!(["../node_modules/chalk"])
@@ -2303,7 +2303,7 @@ interface AlsoKeep {
   #[test]
   fn test_generate_jsr_paths_prefers_declarations() {
     let project = tempfile::tempdir().unwrap();
-    let jsr_dir = project.path().join(".deno/npm-compat/@jsr");
+    let jsr_dir = project.path().join(".oden/npm-compat/@jsr");
     let pkg_dir = jsr_dir.join("std__example");
     std::fs::create_dir_all(pkg_dir.join("_dist")).unwrap();
     std::fs::write(
@@ -2379,7 +2379,7 @@ interface AlsoKeep {
   }
 
   #[test]
-  fn test_build_tsconfig_includes_relative_to_deno_dir() {
+  fn test_build_tsconfig_includes_relative_to_oden_dir() {
     let project_root = Path::new("/tmp/project");
     let tsconfig = build_tsconfig(
       project_root,
@@ -2530,7 +2530,7 @@ interface AlsoKeep {
       .unwrap();
 
     // User's custom path should override the generated one, rebased onto
-    // `.deno/` (the generated tsconfig lives one level below the project root).
+    // `.oden/` (the generated tsconfig lives one level below the project root).
     assert_eq!(
       paths.get("npm:chalk").unwrap(),
       &json!(["../my-custom-chalk"])
@@ -2540,12 +2540,12 @@ interface AlsoKeep {
   }
 
   #[test]
-  fn test_rebase_onto_deno_dir() {
-    assert_eq!(rebase_onto_deno_dir("."), "..");
-    assert_eq!(rebase_onto_deno_dir("./src/*"), "../src/*");
-    assert_eq!(rebase_onto_deno_dir("src/*"), "../src/*");
-    assert_eq!(rebase_onto_deno_dir("../shared"), "../../shared");
-    assert_eq!(rebase_onto_deno_dir("/abs/path"), "/abs/path");
+  fn test_rebase_onto_oden_dir() {
+    assert_eq!(rebase_onto_oden_dir("."), "..");
+    assert_eq!(rebase_onto_oden_dir("./src/*"), "../src/*");
+    assert_eq!(rebase_onto_oden_dir("src/*"), "../src/*");
+    assert_eq!(rebase_onto_oden_dir("../shared"), "../../shared");
+    assert_eq!(rebase_onto_oden_dir("/abs/path"), "/abs/path");
   }
 
   #[test]
@@ -2559,7 +2559,7 @@ interface AlsoKeep {
     let tsconfig: Value = serde_json::from_str(&content).unwrap();
     assert_eq!(
       tsconfig.get("extends").unwrap(),
-      &json!("./.deno/tsconfig.json")
+      &json!("./.oden/tsconfig.json")
     );
   }
 
@@ -2582,7 +2582,7 @@ interface AlsoKeep {
     // Should add extends
     assert_eq!(
       tsconfig.get("extends").unwrap(),
-      &json!("./.deno/tsconfig.json")
+      &json!("./.oden/tsconfig.json")
     );
     // Should preserve existing options
     assert_eq!(
@@ -2613,7 +2613,7 @@ interface AlsoKeep {
     // Ours goes first so the user's team config overrides our defaults.
     assert_eq!(
       tsconfig.get("extends").unwrap(),
-      &json!(["./.deno/tsconfig.json", "./team-shared.json"])
+      &json!(["./.oden/tsconfig.json", "./team-shared.json"])
     );
   }
 
@@ -2634,7 +2634,7 @@ interface AlsoKeep {
     let tsconfig: Value = serde_json::from_str(&content).unwrap();
     assert_eq!(
       tsconfig.get("extends").unwrap(),
-      &json!(["./.deno/tsconfig.json", "./a.json", "./b.json"])
+      &json!(["./.oden/tsconfig.json", "./a.json", "./b.json"])
     );
   }
 
@@ -2664,7 +2664,7 @@ interface AlsoKeep {
     // extends added, user's options not dropped.
     assert_eq!(
       parsed.get("extends").unwrap(),
-      &json!("./.deno/tsconfig.json")
+      &json!("./.oden/tsconfig.json")
     );
     assert_eq!(
       parsed.get("compilerOptions").and_then(|c| c.get("strict")),
@@ -2688,7 +2688,7 @@ interface AlsoKeep {
 
     std::fs::write(
       root.join("tsconfig.json"),
-      r#"{ "extends": ["./a.json", "./.deno/tsconfig.json"] }"#,
+      r#"{ "extends": ["./a.json", "./.oden/tsconfig.json"] }"#,
     )
     .unwrap();
 
@@ -2698,7 +2698,7 @@ interface AlsoKeep {
     let tsconfig: Value = serde_json::from_str(&content).unwrap();
     assert_eq!(
       tsconfig.get("extends").unwrap(),
-      &json!(["./a.json", "./.deno/tsconfig.json"])
+      &json!(["./a.json", "./.oden/tsconfig.json"])
     );
   }
 
@@ -2710,7 +2710,7 @@ interface AlsoKeep {
     // Create tsconfig with correct extends already set
     std::fs::write(
       root.join("tsconfig.json"),
-      r#"{ "extends": "./.deno/tsconfig.json", "compilerOptions": {} }"#,
+      r#"{ "extends": "./.oden/tsconfig.json", "compilerOptions": {} }"#,
     )
     .unwrap();
 
@@ -2720,7 +2720,7 @@ interface AlsoKeep {
     let tsconfig: Value = serde_json::from_str(&content).unwrap();
     assert_eq!(
       tsconfig.get("extends").unwrap(),
-      &json!("./.deno/tsconfig.json")
+      &json!("./.oden/tsconfig.json")
     );
   }
 
@@ -2734,7 +2734,7 @@ interface AlsoKeep {
   // keep the user's project reference
   "references": [
     { "path": "./packages/app" },
-    { "path": "./.deno/npm/stale/tsconfig.json" }
+    { "path": "./.oden/npm/stale/tsconfig.json" }
   ]
 }"#,
     )
@@ -2759,8 +2759,8 @@ interface AlsoKeep {
       parsed.get("references"),
       Some(&json!([
         { "path": "./packages/app" },
-        { "path": "./.deno/npm/a/tsconfig.json" },
-        { "path": "./.deno/npm/b/tsconfig.json" },
+        { "path": "./.oden/npm/a/tsconfig.json" },
+        { "path": "./.oden/npm/b/tsconfig.json" },
       ])),
     );
   }

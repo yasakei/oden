@@ -1,3 +1,3 @@
-import { add } from "@denotest/add";
+import { add } from "@odentest/add";
 
 console.log(`1 + 2 = ${add(1, 2)}`);

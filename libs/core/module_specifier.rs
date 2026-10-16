@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use url::ParseError;
 use url::Url;
@@ -144,7 +144,7 @@ mod tests {
       ),
       (
         "//server/some/dir/file",
-        "file:///home/yeti/deno",
+        "file:///home/yeti/oden",
         "file://server/some/dir/file",
       ),
       // This test is disabled because the url crate does not follow the spec,

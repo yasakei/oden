@@ -1,9 +1,9 @@
-const binaryName = Deno.build.os === "windows" ? "binary.exe" : "binary";
-Deno.copyFileSync(Deno.execPath(), binaryName);
+const binaryName = Oden.build.os === "windows" ? "binary.exe" : "binary";
+Oden.copyFileSync(Oden.execPath(), binaryName);
 
 console.log("Running...");
-new Deno.Command(
-  Deno.execPath(),
+new Oden.Command(
+  Oden.execPath(),
   {
     args: [
       "run",
@@ -13,7 +13,7 @@ new Deno.Command(
       "sub.ts",
     ],
     env: {
-      PATH: Deno.cwd(),
+      PATH: Oden.cwd(),
     },
     stderr: "inherit",
     stdout: "inherit",

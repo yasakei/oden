@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::future::Future;
@@ -6,56 +6,56 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use deno_bundle_runtime::BundlePlatform;
-use deno_cache_dir::GlobalOrLocalHttpCache;
-use deno_cache_dir::npm::NpmCacheDir;
-use deno_config::workspace::WorkspaceDirectory;
-use deno_core::anyhow::Context;
-use deno_core::error::AnyError;
-use deno_core::futures::FutureExt;
-use deno_core::serde_json;
-use deno_core::url::Url;
+use oden_bundle_runtime::BundlePlatform;
+use oden_cache_dir::GlobalOrLocalHttpCache;
+use oden_cache_dir::npm::NpmCacheDir;
+use oden_config::workspace::WorkspaceDirectory;
+use oden_core::anyhow::Context;
+use oden_core::error::AnyError;
+use oden_core::futures::FutureExt;
+use oden_core::serde_json;
+use oden_core::url::Url;
 use deno_error::JsErrorBox;
 use deno_graph::packages::JsrVersionResolver;
-use deno_lib::args::CaData;
-use deno_lib::args::get_root_cert_store;
-use deno_lib::args::npm_process_state;
-use deno_lib::npm::NpmRegistryReadPermissionChecker;
-use deno_lib::npm::NpmRegistryReadPermissionCheckerMode;
-use deno_lib::npm::create_npm_process_state_provider;
-use deno_lib::worker::LibMainWorkerFactory;
-use deno_lib::worker::LibMainWorkerOptions;
-use deno_lib::worker::LibWorkerFactoryRoots;
-use deno_npm::resolution::NpmVersionResolver;
-use deno_npm_cache::NpmCacheSetting;
-use deno_npm_installer::NpmInstallerFactoryOptions;
-use deno_npm_installer::lifecycle_scripts::LifecycleScriptsExecutor;
-use deno_npm_installer::lifecycle_scripts::NullLifecycleScriptsExecutor;
-use deno_npm_installer::process_state::NpmProcessStateKind;
-use deno_npmrc::ResolvedNpmRc;
-use deno_resolver::cache::ParsedSourceCache;
-use deno_resolver::cjs::IsCjsResolutionMode;
-use deno_resolver::deno_json::CompilerOptionsOverrides;
-use deno_resolver::deno_json::CompilerOptionsResolver;
-use deno_resolver::factory::ConfigDiscoveryOption;
-use deno_resolver::factory::NpmProcessStateOptions;
-use deno_resolver::factory::ResolverFactoryOptions;
-use deno_resolver::factory::SpecifiedImportMapProvider;
-use deno_resolver::import_map::WorkspaceExternalImportMapLoader;
-use deno_resolver::loader::MemoryFiles;
-use deno_resolver::npm::DenoInNpmPackageChecker;
-use deno_resolver::workspace::WorkspaceResolver;
-use deno_runtime::CpuProfilerConfig;
-use deno_runtime::FeatureChecker;
-use deno_runtime::deno_fs;
-use deno_runtime::deno_fs::RealFs;
-use deno_runtime::deno_permissions::Permissions;
-use deno_runtime::deno_permissions::PermissionsContainer;
-use deno_runtime::deno_tls::RootCertStoreProvider;
-use deno_runtime::deno_tls::rustls::RootCertStore;
-use deno_runtime::deno_web::BlobStore;
-use deno_runtime::deno_web::BlobStoreTrait;
-use deno_runtime::permissions::RuntimePermissionDescriptorParser;
+use oden_lib::args::CaData;
+use oden_lib::args::get_root_cert_store;
+use oden_lib::args::npm_process_state;
+use oden_lib::npm::NpmRegistryReadPermissionChecker;
+use oden_lib::npm::NpmRegistryReadPermissionCheckerMode;
+use oden_lib::npm::create_npm_process_state_provider;
+use oden_lib::worker::LibMainWorkerFactory;
+use oden_lib::worker::LibMainWorkerOptions;
+use oden_lib::worker::LibWorkerFactoryRoots;
+use oden_npm::resolution::NpmVersionResolver;
+use oden_npm_cache::NpmCacheSetting;
+use oden_npm_installer::NpmInstallerFactoryOptions;
+use oden_npm_installer::lifecycle_scripts::LifecycleScriptsExecutor;
+use oden_npm_installer::lifecycle_scripts::NullLifecycleScriptsExecutor;
+use oden_npm_installer::process_state::NpmProcessStateKind;
+use oden_npmrc::ResolvedNpmRc;
+use oden_resolver::cache::ParsedSourceCache;
+use oden_resolver::cjs::IsCjsResolutionMode;
+use oden_resolver::oden_json::CompilerOptionsOverrides;
+use oden_resolver::oden_json::CompilerOptionsResolver;
+use oden_resolver::factory::ConfigDiscoveryOption;
+use oden_resolver::factory::NpmProcessStateOptions;
+use oden_resolver::factory::ResolverFactoryOptions;
+use oden_resolver::factory::SpecifiedImportMapProvider;
+use oden_resolver::import_map::WorkspaceExternalImportMapLoader;
+use oden_resolver::loader::MemoryFiles;
+use oden_resolver::npm::OdenInNpmPackageChecker;
+use oden_resolver::workspace::WorkspaceResolver;
+use oden_runtime::CpuProfilerConfig;
+use oden_runtime::FeatureChecker;
+use oden_runtime::oden_fs;
+use oden_runtime::oden_fs::RealFs;
+use oden_runtime::oden_permissions::Permissions;
+use oden_runtime::oden_permissions::PermissionsContainer;
+use oden_runtime::oden_tls::RootCertStoreProvider;
+use oden_runtime::oden_tls::rustls::RootCertStore;
+use oden_runtime::oden_web::BlobStore;
+use oden_runtime::oden_web::BlobStoreTrait;
+use oden_runtime::permissions::RuntimePermissionDescriptorParser;
 use node_resolver::NodeConditionOptions;
 use node_resolver::NodeResolverOptions;
 use node_resolver::cache::NodeResolutionThreadLocalCache;
@@ -65,7 +65,7 @@ use crate::args::BundleFlags;
 use crate::args::CliLockfile;
 use crate::args::CliOptions;
 use crate::args::ConfigFlag;
-use crate::args::DenoSubcommand;
+use crate::args::OdenSubcommand;
 use crate::args::Flags;
 use crate::args::FlagsExt;
 use crate::args::InstallFlags;
@@ -73,7 +73,7 @@ use crate::args::InstallFlagsLocal;
 use crate::args::npm_system_info;
 use crate::cache::Caches;
 use crate::cache::CodeCache;
-use crate::cache::DenoDir;
+use crate::cache::OdenDir;
 use crate::cache::GlobalHttpCache;
 use crate::cache::ModuleInfoCache;
 use crate::cache::SqliteNodeAnalysisCache;
@@ -99,13 +99,13 @@ use crate::npm::CliNpmGraphResolver;
 use crate::npm::CliNpmInstaller;
 use crate::npm::CliNpmInstallerFactory;
 use crate::npm::CliNpmResolver;
-use crate::npm::DenoTaskLifeCycleScriptsExecutor;
+use crate::npm::OdenTaskLifeCycleScriptsExecutor;
 use crate::npm::NpmPackumentFormat;
 use crate::resolver::CliCjsTracker;
 use crate::resolver::CliNpmReqResolver;
 use crate::resolver::CliResolver;
 use crate::resolver::on_resolve_diagnostic;
-use crate::standalone::binary::DenoCompileBinaryWriter;
+use crate::standalone::binary::OdenCompileBinaryWriter;
 use crate::sys::CliSys;
 use crate::tools::installer::BinNameResolver;
 use crate::tools::lint::LintRuleProvider;
@@ -165,7 +165,7 @@ struct EszipModuleLoaderProvider {
 impl EszipModuleLoaderProvider {
   pub async fn get(&self) -> Result<Option<&Arc<EszipModuleLoader>>, AnyError> {
     if self.cli_options.eszip()
-      && let DenoSubcommand::Run(run_flags) = self.cli_options.sub_command()
+      && let OdenSubcommand::Run(run_flags) = self.cli_options.sub_command()
     {
       if self.deferred.get().is_none() {
         let eszip_loader = EszipModuleLoader::create(
@@ -194,7 +194,7 @@ struct CliSpecifiedImportMapProvider {
 impl SpecifiedImportMapProvider for CliSpecifiedImportMapProvider {
   async fn get(
     &self,
-  ) -> Result<Option<deno_resolver::workspace::SpecifiedImportMap>, AnyError>
+  ) -> Result<Option<oden_resolver::workspace::SpecifiedImportMap>, AnyError>
   {
     async fn resolve_import_map_value_from_specifier(
       specifier: &Url,
@@ -227,7 +227,7 @@ impl SpecifiedImportMapProvider for CliSpecifiedImportMapProvider {
             format!("Unable to load '{}' import map", specifier)
           })?,
         };
-        Ok(Some(deno_resolver::workspace::SpecifiedImportMap {
+        Ok(Some(oden_resolver::workspace::SpecifiedImportMap {
           base_url: specifier,
           value,
         }))
@@ -237,7 +237,7 @@ impl SpecifiedImportMapProvider for CliSpecifiedImportMapProvider {
           self.workspace_external_import_map_loader.get_or_load()?
         {
           let path_url = deno_path_util::url_from_file_path(&import_map.path)?;
-          Ok(Some(deno_resolver::workspace::SpecifiedImportMap {
+          Ok(Some(oden_resolver::workspace::SpecifiedImportMap {
             base_url: path_url,
             value: import_map.value.clone(),
           }))
@@ -249,8 +249,8 @@ impl SpecifiedImportMapProvider for CliSpecifiedImportMapProvider {
   }
 }
 
-pub type CliWorkspaceFactory = deno_resolver::factory::WorkspaceFactory<CliSys>;
-pub type CliResolverFactory = deno_resolver::factory::ResolverFactory<CliSys>;
+pub type CliWorkspaceFactory = oden_resolver::factory::WorkspaceFactory<CliSys>;
+pub type CliResolverFactory = oden_resolver::factory::ResolverFactory<CliSys>;
 
 pub struct Deferred<T>(once_cell::unsync::OnceCell<T>);
 
@@ -307,7 +307,7 @@ struct CliFactoryServices {
   eszip_module_loader_provider: Deferred<Arc<EszipModuleLoaderProvider>>,
   feature_checker: Deferred<Arc<FeatureChecker>>,
   file_fetcher: Deferred<Arc<CliFileFetcher>>,
-  fs: Deferred<Arc<dyn deno_fs::FileSystem>>,
+  fs: Deferred<Arc<dyn oden_fs::FileSystem>>,
   http_client_provider: Deferred<Arc<HttpClientProvider>>,
   import_deny_permissions: Deferred<Option<PermissionsContainer>>,
   import_http_client_provider: Deferred<Arc<HttpClientProvider>>,
@@ -393,11 +393,11 @@ impl CliFactory {
     })
   }
 
-  pub fn deno_dir(&self) -> Result<&DenoDir, AnyError> {
+  pub fn oden_dir(&self) -> Result<&OdenDir, AnyError> {
     Ok(
       self
         .workspace_factory()?
-        .deno_dir_provider()
+        .oden_dir_provider()
         .get_or_create()?,
     )
   }
@@ -406,15 +406,15 @@ impl CliFactory {
     self.services.caches.get_or_try_init(|| {
       let cli_options = self.cli_options()?;
       let caches = Arc::new(Caches::new(
-        self.workspace_factory()?.deno_dir_provider().clone(),
+        self.workspace_factory()?.oden_dir_provider().clone(),
       ));
       // Warm up the caches we know we'll likely need based on the CLI mode
       match cli_options.sub_command() {
-        DenoSubcommand::Run(_)
-        | DenoSubcommand::Serve(_)
-        | DenoSubcommand::Bench(_)
-        | DenoSubcommand::Test(_)
-        | DenoSubcommand::Check(_) => {
+        OdenSubcommand::Run(_)
+        | OdenSubcommand::Serve(_)
+        | OdenSubcommand::Bench(_)
+        | OdenSubcommand::Test(_)
+        | OdenSubcommand::Check(_) => {
           _ = caches.dep_analysis_db();
           _ = caches.node_analysis_db();
           if cli_options.type_check_mode().is_true() {
@@ -570,7 +570,7 @@ impl CliFactory {
     })
   }
 
-  pub fn fs(&self) -> &Arc<dyn deno_fs::FileSystem> {
+  pub fn fs(&self) -> &Arc<dyn oden_fs::FileSystem> {
     self.services.fs.get_or_init(|| Arc::new(RealFs))
   }
 
@@ -584,7 +584,7 @@ impl CliFactory {
 
   pub fn in_npm_pkg_checker(
     &self,
-  ) -> Result<&DenoInNpmPackageChecker, AnyError> {
+  ) -> Result<&OdenInNpmPackageChecker, AnyError> {
     self.resolver_factory()?.in_npm_package_checker()
   }
 
@@ -605,7 +605,7 @@ impl CliFactory {
     let sys = self.sys();
     let npm_cache_dir = Arc::new(NpmCacheDir::new(
       &sys,
-      self.deno_dir()?.npm_folder_path(),
+      self.oden_dir()?.npm_folder_path(),
       npmrc.get_all_known_registries_urls(),
     ));
     let packument_format = NpmPackumentFormat::new(
@@ -630,7 +630,7 @@ impl CliFactory {
       self
         .install_reporter()?
         .cloned()
-        .map(|r| r as Arc<dyn deno_npm_cache::TarballCacheReporter>),
+        .map(|r| r as Arc<dyn oden_npm_cache::TarballCacheReporter>),
     ))
   }
 
@@ -676,7 +676,7 @@ impl CliFactory {
         )),
         match resolver_factory.npm_resolver()?.as_managed() {
           Some(managed_npm_resolver) => {
-            Arc::new(DenoTaskLifeCycleScriptsExecutor::new(
+            Arc::new(OdenTaskLifeCycleScriptsExecutor::new(
               managed_npm_resolver.clone(),
               self.text_only_progress_bar().clone(),
               cli_options.npm_system_info(),
@@ -688,18 +688,18 @@ impl CliFactory {
         self
           .install_reporter()?
           .cloned()
-          .map(|r| r as Arc<dyn deno_npm_installer::InstallReporter>),
+          .map(|r| r as Arc<dyn oden_npm_installer::InstallReporter>),
         NpmInstallerFactoryOptions {
           clean_on_install: match cli_options.sub_command() {
-            DenoSubcommand::Add { .. }
-            | DenoSubcommand::ApproveScripts { .. }
-            | DenoSubcommand::Remove { .. }
-            | DenoSubcommand::Link { .. }
-            | DenoSubcommand::Unlink { .. }
-            | DenoSubcommand::Cache { .. }
-            | DenoSubcommand::Ci { .. }
-            | DenoSubcommand::Uninstall { .. } => true,
-            DenoSubcommand::Install(flags) => match flags {
+            OdenSubcommand::Add { .. }
+            | OdenSubcommand::ApproveScripts { .. }
+            | OdenSubcommand::Remove { .. }
+            | OdenSubcommand::Link { .. }
+            | OdenSubcommand::Unlink { .. }
+            | OdenSubcommand::Cache { .. }
+            | OdenSubcommand::Ci { .. }
+            | OdenSubcommand::Uninstall { .. } => true,
+            OdenSubcommand::Install(flags) => match flags {
               InstallFlags::Local(flags, _) => match flags {
                 InstallFlagsLocal::Add { .. }
                 | InstallFlagsLocal::TopLevel { .. } => true,
@@ -710,55 +710,55 @@ impl CliFactory {
               },
               InstallFlags::Global(_) => false,
             },
-            DenoSubcommand::Audit { .. }
-            | DenoSubcommand::Bench { .. }
-            | DenoSubcommand::Bundle { .. }
-            | DenoSubcommand::Check { .. }
-            | DenoSubcommand::Clean { .. }
-            | DenoSubcommand::Compile { .. }
-            | DenoSubcommand::Completions { .. }
-            | DenoSubcommand::Desktop { .. }
-            | DenoSubcommand::Coverage { .. }
-            | DenoSubcommand::Deploy { .. }
-            | DenoSubcommand::Doc { .. }
-            | DenoSubcommand::Eval { .. }
-            | DenoSubcommand::Fmt { .. }
-            | DenoSubcommand::Init { .. }
-            | DenoSubcommand::Info { .. }
-            | DenoSubcommand::List { .. }
-            | DenoSubcommand::JSONReference { .. }
-            | DenoSubcommand::Jupyter { .. }
-            | DenoSubcommand::Lsp
-            | DenoSubcommand::SyncTypes { .. }
-            | DenoSubcommand::Lint { .. }
-            | DenoSubcommand::Repl { .. }
-            | DenoSubcommand::Run { .. }
-            | DenoSubcommand::Serve { .. }
-            | DenoSubcommand::Task { .. }
-            | DenoSubcommand::Test { .. }
-            | DenoSubcommand::Transpile { .. }
-            | DenoSubcommand::Outdated { .. }
-            | DenoSubcommand::Types
-            | DenoSubcommand::Upgrade { .. }
-            | DenoSubcommand::Vendor
-            | DenoSubcommand::Why { .. }
-            | DenoSubcommand::Pack { .. }
-            | DenoSubcommand::Publish { .. }
-            | DenoSubcommand::Help { .. }
-            | DenoSubcommand::X { .. }
-            | DenoSubcommand::BumpVersion { .. } => false,
+            OdenSubcommand::Audit { .. }
+            | OdenSubcommand::Bench { .. }
+            | OdenSubcommand::Bundle { .. }
+            | OdenSubcommand::Check { .. }
+            | OdenSubcommand::Clean { .. }
+            | OdenSubcommand::Compile { .. }
+            | OdenSubcommand::Completions { .. }
+            | OdenSubcommand::Desktop { .. }
+            | OdenSubcommand::Coverage { .. }
+            | OdenSubcommand::Deploy { .. }
+            | OdenSubcommand::Doc { .. }
+            | OdenSubcommand::Eval { .. }
+            | OdenSubcommand::Fmt { .. }
+            | OdenSubcommand::Init { .. }
+            | OdenSubcommand::Info { .. }
+            | OdenSubcommand::List { .. }
+            | OdenSubcommand::JSONReference { .. }
+            | OdenSubcommand::Jupyter { .. }
+            | OdenSubcommand::Lsp
+            | OdenSubcommand::SyncTypes { .. }
+            | OdenSubcommand::Lint { .. }
+            | OdenSubcommand::Repl { .. }
+            | OdenSubcommand::Run { .. }
+            | OdenSubcommand::Serve { .. }
+            | OdenSubcommand::Task { .. }
+            | OdenSubcommand::Test { .. }
+            | OdenSubcommand::Transpile { .. }
+            | OdenSubcommand::Outdated { .. }
+            | OdenSubcommand::Types
+            | OdenSubcommand::Upgrade { .. }
+            | OdenSubcommand::Vendor
+            | OdenSubcommand::Why { .. }
+            | OdenSubcommand::Pack { .. }
+            | OdenSubcommand::Publish { .. }
+            | OdenSubcommand::Help { .. }
+            | OdenSubcommand::X { .. }
+            | OdenSubcommand::BumpVersion { .. } => false,
           },
           // Always merge equivalent peer-dep variants when loading the
           // snapshot from a lockfile. This is an in-memory normalization
           // that collapses `NpmPackageId`s which differ only in
           // peer-dependency cycle-unrolling depth (the encoding changed
           // between releases, e.g. 2.7 -> 2.8). Without it, a complete
-          // lockfile written by an older deno is treated as not satisfying
+          // lockfile written by an older oden is treated as not satisfying
           // the requirements and the whole npm graph is re-resolved against
           // the registry, which fails under `--cached-only` (offline
-          // isolates booting from an immutable, pre-baked `DENO_DIR`). See
+          // isolates booting from an immutable, pre-baked `ODEN_DIR`). See
           // denoland/deno#26427 for the original install-path dedup. This is
-          // safe on `deno run`: the dedup only affects the in-memory
+          // safe on `oden run`: the dedup only affects the in-memory
           // resolution snapshot and does not rewrite the user's lockfile
           // unless a real resolution runs (which the dedup is precisely what
           // avoids for an already-satisfied lockfile).
@@ -769,29 +769,29 @@ impl CliFactory {
           caching_strategy: cli_options.default_npm_caching_strategy(),
           lifecycle_scripts_config: cli_options.lifecycle_scripts_config(),
           production: match cli_options.sub_command() {
-            DenoSubcommand::Install(InstallFlags::Local(flags, _)) => {
+            OdenSubcommand::Install(InstallFlags::Local(flags, _)) => {
               match flags {
                 InstallFlagsLocal::TopLevel(f) => f.production,
                 InstallFlagsLocal::Entrypoints(f) => f.production,
                 InstallFlagsLocal::Add(_) => false,
               }
             }
-            DenoSubcommand::Ci(f) => f.production,
+            OdenSubcommand::Ci(f) => f.production,
             _ => false,
           },
           skip_types: match cli_options.sub_command() {
-            DenoSubcommand::Install(InstallFlags::Local(flags, _)) => {
+            OdenSubcommand::Install(InstallFlags::Local(flags, _)) => {
               match flags {
                 InstallFlagsLocal::TopLevel(f) => f.skip_types,
                 InstallFlagsLocal::Entrypoints(f) => f.skip_types,
                 InstallFlagsLocal::Add(_) => false,
               }
             }
-            DenoSubcommand::Ci(f) => f.skip_types,
+            OdenSubcommand::Ci(f) => f.skip_types,
             _ => false,
           },
           resolve_npm_resolution_snapshot: Box::new(|| {
-            deno_lib::args::resolve_npm_resolution_snapshot(&CliSys::default())
+            oden_lib::args::resolve_npm_resolution_snapshot(&CliSys::default())
           }),
         },
       ))
@@ -812,10 +812,10 @@ impl CliFactory {
       .services
       .install_reporter
       .get_or_try_init(|| match self.cli_options()?.sub_command() {
-        DenoSubcommand::Install(InstallFlags::Local(_, _))
-        | DenoSubcommand::Add(_)
-        | DenoSubcommand::Cache(_)
-        | DenoSubcommand::Ci(_) => Ok(Some(Arc::new(
+        OdenSubcommand::Install(InstallFlags::Local(_, _))
+        | OdenSubcommand::Add(_)
+        | OdenSubcommand::Cache(_)
+        | OdenSubcommand::Ci(_) => Ok(Some(Arc::new(
           crate::tools::installer::InstallReporter::new(),
         ))),
         _ => Ok(None),
@@ -847,7 +847,7 @@ impl CliFactory {
         None
           if matches!(
             self.flags.subcommand,
-            DenoSubcommand::Repl(_) | DenoSubcommand::Eval(_)
+            OdenSubcommand::Repl(_) | OdenSubcommand::Eval(_)
           ) =>
         {
           crate::util::env::resolve_cwd_or_fallback(
@@ -878,14 +878,14 @@ impl CliFactory {
 
   pub async fn resolver(&self) -> Result<&Arc<CliResolver>, AnyError> {
     self.initialize_npm_resolution_if_managed().await?;
-    self.resolver_factory()?.deno_resolver().await
+    self.resolver_factory()?.oden_resolver().await
   }
 
   pub fn graph_reporter(
     &self,
   ) -> Result<&Option<Arc<dyn deno_graph::source::Reporter>>, AnyError> {
     match self.cli_options()?.sub_command() {
-      DenoSubcommand::Install(_) | DenoSubcommand::Ci(_) => {
+      OdenSubcommand::Install(_) | OdenSubcommand::Ci(_) => {
         self.services.graph_reporter.get_or_try_init(|| {
           self.install_reporter().map(|opt| {
             opt.map(|r| r.clone() as Arc<dyn deno_graph::source::Reporter>)
@@ -1026,7 +1026,7 @@ impl CliFactory {
             self.root_permissions_container()?.clone(),
             self.sys(),
             self.install_reporter()?.cloned().map(|r| {
-              r as Arc<dyn deno_resolver::file_fetcher::GraphLoaderReporter>
+              r as Arc<dyn oden_resolver::file_fetcher::GraphLoaderReporter>
             }),
           )))
         }
@@ -1079,7 +1079,7 @@ impl CliFactory {
     if let Some((host, name, publish_uid)) =
       cli_options.resolve_inspector_server_options()
     {
-      deno_runtime::deno_inspector_server::create_inspector_server(
+      oden_runtime::oden_inspector_server::create_inspector_server(
         host,
         name,
         publish_uid,
@@ -1128,17 +1128,17 @@ impl CliFactory {
       let mut checker = FeatureChecker::default();
       checker.set_exit_cb(Box::new(crate::unstable_exit_cb));
       let unstable_features = cli_options.unstable_features();
-      for feature in deno_runtime::UNSTABLE_FEATURES {
+      for feature in oden_runtime::UNSTABLE_FEATURES {
         if unstable_features.contains(&feature.name) {
           checker.enable_feature(feature.name);
         }
       }
 
-      // Deno Deploy: when DENO_KV_REQUIRES_DISTRIBUTED_DATABASE=error, force the
-      // unstable KV feature on so `Deno.openKv()` is always exposed. The open
+      // Oden Deploy: when ODEN_KV_REQUIRES_DISTRIBUTED_DATABASE=error, force the
+      // unstable KV feature on so `Oden.openKv()` is always exposed. The open
       // path then rejects with a clear "no database attached" error instead of
-      // the runtime hiding the API and reporting "Deno.openKv is not a function".
-      if std::env::var("DENO_KV_REQUIRES_DISTRIBUTED_DATABASE").as_deref()
+      // the runtime hiding the API and reporting "Oden.openKv is not a function".
+      if std::env::var("ODEN_KV_REQUIRES_DISTRIBUTED_DATABASE").as_deref()
         == Ok("error")
         && !checker.check("kv")
       {
@@ -1152,13 +1152,13 @@ impl CliFactory {
   pub async fn create_compile_binary_writer(
     &self,
     is_desktop: bool,
-  ) -> Result<DenoCompileBinaryWriter<'_>, AnyError> {
+  ) -> Result<OdenCompileBinaryWriter<'_>, AnyError> {
     let cli_options = self.cli_options()?;
-    Ok(DenoCompileBinaryWriter::new(
+    Ok(OdenCompileBinaryWriter::new(
       self.resolver_factory()?.cjs_module_export_analyzer()?,
       self.cjs_tracker()?,
       self.cli_options()?,
-      self.deno_dir()?,
+      self.oden_dir()?,
       self.emitter()?,
       self.file_fetcher()?,
       self.http_client_provider(),
@@ -1273,8 +1273,8 @@ impl CliFactory {
     let npm_resolver = self.npm_resolver().await?;
     // Provide the watcher communicator whenever running under the file watcher,
     // not just for HMR. `CliMainWorker::run()` uses its presence to detect that
-    // it is under a watcher and route `Deno.exit()` through isolate termination
-    // instead of `std::process::exit()`, which keeps `deno serve --watch` (which
+    // it is under a watcher and route `Oden.exit()` through isolate termination
+    // instead of `std::process::exit()`, which keeps `oden serve --watch` (which
     // goes through `run()` rather than `run_for_watcher`) alive across exits.
     // HMR-specific behaviour is gated separately on `create_hmr_runner`. See
     // issue #7590.
@@ -1299,7 +1299,7 @@ impl CliFactory {
       } else {
         None
       },
-      None, // DenoRtNativeAddonLoader
+      None, // OdenRtNativeAddonLoader
       self.feature_checker()?.clone(),
       fs.clone(),
       cli_options.coverage_dir(),
@@ -1350,11 +1350,11 @@ impl CliFactory {
       inspect_wait: cli_options.inspect_wait(),
       trace_ops: cli_options.trace_ops().clone(),
       is_standalone: false,
-      auto_serve: std::env::var("DENO_AUTO_SERVE").is_ok(),
+      auto_serve: std::env::var("ODEN_AUTO_SERVE").is_ok(),
       is_inspecting: cli_options.is_inspecting(),
       location: cli_options.location_flag().clone(),
       // if the user ran a binary command, we'll need to set process.argv[0]
-      // to be the name of the binary command instead of deno
+      // to be the name of the binary command instead of oden
       argv0: cli_options
         .take_binary_npm_command_name()
         .or(std::env::args().next()),
@@ -1362,7 +1362,7 @@ impl CliFactory {
       node_cluster_unique_id: std::env::var("NODE_UNIQUE_ID").ok(),
       node_cluster_sched_policy: std::env::var("NODE_CLUSTER_SCHED_POLICY")
         .ok(),
-      origin_data_folder_path: Some(self.deno_dir()?.origin_data_folder_path()),
+      origin_data_folder_path: Some(self.oden_dir()?.origin_data_folder_path()),
       seed: cli_options.seed(),
       unsafely_ignore_certificate_errors: cli_options
         .unsafely_ignore_certificate_errors()
@@ -1372,21 +1372,21 @@ impl CliFactory {
       serve_host: cli_options.serve_host(),
       otel_config: cli_options.otel_config(),
       no_legacy_abort: cli_options.no_legacy_abort(),
-      startup_snapshot: deno_snapshots::CLI_SNAPSHOT,
-      residual_lazy_js_sources: deno_snapshots::RESIDUAL_LAZY_JS,
-      residual_lazy_esm_sources: deno_snapshots::RESIDUAL_LAZY_ESM,
+      startup_snapshot: oden_snapshots::CLI_SNAPSHOT,
+      residual_lazy_js_sources: oden_snapshots::RESIDUAL_LAZY_JS,
+      residual_lazy_esm_sources: oden_snapshots::RESIDUAL_LAZY_ESM,
       enable_raw_imports: cli_options.unstable_raw_imports(),
       close_on_idle: true,
       maybe_initial_cwd: Some(deno_path_util::url_from_directory_path(
         cli_options.initial_cwd(),
       )?),
-      // Deno 2.8 exposes an `OffscreenCanvas` global whose 2D context is
+      // Oden 2.8 exposes an `OffscreenCanvas` global whose 2D context is
       // unimplemented (`getContext("2d")` returns null). Libraries that
       // feature-detect on the global's presence then crash. Setting this
       // removes the global, restoring the pre-2.8 fallback path. Truthy
       // values are `1` and `true`.
       disable_offscreen_canvas: matches!(
-        std::env::var("DENO_DISABLE_OFFSCREEN_CANVAS").as_deref(),
+        std::env::var("ODEN_DISABLE_OFFSCREEN_CANVAS").as_deref(),
         Ok("1") | Ok("true")
       ),
     })
@@ -1442,7 +1442,7 @@ impl CliFactory {
             no_transpile: false,
             force_check_js: matches!(
               &self.flags.subcommand,
-              DenoSubcommand::Check(check_flags) if check_flags.check_js
+              OdenSubcommand::Check(check_flags) if check_flags.check_js
             ),
             source_map_base: None,
             preserve_jsx: false,
@@ -1451,7 +1451,7 @@ impl CliFactory {
             // otherwise leaves dangling type-only re-exports that crash at
             // runtime. Truthy values are `1` and `true`.
             force_disable_verbatim_module_syntax: matches!(
-              std::env::var("DENO_DISABLE_VERBATIM_MODULE_SYNTAX").as_deref(),
+              std::env::var("ODEN_DISABLE_VERBATIM_MODULE_SYNTAX").as_deref(),
               Ok("1") | Ok("true")
             ),
           },
@@ -1478,17 +1478,17 @@ impl CliFactory {
             },
             typescript_version: Some(
               deno_semver::Version::parse_standard(
-                deno_lib::version::DENO_VERSION_INFO.typescript,
+                oden_lib::version::ODEN_VERSION_INFO.typescript,
               )
               .unwrap(),
             ),
             bundle_mode: matches!(
               self.flags.subcommand,
-              DenoSubcommand::Bundle(_)
+              OdenSubcommand::Bundle(_)
             ) || self.flags.internal.force_bundle_mode,
             is_browser_platform: matches!(
               self.flags.subcommand,
-              DenoSubcommand::Bundle(BundleFlags {
+              OdenSubcommand::Bundle(BundleFlags {
                 platform: BundlePlatform::Browser,
                 ..
               })
@@ -1496,7 +1496,7 @@ impl CliFactory {
           },
           node_code_translator_mode: if matches!(
             options.sub_command(),
-            DenoSubcommand::Bundle(_)
+            OdenSubcommand::Bundle(_)
           ) || self
             .flags
             .internal
@@ -1526,21 +1526,21 @@ impl CliFactory {
             node_resolver::PackageJsonThreadLocalCache,
           )),
           package_json_dep_resolution: match &self.flags.subcommand {
-            DenoSubcommand::Publish(_) => {
+            OdenSubcommand::Publish(_) => {
               // the node_modules directory is not published to jsr, so resolve
               // dependencies via the package.json rather than using node resolution
-              Some(deno_resolver::workspace::PackageJsonDepResolution::Enabled)
+              Some(oden_resolver::workspace::PackageJsonDepResolution::Enabled)
             }
             _ => None,
           },
           allow_json_imports: if matches!(
             self.flags.subcommand,
-            DenoSubcommand::Bundle(_)
+            OdenSubcommand::Bundle(_)
           ) || self.flags.internal.force_bundle_mode
           {
-            deno_resolver::loader::AllowJsonImports::Always
+            oden_resolver::loader::AllowJsonImports::Always
           } else {
-            deno_resolver::loader::AllowJsonImports::WithAttribute
+            oden_resolver::loader::AllowJsonImports::WithAttribute
           },
           require_modules: options.require_modules()?,
         },
@@ -1552,11 +1552,11 @@ impl CliFactory {
 fn new_workspace_factory_options(
   initial_cwd: &Path,
   flags: &Flags,
-) -> deno_resolver::factory::WorkspaceFactoryOptions {
-  deno_resolver::factory::WorkspaceFactoryOptions {
+) -> oden_resolver::factory::WorkspaceFactoryOptions {
+  oden_resolver::factory::WorkspaceFactoryOptions {
     additional_config_file_names: if matches!(
       flags.subcommand,
-      DenoSubcommand::Publish(..)
+      OdenSubcommand::Publish(..)
     ) {
       &["jsr.json", "jsr.jsonc"]
     } else {
@@ -1575,36 +1575,36 @@ fn new_workspace_factory_options(
       }
       ConfigFlag::Disabled => ConfigDiscoveryOption::Disabled,
     },
-    maybe_custom_deno_dir_root: flags.internal.cache_path.clone(),
-    // For `deno install/add/remove/init` we want to force the managed
+    maybe_custom_oden_dir_root: flags.internal.cache_path.clone(),
+    // For `oden install/add/remove/init` we want to force the managed
     // resolver so it can set up the `node_modules/` directory.
     is_package_manager_subcommand: matches!(
       flags.subcommand,
-      DenoSubcommand::Add(_)
-        | DenoSubcommand::Audit(_)
-        | DenoSubcommand::Ci(_)
-        | DenoSubcommand::Clean(_)
-        | DenoSubcommand::Init(_)
-        | DenoSubcommand::Install(_)
-        | DenoSubcommand::Link(_)
-        | DenoSubcommand::List(_)
-        | DenoSubcommand::Outdated(_)
-        | DenoSubcommand::Remove(_)
-        | DenoSubcommand::Unlink(_)
-        | DenoSubcommand::Uninstall(_)
-        | DenoSubcommand::ApproveScripts(_)
+      OdenSubcommand::Add(_)
+        | OdenSubcommand::Audit(_)
+        | OdenSubcommand::Ci(_)
+        | OdenSubcommand::Clean(_)
+        | OdenSubcommand::Init(_)
+        | OdenSubcommand::Install(_)
+        | OdenSubcommand::Link(_)
+        | OdenSubcommand::List(_)
+        | OdenSubcommand::Outdated(_)
+        | OdenSubcommand::Remove(_)
+        | OdenSubcommand::Unlink(_)
+        | OdenSubcommand::Uninstall(_)
+        | OdenSubcommand::ApproveScripts(_)
     ),
     no_lock: flags.no_lock
       || matches!(
         flags.subcommand,
-        DenoSubcommand::Install(InstallFlags::Global(..))
-          | DenoSubcommand::Uninstall(_)
+        OdenSubcommand::Install(InstallFlags::Global(..))
+          | OdenSubcommand::Uninstall(_)
       ),
-    // Seed deno.lock from package-lock.json only when the user is explicitly
-    // setting up dependencies via `deno install` (local form).
+    // Seed oden.lock from package-lock.json only when the user is explicitly
+    // setting up dependencies via `oden install` (local form).
     import_npm_lockfile: matches!(
       flags.subcommand,
-      DenoSubcommand::Install(InstallFlags::Local(..))
+      OdenSubcommand::Install(InstallFlags::Local(..))
     ),
     frozen_lockfile: flags.frozen_lockfile,
     lock_arg: flags.lock.as_ref().map(|l| initial_cwd.join(l)),
@@ -1614,7 +1614,7 @@ fn new_workspace_factory_options(
     node_modules_linker: flags.node_modules_linker,
     npm_process_state: npm_process_state(&CliSys::default()).as_ref().map(
       |s| {
-        use deno_npm_installer::process_state::NpmProcessStateLinkerMode;
+        use oden_npm_installer::process_state::NpmProcessStateLinkerMode;
         NpmProcessStateOptions {
           node_modules_dir: s
             .local_node_modules_path
@@ -1623,10 +1623,10 @@ fn new_workspace_factory_options(
           is_byonm: matches!(s.kind, NpmProcessStateKind::Byonm),
           linker_mode: Some(match s.linker_mode {
             NpmProcessStateLinkerMode::Isolated => {
-              deno_config::deno_json::NodeModulesLinkerMode::Isolated
+              oden_config::oden_json::NodeModulesLinkerMode::Isolated
             }
             NpmProcessStateLinkerMode::Hoisted => {
-              deno_config::deno_json::NodeModulesLinkerMode::Hoisted
+              oden_config::oden_json::NodeModulesLinkerMode::Hoisted
             }
           }),
         }

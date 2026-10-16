@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 use libc::INT_MAX;
 
 use crate::*;
@@ -240,8 +240,8 @@ macro_rules! napi_wrap {
       $crate::util::napi_clear_last_error(env);
 
       let scope_env = unsafe { &mut *env_ptr };
-      deno_core::v8::callback_scope!(unsafe scope, scope_env.context());
-      deno_core::v8::tc_scope!(try_catch, scope);
+      oden_core::v8::callback_scope!(unsafe scope, scope_env.context());
+      oden_core::v8::tc_scope!(try_catch, scope);
 
       #[inline(always)]
       fn inner $( < $( $x ),* > )? ( $env: & $( $lt )? mut Env , $( $ident : $ty ),* ) -> napi_status $body

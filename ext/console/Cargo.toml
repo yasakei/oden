@@ -1,14 +1,14 @@
-# Copyright 2018-2026 the Deno authors. MIT license.
+# Copyright 2018-2026 the Oden authors. MIT license.
 
 [package]
-name = "deno_console"
+name = "oden_console"
 version = "0.222.0"
-authors = ["the Deno authors"]
+authors = ["the Oden authors"]
 edition = "2024"
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/denoland/deno"
-description = "DEPRECATED: use `deno_web` instead"
+description = "DEPRECATED: use `oden_web` instead"
 
 [lib]
 path = "lib.rs"

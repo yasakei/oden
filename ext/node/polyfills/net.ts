@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -26,10 +26,10 @@
 const { core, primordials } = __bootstrap;
 
 const { BlockList, SocketAddress } = core.loadExtScript(
-  "ext:deno_node/internal/blocklist.mjs",
+  "ext:oden_node/internal/blocklist.mjs",
 );
 
-const { EventEmitter } = core.loadExtScript("ext:deno_node/_events.mjs");
+const { EventEmitter } = core.loadExtScript("ext:oden_node/_events.mjs");
 const {
   isIP,
   isIPv4,
@@ -39,7 +39,7 @@ const {
   kSetKeepAliveInitialDelay,
   kSetNoDelay,
   normalizedArgsSymbol,
-} = core.loadExtScript("ext:deno_node/internal/net.ts");
+} = core.loadExtScript("ext:oden_node/internal/net.ts");
 const { Duplex } = core.createLazyLoader("node:stream")();
 const {
   asyncIdSymbol,
@@ -49,7 +49,7 @@ const {
   executionAsyncId,
   newAsyncId,
   ownerSymbol,
-} = core.loadExtScript("ext:deno_node/internal/async_hooks.ts");
+} = core.loadExtScript("ext:oden_node/internal/async_hooks.ts");
 const {
   AbortError,
   ERR_INVALID_ADDRESS_FAMILY,
@@ -69,7 +69,7 @@ const {
   genericNodeError,
   NodeAggregateError,
   uvExceptionWithHostPort,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
 type ErrnoException = any;
 const {
   kAfterAsyncWrite,
@@ -82,65 +82,65 @@ const {
   setStreamTimeout,
   writeGeneric,
   writevGeneric,
-} = core.loadExtScript("ext:deno_node/internal/stream_base_commons.ts");
+} = core.loadExtScript("ext:oden_node/internal/stream_base_commons.ts");
 const { kDestroy, kTimeout } = core.loadExtScript(
-  "ext:deno_node/internal/timers.mjs",
+  "ext:oden_node/internal/timers.mjs",
 );
-const { nextTick } = core.loadExtScript("ext:deno_node/_next_tick.ts");
+const { nextTick } = core.loadExtScript("ext:oden_node/_next_tick.ts");
 const {
   DTRACE_NET_SERVER_CONNECTION,
   DTRACE_NET_STREAM_END,
-} = core.loadExtScript("ext:deno_node/internal/dtrace.ts");
-const { Buffer } = core.loadExtScript("ext:deno_node/internal/buffer.mjs");
+} = core.loadExtScript("ext:oden_node/internal/dtrace.ts");
+const { Buffer } = core.loadExtScript("ext:oden_node/internal/buffer.mjs");
 type LookupOneOptions = any;
 const {
   constants: TCPConstants,
   setupListenWrap,
   TCP,
   TCPConnectWrap,
-} = core.loadExtScript("ext:deno_node/internal_binding/tcp_wrap.ts");
+} = core.loadExtScript("ext:oden_node/internal_binding/tcp_wrap.ts");
 const {
   constants: PipeConstants,
   Pipe,
   PipeConnectWrap,
   setupListenWrap: setupPipeListenWrap,
-} = core.loadExtScript("ext:deno_node/internal_binding/pipe_wrap.ts");
+} = core.loadExtScript("ext:oden_node/internal_binding/pipe_wrap.ts");
 const { ShutdownWrap } = core.loadExtScript(
-  "ext:deno_node/internal_binding/stream_wrap.ts",
+  "ext:oden_node/internal_binding/stream_wrap.ts",
 );
-const { default: assert } = core.loadExtScript("ext:deno_node/assert.ts");
-const { isWindows } = core.loadExtScript("ext:deno_node/_util/os.ts");
+const { default: assert } = core.loadExtScript("ext:oden_node/assert.ts");
+const { isWindows } = core.loadExtScript("ext:oden_node/_util/os.ts");
 const { ADDRCONFIG, lookup: dnsLookup } = core.createLazyLoader("node:dns")()
   .default;
 const { kPermTokenSink } = core.loadExtScript(
-  "ext:deno_node/internal_binding/cares_wrap.ts",
+  "ext:oden_node/internal_binding/cares_wrap.ts",
 );
 const {
   codeMap,
   UV_ECANCELED,
   UV_ETIMEDOUT,
-} = core.loadExtScript("ext:deno_node/internal_binding/uv.ts");
+} = core.loadExtScript("ext:oden_node/internal_binding/uv.ts");
 const { guessHandleType } = core.loadExtScript(
-  "ext:deno_node/internal_binding/util.ts",
+  "ext:oden_node/internal_binding/util.ts",
 );
 const { debuglog } = core.loadExtScript(
-  "ext:deno_node/internal/util/debuglog.ts",
+  "ext:oden_node/internal/util/debuglog.ts",
 );
 type DuplexOptions = any;
 type BufferEncoding = any;
 type Abortable = any;
 const { channel, tracingChannel } = core.loadExtScript(
-  "ext:deno_node/diagnostics_channel.js",
+  "ext:oden_node/diagnostics_channel.js",
 );
 const {
   registerActiveHandle,
   unregisterActiveHandle,
-} = core.loadExtScript("ext:deno_node/internal/process/active_resources.ts");
+} = core.loadExtScript("ext:oden_node/internal/process/active_resources.ts");
 // Lazily resolved at call sites via `lazyCluster()` to break the cluster
 // <-> net cycle. Only used inside `_listenInCluster()`.
 const lazyCluster = core.createLazyLoader("node:cluster");
 const { isUint8Array } = core.loadExtScript(
-  "ext:deno_node/internal/util/types.ts",
+  "ext:oden_node/internal/util/types.ts",
 );
 const {
   validateAbortSignal,
@@ -151,7 +151,7 @@ const {
   validatePort,
   validateString,
   validateStringWithoutNullBytes,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
 
 const {
   ArrayIsArray,
@@ -329,7 +329,7 @@ function _getNewAsyncId(handle?: Handle): number {
   // silently if the receiver isn't a real AsyncWrap, so user-land handles that
   // expose `getAsyncId` borrowed from a prototype (or that have been wrapped
   // by libraries like pg/sequelize across socket reuse) don't crash on Node.
-  // Deno's op2 brand check throws `TypeError: expected AsyncWrap` in the same
+  // Oden's op2 brand check throws `TypeError: expected AsyncWrap` in the same
   // shape, so match Node's tolerance by falling back to a fresh async id.
   try {
     return handle.getAsyncId();
@@ -527,7 +527,7 @@ function _afterConnectImpl(
 
   if (status === 0) {
     if (socket.readable && !readable) {
-      // deno-lint-ignore deno-internal/prefer-primordials -- Readable stream method, not Array.prototype.push
+      // deno-lint-ignore oden-internal/prefer-primordials -- Readable stream method, not Array.prototype.push
       socket.push(null);
       socket.read();
     }
@@ -549,7 +549,7 @@ function _afterConnectImpl(
     socket.emit("connect");
     socket.emit("ready");
 
-    // Deno specific: run tls handshake if it's from a tls socket
+    // Oden specific: run tls handshake if it's from a tls socket
     if (typeof handle.afterConnectTls === "function") {
       handle.afterConnectTls();
     }
@@ -739,7 +739,7 @@ function _internalConnect(
     localPort = (localPort ?? 0) | 0;
     if (addressType === 4) {
       localAddress = localAddress || DEFAULT_IPV4_ADDR;
-      // deno-lint-ignore deno-internal/prefer-primordials -- libuv handle.bind(), not Function.prototype.bind
+      // deno-lint-ignore oden-internal/prefer-primordials -- libuv handle.bind(), not Function.prototype.bind
       err = (socket._handle as TCP).bind(localAddress, localPort);
     } else {
       // addressType === 6
@@ -840,7 +840,7 @@ function _internalConnectMultiple(context, canceled?: boolean) {
   if (localPort) {
     if (addressType === 4) {
       localAddress = DEFAULT_IPV4_ADDR;
-      // deno-lint-ignore deno-internal/prefer-primordials -- libuv handle.bind(), not Function.prototype.bind
+      // deno-lint-ignore oden-internal/prefer-primordials -- libuv handle.bind(), not Function.prototype.bind
       err = self._handle.bind(localAddress, localPort);
     } else {
       // addressType === 6
@@ -1142,7 +1142,7 @@ function _lookupAndConnect(self: Socket, options: TcpSocketConnectOptions) {
   debug("connect: dns options", dnsOpts);
   self._host = host;
   // Only the built-in DNS lookup is trusted to install a NetPermToken on the
-  // handle (so `--allow-net=<host>` keeps authorizing the IPs Deno resolved
+  // handle (so `--allow-net=<host>` keeps authorizing the IPs Oden resolved
   // for it). A custom `lookup` returns arbitrary IPs, so its result is checked
   // against the literal IP with no hostname substitution (GHSA-fhjh-jqv7-m238).
   // This must stay in sync with the `lookup` selection below: any falsy
@@ -1576,7 +1576,7 @@ function Socket(options) {
     onread !== null &&
     typeof onread === "object"
   ) {
-    // deno-lint-ignore deno-internal/prefer-primordials -- user option object property, not TypedArray#buffer
+    // deno-lint-ignore oden-internal/prefer-primordials -- user option object property, not TypedArray#buffer
     const onreadBuffer = onread.buffer;
     if (
       (isUint8Array(onreadBuffer) || typeof onreadBuffer === "function") &&
@@ -2550,7 +2550,7 @@ function _createServerHandle(
 
     if (isWindows) {
       const instances = NumberParseInt(
-        Deno.env.get("NODE_PENDING_PIPE_INSTANCES") ?? "",
+        Oden.env.get("NODE_PENDING_PIPE_INSTANCES") ?? "",
       );
 
       if (!NumberIsNaN(instances)) {
@@ -2590,7 +2590,7 @@ function _createServerHandle(
     } else if (isTCP) {
       err = (handle as TCP).bindWithFlags(address, port ?? 0, flags ?? 0);
     } else {
-      // deno-lint-ignore deno-internal/prefer-primordials -- libuv handle.bind(), not Function.prototype.bind
+      // deno-lint-ignore oden-internal/prefer-primordials -- libuv handle.bind(), not Function.prototype.bind
       err = handle.bind(address);
     }
   }

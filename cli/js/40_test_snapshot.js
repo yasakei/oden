@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { core, primordials } from "ext:core/mod.js";
 
@@ -27,11 +27,11 @@ const {
   TypeError,
 } = primordials;
 
-// Capture `Deno.inspect` and `Deno.noColor` early so that user code mangling
-// the `Deno` global doesn't affect snapshot serialization.
-const DenoNs = globalThis.Deno;
-const inspect = DenoNs.inspect;
-const noColor = DenoNs.noColor;
+// Capture `Oden.inspect` and `Oden.noColor` early so that user code mangling
+// the `Oden` global doesn't affect snapshot serialization.
+const OdenNs = globalThis.Oden;
+const inspect = OdenNs.inspect;
+const noColor = OdenNs.noColor;
 
 class AssertionError extends Error {
   name = "AssertionError";
@@ -231,7 +231,7 @@ function getSnapshotNotMatchMessage(actual, expected) {
     green("Actual")
   } / ${
     red("Expected")
-  }\n\n${diff}\n\nTo update snapshots, run\n    deno test --update-snapshots [files]...\n`;
+  }\n\n${diff}\n\nTo update snapshots, run\n    oden test --update-snapshots [files]...\n`;
 }
 
 let isUpdateMode = undefined;
@@ -305,7 +305,7 @@ function getErrorMessage(message, options) {
 }
 
 /**
- * Implementation of `Deno.TestContext.assertSnapshot()`. `tContext` is the
+ * Implementation of `Oden.TestContext.assertSnapshot()`. `tContext` is the
  * test context object the method was called on.
  */
 export function assertSnapshot(
@@ -448,5 +448,5 @@ function flushTestSnapshots(allowStaleRemoval) {
   }
 }
 
-globalThis.Deno[globalThis.Deno.internal].flushTestSnapshots =
+globalThis.Oden[globalThis.Oden.internal].flushTestSnapshots =
   flushTestSnapshots;

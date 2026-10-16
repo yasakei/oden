@@ -1,4 +1,4 @@
-# Copyright 2018-2026 the Deno authors. MIT license.
+# Copyright 2018-2026 the Oden authors. MIT license.
 
 [package]
 name = "bench_tests"
@@ -10,7 +10,7 @@ license.workspace = true
 repository.workspace = true
 
 [[bench]]
-name = "deno_bench"
+name = "oden_bench"
 harness = false
 path = "main.rs"
 

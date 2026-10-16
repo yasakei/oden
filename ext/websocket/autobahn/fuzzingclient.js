@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // deno-lint-ignore-file
 
@@ -8,18 +8,18 @@ import { checkCiHash } from "../../../tools/util.js";
 $.setPrintCommand(true);
 const pwd = new URL(".", import.meta.url).pathname;
 
-const self = Deno.execPath();
+const self = Oden.execPath();
 const ciHash = await checkCiHash("autobahn", async (hasher) => {
   await hasher.hashFile(self);
   await hasher.hashDir(pwd);
 });
 if (ciHash.skip) {
-  Deno.exit(0);
+  Oden.exit(0);
 }
 
 const AUTOBAHN_TESTSUITE_DOCKER =
   "crossbario/autobahn-testsuite:25.10.1@sha256:519915fb568b04c9383f70a1c405ae3ff44ab9e35835b085239c258b6fac3074";
-$`${self} run -A --config ${pwd}/../../../tests/config/deno.json ${pwd}/autobahn_server.js`
+$`${self} run -A --config ${pwd}/../../../tests/config/oden.json ${pwd}/autobahn_server.js`
   .spawn();
 
 for (let i = 0; i < 6; i++) {
@@ -42,10 +42,10 @@ await $`docker run
   wstest -m fuzzingclient -s fuzzingclient.json`
   .cwd(pwd);
 
-const { deno_websocket } = JSON.parse(
-  Deno.readTextFileSync(`${pwd}/reports/servers/index.json`),
+const { oden_websocket } = JSON.parse(
+  Oden.readTextFileSync(`${pwd}/reports/servers/index.json`),
 );
-const result = Object.values(deno_websocket);
+const result = Object.values(oden_websocket);
 
 function failed(name) {
   return name != "OK" && name != "INFORMATIONAL" && name != "NON-STRICT";
@@ -60,4 +60,4 @@ console.log(
 
 const exitCode = failedtests.length == 0 ? 0 : 1;
 if (exitCode === 0) await ciHash.commit();
-Deno.exit(exitCode);
+Oden.exit(exitCode);

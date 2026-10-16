@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "@odentest/npm-add": "jsr:@odentest/npm-add@1",
+    "@odentest/npm-add-0-5": "jsr:@odentest/npm-add@0.5"
+  }
+}

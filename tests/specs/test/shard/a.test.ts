@@ -1,1 +1,1 @@
-Deno.test("test_a", () => {});
+Oden.test("test_a", () => {});

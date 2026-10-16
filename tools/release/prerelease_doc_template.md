@@ -19,7 +19,7 @@ land until the release is finished.**
 
 @here
 
-Deno v$VERSION is now getting released.
+Oden v$VERSION is now getting released.
 
 `denoland/deno` is now locked.
 
@@ -28,7 +28,7 @@ Deno v$VERSION is now getting released.
 Release checklist: <LINK TO THIS FORKED GIST GOES HERE>
 ```
 
-## Updating `deno`
+## Updating `oden`
 
 ### Phase 1: Bumping versions
 
@@ -101,5 +101,5 @@ Release checklist: <LINK TO THIS FORKED GIST GOES HERE>
 
 *You can land PRs now*
 
-Deno v$VERSION has been released.
+Oden v$VERSION has been released.
 ```

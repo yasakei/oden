@@ -1,2 +1,2 @@
-// @deno-types="./foo.d.ts"
+// @oden-types="./foo.d.ts"
 export * from "./foo.js";

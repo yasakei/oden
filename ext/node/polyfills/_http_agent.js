@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 
 import { core, primordials } from "ext:core/mod.js";
@@ -6,29 +6,29 @@ import { op_get_env_no_permission_check } from "ext:core/ops";
 import * as net from "node:net";
 import httpProxy from "node:_http_proxy";
 const lazyTls = core.createLazyLoader("node:tls");
-const { EventEmitter } = core.loadExtScript("ext:deno_node/_events.mjs");
+const { EventEmitter } = core.loadExtScript("ext:oden_node/_events.mjs");
 const { debuglog } = core.loadExtScript(
-  "ext:deno_node/internal/util/debuglog.ts",
+  "ext:oden_node/internal/util/debuglog.ts",
 );
 let debug = debuglog("http", (fn) => {
   debug = fn;
 });
-const { AsyncResource } = core.loadExtScript("ext:deno_node/async_hooks.ts");
+const { AsyncResource } = core.loadExtScript("ext:oden_node/async_hooks.ts");
 const {
   emitDestroy,
   emitInit,
   executionAsyncId,
   symbols,
-} = core.loadExtScript("ext:deno_node/internal/async_hooks.ts");
+} = core.loadExtScript("ext:oden_node/internal/async_hooks.ts");
 const { async_id_symbol } = symbols;
 const { kEmptyObject, once } = core.loadExtScript(
-  "ext:deno_node/internal/util.mjs",
+  "ext:oden_node/internal/util.mjs",
 );
 const {
   validateNumber,
   validateOneOf,
   validateString,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
 
 const {
   ArrayPrototypeIncludes,
@@ -192,7 +192,7 @@ export function Agent(options) {
     // and could cause unhandled exception.
 
     // In Node.js, nextTick (where 'free' is emitted) always runs before I/O,
-    // so the socket is guaranteed to be writable here. In Deno, I/O can
+    // so the socket is guaranteed to be writable here. In Oden, I/O can
     // interleave with nextTick, so a server FIN may arrive before 'free'
     // runs, making the socket non-writable but not yet destroyed.
     if (socket.destroyed) {

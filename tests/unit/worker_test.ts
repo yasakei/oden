@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // deno-lint-ignore-file no-console
 
@@ -11,7 +11,7 @@ function resolveWorker(worker: string): string {
   return import.meta.resolve(`../testdata/workers/${worker}`);
 }
 
-Deno.test(
+Oden.test(
   { permissions: { read: true } },
   function utimeSyncFileSuccess() {
     const w = new Worker(
@@ -23,7 +23,7 @@ Deno.test(
   },
 );
 
-Deno.test({
+Oden.test({
   name: "worker terminate",
   fn: async function () {
     const jsWorker = new Worker(
@@ -54,7 +54,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "worker from data url",
   async fn() {
     const tsWorker = new Worker(
@@ -73,7 +73,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "worker nested",
   fn: async function () {
     const nestedWorker = new Worker(
@@ -93,7 +93,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "worker throws when executing",
   fn: async function () {
     const throwingWorker = new Worker(
@@ -116,7 +116,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "worker globals",
   fn: async function () {
     const workerOptions: WorkerOptions = { type: "module" };
@@ -136,7 +136,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "worker navigator",
   fn: async function () {
     const workerOptions: WorkerOptions = { type: "module" };
@@ -156,7 +156,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "worker fetch API",
   fn: async function () {
     const fetchingWorker = new Worker(
@@ -180,7 +180,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "worker terminate busy loop",
   fn: async function () {
     const { promise, resolve } = Promise.withResolvers<number>();
@@ -210,7 +210,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "worker race condition",
   fn: async function () {
     // See issue for details
@@ -233,7 +233,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "worker is event listener",
   fn: async function () {
     let messageHandlersCalled = 0;
@@ -281,7 +281,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "worker scope is event listener",
   fn: async function () {
     const worker = new Worker(
@@ -308,26 +308,26 @@ Deno.test({
   },
 });
 
-Deno.test({
-  name: "worker with Deno namespace",
+Oden.test({
+  name: "worker with Oden namespace",
   fn: async function () {
-    const denoWorker = new Worker(
-      resolveWorker("deno_worker.ts"),
-      { type: "module", deno: { permissions: "inherit" } },
+    const odenWorker = new Worker(
+      resolveWorker("oden_worker.ts"),
+      { type: "module", oden: { permissions: "inherit" } },
     );
 
     const { promise, resolve } = Promise.withResolvers<string>();
-    denoWorker.onmessage = (e) => {
-      denoWorker.terminate();
+    odenWorker.onmessage = (e) => {
+      odenWorker.terminate();
       resolve(e.data);
     };
 
-    denoWorker.postMessage("Hello World");
+    odenWorker.postMessage("Hello World");
     assertEquals(await promise, "Hello World");
   },
 });
 
-Deno.test({
+Oden.test({
   name: "worker with crypto in scope",
   fn: async function () {
     const w = new Worker(
@@ -346,7 +346,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "Worker event handler order",
   fn: async function () {
     const { promise, resolve } = Promise.withResolvers<void>();
@@ -370,7 +370,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "Worker immediate close",
   fn: async function () {
     const { promise, resolve } = Promise.withResolvers<void>();
@@ -386,7 +386,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "Worker post undefined",
   fn: async function () {
     const { promise, resolve } = Promise.withResolvers<void>();
@@ -411,10 +411,10 @@ Deno.test({
   },
 });
 
-Deno.test("Worker inherits permissions", async function () {
+Oden.test("Worker inherits permissions", async function () {
   const worker = new Worker(
     resolveWorker("read_check_worker.js"),
-    { type: "module", deno: { permissions: "inherit" } },
+    { type: "module", oden: { permissions: "inherit" } },
   );
 
   const { promise, resolve } = Promise.withResolvers<boolean>();
@@ -427,10 +427,10 @@ Deno.test("Worker inherits permissions", async function () {
   worker.terminate();
 });
 
-Deno.test("Worker limit children permissions", async function () {
+Oden.test("Worker limit children permissions", async function () {
   const worker = new Worker(
     resolveWorker("read_check_worker.js"),
-    { type: "module", deno: { permissions: { read: false } } },
+    { type: "module", oden: { permissions: { read: false } } },
   );
 
   const { promise, resolve } = Promise.withResolvers<boolean>();
@@ -444,36 +444,36 @@ Deno.test("Worker limit children permissions", async function () {
 });
 
 function setupReadCheckGranularWorkerTest() {
-  const tempDir = Deno.realPathSync(Deno.makeTempDirSync());
-  const initialPath = Deno.env.get("PATH")!;
-  const initialCwd = Deno.cwd();
-  Deno.chdir(tempDir);
-  const envSep = Deno.build.os === "windows" ? ";" : ":";
-  Deno.env.set("PATH", initialPath + envSep + tempDir);
+  const tempDir = Oden.realPathSync(Oden.makeTempDirSync());
+  const initialPath = Oden.env.get("PATH")!;
+  const initialCwd = Oden.cwd();
+  Oden.chdir(tempDir);
+  const envSep = Oden.build.os === "windows" ? ";" : ":";
+  Oden.env.set("PATH", initialPath + envSep + tempDir);
 
   // create executables that will be resolved when doing `which`
-  const ext = Deno.build.os === "windows" ? ".exe" : "";
-  Deno.copyFileSync(Deno.execPath(), tempDir + "/bar" + ext);
+  const ext = Oden.build.os === "windows" ? ".exe" : "";
+  Oden.copyFileSync(Oden.execPath(), tempDir + "/bar" + ext);
 
   return {
     tempDir,
     runFooFilePath: tempDir + "/foo" + ext,
     [Symbol.dispose]() {
-      Deno.removeSync(tempDir, { recursive: true });
-      Deno.env.set("PATH", initialPath);
-      Deno.chdir(initialCwd);
+      Oden.removeSync(tempDir, { recursive: true });
+      Oden.env.set("PATH", initialPath);
+      Oden.chdir(initialCwd);
     },
   };
 }
 
-Deno.test("Worker limit children permissions granularly", async function () {
+Oden.test("Worker limit children permissions granularly", async function () {
   const ctx = setupReadCheckGranularWorkerTest();
   const workerUrl = resolveWorker("read_check_granular_worker.js");
   const worker = new Worker(
     workerUrl,
     {
       type: "module",
-      deno: {
+      oden: {
         permissions: {
           env: ["foo"],
           net: ["foo", "bar:8000"],
@@ -532,12 +532,12 @@ Deno.test("Worker limit children permissions granularly", async function () {
   worker.terminate();
 });
 
-Deno.test("Nested worker limit children permissions", async function () {
+Oden.test("Nested worker limit children permissions", async function () {
   const _cleanup = setupReadCheckGranularWorkerTest();
   /** This worker has permissions but doesn't grant them to its children */
   const worker = new Worker(
     resolveWorker("parent_read_check_worker.js"),
-    { type: "module", deno: { permissions: "inherit" } },
+    { type: "module", oden: { permissions: "inherit" } },
   );
   // deno-lint-ignore no-explicit-any
   const { promise, resolve } = Promise.withResolvers<any>();
@@ -581,7 +581,7 @@ Deno.test("Nested worker limit children permissions", async function () {
 });
 
 // This test relies on env permissions not being granted on main thread
-Deno.test({
+Oden.test({
   name:
     "Worker initialization throws on worker permissions greater than parent thread permissions",
   permissions: { env: false },
@@ -589,21 +589,21 @@ Deno.test({
     assertThrows(
       () => {
         const worker = new Worker(
-          resolveWorker("deno_worker.ts"),
-          { type: "module", deno: { permissions: { env: true } } },
+          resolveWorker("oden_worker.ts"),
+          { type: "module", oden: { permissions: { env: true } } },
         );
         worker.terminate();
       },
-      Deno.errors.NotCapable,
+      Oden.errors.NotCapable,
       "Can't escalate parent thread permissions",
     );
   },
 });
 
-Deno.test("Worker with disabled permissions", async function () {
+Oden.test("Worker with disabled permissions", async function () {
   const worker = new Worker(
     resolveWorker("no_permissions_worker.js"),
-    { type: "module", deno: { permissions: "none" } },
+    { type: "module", oden: { permissions: "none" } },
   );
 
   const { promise, resolve } = Promise.withResolvers<boolean>();
@@ -616,10 +616,10 @@ Deno.test("Worker with disabled permissions", async function () {
   worker.terminate();
 });
 
-Deno.test("Worker permissions are not inherited with empty permission object", async function () {
+Oden.test("Worker permissions are not inherited with empty permission object", async function () {
   const worker = new Worker(
     resolveWorker("permission_echo.js"),
-    { type: "module", deno: { permissions: {} } },
+    { type: "module", oden: { permissions: {} } },
   );
 
   // deno-lint-ignore no-explicit-any
@@ -641,10 +641,10 @@ Deno.test("Worker permissions are not inherited with empty permission object", a
   worker.terminate();
 });
 
-Deno.test("Worker permissions are not inherited with single specified permission", async function () {
+Oden.test("Worker permissions are not inherited with single specified permission", async function () {
   const worker = new Worker(
     resolveWorker("permission_echo.js"),
-    { type: "module", deno: { permissions: { net: true } } },
+    { type: "module", oden: { permissions: { net: true } } },
   );
 
   // deno-lint-ignore no-explicit-any
@@ -666,20 +666,20 @@ Deno.test("Worker permissions are not inherited with single specified permission
   worker.terminate();
 });
 
-Deno.test("Worker with invalid permission arg", function () {
+Oden.test("Worker with invalid permission arg", function () {
   assertThrows(
     () =>
       new Worker(`data:,close();`, {
         type: "module",
         // @ts-expect-error invalid env value
-        deno: { permissions: { env: "foo" } },
+        oden: { permissions: { env: "foo" } },
       }),
     TypeError,
-    '(deno.permissions.env) invalid value: string "foo", expected "inherit" or boolean or string[]',
+    '(oden.permissions.env) invalid value: string "foo", expected "inherit" or boolean or string[]',
   );
 });
 
-Deno.test({
+Oden.test({
   name: "worker location",
   fn: async function () {
     const { promise, resolve } = Promise.withResolvers<string>();
@@ -694,7 +694,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "Worker with top-level-await",
   fn: async function () {
     const { promise, resolve, reject } = Promise.withResolvers<void>();
@@ -716,13 +716,13 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "Worker with native HTTP",
   fn: async function () {
     const { promise, resolve } = Promise.withResolvers<void>();
     const worker = new Worker(
       resolveWorker("http_worker.js"),
-      { type: "module", deno: { permissions: "inherit" } },
+      { type: "module", oden: { permissions: "inherit" } },
     );
     worker.onmessage = () => {
       resolve();
@@ -736,7 +736,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "structured cloning postMessage",
   fn: async function () {
     const worker = new Worker(
@@ -770,7 +770,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "worker with relative specifier",
   fn: async function () {
     assertEquals(location.href, "http://127.0.0.1:4545/");
@@ -788,7 +788,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "worker SharedArrayBuffer",
   fn: async function () {
     const { promise, resolve } = Promise.withResolvers<void>();
@@ -816,7 +816,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "Send MessagePorts from / to workers",
   fn: async function () {
     const worker = new Worker(
@@ -854,7 +854,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "worker main-thread receives a burst of messages (sync drain)",
   fn: async function () {
     // Regression test for the Web `Worker` main-side receive loop's bounded
@@ -883,7 +883,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "worker onmessage re-armed between two queued messages (sync drain)",
   fn: async function () {
     // Regression test (mirrors WPT workers/Worker-structure-message.html): the
@@ -915,13 +915,13 @@ Deno.test({
   },
 });
 
-Deno.test({
-  name: "worker Deno.memoryUsage",
+Oden.test({
+  name: "worker Oden.memoryUsage",
   fn: async function () {
     const w = new Worker(
       /**
        * Source code
-       * self.onmessage = function() {self.postMessage(Deno.memoryUsage())}
+       * self.onmessage = function() {self.postMessage(Oden.memoryUsage())}
        */
       "data:application/typescript;base64,c2VsZi5vbm1lc3NhZ2UgPSBmdW5jdGlvbigpIHtzZWxmLnBvc3RNZXNzYWdlKERlbm8ubWVtb3J5VXNhZ2UoKSl9",
       { type: "module", name: "tsWorker" },

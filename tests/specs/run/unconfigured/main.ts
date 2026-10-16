@@ -1,11 +1,11 @@
-const tempDirPath = await Deno.makeTempDir();
+const tempDirPath = await Oden.makeTempDir();
 
 const sockPath = `${tempDirPath}/control.sock`;
 const testPath = `${tempDirPath}/test.ts`;
 
-const command = new Deno.Command(Deno.execPath(), {
+const command = new Oden.Command(Oden.execPath(), {
   env: {
-    DENO_UNSTABLE_CONTROL_SOCK: `unix:${sockPath}`,
+    ODEN_UNSTABLE_CONTROL_SOCK: `unix:${sockPath}`,
   },
 });
 
@@ -14,7 +14,7 @@ const child = command.spawn();
 let i = 0;
 while (true) {
   try {
-    await Deno.lstat(sockPath);
+    await Oden.lstat(sockPath);
     break;
   } catch {}
 
@@ -26,17 +26,17 @@ while (true) {
   await new Promise((r) => setTimeout(r, 10));
 }
 
-const sock = await Deno.connect({
+const sock = await Oden.connect({
   transport: "unix",
   path: sockPath,
 });
 
-Deno.writeTextFileSync(
+Oden.writeTextFileSync(
   testPath,
   `
-console.log(Deno[Deno.internal].isFromUnconfiguredRuntime());
-console.log(Deno.env.get('A'));
-Deno.serve({ onListen() {} }, () => {}).shutdown();
+console.log(Oden[Oden.internal].isFromUnconfiguredRuntime());
+console.log(Oden.env.get('A'));
+Oden.serve({ onListen() {} }, () => {}).shutdown();
 `,
 );
 
@@ -59,9 +59,9 @@ const nodeSockPath = `${tempDirPath}/node-control.sock`;
 const nodeOverrideSockPath = `${tempDirPath}/node-override.sock`;
 const nodeTestPath = `${tempDirPath}/node_test.ts`;
 
-const nodeCommand = new Deno.Command(Deno.execPath(), {
+const nodeCommand = new Oden.Command(Oden.execPath(), {
   env: {
-    DENO_UNSTABLE_CONTROL_SOCK: `unix:${nodeSockPath}`,
+    ODEN_UNSTABLE_CONTROL_SOCK: `unix:${nodeSockPath}`,
   },
 });
 
@@ -70,7 +70,7 @@ const nodeChild = nodeCommand.spawn();
 i = 0;
 while (true) {
   try {
-    await Deno.lstat(nodeSockPath);
+    await Oden.lstat(nodeSockPath);
     break;
   } catch {}
 
@@ -82,12 +82,12 @@ while (true) {
   await new Promise((r) => setTimeout(r, 10));
 }
 
-const nodeSock = await Deno.connect({
+const nodeSock = await Oden.connect({
   transport: "unix",
   path: nodeSockPath,
 });
 
-Deno.writeTextFileSync(
+Oden.writeTextFileSync(
   nodeTestPath,
   `
 import http from "node:http";
@@ -103,8 +103,8 @@ const nodeData = JSON.stringify({
   cwd: tempDirPath,
   args: ["run", "-A", "node_test.ts"],
   env: [
-    ["DENO_AUTO_SERVE", "1"],
-    ["DENO_SERVE_ADDRESS", `duplicate,unix:${nodeOverrideSockPath}`],
+    ["ODEN_AUTO_SERVE", "1"],
+    ["ODEN_SERVE_ADDRESS", `duplicate,unix:${nodeOverrideSockPath}`],
   ],
 });
 
@@ -124,9 +124,9 @@ const h2SockPath = `${tempDirPath}/h2-control.sock`;
 const h2OverrideSockPath = `${tempDirPath}/h2-override.sock`;
 const h2TestPath = `${tempDirPath}/h2_test.ts`;
 
-const h2Command = new Deno.Command(Deno.execPath(), {
+const h2Command = new Oden.Command(Oden.execPath(), {
   env: {
-    DENO_UNSTABLE_CONTROL_SOCK: `unix:${h2SockPath}`,
+    ODEN_UNSTABLE_CONTROL_SOCK: `unix:${h2SockPath}`,
   },
 });
 
@@ -135,7 +135,7 @@ const h2Child = h2Command.spawn();
 i = 0;
 while (true) {
   try {
-    await Deno.lstat(h2SockPath);
+    await Oden.lstat(h2SockPath);
     break;
   } catch {}
 
@@ -147,12 +147,12 @@ while (true) {
   await new Promise((r) => setTimeout(r, 10));
 }
 
-const h2Sock = await Deno.connect({
+const h2Sock = await Oden.connect({
   transport: "unix",
   path: h2SockPath,
 });
 
-Deno.writeTextFileSync(
+Oden.writeTextFileSync(
   h2TestPath,
   `
 import http2 from "node:http2";
@@ -168,8 +168,8 @@ const h2Data = JSON.stringify({
   cwd: tempDirPath,
   args: ["run", "-A", "h2_test.ts"],
   env: [
-    ["DENO_AUTO_SERVE", "1"],
-    ["DENO_SERVE_ADDRESS", `duplicate,unix:${h2OverrideSockPath}`],
+    ["ODEN_AUTO_SERVE", "1"],
+    ["ODEN_SERVE_ADDRESS", `duplicate,unix:${h2OverrideSockPath}`],
   ],
 });
 

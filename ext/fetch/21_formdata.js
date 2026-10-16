@@ -1,14 +1,14 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core, primordials } = __bootstrap;
-const webidl = core.loadExtScript("ext:deno_webidl/00_webidl.js");
+const webidl = core.loadExtScript("ext:oden_webidl/00_webidl.js");
 const {
   Blob,
   BlobPrototype,
   File,
   FilePrototype,
-} = core.loadExtScript("ext:deno_web/09_file.js");
+} = core.loadExtScript("ext:oden_web/09_file.js");
 const {
   ArrayPrototypePush,
   ArrayPrototypeSlice,
@@ -263,7 +263,7 @@ class FormData {
     }
   }
 
-  [SymbolFor("Deno.privateCustomInspect")](inspect, inspectOptions) {
+  [SymbolFor("Oden.privateCustomInspect")](inspect, inspectOptions) {
     if (ObjectPrototypeIsPrototypeOf(FormDataPrototype, this)) {
       return `${this.constructor.name} ${
         inspect(ObjectFromEntries(this), inspectOptions)
@@ -315,7 +315,7 @@ function formDataToBlob(formData) {
   const chunks = [];
   const prefix = `--${boundary}\r\nContent-Disposition: form-data; name="`;
 
-  // deno-lint-ignore deno-internal/prefer-primordials
+  // deno-lint-ignore oden-internal/prefer-primordials
   for (const { 0: name, 1: value } of formData) {
     if (typeof value === "string") {
       ArrayPrototypePush(

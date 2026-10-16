@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 /* Copyright Joyent, Inc. and other Node contributors. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,7 +27,7 @@
 // The full set of Windows error constants was stripped to reduce compile times.
 // Original source: https://raw.githubusercontent.com/mic101/windows/master/WRK-v1.2/public/sdk/inc/winerror.h
 
-use deno_core::op2;
+use oden_core::op2;
 
 #[op2]
 #[string]

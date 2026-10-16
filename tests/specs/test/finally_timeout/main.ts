@@ -1,4 +1,4 @@
-Deno.test("error", function () {
+Oden.test("error", function () {
   const timer = setTimeout(() => null, 10000);
   try {
     throw new Error("fail");
@@ -7,5 +7,5 @@ Deno.test("error", function () {
   }
 });
 
-Deno.test("success", function () {
+Oden.test("success", function () {
 });

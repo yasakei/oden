@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::sync::Arc;
 use std::sync::atomic::AtomicU64;
 use std::sync::atomic::Ordering;
 use std::time::Instant;
 
-use deno_core::parking_lot::Mutex;
-use deno_runtime::ops::tty::ConsoleSize;
+use oden_core::parking_lot::Mutex;
+use oden_runtime::ops::tty::ConsoleSize;
 
 use self::renderer::ProgressBarRenderer;
 use self::renderer::ProgressData;
@@ -287,7 +287,7 @@ pub struct ProgressBar {
   inner: ProgressBarInner,
 }
 
-impl deno_npm_installer::Reporter for ProgressBar {
+impl oden_npm_installer::Reporter for ProgressBar {
   type Guard = UpdateGuard;
   type ClearGuard = UpdateGuard;
 

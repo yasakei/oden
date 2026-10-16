@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // glibc 2.27 introduced new optimized versions of several libm functions.
 // When linking against a glibc >= 2.27 sysroot, the linker picks up the

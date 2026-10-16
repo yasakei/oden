@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 // This code has been inspired by https://github.com/bevry/domain-browser/commit/8bce7f4a093966ca850da75b024239ad5d0b33c6
 // deno-lint-ignore-file no-process-global
@@ -6,10 +6,10 @@
 (function () {
 const { core, primordials } = __bootstrap;
 const { ERR_UNHANDLED_ERROR } = core.loadExtScript(
-  "ext:deno_node/internal/errors.ts",
+  "ext:oden_node/internal/errors.ts",
 );
 const { AsyncHook } = core.loadExtScript(
-  "ext:deno_node/internal/async_hooks.ts",
+  "ext:oden_node/internal/async_hooks.ts",
 );
 const {
   ArrayPrototypeEvery,
@@ -25,7 +25,7 @@ const {
   ReflectApply,
   SafeMap,
 } = primordials;
-const { EventEmitter } = core.loadExtScript("ext:deno_node/_events.mjs");
+const { EventEmitter } = core.loadExtScript("ext:oden_node/_events.mjs");
 
 function emitError(e) {
   this.emit("error", e);

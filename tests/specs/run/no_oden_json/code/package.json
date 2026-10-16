@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@odentest/check-error": "1.0.0",
+    "chalk": "4"
+  },
+  "devDependencies": {
+    "@odentest/cjs-default-export": "1.0.0"
+  }
+}

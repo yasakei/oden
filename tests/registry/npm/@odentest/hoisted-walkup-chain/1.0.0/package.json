@@ -1,0 +1,8 @@
+{
+  "name": "@odentest/hoisted-walkup-chain",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@odentest/hoisted-walkup-x": "1.0.0"
+  }
+}

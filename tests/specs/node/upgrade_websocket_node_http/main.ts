@@ -7,7 +7,7 @@ const server = http.createServer((_req, res) => {
 });
 
 server.on("upgrade", (req, nodeSocket, head) => {
-  const { socket } = Deno.upgradeWebSocket(
+  const { socket } = Oden.upgradeWebSocket(
     new Request("http://localhost/", {
       headers: req.headers as HeadersInit,
     }),
@@ -52,6 +52,6 @@ server.listen(0, () => {
 // Safety timeout to prevent hanging on CI (unref'd so it doesn't keep the process alive)
 const _t = setTimeout(() => {
   console.error("timeout - forcing exit");
-  Deno.exit(1);
+  Oden.exit(1);
 }, 60000);
-Deno.unrefTimer(_t);
+Oden.unrefTimer(_t);

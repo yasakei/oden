@@ -1,0 +1,22 @@
+{
+  //   a
+  //  / \
+  // b   c
+  //  \ /
+  //   d
+  "tasks": {
+    "a": {
+      "command": "oden run a.js",
+      "dependencies": ["b", "c"]
+    },
+    "b": {
+      "command": "oden run b.js",
+      "dependencies": ["d"]
+    },
+    "c": {
+      "command": "oden run c.js",
+      "dependencies": ["d"]
+    },
+    "d": "oden run d.js"
+  }
+}

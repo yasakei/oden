@@ -1,0 +1,4 @@
+{
+  "args": "cache --reload npm:chalk npm:mkdirp",
+  "output": "oden_cache.out"
+}

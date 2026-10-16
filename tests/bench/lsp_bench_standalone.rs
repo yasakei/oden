@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use bencher::Bencher;
 use bencher::benchmark_group;
@@ -13,10 +13,10 @@ fn incremental_change_wait(bench: &mut Bencher) {
   let mut client = LspClientBuilder::new().build();
   client.initialize_default();
   let (method, _): (String, Option<Value>) = client.read_notification();
-  assert_eq!(method, "deno/didRefreshDenoConfigurationTree");
-  client.change_configuration(json!({ "deno": { "enable": true } }));
+  assert_eq!(method, "oden/didRefreshOdenConfigurationTree");
+  client.change_configuration(json!({ "oden": { "enable": true } }));
   let (method, _): (String, Option<Value>) = client.read_notification();
-  assert_eq!(method, "deno/didRefreshDenoConfigurationTree");
+  assert_eq!(method, "oden/didRefreshOdenConfigurationTree");
 
   client.write_notification(
     "textDocument/didOpen",

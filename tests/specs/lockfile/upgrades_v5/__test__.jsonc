@@ -8,19 +8,19 @@
           "output": "[WILDCARD]"
         },
         {
-          "args": ["eval", "console.log(Deno.readTextFileSync('deno.lock'))"],
-          "output": "deno.lock.json.out"
+          "args": ["eval", "console.log(Oden.readTextFileSync('oden.lock'))"],
+          "output": "oden.lock.json.out"
         },
         {
-          "args": "install jsr:@denotest/add",
+          "args": "install jsr:@odentest/add",
           "output": "[WILDCARD]"
         },
         {
           "args": [
             "eval",
-            "console.log(Deno.readTextFileSync('deno.lock'))"
+            "console.log(Oden.readTextFileSync('oden.lock'))"
           ],
-          "output": "deno.lock.v5.json.out"
+          "output": "oden.lock.v5.json.out"
         }
       ]
     },
@@ -29,7 +29,7 @@
         {
           "args": [
             "eval",
-            "Deno.writeTextFileSync('deno.json', '{\"nodeModulesDir\":\"auto\"}')"
+            "Oden.writeTextFileSync('oden.json', '{\"nodeModulesDir\":\"auto\"}')"
           ],
           "output": ""
         },

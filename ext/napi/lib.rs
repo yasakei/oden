@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![allow(non_camel_case_types, reason = "matches Node-API naming conventions")]
 #![allow(
@@ -42,19 +42,19 @@ pub use std::ptr;
 use std::rc::Rc;
 use std::thread_local;
 
-use deno_core::ExternalOpsTracker;
-use deno_core::OpState;
-use deno_core::V8CrossThreadTaskSpawner;
-use deno_core::V8TaskSpawner;
-use deno_core::op2;
-use deno_core::parking_lot::RwLock;
-use deno_core::url::Url;
+use oden_core::ExternalOpsTracker;
+use oden_core::OpState;
+use oden_core::V8CrossThreadTaskSpawner;
+use oden_core::V8TaskSpawner;
+use oden_core::op2;
+use oden_core::parking_lot::RwLock;
+use oden_core::url::Url;
 // Expose common stuff for ease of use.
-// `use deno_napi::*`
-pub use deno_core::v8;
-use deno_permissions::PermissionCheckError;
-pub use denort_helper::DenoRtNativeAddonLoader;
-pub use denort_helper::DenoRtNativeAddonLoaderRc;
+// `use oden_napi::*`
+pub use oden_core::v8;
+use oden_permissions::PermissionCheckError;
+pub use odenrt_helper::OdenRtNativeAddonLoader;
+pub use odenrt_helper::OdenRtNativeAddonLoaderRc;
 #[cfg(unix)]
 use libloading::os::unix::*;
 #[cfg(windows)]
@@ -89,7 +89,7 @@ pub enum NApiError {
   InvalidPath,
   #[class(type)]
   #[error(transparent)]
-  DenoRtLoad(#[from] denort_helper::LoadError),
+  OdenRtLoad(#[from] odenrt_helper::LoadError),
   #[class(type)]
   // libloading's `Display` for a failed load is opaque (e.g. just
   // `LoadLibraryExW failed` on Windows). Surface the underlying OS error via
@@ -106,7 +106,7 @@ pub enum NApiError {
   #[class(type)]
   #[error(
     "Cannot load native addon at {}: it was built against the legacy Node.js \
-     native addon API (NODE_MODULE / nan), which Deno does not support. Only \
+     native addon API (NODE_MODULE / nan), which Oden does not support. Only \
      Node-API (N-API) addons are supported.",
     .0.display()
   )]
@@ -115,7 +115,7 @@ pub enum NApiError {
   #[error(
     "Cannot load native addon at {}: it links directly against the Node.js \
      binary (node.exe) and relies on the V8 C++ ABI, Node.js internals and/or \
-     libuv exported by that executable, none of which Deno provides. An addon \
+     libuv exported by that executable, none of which Oden provides. An addon \
      can use Node-API (N-API) and still be unsupported when it has a regular \
      import of node.exe. The addon must be rebuilt to avoid linking directly \
      against node.exe, for example by using delay-loaded node.exe imports.",
@@ -880,12 +880,12 @@ fn report_finalizer_exception(
   );
 }
 
-deno_core::extension!(deno_napi,
+oden_core::extension!(oden_napi,
   ops = [
     op_napi_open
   ],
   options = {
-    deno_rt_native_addon_loader: Option<DenoRtNativeAddonLoaderRc>,
+    oden_rt_native_addon_loader: Option<OdenRtNativeAddonLoaderRc>,
   },
   state = |state, options| {
     state.put(NapiState {
@@ -896,7 +896,7 @@ deno_core::extension!(deno_napi,
       napi_wrap: None,
       type_tag: None,
     });
-    if let Some(loader) = options.deno_rt_native_addon_loader {
+    if let Some(loader) = options.oden_rt_native_addon_loader {
       state.put(loader);
     }
   },
@@ -934,12 +934,12 @@ fn op_napi_open<'scope>(
     cleanup_hooks,
     ref_tracker,
     external_ops_tracker,
-    deno_rt_native_addon_loader,
+    oden_rt_native_addon_loader,
     path,
   ) = {
     let mut op_state = op_state.borrow_mut();
     let permissions =
-      op_state.borrow_mut::<deno_permissions::PermissionsContainer>();
+      op_state.borrow_mut::<oden_permissions::PermissionsContainer>();
     let path = permissions.check_ffi(Cow::Borrowed(Path::new(path)))?;
     let napi_state = op_state.borrow::<NapiState>();
     (
@@ -948,23 +948,23 @@ fn op_napi_open<'scope>(
       napi_state.env_cleanup_hooks.clone(),
       napi_state.ref_tracker.clone(),
       op_state.external_ops_tracker.clone(),
-      op_state.try_borrow::<DenoRtNativeAddonLoaderRc>().cloned(),
+      op_state.try_borrow::<OdenRtNativeAddonLoaderRc>().cloned(),
       path,
     )
   };
 
   // Register the uv_compat loop so that our libuv-ABI `uv_timer_*`
-  // polyfills bridge onto Deno's event loop instead of degrading to
+  // polyfills bridge onto Oden's event loop instead of degrading to
   // no-ops. The loop pointer is opaque to addons — they only pass it
   // through to other uv_* polyfill functions, which re-resolve it from
   // this thread-local in any case.
   {
     let op_state = op_state.borrow();
     if let Some(uv_loop) =
-      op_state.try_borrow::<Box<deno_core::uv_compat::UvLoop>>()
+      op_state.try_borrow::<Box<oden_core::uv_compat::UvLoop>>()
     {
       let loop_ptr =
-        &**uv_loop as *const deno_core::uv_compat::UvLoop as *mut _;
+        &**uv_loop as *const oden_core::uv_compat::UvLoop as *mut _;
       crate::uv::register_default_uv_loop(loop_ptr);
     }
   }
@@ -1043,7 +1043,7 @@ fn op_napi_open<'scope>(
   #[cfg(not(unix))]
   let flags = 0x00000008;
 
-  let real_path = match deno_rt_native_addon_loader {
+  let real_path = match oden_rt_native_addon_loader {
     Some(loader) => loader.load_and_resolve_path(&path)?,
     None => Cow::Borrowed(path.as_ref()),
   };

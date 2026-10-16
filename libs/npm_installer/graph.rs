@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::sync::Arc;
@@ -6,9 +6,9 @@ use std::sync::Arc;
 use deno_error::JsErrorBox;
 use deno_graph::NpmLoadError;
 use deno_graph::NpmResolvePkgReqsResult;
-use deno_npm::resolution::NpmResolutionError;
-use deno_npm_cache::NpmCacheHttpClient;
-use deno_resolver::graph::FoundPackageJsonDepFlag;
+use oden_npm::resolution::NpmResolutionError;
+use oden_npm_cache::NpmCacheHttpClient;
+use oden_resolver::graph::FoundPackageJsonDepFlag;
 use deno_semver::package::PackageReq;
 
 use crate::NpmInstaller;
@@ -38,7 +38,7 @@ impl NpmCachingStrategy {
 }
 
 #[derive(Debug)]
-pub struct NpmDenoGraphResolver<
+pub struct NpmOdenGraphResolver<
   TNpmCacheHttpClient: NpmCacheHttpClient,
   TSys: NpmInstallerSys,
 > {
@@ -48,7 +48,7 @@ pub struct NpmDenoGraphResolver<
 }
 
 impl<TNpmCacheHttpClient: NpmCacheHttpClient, TSys: NpmInstallerSys>
-  NpmDenoGraphResolver<TNpmCacheHttpClient, TSys>
+  NpmOdenGraphResolver<TNpmCacheHttpClient, TSys>
 {
   pub fn new(
     npm_installer: Option<Arc<NpmInstaller<TNpmCacheHttpClient, TSys>>>,
@@ -66,7 +66,7 @@ impl<TNpmCacheHttpClient: NpmCacheHttpClient, TSys: NpmInstallerSys>
 #[async_trait::async_trait(?Send)]
 impl<TNpmCacheHttpClient: NpmCacheHttpClient, TSys: NpmInstallerSys>
   deno_graph::source::NpmResolver
-  for NpmDenoGraphResolver<TNpmCacheHttpClient, TSys>
+  for NpmOdenGraphResolver<TNpmCacheHttpClient, TSys>
 {
   fn load_and_cache_npm_package_info(&self, package_name: &str) {
     // ok not to do this in Wasm because this is just an optimization
@@ -142,7 +142,7 @@ impl<TNpmCacheHttpClient: NpmCacheHttpClient, TSys: NpmInstallerSys>
           }
         } else {
           let err =
-            Arc::new(JsErrorBox::from_err(deno_resolver::npm::NoNpmError));
+            Arc::new(JsErrorBox::from_err(oden_resolver::npm::NoNpmError));
           NpmResolvePkgReqsResult {
             results: package_reqs
               .iter()

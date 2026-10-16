@@ -1,5 +1,5 @@
 {
-  "exclude": ["*.deno.ts"],
+  "exclude": ["*.oden.ts"],
   "compilerOptions": {
     "composite": true,
     "lib": ["esnext", "dom"]

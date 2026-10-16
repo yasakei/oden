@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assertStrictEquals } from "./test_util.ts";
 
-Deno.test(
+Oden.test(
   { permissions: { net: ["127.0.0.1"] } },
   async function eventSourceColonInMessage() {
     const portDeferred = Promise.withResolvers<number>();
 
-    await using _server = Deno.serve({
+    await using _server = Oden.serve({
       handler: () =>
         new Response('data: {"key":"value"}\n\n', {
           headers: { "content-type": "text/event-stream" },

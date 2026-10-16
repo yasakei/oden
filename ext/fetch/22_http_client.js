@@ -1,9 +1,9 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core, primordials } = __bootstrap;
 const { op_fetch_custom_client } = core.ops;
-const { loadTlsKeyPair } = core.loadExtScript("ext:deno_net/02_tls.js");
+const { loadTlsKeyPair } = core.loadExtScript("ext:oden_net/02_tls.js");
 
 const { internalRidSymbol } = core;
 const {
@@ -17,7 +17,7 @@ const {
 } = primordials;
 
 /**
- * @param {Deno.CreateHttpClientOptions} options
+ * @param {Oden.CreateHttpClientOptions} options
  * @returns {HttpClient}
  */
 function createHttpClient(options) {
@@ -90,7 +90,7 @@ function createHttpClient(options) {
       proxy.transport = "http";
     }
   }
-  const keyPair = loadTlsKeyPair("Deno.createHttpClient", options);
+  const keyPair = loadTlsKeyPair("Oden.createHttpClient", options);
   return new HttpClient(
     op_fetch_custom_client(
       options,

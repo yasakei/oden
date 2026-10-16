@@ -1,5 +1,5 @@
 function foo() {
-  Deno.hostname();
+  Oden.hostname();
 }
 
 function bar() {

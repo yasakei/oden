@@ -1,0 +1,7 @@
+{
+  "name": "@odentest/non-existent-dep-version",
+  "version": "1.0.0",
+  "dependencies": {
+    "@odentest/esm-basic": "=99.99.99"
+  }
+}

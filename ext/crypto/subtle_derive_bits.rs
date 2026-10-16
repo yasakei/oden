@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! `SubtleCrypto.deriveBits()` body in Rust.
 //!
@@ -12,11 +12,11 @@ use std::borrow::Cow;
 
 use argon2::Argon2;
 use argon2::ParamsBuilder;
-use deno_core::v8;
-use deno_core::webidl::ContextFn;
-use deno_core::webidl::WebIdlConverter;
-use deno_core::webidl::WebIdlError;
-use deno_core::webidl::WebIdlErrorKind;
+use oden_core::v8;
+use oden_core::webidl::ContextFn;
+use oden_core::webidl::WebIdlConverter;
+use oden_core::webidl::WebIdlError;
+use oden_core::webidl::WebIdlErrorKind;
 use deno_error::JsErrorBox;
 
 use crate::CryptoError;
@@ -347,7 +347,7 @@ fn read_required_public_key<'a, 'b>(
     ));
   }
   let Some(key_ptr) =
-    deno_core::cppgc::try_unwrap_cppgc_object::<CryptoKey>(scope, val)
+    oden_core::cppgc::try_unwrap_cppgc_object::<CryptoKey>(scope, val)
   else {
     return Err(WebIdlError::new(
       prefix,

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![allow(clippy::disallowed_methods, reason = "file system implementation")]
 
@@ -13,16 +13,16 @@ use std::path::PathBuf;
 use std::rc::Rc;
 use std::sync::Mutex;
 
-use deno_core::unsync::spawn_blocking;
-use deno_io::StdFileResourceInner;
-use deno_io::fs::File;
-use deno_io::fs::FsError;
-use deno_io::fs::FsResult;
-use deno_io::fs::FsStat;
-use deno_io::fs::FsStatFs;
-use deno_maybe_sync::new_rc;
-use deno_permissions::CheckedPath;
-use deno_permissions::CheckedPathBuf;
+use oden_core::unsync::spawn_blocking;
+use oden_io::StdFileResourceInner;
+use oden_io::fs::File;
+use oden_io::fs::FsError;
+use oden_io::fs::FsResult;
+use oden_io::fs::FsStat;
+use oden_io::fs::FsStatFs;
+use oden_maybe_sync::new_rc;
+use oden_permissions::CheckedPath;
+use oden_permissions::CheckedPathBuf;
 
 use crate::FileSystem;
 use crate::OpenOptions;
@@ -937,7 +937,7 @@ fn stat(path: &Path) -> FsResult<FsStat> {
   let file = open_for_stat_windows(path, false)?;
   let metadata = file.metadata()?;
   let mut fsstat = FsStat::from_std(metadata);
-  deno_io::stat_extra(&file, &mut fsstat)?;
+  oden_io::stat_extra(&file, &mut fsstat)?;
   Ok(fsstat)
 }
 
@@ -952,13 +952,13 @@ fn lstat(path: &Path) -> FsResult<FsStat> {
   let file = open_for_stat_windows(path, true)?;
   let metadata = file.metadata()?;
   let mut fsstat = FsStat::from_std(metadata);
-  deno_io::stat_extra(&file, &mut fsstat)?;
+  oden_io::stat_extra(&file, &mut fsstat)?;
   Ok(fsstat)
 }
 
 // Some Windows file system drivers (notably ImDisk-backed memory disks)
 // reject `FILE_FLAG_BACKUP_SEMANTICS` for regular files and return
-// `ERROR_INVALID_FUNCTION` (1). Deno passes that flag so `CreateFile` can
+// `ERROR_INVALID_FUNCTION` (1). Oden passes that flag so `CreateFile` can
 // open directories; on those drivers we transparently retry without it.
 // See https://github.com/denoland/deno/issues/26257.
 #[cfg(windows)]

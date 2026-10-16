@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::BTreeMap;
 use std::collections::HashMap;
@@ -10,19 +10,19 @@ use std::sync::Arc;
 
 use deno_ast::MediaType;
 use deno_ast::ModuleSpecifier;
-use deno_config::deno_json::CompilerOptionTypesDeserializeError;
-use deno_core::url::Url;
+use oden_config::oden_json::CompilerOptionTypesDeserializeError;
+use oden_core::url::Url;
 use deno_error::JsErrorBox;
 use deno_graph::Module;
 use deno_graph::ModuleGraph;
 use deno_graph::ResolutionError;
-use deno_lib::util::hash::FastInsecureHasher;
-use deno_resolver::deno_json::CompilerOptionsData;
-use deno_resolver::deno_json::CompilerOptionsParseError;
-use deno_resolver::deno_json::CompilerOptionsResolver;
-use deno_resolver::deno_json::JsxImportSourceConfigResolver;
-use deno_resolver::deno_json::ToMaybeJsxImportSourceConfigError;
-use deno_resolver::graph::maybe_additional_sloppy_imports_message;
+use oden_lib::util::hash::FastInsecureHasher;
+use oden_resolver::oden_json::CompilerOptionsData;
+use oden_resolver::oden_json::CompilerOptionsParseError;
+use oden_resolver::oden_json::CompilerOptionsResolver;
+use oden_resolver::oden_json::JsxImportSourceConfigResolver;
+use oden_resolver::oden_json::ToMaybeJsxImportSourceConfigError;
+use oden_resolver::graph::maybe_additional_sloppy_imports_message;
 use deno_semver::npm::NpmPackageReqReference;
 use deno_terminal::colors;
 use indexmap::IndexMap;
@@ -32,7 +32,7 @@ use rustc_hash::FxHashSet;
 
 use crate::args::CliOptions;
 use crate::args::CompilerOptions;
-use crate::args::DenoSubcommand;
+use crate::args::OdenSubcommand;
 use crate::args::TsTypeLib;
 use crate::args::TypeCheckMode;
 use crate::cache::CacheDBHash;
@@ -179,24 +179,24 @@ impl TypeChecker {
 
     // Merge declaration-specific options into the base compiler options
     let mut config_value =
-      deno_core::serde_json::to_value(base_compiler_options.as_ref())
+      oden_core::serde_json::to_value(base_compiler_options.as_ref())
         .map_err(|e| CheckErrorKind::Other(JsErrorBox::from_err(e)))?;
     if let Some(config_obj) = config_value.as_object_mut() {
       config_obj.insert(
         "declaration".into(),
-        deno_core::serde_json::Value::Bool(true),
+        oden_core::serde_json::Value::Bool(true),
       );
       config_obj.insert(
         "emitDeclarationOnly".into(),
-        deno_core::serde_json::Value::Bool(true),
+        oden_core::serde_json::Value::Bool(true),
       );
       config_obj
-        .insert("noEmit".into(), deno_core::serde_json::Value::Bool(false));
+        .insert("noEmit".into(), oden_core::serde_json::Value::Bool(false));
     }
 
     let compiler_options = Arc::new(CompilerOptions::new(config_value));
 
-    let hash_data = FastInsecureHasher::new_deno_versioned()
+    let hash_data = FastInsecureHasher::new_oden_versioned()
       .write_hashable(&compiler_options)
       .finish();
 
@@ -226,15 +226,15 @@ impl TypeChecker {
     )?;
 
     // Declaration emit type-checks with `TypeCheckMode::All`, which (unlike
-    // `deno check`'s default `Local` mode) doesn't scope semantic diagnostics
+    // `oden check`'s default `Local` mode) doesn't scope semantic diagnostics
     // to the user's own files. That widens the report to every file in the
-    // program, including deno's bundled `asset:///` declarations. Those aren't
+    // program, including oden's bundled `asset:///` declarations. Those aren't
     // self-contained under a user-supplied `compilerOptions.lib`: with
-    // `"lib": ["dom", "deno.ns"]`, `lib.deno.ns.d.ts`'s own `import("node:net")`
+    // `"lib": ["dom", "oden.ns"]`, `lib.oden.ns.d.ts`'s own `import("node:net")`
     // and `NodeJS.Timeout` references have nothing to resolve against, and
     // adding `"node"` instead collides the bundled node types with the web
     // ones. Either way the user gets errors in a file they can't edit.
-    // `deno check` never surfaces these, so neither should declaration emit.
+    // `oden check` never surfaces these, so neither should declaration emit.
     let diagnostics = response.diagnostics.filter(|d| {
       !d.file_name
         .as_deref()
@@ -279,7 +279,7 @@ impl TypeChecker {
         FailedTypeCheckingError {
           can_skip: !matches!(
             self.cli_options.sub_command(),
-            DenoSubcommand::Check(_)
+            OdenSubcommand::Check(_)
           ),
         }
         .into(),
@@ -293,8 +293,8 @@ impl TypeChecker {
   ///
   /// It is expected that it is determined if a check and/or emit is validated
   /// before the function is called.
-  /// Walk the module graph exactly as Deno 2.x's forked tsc did - for the
-  /// native (external tsc) check path in `crate::tools::check`. Returns deno's
+  /// Walk the module graph exactly as Oden 2.x's forked tsc did - for the
+  /// native (external tsc) check path in `crate::tools::check`. Returns oden's
   /// own graph diagnostics (missing modules + hints) plus a combined check hash
   /// over every compiler-options group, with the pinned tsc version folded in.
   /// Native check runs a single external tsc over the whole generated
@@ -318,7 +318,7 @@ impl TypeChecker {
     let npm_check_state_hash = check_state_hash(&self.npm_resolver);
     let groups = self.group_roots_by_compiler_options(graph, lib)?;
     let mut missing_diagnostics = tsc::Diagnostics::default();
-    let mut combined = FastInsecureHasher::new_deno_versioned();
+    let mut combined = FastInsecureHasher::new_oden_versioned();
     combined.write_hashable(crate::tsc::native::TYPESCRIPT_VERSION);
     let mut any_hash = false;
     for group in groups {
@@ -460,7 +460,7 @@ impl TypeChecker {
           // this is slightly hacky. It's used as the referrer for resolving
           // npm imports in the key
           referrer: dir
-            .member_or_root_deno_json()
+            .member_or_root_oden_json()
             .map(|d| d.specifier.clone())
             .unwrap_or_else(|| dir.dir_url().as_ref().clone()),
         }
@@ -599,7 +599,7 @@ impl Iterator for DiagnosticsByFolderRealIterator<'_> {
 
 /// Converts the list of ambient module names to regex string
 /// Hash of the npm resolution state, folded into the type-check cache key so
-/// the cache busts when npm deps (or nodeModulesDir) change. Shared by Deno
+/// the cache busts when npm deps (or nodeModulesDir) change. Shared by Oden
 /// 2.x's forked tsc and the native (external tsc) check path.
 fn check_state_hash(resolver: &CliNpmResolver) -> Option<u64> {
   match resolver {
@@ -608,7 +608,7 @@ fn check_state_hash(resolver: &CliNpmResolver) -> Option<u64> {
     CliNpmResolver::Managed(resolver) => {
       let mut package_reqs = resolver.resolution().package_reqs();
       package_reqs.sort_by(|a, b| a.0.cmp(&b.0)); // determinism
-      let mut hasher = FastInsecureHasher::new_without_deno_version();
+      let mut hasher = FastInsecureHasher::new_without_oden_version();
       // ensure the cache gets busted when turning nodeModulesDir on or off
       // as this could cause changes in resolution
       hasher.write_hashable(resolver.root_node_modules_path().is_some());
@@ -735,11 +735,11 @@ impl DiagnosticsByFolderRealIterator<'_> {
     // that data here.
     let compiler_options = check_group.compiler_options.clone();
 
-    let compiler_options_hash_data = FastInsecureHasher::new_deno_versioned()
+    let compiler_options_hash_data = FastInsecureHasher::new_oden_versioned()
       .write_hashable(&compiler_options)
       .finish();
     let code_cache = self.code_cache.as_ref().map(|c| {
-      let c: Arc<dyn deno_runtime::code_cache::CodeCache> = c.clone();
+      let c: Arc<dyn oden_runtime::code_cache::CodeCache> = c.clone();
       c
     });
     let response = tsc::exec(
@@ -889,12 +889,12 @@ impl DiagnosticsByFolderRealIterator<'_> {
       // Try to resolve the package folder and then the subpath
       let Ok(pkg_folder) = self
         .npm_resolver
-        .resolve_pkg_folder_from_deno_module_req(npm_ref.req(), root)
+        .resolve_pkg_folder_from_oden_module_req(npm_ref.req(), root)
       else {
         continue;
       };
       let Ok(resolved) =
-        self.node_resolver.resolve_package_subpath_from_deno_module(
+        self.node_resolver.resolve_package_subpath_from_oden_module(
           &pkg_folder,
           npm_ref.sub_path(),
           Some(root),
@@ -989,7 +989,7 @@ impl<'a> GraphWalker<'a> {
     type_check_mode: TypeCheckMode,
   ) -> Self {
     let maybe_hasher = npm_cache_state_hash.map(|npm_cache_state_hash| {
-      let mut hasher = FastInsecureHasher::new_deno_versioned();
+      let mut hasher = FastInsecureHasher::new_oden_versioned();
       hasher.write_hashable(npm_cache_state_hash);
       hasher.write_u8(match type_check_mode {
         TypeCheckMode::All => 0,
@@ -1466,11 +1466,11 @@ impl<'a> GraphWalker<'a> {
       .npm_resolver
       .as_managed()
       .unwrap()
-      .resolve_pkg_folder_from_deno_module_req(req_ref.req())
+      .resolve_pkg_folder_from_oden_module_req(req_ref.req())
       .ok()?;
     let resolved = self
       .node_resolver
-      .resolve_package_subpath_from_deno_module(
+      .resolve_package_subpath_from_oden_module(
         &pkg_dir,
         req_ref.sub_path(),
         Some(referrer),
@@ -1764,7 +1764,7 @@ mod test {
   fn get_leading_comments_test() {
     assert_eq!(
       get_leading_comments(
-        "#!/usr/bin/env deno\r\n// test\n/* 1 *//*2*///3\n//\n /**/  /*4 */"
+        "#!/usr/bin/env oden\r\n// test\n/* 1 *//*2*///3\n//\n /**/  /*4 */"
       ),
       vec![
         " test".to_string(),

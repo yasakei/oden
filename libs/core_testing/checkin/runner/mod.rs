@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::any::Any;
 use std::any::TypeId;
@@ -11,10 +11,10 @@ use std::sync::mpsc::RecvTimeoutError;
 use std::sync::mpsc::channel;
 use std::time::Duration;
 
-use deno_core::CrossIsolateStore;
-use deno_core::Extension;
-use deno_core::JsRuntime;
-use deno_core::RuntimeOptions;
+use oden_core::CrossIsolateStore;
+use oden_core::Extension;
+use oden_core::JsRuntime;
+use oden_core::RuntimeOptions;
 
 use self::ops_worker::WorkerCloseWatcher;
 use self::ops_worker::WorkerHostSide;

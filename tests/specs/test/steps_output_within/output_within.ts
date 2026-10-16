@@ -1,4 +1,4 @@
-Deno.test("description", async (t) => {
+Oden.test("description", async (t) => {
   // the output is not great, but this is an extreme scenario
   console.log(1);
   await t.step("step 1", async (t) => {

@@ -1,6 +1,6 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { core } from "ext:core/mod.js";
-const mod = core.loadExtScript("ext:deno_node/inspector/promises.js");
+const mod = core.loadExtScript("ext:oden_node/inspector/promises.js");
 
 export const Session = mod.Session;
 export const close = mod.close;

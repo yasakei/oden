@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core, primordials } = __bootstrap;
@@ -31,12 +31,12 @@ const {
 
 const EMPTY_OPTIONS = ObjectFreeze(ObjectSetPrototypeOf({}, null));
 
-const webidl = core.loadExtScript("ext:deno_webidl/00_webidl.js");
+const webidl = core.loadExtScript("ext:oden_webidl/00_webidl.js");
 const { createFilteredInspectProxy } = core.loadExtScript(
-  "ext:deno_web/01_console.js",
+  "ext:oden_web/01_console.js",
 );
-const { URL } = core.loadExtScript("ext:deno_web/00_url.js");
-const { getLocationHref } = core.loadExtScript("ext:deno_web/12_location.js");
+const { URL } = core.loadExtScript("ext:oden_web/00_url.js");
+const { getLocationHref } = core.loadExtScript("ext:oden_web/12_location.js");
 const { serializePermissions } = core.loadExtScript(
   "ext:runtime/10_permissions.js",
 );
@@ -47,15 +47,15 @@ const {
   EventTarget,
   MessageEvent,
   setIsTrusted,
-} = core.loadExtScript("ext:deno_web/02_event.js");
+} = core.loadExtScript("ext:oden_web/02_event.js");
 const {
   deserializeJsMessageData,
   MessagePortPrototype,
   serializeJsMessageData,
   serializeMessageData,
-} = core.loadExtScript("ext:deno_web/13_message_port.js");
+} = core.loadExtScript("ext:oden_web/13_message_port.js");
 const { DOMException } = core.loadExtScript(
-  "ext:deno_web/01_dom_exception.js",
+  "ext:oden_web/01_dom_exception.js",
 );
 
 function createWorker(
@@ -114,7 +114,7 @@ class Worker extends EventTarget {
     super();
     specifier = String(specifier);
     const {
-      deno,
+      oden,
       name,
       type = "classic",
     } = options;
@@ -161,7 +161,7 @@ class Worker extends EventTarget {
       specifier,
       hasSourceCode,
       sourceCode,
-      deno?.permissions,
+      oden?.permissions,
       this.#name,
       workerType,
       false,
@@ -367,7 +367,7 @@ class Worker extends EventTarget {
     }
   }
 
-  [SymbolFor("Deno.privateCustomInspect")](inspect, inspectOptions) {
+  [SymbolFor("Oden.privateCustomInspect")](inspect, inspectOptions) {
     return inspect(
       createFilteredInspectProxy({
         object: this,

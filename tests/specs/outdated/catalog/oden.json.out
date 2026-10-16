@@ -1,0 +1,11 @@
+{
+  "workspace": ["./member"],
+  "catalog": {
+    "@odentest/has-patch-versions": "0.2.0"
+  },
+  "catalogs": {
+    "testing": {
+      "@odentest/breaking-change-between-versions": "2.0.0"
+    }
+  }
+}

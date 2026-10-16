@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -1008,11 +1008,11 @@ u4QuUoobAgMBAAE=
   #[test]
   fn test_substitute_variable_from_env_variable() {
     let sys = sys_traits::impls::InMemorySys::default();
-    sys.env_set_var("DENO_DOTENV_TEST_KEY11", "overriden from process env");
+    sys.env_set_var("ODEN_DOTENV_TEST_KEY11", "overriden from process env");
 
     assert_parsed_eq_with_substitution(
       &sys,
-      r#"KEY=">${DENO_DOTENV_TEST_KEY11}<""#,
+      r#"KEY=">${ODEN_DOTENV_TEST_KEY11}<""#,
       &[("KEY", ">overriden from process env<")],
     );
   }
@@ -1020,16 +1020,16 @@ u4QuUoobAgMBAAE=
   #[test]
   fn test_substitute_variable_env_variable_overrides_dotenv_in_substitution() {
     let sys = sys_traits::impls::InMemorySys::default();
-    sys.env_set_var("DENO_DOTENV_TEST_KEY11", "overriden from process env");
+    sys.env_set_var("ODEN_DOTENV_TEST_KEY11", "overriden from process env");
 
     assert_parsed_eq_with_substitution(
       &sys,
       r#"
-      DENO_DOTENV_TEST_KEY11=test_user
-      KEY=">${DENO_DOTENV_TEST_KEY11}<"
+      ODEN_DOTENV_TEST_KEY11=test_user
+      KEY=">${ODEN_DOTENV_TEST_KEY11}<"
       "#,
       &[
-        ("DENO_DOTENV_TEST_KEY11", "test_user"),
+        ("ODEN_DOTENV_TEST_KEY11", "test_user"),
         ("KEY", ">overriden from process env<"),
       ],
     );

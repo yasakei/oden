@@ -1,5 +1,5 @@
 try {
-  await Deno.open("./some/file.txt");
+  await Oden.open("./some/file.txt");
 } catch (_e) {}
 
 // deno-lint-ignore no-explicit-any

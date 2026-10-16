@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@odentest/multiple-arch-deps": "*"
+  }
+}

@@ -12,9 +12,9 @@
     {
       "args": [
         "eval",
-        "console.log(Deno.readTextFileSync('deno.json').trim())"
+        "console.log(Oden.readTextFileSync('oden.json').trim())"
       ],
-      "output": "deno_after.out"
+      "output": "oden_after.out"
     }
   ]
 }

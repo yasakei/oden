@@ -1,4 +1,4 @@
-import { getValue, setValue } from "@denotest3/basic";
+import { getValue, setValue } from "@odentest3/basic";
 
 console.log(getValue());
 setValue(42);

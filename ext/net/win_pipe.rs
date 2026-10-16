@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::ffi::OsStr;
@@ -8,12 +8,12 @@ use std::rc::Rc;
 use std::task::Context;
 use std::task::Poll;
 
-use deno_core::AsyncRefCell;
-use deno_core::AsyncResult;
-use deno_core::CancelHandle;
-use deno_core::CancelTryFuture;
-use deno_core::RcRef;
-use deno_core::Resource;
+use oden_core::AsyncRefCell;
+use oden_core::AsyncResult;
+use oden_core::CancelHandle;
+use oden_core::CancelTryFuture;
+use oden_core::RcRef;
+use oden_core::Resource;
 use tokio::io::AsyncRead;
 use tokio::io::AsyncReadExt;
 use tokio::io::AsyncWrite;
@@ -151,8 +151,8 @@ impl NamedPipe {
 }
 
 impl Resource for NamedPipe {
-  deno_core::impl_readable_byob!();
-  deno_core::impl_writable!();
+  oden_core::impl_readable_byob!();
+  oden_core::impl_writable!();
 
   fn name(&self) -> Cow<'_, str> {
     Cow::Borrowed("namedPipe")

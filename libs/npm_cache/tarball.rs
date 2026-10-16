@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 use std::sync::Arc;
 
 use deno_error::JsErrorBox;
-use deno_npm::registry::NpmPackageVersionDistInfo;
-use deno_npmrc::ResolvedNpmRc;
+use oden_npm::registry::NpmPackageVersionDistInfo;
+use oden_npmrc::ResolvedNpmRc;
 use deno_semver::package::PackageNv;
 use futures::FutureExt;
 use futures::future::LocalBoxFuture;
@@ -211,7 +211,7 @@ impl<THttpClient: NpmCacheHttpClient, TSys: NpmCacheSys>
 
       }
       // The URL we actually download from (post-relocation). Reported in the
-      // error paths below so they point at the registry Deno really contacted
+      // error paths below so they point at the registry Oden really contacted
       // rather than the original `dist.tarball`, which may have been relocated
       // away from `registry.npmjs.org`.
       let fetched_tarball_url = tarball_uri.to_string();
@@ -252,7 +252,7 @@ impl<THttpClient: NpmCacheHttpClient, TSys: NpmCacheSys>
           } else {
             // The user ran with `--reload`, so overwrite the package instead of
             // deleting it since the package might get corrupted if a user kills
-            // their deno process while it's deleting a package directory
+            // their oden process while it's deleting a package directory
             //
             // We can't rename this folder and delete it because the folder
             // may be in use by another process or may now contain hardlinks,

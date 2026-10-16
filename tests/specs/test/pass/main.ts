@@ -1,37 +1,37 @@
-Deno.test("test 0", () => {});
-Deno.test("test 1", () => {});
-Deno.test("test 2", () => {});
-Deno.test("test 3", () => {});
-Deno.test("test 4", () => {});
-Deno.test("test 5", () => {});
-Deno.test("test 6", () => {});
-Deno.test("test 7", () => {});
-Deno.test("test 8", () => {
+Oden.test("test 0", () => {});
+Oden.test("test 1", () => {});
+Oden.test("test 2", () => {});
+Oden.test("test 3", () => {});
+Oden.test("test 4", () => {});
+Oden.test("test 5", () => {});
+Oden.test("test 6", () => {});
+Oden.test("test 7", () => {});
+Oden.test("test 8", () => {
   console.log("console.log");
 });
-Deno.test("test 9", () => {
+Oden.test("test 9", () => {
   console.error("console.error");
 });
 
-Deno.test("test\b", () => {
+Oden.test("test\b", () => {
   console.error("console.error");
 });
-Deno.test("test\f", () => {
-  console.error("console.error");
-});
-
-Deno.test("test\t", () => {
+Oden.test("test\f", () => {
   console.error("console.error");
 });
 
-Deno.test("test\n", () => {
+Oden.test("test\t", () => {
   console.error("console.error");
 });
 
-Deno.test("test\r", () => {
+Oden.test("test\n", () => {
   console.error("console.error");
 });
 
-Deno.test("test\v", () => {
+Oden.test("test\r", () => {
+  console.error("console.error");
+});
+
+Oden.test("test\v", () => {
   console.error("console.error");
 });

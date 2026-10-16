@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assert, assertEquals, assertThrows, fail } from "@std/assert";
 import dns, { getDefaultResultOrder, lookupService } from "node:dns";
 import dnsPromises, {
@@ -6,7 +6,7 @@ import dnsPromises, {
   lookup as lookupPromise,
   lookupService as lookupServicePromise,
 } from "node:dns/promises";
-import { ErrnoException } from "ext:deno_node/_global.d.ts";
+import { ErrnoException } from "ext:oden_node/_global.d.ts";
 
 interface LookupServiceResult {
   hostname: string;
@@ -16,7 +16,7 @@ interface LookupServiceResult {
 const address = "8.8.8.8";
 const port = 80;
 
-Deno.test("lookupService with callback", async () => {
+Oden.test("lookupService with callback", async () => {
   // Named import
   const result = await new Promise<LookupServiceResult>(
     (resolve, reject) => {
@@ -45,7 +45,7 @@ Deno.test("lookupService with callback", async () => {
 // Regression test for https://github.com/denoland/deno/issues/36537
 // `dns.lookupService` must accept a numeric string port like Node.js instead
 // of throwing `TypeError: expected i32`.
-Deno.test("[node/dns] lookupService accepts a string port", async () => {
+Oden.test("[node/dns] lookupService accepts a string port", async () => {
   const result = await new Promise<LookupServiceResult>(
     (resolve, reject) => {
       // deno-lint-ignore no-explicit-any
@@ -62,7 +62,7 @@ Deno.test("[node/dns] lookupService accepts a string port", async () => {
 // Regression test for https://github.com/denoland/deno/issues/36518
 // `Resolver.setLocalAddress` must not throw ERR_NOT_IMPLEMENTED; Node accepts
 // it and returns undefined.
-Deno.test("[node/dns] Resolver.setLocalAddress does not throw", () => {
+Oden.test("[node/dns] Resolver.setLocalAddress does not throw", () => {
   const resolver = new dns.promises.Resolver();
   resolver.setLocalAddress("0.0.0.0", "::");
   // The two addresses may be given in either order (one IPv4, one IPv6).
@@ -81,7 +81,7 @@ Deno.test("[node/dns] Resolver.setLocalAddress does not throw", () => {
 // `EBADNAME` with `errno: undefined`, matching Node.js/c-ares, instead of
 // flattening the error to `UNKNOWN` (errno -4094). The bad name is rejected
 // while parsing the query, so this does not depend on network access.
-Deno.test("[node/dns] resolve of a malformed hostname reports EBADNAME", async () => {
+Oden.test("[node/dns] resolve of a malformed hostname reports EBADNAME", async () => {
   const err = await new Promise<ErrnoException>((resolve) => {
     dns.resolve4("example..com", (err) => {
       resolve(err as unknown as ErrnoException);
@@ -94,7 +94,7 @@ Deno.test("[node/dns] resolve of a malformed hostname reports EBADNAME", async (
   assertEquals(err.hostname, "example..com");
 });
 
-Deno.test("lookupService promise", async () => {
+Oden.test("lookupService promise", async () => {
   // Named import
   const result = await lookupServicePromise(address, port);
   assertEquals(typeof result.hostname, "string");
@@ -109,7 +109,7 @@ Deno.test("lookupService promise", async () => {
   assertEquals(typeof defaultImportResult.service, "string");
 });
 
-Deno.test("[node/dns] lookupService accepts string ports", async () => {
+Oden.test("[node/dns] lookupService accepts string ports", async () => {
   const stringPort = "80" as unknown as number;
 
   const callbackResult = await new Promise<LookupServiceResult>(
@@ -128,7 +128,7 @@ Deno.test("[node/dns] lookupService accepts string ports", async () => {
   assertEquals(typeof promiseResult.service, "string");
 });
 
-Deno.test("lookupService not found", async () => {
+Oden.test("lookupService not found", async () => {
   const address = "10.0.0.0";
 
   // Promise
@@ -162,7 +162,7 @@ Deno.test("lookupService not found", async () => {
   });
 });
 
-Deno.test("[node/dns] getDefaultResultOrder returns valid order", () => {
+Oden.test("[node/dns] getDefaultResultOrder returns valid order", () => {
   // Named export from dns
   const order = getDefaultResultOrder();
   assertEquals(typeof order, "string");
@@ -184,7 +184,7 @@ Deno.test("[node/dns] getDefaultResultOrder returns valid order", () => {
   assertEquals(dnsPromises.getDefaultResultOrder(), order);
 });
 
-Deno.test("[node/dns] getDefaultResultOrder reflects setDefaultResultOrder", () => {
+Oden.test("[node/dns] getDefaultResultOrder reflects setDefaultResultOrder", () => {
   const original = dns.getDefaultResultOrder();
   try {
     dns.setDefaultResultOrder("ipv4first");
@@ -198,7 +198,7 @@ Deno.test("[node/dns] getDefaultResultOrder reflects setDefaultResultOrder", () 
   }
 });
 
-Deno.test("[node/dns] lookup accepts string family values", async () => {
+Oden.test("[node/dns] lookup accepts string family values", async () => {
   const ipv4Result = await lookupPromise("localhost", { family: "IPv4" });
   assertEquals(ipv4Result.family, 4);
 
@@ -211,7 +211,7 @@ Deno.test("[node/dns] lookup accepts string family values", async () => {
 // hosts file, e.g. /etc/hosts) rather than querying DNS servers directly.
 // `localhost` is present in the hosts file on every supported platform and is
 // not resolvable through public DNS, so it exercises that path.
-Deno.test("[node/dns] lookup uses the system resolver / hosts file", async () => {
+Oden.test("[node/dns] lookup uses the system resolver / hosts file", async () => {
   const { address, family } = await new Promise<
     { address: string; family: number }
   >((resolve, reject) => {
@@ -238,7 +238,7 @@ Deno.test("[node/dns] lookup uses the system resolver / hosts file", async () =>
 // `dns.lookup` must follow Node.js behavior when `hostname` is falsy
 // (undefined / null / empty string): the callback is invoked with
 // (null, null, family) instead of throwing synchronously.
-Deno.test("[node/dns] lookup with falsy hostname invokes callback", async () => {
+Oden.test("[node/dns] lookup with falsy hostname invokes callback", async () => {
   for (const hostname of [undefined, null, ""]) {
     const result = await new Promise<
       { error: unknown; address: unknown; family: unknown }
@@ -292,7 +292,7 @@ Deno.test("[node/dns] lookup with falsy hostname invokes callback", async () => 
   assertEquals(resultAll, { error: null, addresses: [] });
 });
 
-Deno.test("[node/dns] promises.lookup with falsy hostname resolves", async () => {
+Oden.test("[node/dns] promises.lookup with falsy hostname resolves", async () => {
   for (const hostname of [undefined, null, ""]) {
     // deno-lint-ignore no-explicit-any
     const result = await lookupPromise(hostname as any);
@@ -312,7 +312,7 @@ Deno.test("[node/dns] promises.lookup with falsy hostname resolves", async () =>
 // A failed `dns.lookup` must report the real libuv error code and errno
 // (ENOTFOUND / -3008) like Node.js, instead of flattening every failure to
 // EAI_NODATA (-3007).
-Deno.test("[node/dns] lookup of a missing host reports ENOTFOUND", async () => {
+Oden.test("[node/dns] lookup of a missing host reports ENOTFOUND", async () => {
   const err = await new Promise<ErrnoException>((resolve) => {
     dns.lookup("nonexistent-host.invalid", (err) => {
       resolve(err as unknown as ErrnoException);

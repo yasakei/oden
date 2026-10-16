@@ -1,7 +1,7 @@
 {
   "name": "lockfile_only_package_json",
   "dependencies": {
-    "@denotest/esm-basic": "*"
+    "@odentest/esm-basic": "*"
   },
   "type": "module"
 }

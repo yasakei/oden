@@ -1,5 +1,5 @@
-// deno-lint-ignore-file no-deprecated-deno-api
-// Copyright 2018-2026 the Deno authors. MIT license.
+// deno-lint-ignore-file no-deprecated-oden-api
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   assert,
   assertEquals,
@@ -8,26 +8,26 @@ import {
   assertThrows,
 } from "./test_util.ts";
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, run: false } },
   function runPermissions() {
     assertThrows(() => {
-      // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-      Deno.run({
-        cmd: [Deno.execPath(), "eval", "console.log('hello world')"],
+      // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+      Oden.run({
+        cmd: [Oden.execPath(), "eval", "console.log('hello world')"],
       });
-    }, Deno.errors.NotCapable);
+    }, Oden.errors.NotCapable);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
   async function runSuccess() {
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
       // freeze the array to ensure it's not modified
       cmd: Object.freeze([
-        Deno.execPath(),
+        Oden.execPath(),
         "eval",
         "console.log('hello world')",
       ]),
@@ -43,13 +43,13 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
   async function runUrl() {
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
       cmd: [
-        new URL(`file:///${Deno.execPath()}`),
+        new URL(`file:///${Oden.execPath()}`),
         "eval",
         "console.log('hello world')",
       ],
@@ -65,14 +65,14 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
   async function runStdinRid0(): Promise<
     void
   > {
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
-      cmd: [Deno.execPath(), "eval", "console.log('hello world')"],
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
+      cmd: [Oden.execPath(), "eval", "console.log('hello world')"],
       stdin: 0,
       stdout: "piped",
       stderr: "null",
@@ -86,39 +86,39 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
   function runInvalidStdio() {
     assertThrows(() =>
-      // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-      Deno.run({
-        cmd: [Deno.execPath(), "eval", "console.log('hello world')"],
+      // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+      Oden.run({
+        cmd: [Oden.execPath(), "eval", "console.log('hello world')"],
         stdin: "a",
       })
     );
     assertThrows(() =>
-      // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-      Deno.run({
-        cmd: [Deno.execPath(), "eval", "console.log('hello world')"],
+      // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+      Oden.run({
+        cmd: [Oden.execPath(), "eval", "console.log('hello world')"],
         stdout: "b",
       })
     );
     assertThrows(() =>
-      // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-      Deno.run({
-        cmd: [Deno.execPath(), "eval", "console.log('hello world')"],
+      // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+      Oden.run({
+        cmd: [Oden.execPath(), "eval", "console.log('hello world')"],
         stderr: "c",
       })
     );
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
   async function runCommandFailedWithCode() {
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
-      cmd: [Deno.execPath(), "eval", "Deno.exit(41 + 1)"],
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
+      cmd: [Oden.execPath(), "eval", "Oden.exit(41 + 1)"],
     });
     const status = await p.status();
     assertEquals(status.success, false);
@@ -128,22 +128,22 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { run: true, read: true },
   },
   async function runCommandFailedWithSignal() {
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
       cmd: [
-        Deno.execPath(),
+        Oden.execPath(),
         "eval",
-        "Deno.kill(Deno.pid, 'SIGKILL')",
+        "Oden.kill(Oden.pid, 'SIGKILL')",
       ],
     });
     const status = await p.status();
     assertEquals(status.success, false);
-    if (Deno.build.os === "windows") {
+    if (Oden.build.os === "windows") {
       assertEquals(status.code, 1);
       assertEquals(status.signal, undefined);
     } else {
@@ -154,33 +154,33 @@ Deno.test(
   },
 );
 
-Deno.test({ permissions: { run: true } }, function runNotFound() {
+Oden.test({ permissions: { run: true } }, function runNotFound() {
   let error;
   try {
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    Deno.run({ cmd: ["this file hopefully doesn't exist"] });
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    Oden.run({ cmd: ["this file hopefully doesn't exist"] });
   } catch (e) {
     error = e;
   }
   assert(error !== undefined);
-  assert(error instanceof Deno.errors.NotFound);
+  assert(error instanceof Oden.errors.NotFound);
 });
 
-Deno.test(
+Oden.test(
   { permissions: { write: true, run: true, read: true } },
   async function runWithCwdIsAsync() {
     const enc = new TextEncoder();
-    const cwd = await Deno.makeTempDir({ prefix: "deno_command_test" });
+    const cwd = await Oden.makeTempDir({ prefix: "oden_command_test" });
 
-    const exitCodeFile = "deno_was_here";
+    const exitCodeFile = "oden_was_here";
     const programFile = "poll_exit.ts";
     const program = `
 async function tryExit() {
   try {
-    const code = parseInt(await Deno.readTextFile("${exitCodeFile}"));
-    Deno.exit(code);
+    const code = parseInt(await Oden.readTextFile("${exitCodeFile}"));
+    Oden.exit(code);
   } catch {
-    // Retry if we got here before deno wrote the file.
+    // Retry if we got here before oden wrote the file.
     setTimeout(tryExit, 0.01);
   }
 }
@@ -188,17 +188,17 @@ async function tryExit() {
 tryExit();
 `;
 
-    Deno.writeFileSync(`${cwd}/${programFile}`, enc.encode(program));
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
+    Oden.writeFileSync(`${cwd}/${programFile}`, enc.encode(program));
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
       cwd,
-      cmd: [Deno.execPath(), "run", "--allow-read", programFile],
+      cmd: [Oden.execPath(), "run", "--allow-read", programFile],
     });
 
-    // Write the expected exit code *after* starting deno.
+    // Write the expected exit code *after* starting oden.
     // This is how we verify that `run()` is actually asynchronous.
     const code = 84;
-    Deno.writeFileSync(`${cwd}/${exitCodeFile}`, enc.encode(`${code}`));
+    Oden.writeFileSync(`${cwd}/${exitCodeFile}`, enc.encode(`${code}`));
 
     const status = await p.status();
     assertEquals(status.success, false);
@@ -208,19 +208,19 @@ tryExit();
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
   async function runStdinPiped(): Promise<
     void
   > {
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
       cmd: [
-        Deno.execPath(),
+        Oden.execPath(),
         "eval",
         `
         const buffer = new Uint8Array(5);
-        await Deno.stdin.read(buffer);
+        await Oden.stdin.read(buffer);
         if (new TextDecoder().decode(buffer) !== "hello") {
           throw new Error('Expected \\'hello\\'')
         }
@@ -246,17 +246,17 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
   async function runStdoutPiped(): Promise<
     void
   > {
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
       cmd: [
-        Deno.execPath(),
+        Oden.execPath(),
         "eval",
-        "await Deno.stdout.write(new TextEncoder().encode('hello'))",
+        "await Oden.stdout.write(new TextEncoder().encode('hello'))",
       ],
       stdout: "piped",
     });
@@ -283,17 +283,17 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
   async function runStderrPiped(): Promise<
     void
   > {
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
       cmd: [
-        Deno.execPath(),
+        Oden.execPath(),
         "eval",
-        "await Deno.stderr.write(new TextEncoder().encode('hello'))",
+        "await Oden.stderr.write(new TextEncoder().encode('hello'))",
       ],
       stderr: "piped",
     });
@@ -320,15 +320,15 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
   async function runOutput() {
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
       cmd: [
-        Deno.execPath(),
+        Oden.execPath(),
         "eval",
-        "await Deno.stdout.write(new TextEncoder().encode('hello'))",
+        "await Oden.stdout.write(new TextEncoder().encode('hello'))",
       ],
       stdout: "piped",
     });
@@ -339,17 +339,17 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
   async function runStderrOutput(): Promise<
     void
   > {
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
       cmd: [
-        Deno.execPath(),
+        Oden.execPath(),
         "eval",
-        "await Deno.stderr.write(new TextEncoder().encode('error'))",
+        "await Oden.stderr.write(new TextEncoder().encode('error'))",
       ],
       stderr: "piped",
     });
@@ -360,24 +360,24 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { run: true, write: true, read: true },
   },
   async function runRedirectStdoutStderr() {
-    const tempDir = await Deno.makeTempDir();
+    const tempDir = await Oden.makeTempDir();
     const fileName = tempDir + "/redirected_stdio.txt";
-    using file = await Deno.open(fileName, {
+    using file = await Oden.open(fileName, {
       create: true,
       write: true,
     });
 
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
       cmd: [
-        Deno.execPath(),
+        Oden.execPath(),
         "eval",
-        "Deno.stderr.write(new TextEncoder().encode('error\\n')); Deno.stdout.write(new TextEncoder().encode('output\\n'));",
+        "Oden.stderr.write(new TextEncoder().encode('error\\n')); Oden.stdout.write(new TextEncoder().encode('output\\n'));",
       ],
       stdout: "piped",
       stderr: "piped",
@@ -388,7 +388,7 @@ Deno.test(
     await p.status();
     p.close();
 
-    const fileContents = await Deno.readFile(fileName);
+    const fileContents = await Oden.readFile(fileName);
     const decoder = new TextDecoder();
     const text = decoder.decode(fileContents);
 
@@ -399,24 +399,24 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { run: true, write: true, read: true },
   },
   async function runRedirectStdin() {
-    const tempDir = await Deno.makeTempDir();
+    const tempDir = await Oden.makeTempDir();
     const fileName = tempDir + "/redirected_stdio.txt";
-    await Deno.writeTextFile(fileName, "hello");
-    using file = await Deno.open(fileName);
+    await Oden.writeTextFile(fileName, "hello");
+    using file = await Oden.open(fileName);
 
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
       cmd: [
-        Deno.execPath(),
+        Oden.execPath(),
         "eval",
         `
         const buffer = new Uint8Array(5);
-        await Deno.stdin.read(buffer);
+        await Oden.stdin.read(buffer);
         if (new TextDecoder().decode(buffer) !== "hello") {
           throw new Error('Expected \\'hello\\'')
         }
@@ -432,15 +432,15 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
   async function runEnv() {
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
       cmd: [
-        Deno.execPath(),
+        Oden.execPath(),
         "eval",
-        "Deno.stdout.write(new TextEncoder().encode(Deno.env.get('FOO') + Deno.env.get('BAR')))",
+        "Oden.stdout.write(new TextEncoder().encode(Oden.env.get('FOO') + Oden.env.get('BAR')))",
       ],
       env: {
         FOO: "0123",
@@ -455,15 +455,15 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
   async function runClose() {
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
       cmd: [
-        Deno.execPath(),
+        Oden.execPath(),
         "eval",
-        "setTimeout(() => Deno.stdout.write(new TextEncoder().encode('error')), 10000)",
+        "setTimeout(() => Oden.stdout.write(new TextEncoder().encode('error')), 10000)",
       ],
       stderr: "piped",
     });
@@ -479,12 +479,12 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
   async function runKillAfterStatus() {
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
-      cmd: [Deno.execPath(), "eval", 'console.log("hello")'],
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
+      cmd: [Oden.execPath(), "eval", 'console.log("hello")'],
     });
     await p.status();
 
@@ -496,68 +496,68 @@ Deno.test(
     }
 
     assert(
-      error instanceof Deno.errors.NotFound ||
+      error instanceof Oden.errors.NotFound ||
         // On Windows, the underlying Windows API may return
         // `ERROR_ACCESS_DENIED` when the process has exited, but hasn't been
         // completely cleaned up yet and its `pid` is still valid.
-        (Deno.build.os === "windows" &&
-          error instanceof Deno.errors.PermissionDenied),
+        (Oden.build.os === "windows" &&
+          error instanceof Oden.errors.PermissionDenied),
     );
 
     p.close();
   },
 );
 
-Deno.test({ permissions: { run: false } }, function killPermissions() {
+Oden.test({ permissions: { run: false } }, function killPermissions() {
   assertThrows(() => {
     // Signalling a process other than the current one still requires
     // --allow-run. We use a pid that is not our own; the permission check
     // happens before the signal is delivered, so it does not matter whether
     // the pid refers to a live process.
-    Deno.kill(Deno.pid + 1, "SIGCONT");
-  }, Deno.errors.NotCapable);
+    Oden.kill(Oden.pid + 1, "SIGCONT");
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test({ permissions: { run: false } }, function killSelfNoPermissions() {
+Oden.test({ permissions: { run: false } }, function killSelfNoPermissions() {
   // Sending a signal to the current process is functionally equivalent to
   // terminating yourself, which never required permissions. Signal 0 is a
   // liveness check that does not deliver a signal, so it works cross-platform
   // without requiring --allow-run.
-  Deno.kill(Deno.pid, 0);
+  Oden.kill(Oden.pid, 0);
 });
 
-Deno.test(
-  { ignore: Deno.build.os !== "windows", permissions: { run: true } },
+Oden.test(
+  { ignore: Oden.build.os !== "windows", permissions: { run: true } },
   function negativePidInvalidWindows() {
     assertThrows(() => {
-      Deno.kill(-1, "SIGTERM");
+      Oden.kill(-1, "SIGTERM");
     }, TypeError);
   },
 );
 
-Deno.test(
-  { ignore: Deno.build.os !== "windows", permissions: { run: true } },
+Oden.test(
+  { ignore: Oden.build.os !== "windows", permissions: { run: true } },
   function invalidSignalNameWindows() {
     assertThrows(() => {
-      Deno.kill(Deno.pid, "SIGUSR1");
+      Oden.kill(Oden.pid, "SIGUSR1");
     }, TypeError);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
   async function killSuccess() {
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
-      cmd: [Deno.execPath(), "eval", "setTimeout(() => {}, 10000)"],
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
+      cmd: [Oden.execPath(), "eval", "setTimeout(() => {}, 10000)"],
     });
 
     try {
-      Deno.kill(p.pid, "SIGKILL");
+      Oden.kill(p.pid, "SIGKILL");
       const status = await p.status();
 
       assertEquals(status.success, false);
-      if (Deno.build.os === "windows") {
+      if (Oden.build.os === "windows") {
         assertEquals(status.code, 1);
         assertEquals(status.signal, undefined);
       } else {
@@ -570,40 +570,40 @@ Deno.test(
   },
 );
 
-Deno.test({ permissions: { run: true, read: true } }, function killFailed() {
-  // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-  const p = Deno.run({
-    cmd: [Deno.execPath(), "eval", "setTimeout(() => {}, 10000)"],
+Oden.test({ permissions: { run: true, read: true } }, function killFailed() {
+  // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+  const p = Oden.run({
+    cmd: [Oden.execPath(), "eval", "setTimeout(() => {}, 10000)"],
   });
   assert(!p.stdin);
   assert(!p.stdout);
 
   assertThrows(() => {
     // @ts-expect-error testing runtime error of bad signal
-    Deno.kill(p.pid, "foobar");
+    Oden.kill(p.pid, "foobar");
   }, TypeError);
 
   p.close();
 });
 
-Deno.test(
+Oden.test(
   {
     permissions: { run: true, read: true, write: true },
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
   },
   async function nonExistentCwd(): Promise<void> {
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
       cmd: [
-        Deno.execPath(),
+        Oden.execPath(),
         "eval",
-        `const dir = Deno.makeTempDirSync();
-        Deno.chdir(dir);
-        Deno.removeSync(dir);
-        const p = Deno.run({cmd:[Deno.execPath(), "eval", "console.log(1);"]});
+        `const dir = Oden.makeTempDirSync();
+        Oden.chdir(dir);
+        Oden.removeSync(dir);
+        const p = Oden.run({cmd:[Oden.execPath(), "eval", "console.log(1);"]});
         const { code } = await p.status();
         p.close();
-        Deno.exit(code);
+        Oden.exit(code);
         `,
       ],
       stdout: "piped",
@@ -619,79 +619,79 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { run: true, read: true, write: true },
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
   },
   async function runWatchAndSigint(): Promise<void> {
-    const tempDir = await Deno.makeTempDir();
+    const tempDir = await Oden.makeTempDir();
     const tempFile = `${tempDir}/temp_watch_file.ts`;
-    await Deno.writeTextFile(tempFile, "console.log('watch test');");
+    await Oden.writeTextFile(tempFile, "console.log('watch test');");
 
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
-      cmd: [Deno.execPath(), "run", "--watch", tempFile],
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
+      cmd: [Oden.execPath(), "run", "--watch", tempFile],
       stdout: "piped",
       stderr: "null",
     });
 
-    Deno.kill(p.pid, "SIGINT");
+    Oden.kill(p.pid, "SIGINT");
     const data = new Uint8Array(10);
     const out = await p.stdout.read(data);
     assertEquals(out, null);
     p.stdout.close();
     p.close();
 
-    await Deno.remove(tempFile);
-    await Deno.remove(tempDir);
+    await Oden.remove(tempFile);
+    await Oden.remove(tempDir);
   },
 );
 
-Deno.test(
+Oden.test(
   {
     permissions: { run: true, read: true, write: true },
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
   },
   async function runWatchWaitForSigint(): Promise<void> {
-    const tempDir = await Deno.makeTempDir();
+    const tempDir = await Oden.makeTempDir();
     const tempFile = `${tempDir}/temp_watch_file.ts`;
-    await Deno.writeTextFile(
+    await Oden.writeTextFile(
       tempFile,
-      `Deno.addSignalListener("SIGINT", () => {
+      `Oden.addSignalListener("SIGINT", () => {
   console.log("SIGINT");
   ac.abort();
 });
 
-Deno.serve({ signal: ac.signal }, () => new Response("Hello World"));
+Oden.serve({ signal: ac.signal }, () => new Response("Hello World"));
 `,
     );
 
-    // @ts-ignore `Deno.run()` was soft-removed in Deno 2.
-    const p = Deno.run({
-      cmd: [Deno.execPath(), "run", "--watch", tempFile],
+    // @ts-ignore `Oden.run()` was soft-removed in Oden 2.
+    const p = Oden.run({
+      cmd: [Oden.execPath(), "run", "--watch", tempFile],
       stdout: "piped",
       stderr: "null",
     });
 
-    Deno.kill(p.pid, "SIGINT");
+    Oden.kill(p.pid, "SIGINT");
     const data = new Uint8Array(10);
     const out = await p.stdout.read(data);
     assertEquals(out, null);
     p.stdout.close();
     p.close();
 
-    await Deno.remove(tempFile);
-    await Deno.remove(tempDir);
+    await Oden.remove(tempFile);
+    await Oden.remove(tempDir);
   },
 );
 
-Deno.test({
+Oden.test({
   name: "process.ppid matches parent process",
   permissions: { run: true, read: true },
-  ignore: Deno.build.os === "windows",
+  ignore: Oden.build.os === "windows",
   async fn() {
-    const command = new Deno.Command(Deno.execPath(), {
+    const command = new Oden.Command(Oden.execPath(), {
       args: [
         "eval",
         "import { ppid } from 'node:process'; console.log(ppid);",
@@ -704,6 +704,6 @@ Deno.test({
       new TextDecoder().decode(stdout).trim(),
     );
 
-    assertEquals(stdoutPpid, Deno.pid);
+    assertEquals(stdoutPpid, Oden.pid);
   },
 });

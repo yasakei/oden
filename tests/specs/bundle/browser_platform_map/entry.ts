@@ -1,2 +1,2 @@
-import { hello } from "npm:@denotest/browser-field-map";
+import { hello } from "npm:@odentest/browser-field-map";
 console.log(hello());

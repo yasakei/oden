@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![allow(clippy::print_stdout, reason = "example code")]
 #![allow(clippy::print_stderr, reason = "example code")]
@@ -7,13 +7,13 @@
 use std::env::current_dir;
 use std::rc::Rc;
 
-use deno_core::FsModuleLoader;
-use deno_core::JsRuntime;
-use deno_core::PollEventLoopOptions;
-use deno_core::RuntimeOptions;
-use deno_core::anyhow;
-use deno_core::extension;
-use deno_core::op2;
+use oden_core::FsModuleLoader;
+use oden_core::JsRuntime;
+use oden_core::PollEventLoopOptions;
+use oden_core::RuntimeOptions;
+use oden_core::anyhow;
+use oden_core::extension;
+use oden_core::op2;
 
 fn main() {
   let runtime = tokio::runtime::Builder::new_current_thread()
@@ -34,7 +34,7 @@ extension!(runjs_extension, ops = [op_call_rust,],);
 
 async fn run_js(file_path: &str) -> Result<(), anyhow::Error> {
   let cwd = current_dir()?;
-  let main_module = deno_core::resolve_path(file_path, &cwd)?;
+  let main_module = oden_core::resolve_path(file_path, &cwd)?;
 
   let mut js_runtime = JsRuntime::new(RuntimeOptions {
     module_loader: Some(Rc::new(FsModuleLoader)),

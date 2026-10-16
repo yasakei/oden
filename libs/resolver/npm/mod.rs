@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::fmt::Debug;
@@ -7,9 +7,9 @@ use std::path::PathBuf;
 
 use boxed_error::Boxed;
 use deno_error::JsError;
-use deno_maybe_sync::MaybeSend;
-use deno_maybe_sync::MaybeSync;
-use deno_maybe_sync::new_rc;
+use oden_maybe_sync::MaybeSend;
+use oden_maybe_sync::MaybeSync;
+use oden_maybe_sync::new_rc;
 use deno_semver::Version;
 use deno_semver::npm::NpmPackageReqReference;
 use deno_semver::package::PackageReq;
@@ -31,7 +31,7 @@ use node_resolver::errors::PackageFolderResolveErrorKind;
 use node_resolver::errors::PackageFolderResolveIoError;
 use node_resolver::errors::PackageNotFoundError;
 use node_resolver::errors::PackageResolveErrorKind;
-use node_resolver::errors::PackageSubpathFromDenoModuleResolveError;
+use node_resolver::errors::PackageSubpathFromOdenModuleResolveError;
 use node_resolver::errors::TypesNotFoundError;
 use thiserror::Error;
 use url::Url;
@@ -40,9 +40,9 @@ pub use self::byonm::ByonmInNpmPackageChecker;
 pub use self::byonm::ByonmNpmResolver;
 pub use self::byonm::ByonmNpmResolverCreateOptions;
 pub use self::byonm::ByonmNpmResolverRc;
-pub use self::byonm::ByonmResolvePkgFolderFromDenoReqError;
+pub use self::byonm::ByonmResolvePkgFolderFromOdenReqError;
 pub use self::local::get_package_folder_id_folder_name;
-pub use self::local::normalize_pkg_name_for_node_modules_deno_folder;
+pub use self::local::normalize_pkg_name_for_node_modules_oden_folder;
 use self::managed::ManagedInNpmPackageChecker;
 use self::managed::ManagedInNpmPkgCheckerCreateOptions;
 pub use self::managed::ManagedNpmResolver;
@@ -61,41 +61,41 @@ pub enum CreateInNpmPkgCheckerOptions<'a> {
 }
 
 #[derive(Debug, Clone)]
-pub enum DenoInNpmPackageChecker {
+pub enum OdenInNpmPackageChecker {
   Managed(ManagedInNpmPackageChecker),
   Byonm(ByonmInNpmPackageChecker),
 }
 
-impl DenoInNpmPackageChecker {
+impl OdenInNpmPackageChecker {
   pub fn new(options: CreateInNpmPkgCheckerOptions) -> Self {
     match options {
       CreateInNpmPkgCheckerOptions::Managed(options) => {
-        DenoInNpmPackageChecker::Managed(create_managed_in_npm_pkg_checker(
+        OdenInNpmPackageChecker::Managed(create_managed_in_npm_pkg_checker(
           options,
         ))
       }
       CreateInNpmPkgCheckerOptions::Byonm => {
-        DenoInNpmPackageChecker::Byonm(ByonmInNpmPackageChecker)
+        OdenInNpmPackageChecker::Byonm(ByonmInNpmPackageChecker)
       }
     }
   }
 }
 
-impl InNpmPackageChecker for DenoInNpmPackageChecker {
+impl InNpmPackageChecker for OdenInNpmPackageChecker {
   fn in_npm_package(&self, specifier: &Url) -> bool {
     if is_synthetic_module(specifier) {
       return false;
     }
     match self {
-      DenoInNpmPackageChecker::Managed(c) => c.in_npm_package(specifier),
-      DenoInNpmPackageChecker::Byonm(c) => c.in_npm_package(specifier),
+      OdenInNpmPackageChecker::Managed(c) => c.in_npm_package(specifier),
+      OdenInNpmPackageChecker::Byonm(c) => c.in_npm_package(specifier),
     }
   }
 }
 
-/// Whether `specifier` names one of the synthetic modules Deno uses for code
-/// that has no file on disk, such as `deno eval` (`$deno$eval.mts`) or piped
-/// stdin (`$deno$stdin.mts`).
+/// Whether `specifier` names one of the synthetic modules Oden uses for code
+/// that has no file on disk, such as `oden eval` (`$oden$eval.mts`) or piped
+/// stdin (`$oden$stdin.mts`).
 ///
 /// These are resolved against the cwd so that imports and the closest
 /// `package.json` resolve as if the code were a file sitting there, which means
@@ -113,13 +113,13 @@ pub fn is_synthetic_module(specifier: &Url) -> bool {
     Some(index) => &path[index + 1..],
     None => path,
   };
-  file_name.starts_with("$deno$")
+  file_name.starts_with("$oden$")
 }
 
 #[derive(Debug, Error, JsError)]
 #[class(generic)]
 #[error(
-  "Could not resolve \"{}\", but found it in a package.json. Deno expects the node_modules/ directory to be up to date. Did you forget to run `deno install`?",
+  "Could not resolve \"{}\", but found it in a package.json. Oden expects the node_modules/ directory to be up to date. Did you forget to run `oden install`?",
   specifier
 )]
 pub struct NodeModulesOutOfDateError {
@@ -128,11 +128,11 @@ pub struct NodeModulesOutOfDateError {
 
 #[derive(Debug, Error, JsError)]
 #[class(generic)]
-#[error("Could not find '{}'. Deno expects the node_modules/ directory to be up to date. Did you forget to run `deno install`?", package_json_path.display())]
+#[error("Could not find '{}'. Oden expects the node_modules/ directory to be up to date. Did you forget to run `oden install`?", package_json_path.display())]
 pub struct MissingPackageNodeModulesFolderError {
   pub package_json_path: PathBuf,
   // Don't bother displaying this error, so don't name it "source"
-  pub inner: PackageSubpathFromDenoModuleResolveError,
+  pub inner: PackageSubpathFromOdenModuleResolveError,
 }
 
 #[derive(Debug, Boxed, JsError)]
@@ -185,7 +185,7 @@ impl ResolveReqWithSubPathError {
       ResolveReqWithSubPathErrorKind::MissingPackageNodeModulesFolder(err) => {
         err.inner.maybe_specifier()
       }
-      ResolveReqWithSubPathErrorKind::ResolvePkgFolderFromDenoReq(err) => {
+      ResolveReqWithSubPathErrorKind::ResolvePkgFolderFromOdenReq(err) => {
         Some(Cow::Owned(UrlOrPath::Url(err.npm_specifier.clone())))
       }
       ResolveReqWithSubPathErrorKind::PackageSubpathResolve(err) => {
@@ -205,12 +205,12 @@ pub enum ResolveReqWithSubPathErrorKind {
   NoNpm(NoNpmError),
   #[class(inherit)]
   #[error(transparent)]
-  ResolvePkgFolderFromDenoReq(
-    #[from] ContextedResolvePkgFolderFromDenoReqError,
+  ResolvePkgFolderFromOdenReq(
+    #[from] ContextedResolvePkgFolderFromOdenReqError,
   ),
   #[class(inherit)]
   #[error(transparent)]
-  PackageSubpathResolve(#[from] PackageSubpathFromDenoModuleResolveError),
+  PackageSubpathResolve(#[from] PackageSubpathFromOdenModuleResolveError),
 }
 
 impl ResolveReqWithSubPathErrorKind {
@@ -218,7 +218,7 @@ impl ResolveReqWithSubPathErrorKind {
     match self {
       ResolveReqWithSubPathErrorKind::NoNpm(_) => None,
       ResolveReqWithSubPathErrorKind::MissingPackageNodeModulesFolder(_)
-      | ResolveReqWithSubPathErrorKind::ResolvePkgFolderFromDenoReq(_) => None,
+      | ResolveReqWithSubPathErrorKind::ResolvePkgFolderFromOdenReq(_) => None,
       ResolveReqWithSubPathErrorKind::PackageSubpathResolve(
         package_subpath_resolve_error,
       ) => package_subpath_resolve_error.as_types_not_found(),
@@ -231,7 +231,7 @@ impl ResolveReqWithSubPathErrorKind {
       ResolveReqWithSubPathErrorKind::MissingPackageNodeModulesFolder(_) => {
         None
       }
-      ResolveReqWithSubPathErrorKind::ResolvePkgFolderFromDenoReq(_) => None,
+      ResolveReqWithSubPathErrorKind::ResolvePkgFolderFromOdenReq(_) => None,
       ResolveReqWithSubPathErrorKind::PackageSubpathResolve(e) => {
         Some(e.code())
       }
@@ -241,32 +241,32 @@ impl ResolveReqWithSubPathErrorKind {
 
 #[derive(Debug, JsError)]
 #[class(inherit)]
-pub struct ContextedResolvePkgFolderFromDenoReqError {
+pub struct ContextedResolvePkgFolderFromOdenReqError {
   pub npm_specifier: Url,
   #[inherit]
-  pub inner: ResolvePkgFolderFromDenoReqError,
+  pub inner: ResolvePkgFolderFromOdenReqError,
 }
 
-impl std::error::Error for ContextedResolvePkgFolderFromDenoReqError {
+impl std::error::Error for ContextedResolvePkgFolderFromOdenReqError {
   fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
     self.inner.source()
   }
 }
 
-impl std::fmt::Display for ContextedResolvePkgFolderFromDenoReqError {
+impl std::fmt::Display for ContextedResolvePkgFolderFromOdenReqError {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     std::fmt::Display::fmt(&self.inner, f)
   }
 }
 
 #[derive(Debug, Error, JsError)]
-pub enum ResolvePkgFolderFromDenoReqError {
+pub enum ResolvePkgFolderFromOdenReqError {
   #[class(inherit)]
   #[error(transparent)]
-  Managed(managed::ManagedResolvePkgFolderFromDenoReqError),
+  Managed(managed::ManagedResolvePkgFolderFromOdenReqError),
   #[class(inherit)]
   #[error(transparent)]
-  Byonm(byonm::ByonmResolvePkgFolderFromDenoReqError),
+  Byonm(byonm::ByonmResolvePkgFolderFromOdenReqError),
 }
 
 pub enum NpmResolverCreateOptions<TSys: NpmResolverSys> {
@@ -289,7 +289,7 @@ pub trait NpmResolverSys:
 
 #[derive(Debug, Clone)]
 pub enum NpmResolver<TSys: NpmResolverSys> {
-  /// The resolver when "bring your own node_modules" is enabled where Deno
+  /// The resolver when "bring your own node_modules" is enabled where Oden
   /// does not setup the node_modules directories automatically, but instead
   /// uses what already exists on the file system.
   Byonm(ByonmNpmResolverRc<TSys>),
@@ -334,18 +334,18 @@ impl<TSys: NpmResolverSys> NpmResolver<TSys> {
     }
   }
 
-  pub fn resolve_pkg_folder_from_deno_module_req(
+  pub fn resolve_pkg_folder_from_oden_module_req(
     &self,
     req: &PackageReq,
     referrer: &Url,
-  ) -> Result<PathBuf, ResolvePkgFolderFromDenoReqError> {
+  ) -> Result<PathBuf, ResolvePkgFolderFromOdenReqError> {
     match self {
       NpmResolver::Byonm(byonm_resolver) => byonm_resolver
-        .resolve_pkg_folder_from_deno_module_req(req, referrer)
-        .map_err(ResolvePkgFolderFromDenoReqError::Byonm),
+        .resolve_pkg_folder_from_oden_module_req(req, referrer)
+        .map_err(ResolvePkgFolderFromOdenReqError::Byonm),
       NpmResolver::Managed(managed_resolver) => managed_resolver
-        .resolve_pkg_folder_from_deno_module_req(req)
-        .map_err(ResolvePkgFolderFromDenoReqError::Managed),
+        .resolve_pkg_folder_from_oden_module_req(req)
+        .map_err(ResolvePkgFolderFromOdenReqError::Managed),
     }
   }
 }
@@ -411,7 +411,7 @@ pub type NpmReqResolverRc<
   TIsBuiltInNodeModuleChecker,
   TNpmPackageFolderResolver,
   TSys,
-> = deno_maybe_sync::MaybeArc<
+> = oden_maybe_sync::MaybeArc<
   NpmReqResolver<
     TInNpmPackageChecker,
     TIsBuiltInNodeModuleChecker,
@@ -518,8 +518,8 @@ impl<
   ) -> Result<UrlOrPath, ResolveReqWithSubPathError> {
     let package_folder = self
       .npm_resolver
-      .resolve_pkg_folder_from_deno_module_req(req, referrer)
-      .map_err(|inner| ContextedResolvePkgFolderFromDenoReqError {
+      .resolve_pkg_folder_from_oden_module_req(req, referrer)
+      .map_err(|inner| ContextedResolvePkgFolderFromOdenReqError {
         npm_specifier: Url::parse(&format!(
           "npm:{}{}",
           req,
@@ -529,7 +529,7 @@ impl<
         inner,
       })?;
     let resolution_result =
-      self.node_resolver.resolve_package_subpath_from_deno_module(
+      self.node_resolver.resolve_package_subpath_from_oden_module(
         &package_folder,
         sub_path,
         Some(referrer),
@@ -717,6 +717,6 @@ pub(crate) fn join_package_name_to_path(
 
 // Matching a locally installed (e.g. pnpm/npm workspace) package against a
 // requirement is prerelease-inclusive. The canonical implementation lives in
-// `deno_config` so it can be shared with `NpmPackageConfig` matching; re-export
+// `oden_config` so it can be shared with `NpmPackageConfig` matching; re-export
 // it here for the byonm and cache_deps callers.
-pub use deno_config::workspace::version_req_matches_including_pre;
+pub use oden_config::workspace::version_req_matches_including_pre;

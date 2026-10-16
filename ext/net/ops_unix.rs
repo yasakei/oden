@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cell::RefCell;
@@ -20,17 +20,17 @@ use std::path::PathBuf;
 use std::ptr;
 use std::rc::Rc;
 
-use deno_core::AsyncRefCell;
-use deno_core::CancelHandle;
-use deno_core::CancelTryFuture;
-use deno_core::JsBuffer;
-use deno_core::OpState;
-use deno_core::RcRef;
-use deno_core::Resource;
-use deno_core::ResourceId;
-use deno_core::op2;
-use deno_permissions::OpenAccessKind;
-use deno_permissions::PermissionsContainer;
+use oden_core::AsyncRefCell;
+use oden_core::CancelHandle;
+use oden_core::CancelTryFuture;
+use oden_core::JsBuffer;
+use oden_core::OpState;
+use oden_core::RcRef;
+use oden_core::Resource;
+use oden_core::ResourceId;
+use oden_core::op2;
+use oden_permissions::OpenAccessKind;
+use oden_permissions::PermissionsContainer;
 use serde::Deserialize;
 use serde::Serialize;
 use tokio::net::UnixDatagram;
@@ -150,7 +150,7 @@ pub async fn op_net_connect_unix(
       state.borrow_mut::<PermissionsContainer>(),
       Cow::Owned(PathBuf::from(address_path)),
       OpenAccessKind::ReadWriteNoFollow,
-      Some("Deno.connect()"),
+      Some("Oden.connect()"),
     )?
   };
   let unix_stream = UnixStream::connect(address_path).await?;
@@ -199,7 +199,7 @@ pub async fn op_net_send_unixpacket(
       s.borrow_mut::<PermissionsContainer>(),
       Cow::Owned(PathBuf::from(address_path)),
       OpenAccessKind::WriteNoFollow,
-      Some("Deno.DatagramConn.send()"),
+      Some("Oden.DatagramConn.send()"),
     )?
   };
 
@@ -253,7 +253,7 @@ pub fn net_listen_unixpacket(
         permissions,
         Cow::Borrowed(Path::new(address_path)),
         OpenAccessKind::ReadWriteNoFollow,
-        Some("Deno.listenDatagram()"),
+        Some("Oden.listenDatagram()"),
       )?;
       bind_unix_datagram(address_path.as_ref())?
     }
@@ -276,7 +276,7 @@ pub fn op_net_listen_unixpacket(
   state: &mut OpState,
   #[string] path: Option<String>, // todo: Option<&str> not supported in ops yet
 ) -> Result<(ResourceId, Option<String>), NetError> {
-  super::check_unstable(state, "Deno.listenDatagram");
+  super::check_unstable(state, "Oden.listenDatagram");
   net_listen_unixpacket(state, path.as_deref())
 }
 

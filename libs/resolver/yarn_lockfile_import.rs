@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-//! Translation from yarn's `yarn.lock` to a deno.lock v5 JSON string.
+//! Translation from yarn's `yarn.lock` to a oden.lock v5 JSON string.
 //!
 //! Supports yarn classic (v1) only. Yarn berry (v2+) uses YAML with
 //! `checksum` fields that are typically xxhash rather than SRI-compatible
-//! sha-512 digests, so translating berry lockfiles to deno.lock without
+//! sha-512 digests, so translating berry lockfiles to oden.lock without
 //! losing integrity information is not possible without re-fetching the
 //! tarballs. Berry lockfiles are detected and rejected with a clear error.
 
@@ -23,9 +23,9 @@ pub enum YarnLockfileImportError {
   Empty,
 }
 
-/// Convert a yarn v1 `yarn.lock` string into a deno.lock v5 JSON string. Only
+/// Convert a yarn v1 `yarn.lock` string into a oden.lock v5 JSON string. Only
 /// the npm subset is populated.
-pub fn yarn_lock_to_deno_lock_v5(
+pub fn yarn_lock_to_oden_lock_v5(
   text: &str,
 ) -> Result<String, YarnLockfileImportError> {
   if is_yarn_berry(text) {
@@ -146,7 +146,7 @@ pub fn yarn_lock_to_deno_lock_v5(
 
   Ok(
     serde_json::to_string(&Value::Object(output))
-      .expect("serializing deno.lock v5"),
+      .expect("serializing oden.lock v5"),
   )
 }
 
@@ -379,7 +379,7 @@ supports-color@^7.1.0:
 
   #[test]
   fn translates_yarn_v1() {
-    let out = yarn_lock_to_deno_lock_v5(SAMPLE).unwrap();
+    let out = yarn_lock_to_oden_lock_v5(SAMPLE).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["version"], "5");
     assert_eq!(v["specifiers"]["npm:chalk@^4.0.0"], "4.1.2");
@@ -399,7 +399,7 @@ supports-color@^7.1.0:
   resolved "https://registry.yarnpkg.com/@scope/pkg/-/pkg-1.2.3.tgz"
   integrity sha512-SP
 "#;
-    let out = yarn_lock_to_deno_lock_v5(input).unwrap();
+    let out = yarn_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["specifiers"]["npm:@scope/pkg@^1.0.0"], "1.2.3");
     assert!(
@@ -429,7 +429,7 @@ pkg@^1.0.0:
   dependencies:
     "@babel/code-frame" "^7.0.0"
 "#;
-    let out = yarn_lock_to_deno_lock_v5(input).unwrap();
+    let out = yarn_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     let pkg_deps = v["npm"]["pkg@1.0.0"]["dependencies"].as_array().unwrap();
     assert!(pkg_deps.iter().any(|d| d == "@babel/code-frame@7.0.0"));
@@ -444,7 +444,7 @@ pkg@^1.0.0:
   resolved "..."
   integrity sha512-CHALK
 "#;
-    let out = yarn_lock_to_deno_lock_v5(input).unwrap();
+    let out = yarn_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["specifiers"]["npm:chalk@^4.0.0"], "4.1.2");
     assert_eq!(v["specifiers"]["npm:chalk@^4.1.0"], "4.1.2");
@@ -460,7 +460,7 @@ __metadata:
 "chalk@npm:^4.0.0":
   version: 4.1.2
 "#;
-    let err = yarn_lock_to_deno_lock_v5(input).unwrap_err();
+    let err = yarn_lock_to_oden_lock_v5(input).unwrap_err();
     assert!(matches!(err, YarnLockfileImportError::BerryUnsupported));
   }
 
@@ -497,7 +497,7 @@ remote@https://example.com/remote.tgz:
   resolved "https://registry.yarnpkg.com/underlying/-/underlying-2.0.0.tgz"
   integrity sha512-UNDERLYING
 "#;
-    let out = yarn_lock_to_deno_lock_v5(input).unwrap();
+    let out = yarn_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     let specifiers = v["specifiers"].as_object().unwrap();
     assert_eq!(specifiers.len(), 1);

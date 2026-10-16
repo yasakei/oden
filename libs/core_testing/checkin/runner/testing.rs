@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::path::Path;
 use std::path::PathBuf;
@@ -6,12 +6,12 @@ use std::sync::Arc;
 use std::sync::OnceLock;
 
 use anyhow::bail;
-use deno_core::JsRuntime;
-use deno_core::OpState;
-use deno_core::PollEventLoopOptions;
-use deno_core::op2;
-use deno_core::url::Url;
-use deno_core::v8;
+use oden_core::JsRuntime;
+use oden_core::OpState;
+use oden_core::PollEventLoopOptions;
+use oden_core::op2;
+use oden_core::url::Url;
+use oden_core::v8;
 use pretty_assertions::assert_eq;
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
@@ -22,7 +22,7 @@ use super::create_runtime_from_snapshot;
 use super::run_async;
 use super::snapshot;
 
-deno_core::extension!(
+oden_core::extension!(
   checkin_testing,
   ops = [
     op_test_register,
@@ -88,7 +88,7 @@ async fn run_integration_test_task(
   runtime
     .op_state()
     .borrow_mut()
-    .put(deno_core::error::InitialCwd(Arc::new(Url::parse(
+    .put(oden_core::error::InitialCwd(Arc::new(Url::parse(
       "test:///",
     )?)));
   let maybe_error = match runtime.load_main_es_module(&url).await {
@@ -144,7 +144,7 @@ async fn run_unit_test_task(
   runtime
     .op_state()
     .borrow_mut()
-    .put(deno_core::error::InitialCwd(Arc::new(Url::parse(
+    .put(oden_core::error::InitialCwd(Arc::new(Url::parse(
       "test:///",
     )?)));
   let module = runtime.load_main_es_module(&url).await?;

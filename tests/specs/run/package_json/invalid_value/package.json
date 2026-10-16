@@ -3,7 +3,7 @@
     "test": "echo 1"
   },
   "dependencies": {
-    "@denotest/esm-basic": "*",
-    "@denotest/cjs-default-export": "invalid stuff that won't parse"
+    "@odentest/esm-basic": "*",
+    "@odentest/cjs-default-export": "invalid stuff that won't parse"
   }
 }

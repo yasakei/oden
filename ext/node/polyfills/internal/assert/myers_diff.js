@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Node.js contributors. All rights reserved. MIT License.
 (function () {
 const { core, primordials } = __bootstrap;
 const { ERR_OUT_OF_RANGE } = core.loadExtScript(
-  "ext:deno_node/internal/errors.ts",
+  "ext:oden_node/internal/errors.ts",
 );
-const colors = core.loadExtScript("ext:deno_node/internal/util/colors.ts");
+const colors = core.loadExtScript("ext:oden_node/internal/util/colors.ts");
 
 const {
   ArrayPrototypePush,

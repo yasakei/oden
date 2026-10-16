@@ -1,5 +1,5 @@
-#!/usr/bin/env -S deno run --allow-read=. --allow-run=git --config=tests/config/deno.json
-// Copyright 2018-2026 the Deno authors. MIT license.
+#!/usr/bin/env -S oden run --allow-read=. --allow-run=git --config=tests/config/oden.json
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // deno-lint-ignore-file no-console
 
@@ -11,7 +11,7 @@ const buffer = new Uint8Array(1024);
 const textDecoder = new TextDecoder();
 
 async function readFirstPartOfFile(filePath) {
-  const file = await Deno.open(filePath, { read: true });
+  const file = await Oden.open(filePath, { read: true });
   try {
     const byteCount = await file.read(buffer);
     return textDecoder.decode(buffer.slice(0, byteCount ?? 0));
@@ -67,7 +67,7 @@ export async function checkCopyright() {
   const ACCEPTABLE_LINES =
     /^(\/\/ deno-lint-.*|\/\/ Copyright.*|\/\/ Ported.*|\s*|#!\/.*)\n/;
   const COPYRIGHT_LINE =
-    `Copyright 2018-${copyrightYear} the Deno authors. MIT license.`;
+    `Copyright 2018-${copyrightYear} the Oden authors. MIT license.`;
   const TOML_COPYRIGHT_LINE = "# " + COPYRIGHT_LINE;
   const C_STYLE_COPYRIGHT_LINE = "// " + COPYRIGHT_LINE;
 
@@ -106,9 +106,9 @@ export async function checkCopyright() {
   }
 
   // check the main license file
-  const licenseText = Deno.readTextFileSync(ROOT_PATH + "/LICENSE.md");
+  const licenseText = Oden.readTextFileSync(ROOT_PATH + "/LICENSE.md");
   if (
-    !licenseText.includes(`Copyright 2018-${copyrightYear} the Deno authors`)
+    !licenseText.includes(`Copyright 2018-${copyrightYear} the Oden authors`)
   ) {
     errors.push(`LICENSE.md has old copyright year`);
   }

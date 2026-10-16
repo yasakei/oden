@@ -1,0 +1,6 @@
+{
+  "nodeModulesDir": "auto",
+  "imports": {
+    "@odentest/deprecated-package-with-bin": "npm:@odentest/deprecated-package-with-bin@1.0.0"
+  }
+}

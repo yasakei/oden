@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assertEquals, fail } from "@std/assert";
 import { assertCallbackErrorUncaught } from "../_test_utils.ts";
 import { rename, renameSync } from "node:fs";
@@ -6,10 +6,10 @@ import { existsSync } from "node:fs";
 import { join, parse } from "@std/path";
 import { Buffer } from "node:buffer";
 
-Deno.test({
+Oden.test({
   name: "ASYNC: renaming a file",
   async fn() {
-    const file = Deno.makeTempFileSync();
+    const file = Oden.makeTempFileSync();
     const newPath = join(parse(file).dir, `${parse(file).base}_renamed`);
     await new Promise<void>((resolve, reject) => {
       rename(file, newPath, (err) => {
@@ -22,16 +22,16 @@ Deno.test({
         assertEquals(existsSync(file), false);
       }, () => fail())
       .finally(() => {
-        if (existsSync(file)) Deno.removeSync(file);
-        if (existsSync(newPath)) Deno.removeSync(newPath);
+        if (existsSync(file)) Oden.removeSync(file);
+        if (existsSync(newPath)) Oden.removeSync(newPath);
       });
   },
 });
 
-Deno.test({
+Oden.test({
   name: "SYNC: renaming a file",
   fn() {
-    const file = Deno.makeTempFileSync();
+    const file = Oden.makeTempFileSync();
     const newPath = join(parse(file).dir, `${parse(file).base}_renamed`);
     renameSync(file, newPath);
     assertEquals(existsSync(newPath), true);
@@ -39,21 +39,21 @@ Deno.test({
   },
 });
 
-Deno.test("[std/node/fs] rename callback isn't called twice if error is thrown", async () => {
-  const tempFile = await Deno.makeTempFile();
+Oden.test("[std/node/fs] rename callback isn't called twice if error is thrown", async () => {
+  const tempFile = await Oden.makeTempFile();
   const importUrl = new URL("node:fs", import.meta.url);
   await assertCallbackErrorUncaught({
     prelude: `import { rename } from ${JSON.stringify(importUrl)}`,
     invocation: `rename(${JSON.stringify(tempFile)},
                         ${JSON.stringify(`${tempFile}.newname`)}, `,
     async cleanup() {
-      await Deno.remove(`${tempFile}.newname`);
+      await Oden.remove(`${tempFile}.newname`);
     },
   });
 });
 
-Deno.test("[std/node/fs] rename: accepts Buffer paths", async () => {
-  const file = Deno.makeTempFileSync();
+Oden.test("[std/node/fs] rename: accepts Buffer paths", async () => {
+  const file = Oden.makeTempFileSync();
   const bufferOldPath = Buffer.from(file, "utf-8");
   const newPath = join(parse(file).dir, `${parse(file).base}_renamed`);
   const bufferNewPath = Buffer.from(newPath, "utf-8");
@@ -70,8 +70,8 @@ Deno.test("[std/node/fs] rename: accepts Buffer paths", async () => {
     }, () => fail());
 });
 
-Deno.test("[std/node/fs] rename: convert Deno errors to Node.js errors", async () => {
-  const dir = Deno.makeTempDirSync();
+Oden.test("[std/node/fs] rename: convert Oden errors to Node.js errors", async () => {
+  const dir = Oden.makeTempDirSync();
   const oldPath = join(dir, "non_existent_file");
   const newPath = join(dir, "new_file");
 
@@ -90,8 +90,8 @@ Deno.test("[std/node/fs] rename: convert Deno errors to Node.js errors", async (
     });
 });
 
-Deno.test("[std/node/fs] renameSync: accepts Buffer paths", () => {
-  const file = Deno.makeTempFileSync();
+Oden.test("[std/node/fs] renameSync: accepts Buffer paths", () => {
+  const file = Oden.makeTempFileSync();
   const bufferOldPath = Buffer.from(file, "utf-8");
   const newPath = join(parse(file).dir, `${parse(file).base}_renamed`);
   const bufferNewPath = Buffer.from(newPath, "utf-8");
@@ -101,8 +101,8 @@ Deno.test("[std/node/fs] renameSync: accepts Buffer paths", () => {
   assertEquals(existsSync(file), false);
 });
 
-Deno.test("[std/node/fs] renameSync: convert Deno errors to Node.js errors", () => {
-  const dir = Deno.makeTempDirSync();
+Oden.test("[std/node/fs] renameSync: convert Oden errors to Node.js errors", () => {
+  const dir = Oden.makeTempDirSync();
   const oldPath = join(dir, "non_existent_file");
   const newPath = join(dir, "new_file");
 

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 /// <reference path="../../core/internal.d.ts" />
 
@@ -23,18 +23,18 @@ const {
   Uint8Array,
 } = primordials;
 
-const webidl = core.loadExtScript("ext:deno_webidl/00_webidl.js");
+const webidl = core.loadExtScript("ext:oden_webidl/00_webidl.js");
 const { createFilteredInspectProxy } = core.loadExtScript(
-  "ext:deno_web/01_console.js",
+  "ext:oden_web/01_console.js",
 );
 const {
   defineEventHandler,
   EventTarget,
   setIsTrusted,
   setTarget,
-} = core.loadExtScript("ext:deno_web/02_event.js");
-const { defer } = core.loadExtScript("ext:deno_web/02_timers.js");
-const { DOMException } = core.loadExtScript("ext:deno_web/01_dom_exception.js");
+} = core.loadExtScript("ext:oden_web/02_event.js");
+const { defer } = core.loadExtScript("ext:oden_web/02_timers.js");
+const { DOMException } = core.loadExtScript("ext:oden_web/01_dom_exception.js");
 
 const _name = Symbol("[[name]]");
 const _closed = Symbol("[[closed]]");
@@ -204,7 +204,7 @@ class BroadcastChannel extends EventTarget {
     }
   }
 
-  [SymbolFor("Deno.privateCustomInspect")](inspect, inspectOptions) {
+  [SymbolFor("Oden.privateCustomInspect")](inspect, inspectOptions) {
     return inspect(
       createFilteredInspectProxy({
         object: this,

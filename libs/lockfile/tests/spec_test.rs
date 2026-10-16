@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![allow(clippy::disallowed_methods, reason = "test code")]
 
@@ -11,15 +11,15 @@ use std::panic::AssertUnwindSafe;
 use std::panic::UnwindSafe;
 use std::path::PathBuf;
 
-use deno_lockfile::Lockfile;
-use deno_lockfile::Lockfile5NpmInfo;
-use deno_lockfile::LockfileLinkContent;
-use deno_lockfile::NewLockfileOptions;
-use deno_lockfile::NpmPackageInfoProvider;
-use deno_lockfile::PackagesContent;
-use deno_lockfile::SetWorkspaceConfigOptions;
-use deno_lockfile::WorkspaceConfig;
-use deno_lockfile::WorkspaceMemberConfig;
+use oden_lockfile::Lockfile;
+use oden_lockfile::Lockfile5NpmInfo;
+use oden_lockfile::LockfileLinkContent;
+use oden_lockfile::NewLockfileOptions;
+use oden_lockfile::NpmPackageInfoProvider;
+use oden_lockfile::PackagesContent;
+use oden_lockfile::SetWorkspaceConfigOptions;
+use oden_lockfile::WorkspaceConfig;
+use oden_lockfile::WorkspaceMemberConfig;
 use deno_semver::jsr::JsrDepPackageReq;
 use deno_semver::package::PackageNv;
 use file_test_runner::RunOptions;

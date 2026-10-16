@@ -1,0 +1,10 @@
+{
+  "name": "@odentest/oden",
+  "version": "1.0.0",
+  "bin": {
+    "oden": "./bin/oden"
+  },
+  "scripts": {
+    "postinstall": "node setup.js"
+  }
+}

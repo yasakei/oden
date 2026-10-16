@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::path::Path;
 use std::path::PathBuf;
 
-use deno_package_json::PackageJson;
-use deno_package_json::PackageJsonDepValue;
-use deno_package_json::PackageJsonRc;
+use oden_package_json::PackageJson;
+use oden_package_json::PackageJsonDepValue;
+use oden_package_json::PackageJsonRc;
 use deno_path_util::url_to_file_path;
 use deno_semver::StackString;
 use deno_semver::Version;
@@ -28,20 +28,20 @@ use sys_traits::FsReadDir;
 use thiserror::Error;
 use url::Url;
 
-use super::local::normalize_pkg_name_for_node_modules_deno_folder;
+use super::local::normalize_pkg_name_for_node_modules_oden_folder;
 use crate::npm::join_package_name_to_path;
 use crate::npm::version_req_matches_including_pre;
 
 #[derive(Debug, Error, deno_error::JsError)]
-pub enum ByonmResolvePkgFolderFromDenoReqError {
+pub enum ByonmResolvePkgFolderFromOdenReqError {
   #[class(generic)]
-  #[error("Could not find \"{}\" in a node_modules folder. Deno expects the node_modules/ directory to be up to date. Did you forget to run `deno install`?", .0)]
+  #[error("Could not find \"{}\" in a node_modules folder. Oden expects the node_modules/ directory to be up to date. Did you forget to run `oden install`?", .0)]
   MissingAlias(StackString),
   #[class(inherit)]
   #[error(transparent)]
   PackageJson(#[from] PackageJsonLoadError),
   #[class(generic)]
-  #[error("Could not find a matching package for 'npm:{}' in the node_modules directory. Ensure you have all your JSR and npm dependencies listed in your deno.json or package.json, then run `deno install`. Alternatively, turn on auto-install by specifying `\"nodeModulesDir\": \"auto\"` in your deno.json file.", .0)]
+  #[error("Could not find a matching package for 'npm:{}' in the node_modules directory. Ensure you have all your JSR and npm dependencies listed in your oden.json or package.json, then run `oden install`. Alternatively, turn on auto-install by specifying `\"nodeModulesDir\": \"auto\"` in your oden.json file.", .0)]
   UnmatchedReq(PackageReq),
   #[class(inherit)]
   #[error(transparent)]
@@ -51,7 +51,7 @@ pub enum ByonmResolvePkgFolderFromDenoReqError {
 pub struct ByonmNpmResolverCreateOptions<TSys: FsRead + FsMetadata> {
   pub root_node_modules_dir: Option<PathBuf>,
   /// When set, the ancestor walk for node_modules resolution will not
-  /// go above this directory. Used by deno_rt for self-extracting binaries
+  /// go above this directory. Used by oden_rt for self-extracting binaries
   /// to prevent escaping the VFS root.
   pub search_stop_dir: Option<PathBuf>,
   pub sys: NodeResolutionSys<TSys>,
@@ -66,7 +66,7 @@ pub trait ByonmNpmResolverSys:
 
 #[allow(clippy::disallowed_types, reason = "definition")]
 pub type ByonmNpmResolverRc<TSys> =
-  deno_maybe_sync::MaybeArc<ByonmNpmResolver<TSys>>;
+  oden_maybe_sync::MaybeArc<ByonmNpmResolver<TSys>>;
 
 #[derive(Debug)]
 pub struct ByonmNpmResolver<TSys: ByonmNpmResolverSys> {
@@ -129,11 +129,11 @@ impl<TSys: ByonmNpmResolverSys> ByonmNpmResolver<TSys> {
     None
   }
 
-  pub fn resolve_pkg_folder_from_deno_module_req(
+  pub fn resolve_pkg_folder_from_oden_module_req(
     &self,
     req: &PackageReq,
     referrer: &Url,
-  ) -> Result<PathBuf, ByonmResolvePkgFolderFromDenoReqError> {
+  ) -> Result<PathBuf, ByonmResolvePkgFolderFromOdenReqError> {
     fn node_resolve_dir<TSys: FsCanonicalize + FsMetadata>(
       sys: &NodeResolutionSys<TSys>,
       alias: &str,
@@ -170,7 +170,7 @@ impl<TSys: ByonmNpmResolverSys> ByonmNpmResolver<TSys> {
         // requirement. The package.json dep may intersect the req (e.g.,
         // dep is ^1.3.5, req is @1.3.6) but the physically installed
         // version might not satisfy it (e.g., 1.3.5 is installed).
-        // In that case, fall through to the .deno/ search.
+        // In that case, fall through to the .oden/ search.
         //
         // When the req is a tag (e.g. `latest`), we can't compare against
         // a parsed version, so trust the alias resolution.
@@ -195,16 +195,16 @@ impl<TSys: ByonmNpmResolverSys> ByonmNpmResolver<TSys> {
       }
     }
 
-    // check if node_modules/.deno/ matches this constraint
+    // check if node_modules/.oden/ matches this constraint
     if let Some(folder) = self.resolve_folder_in_root_node_modules(req) {
       return Ok(folder);
     }
 
     match maybe_pkg_json_and_alias {
       Some((_, alias)) => {
-        Err(ByonmResolvePkgFolderFromDenoReqError::MissingAlias(alias))
+        Err(ByonmResolvePkgFolderFromOdenReqError::MissingAlias(alias))
       }
-      None => Err(ByonmResolvePkgFolderFromDenoReqError::UnmatchedReq(
+      None => Err(ByonmResolvePkgFolderFromOdenReqError::UnmatchedReq(
         req.clone(),
       )),
     }
@@ -216,12 +216,12 @@ impl<TSys: ByonmNpmResolverSys> ByonmNpmResolver<TSys> {
     referrer: &Url,
   ) -> Result<
     Option<(PackageJsonRc, StackString)>,
-    ByonmResolvePkgFolderFromDenoReqError,
+    ByonmResolvePkgFolderFromOdenReqError,
   > {
     fn resolve_alias_from_pkg_json(
       req: &PackageReq,
       pkg_json: &PackageJson,
-    ) -> Result<Option<StackString>, ByonmResolvePkgFolderFromDenoReqError>
+    ) -> Result<Option<StackString>, ByonmResolvePkgFolderFromOdenReqError>
     {
       let deps = pkg_json.resolve_local_package_json_deps();
       for (key, value) in
@@ -348,21 +348,21 @@ impl<TSys: ByonmNpmResolverSys> ByonmNpmResolver<TSys> {
     &self,
     req: &PackageReq,
   ) -> Option<PathBuf> {
-    // now check if node_modules/.deno/ matches this constraint
+    // now check if node_modules/.oden/ matches this constraint
     let root_node_modules_dir = self.root_node_modules_dir.as_ref()?;
-    let node_modules_deno_dir = root_node_modules_dir.join(".deno");
-    let Ok(entries) = self.sys.fs_read_dir(&node_modules_deno_dir) else {
+    let node_modules_oden_dir = root_node_modules_dir.join(".oden");
+    let Ok(entries) = self.sys.fs_read_dir(&node_modules_oden_dir) else {
       return None;
     };
     let search_prefix = format!(
       "{}@",
-      normalize_pkg_name_for_node_modules_deno_folder(&req.name)
+      normalize_pkg_name_for_node_modules_oden_folder(&req.name)
     );
     let mut best_version = None;
 
     // example entries:
-    // - @denotest+add@1.0.0
-    // - @denotest+add@1.0.0_1
+    // - @odentest+add@1.0.0
+    // - @odentest+add@1.0.0_1
     for entry in entries {
       let Ok(entry) = entry else {
         continue;
@@ -387,7 +387,7 @@ impl<TSys: ByonmNpmResolverSys> ByonmNpmResolver<TSys> {
       };
       if let Some(tag) = req.version_req.tag() {
         let initialized_file =
-          node_modules_deno_dir.join(&entry_name).join(".initialized");
+          node_modules_oden_dir.join(&entry_name).join(".initialized");
         let Ok(contents) = self.sys.fs_read_to_string_lossy(&initialized_file)
         else {
           continue;
@@ -425,7 +425,7 @@ impl<TSys: ByonmNpmResolverSys> ByonmNpmResolver<TSys> {
 
     best_version.map(|(_version, entry_name)| {
       join_package_name_to_path(
-        Cow::Owned(node_modules_deno_dir.join(entry_name).join("node_modules")),
+        Cow::Owned(node_modules_oden_dir.join(entry_name).join("node_modules")),
         &req.name,
       )
     })
@@ -473,7 +473,7 @@ impl<TSys: FsCanonicalize + FsMetadata + FsRead + FsReadDir>
             }
           }
 
-          // prevent code like deno rt from going outside the vfs
+          // prevent code like oden rt from going outside the vfs
           if search_stop_dir == Some(current_folder) {
             break;
           }

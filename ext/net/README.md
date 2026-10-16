@@ -1,4 +1,4 @@
-# deno_net
+# oden_net
 
 **This crate implements networking APIs.**
 
@@ -9,15 +9,15 @@ From javascript, include the extension's source:
 ```javascript
 import { core } from "ext:core/mod.js";
 
-const webidl = core.loadExtScript("ext:deno_webidl/00_webidl.js");
-const net = core.loadExtScript("ext:deno_net/01_net.js");
-const tls = core.loadExtScript("ext:deno_net/02_tls.js");
-const loadQuic = core.createLazyLoader("ext:deno_net/03_quic.js");
+const webidl = core.loadExtScript("ext:oden_webidl/00_webidl.js");
+const net = core.loadExtScript("ext:oden_net/01_net.js");
+const tls = core.loadExtScript("ext:oden_net/02_tls.js");
+const loadQuic = core.createLazyLoader("ext:oden_net/03_quic.js");
 const quic = loadQuic();
 ```
 
 Then from rust, provide:
-`deno_net::deno_net::init(root_cert_store_provider, unsafely_ignore_certificate_errors)`
+`oden_net::oden_net::init(root_cert_store_provider, unsafely_ignore_certificate_errors)`
 
 Where:
 
@@ -28,12 +28,12 @@ In the `extensions` field of your `RuntimeOptions`
 
 ## Dependencies
 
-- **deno_web**: Provided by the `deno_web` crate
-- **deno_fetch**: Provided by the `deno_fetch` crate
+- **oden_web**: Provided by the `oden_web` crate
+- **oden_fetch**: Provided by the `oden_fetch` crate
 
 ## Provided ops
 
-Following ops are provided, which can be accessed through `Deno.ops`:
+Following ops are provided, which can be accessed through `Oden.ops`:
 
 ### Net
 

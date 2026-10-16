@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { AsyncLocalStorage, AsyncResource, createHook } from "node:async_hooks";
 import process from "node:process";
 import { clearImmediate, setImmediate } from "node:timers";
 import { assert, assertEquals, assertRejects, assertThrows } from "@std/assert";
 
-Deno.test(async function foo() {
+Oden.test(async function foo() {
   const asyncLocalStorage = new AsyncLocalStorage();
 
   const out: string[] = [];
@@ -35,11 +35,11 @@ Deno.test(async function foo() {
   ]);
 });
 
-Deno.test(async function bar() {
+Oden.test(async function bar() {
   let differentScopeDone = false;
   const als = new AsyncLocalStorage();
   const ac = new AbortController();
-  const server = Deno.serve({
+  const server = Oden.serve({
     signal: ac.signal,
     port: 4000,
   }, () => {
@@ -64,7 +64,7 @@ Deno.test(async function bar() {
   assert(differentScopeDone);
 });
 
-Deno.test(async function nested() {
+Oden.test(async function nested() {
   const als = new AsyncLocalStorage();
   const deferred = Promise.withResolvers();
   const deferred1 = Promise.withResolvers();
@@ -80,7 +80,7 @@ Deno.test(async function nested() {
   assertEquals(await deferred1.promise, null);
 });
 
-Deno.test(async function asyncLocalStorageExitPreservesNoStore() {
+Oden.test(async function asyncLocalStorageExitPreservesNoStore() {
   const als = new AsyncLocalStorage<string>();
 
   await als.run("outer", async () => {
@@ -110,7 +110,7 @@ Deno.test(async function asyncLocalStorageExitPreservesNoStore() {
   assertEquals(als.getStore(), undefined);
 });
 
-Deno.test(async function asyncLocalStorageDistinguishesUndefinedFromDefault() {
+Oden.test(async function asyncLocalStorageDistinguishesUndefinedFromDefault() {
   const als = new AsyncLocalStorage<string | undefined>({
     defaultValue: "default",
   });
@@ -138,7 +138,7 @@ Deno.test(async function asyncLocalStorageDistinguishesUndefinedFromDefault() {
   assertEquals(als.getStore(), "default");
 });
 
-Deno.test(async function asyncLocalStorageExitRestoresAfterErrors() {
+Oden.test(async function asyncLocalStorageExitRestoresAfterErrors() {
   const als = new AsyncLocalStorage<string>();
 
   await als.run("outer", async () => {
@@ -168,7 +168,7 @@ Deno.test(async function asyncLocalStorageExitRestoresAfterErrors() {
   });
 });
 
-Deno.test(async function asyncLocalStorageExitDoesNotAffectConcurrentFlows() {
+Oden.test(async function asyncLocalStorageExitDoesNotAffectConcurrentFlows() {
   const als = new AsyncLocalStorage<string>();
   const exited = Promise.withResolvers<void>();
   const resume = Promise.withResolvers<void>();
@@ -194,7 +194,7 @@ Deno.test(async function asyncLocalStorageExitDoesNotAffectConcurrentFlows() {
   await exitingFlow;
 });
 
-Deno.test(async function enterWith() {
+Oden.test(async function enterWith() {
   const als = new AsyncLocalStorage();
   const deferred = Promise.withResolvers();
   const deferred1 = Promise.withResolvers();
@@ -211,7 +211,7 @@ Deno.test(async function enterWith() {
   assertEquals(await deferred1.promise, null);
 });
 
-Deno.test(async function snapshot() {
+Oden.test(async function snapshot() {
   const als = new AsyncLocalStorage();
   const deferred = Promise.withResolvers();
 
@@ -225,7 +225,7 @@ Deno.test(async function snapshot() {
   assertEquals(await deferred.promise, null);
 });
 
-Deno.test(async function bind() {
+Oden.test(async function bind() {
   const als = new AsyncLocalStorage();
   const deferred = Promise.withResolvers();
 
@@ -242,17 +242,17 @@ Deno.test(async function bind() {
   assertEquals(await deferred.promise, null);
 });
 
-Deno.test(function asyncResourceStub() {
+Oden.test(function asyncResourceStub() {
   const resource = new AsyncResource("dbquery");
   assert(typeof resource.asyncId() === "number");
 });
 
-Deno.test(function emitDestroyStub() {
+Oden.test(function emitDestroyStub() {
   const resource = new AsyncResource("foo");
   assert(typeof resource.emitDestroy === "function");
 });
 
-Deno.test(function runInAsyncScopeFiresBeforeAndAfter() {
+Oden.test(function runInAsyncScopeFiresBeforeAndAfter() {
   const events: string[] = [];
   const resource = new AsyncResource("MYRES");
   const targetId = resource.asyncId();
@@ -275,7 +275,7 @@ Deno.test(function runInAsyncScopeFiresBeforeAndAfter() {
   assertEquals(events, ["before", "fn", "after"]);
 });
 
-Deno.test(function clearImmediateEmitsDestroy() {
+Oden.test(function clearImmediateEmitsDestroy() {
   let immediateAsyncId: number | undefined;
   const destroyed: number[] = [];
   const hook = createHook({
@@ -300,7 +300,7 @@ Deno.test(function clearImmediateEmitsDestroy() {
   }
 });
 
-Deno.test(async function worksWithAsyncAPIs() {
+Oden.test(async function worksWithAsyncAPIs() {
   const store = new AsyncLocalStorage();
   const test = () => assertEquals(store.getStore(), "data");
   await store.run("data", async () => {
@@ -323,7 +323,7 @@ Deno.test(async function worksWithAsyncAPIs() {
   });
 });
 
-Deno.test(async function worksWithDynamicImports() {
+Oden.test(async function worksWithDynamicImports() {
   const store = new AsyncLocalStorage();
   // @ts-expect-error implicit any
   globalThis.alsDynamicImport = () => store.getStore();
@@ -335,7 +335,7 @@ Deno.test(async function worksWithDynamicImports() {
   });
 });
 
-Deno.test(async function asyncLocalStoragePreservedInStreamFinished() {
+Oden.test(async function asyncLocalStoragePreservedInStreamFinished() {
   const http = await import("node:http");
   const { finished } = await import("node:stream");
   const als = new AsyncLocalStorage();
@@ -378,7 +378,7 @@ Deno.test(async function asyncLocalStoragePreservedInStreamFinished() {
 // callbacks directly, so the async context that was active when the operation
 // was started has to be captured and restored, otherwise it is lost inside the
 // `connect` and `connection` handlers.
-Deno.test(async function asyncLocalStoragePreservedInNetCallbacks() {
+Oden.test(async function asyncLocalStoragePreservedInNetCallbacks() {
   const net = await import("node:net");
   const als = new AsyncLocalStorage();
   const observed: { serverConnection: unknown; clientConnect: unknown } = {

@@ -1,7 +1,7 @@
 {
   "tempDir": true,
   "envs": {
-    "DENORT_BIN": "denort_intel"
+    "ODENRT_BIN": "odenrt_intel"
   },
   "steps": [
     {

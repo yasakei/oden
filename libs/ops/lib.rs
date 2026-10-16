@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![doc = include_str!("README.md")]
 #![deny(clippy::unnecessary_wraps)]
@@ -71,10 +71,10 @@ fn get_internalized_string(
   }
 
   Ok(quote::quote! {
-    ::deno_core::v8::String::new_from_one_byte(
+    ::oden_core::v8::String::new_from_one_byte(
       __scope,
       #name_str.as_bytes(),
-      ::deno_core::v8::NewStringType::Internalized,
+      ::oden_core::v8::NewStringType::Internalized,
     )
     .unwrap()
     .into()
@@ -99,10 +99,10 @@ mod infra {
     let source =
       std::fs::read_to_string(&input).expect("Failed to read test file");
 
-    const PRELUDE: &str = r"// Copyright 2018-2026 the Deno authors. MIT license.
+    const PRELUDE: &str = r"// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![deny(warnings)]
-deno_ops_compile_test_runner::prelude!();";
+oden_ops_compile_test_runner::prelude!();";
 
     if !source.starts_with(PRELUDE) {
       panic!("Source does not start with expected prelude:]n{PRELUDE}");

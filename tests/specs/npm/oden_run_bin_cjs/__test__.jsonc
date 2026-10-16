@@ -1,0 +1,4 @@
+{
+  "args": "run -A --quiet npm:@odentest/bin/cli-cjs this is a test",
+  "output": "oden_run_cjs.out"
+}

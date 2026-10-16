@@ -1,0 +1,16 @@
+{
+  "version": "5",
+  "specifiers": {
+    "npm:@odentest/esm-basic@*": "1.0.0"
+  },
+  "npm": {
+    "@odentest/esm-basic@1.0.0": [WILDCARD]
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@odentest/esm-basic@*"
+      ]
+    }
+  }
+}

@@ -1,4 +1,4 @@
-Deno.test(
+Oden.test(
 	{ perms: { net: true } },
 	async function responseClone() {
 		const response =

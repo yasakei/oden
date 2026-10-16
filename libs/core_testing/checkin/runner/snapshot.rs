@@ -1,9 +1,9 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::rc::Rc;
 
-use deno_core::JsRuntimeForSnapshot;
-use deno_core::RuntimeOptions;
+use oden_core::JsRuntimeForSnapshot;
+use oden_core::RuntimeOptions;
 
 use super::extensions;
 use super::ts_module_loader::maybe_transpile_source;

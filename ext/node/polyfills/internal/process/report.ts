@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core, primordials } = __bootstrap;
@@ -11,7 +11,7 @@ const {
 } = primordials;
 
 const { arch, versions } = core.loadExtScript(
-  "ext:deno_node/_process/process.ts",
+  "ext:oden_node/_process/process.ts",
 );
 const lazyOs = core.createLazyLoader("node:os");
 
@@ -44,15 +44,15 @@ function getReport(_err) {
       filename: report.filename, // assumption!
       dumpEventTime,
       dumpEventTimeStamp: DatePrototypeGetTime(dumpEventTime),
-      processId: Deno.pid, // I am not sure if it should be Deno.pid or Deno.ppid
+      processId: Oden.pid, // I am not sure if it should be Oden.pid or Oden.ppid
       threadId: 0,
-      cwd: Deno.cwd(),
+      cwd: Oden.cwd(),
       commandLine: ["node"],
       nodejsVersion: `v${versions.node}`,
       ...getGlibcVersions(),
       wordSize: 64,
       arch: arch(),
-      platform: Deno.build.os,
+      platform: Oden.build.os,
       componentVersions: versions,
       release: {
         name: "node",
@@ -62,11 +62,11 @@ function getReport(_err) {
           "https://nodejs.org/download/release/v21.2.0/node-v21.2.0.tar.gz",
       },
       osName:
-        StringPrototypeToUpperCase(StringPrototypeCharAt(Deno.build.os, 0)) +
-        StringPrototypeSlice(Deno.build.os, 1),
+        StringPrototypeToUpperCase(StringPrototypeCharAt(Oden.build.os, 0)) +
+        StringPrototypeSlice(Oden.build.os, 1),
       osRelease: todoUndefined,
       osVersion: todoUndefined,
-      osMachine: Deno.build.arch,
+      osMachine: Oden.build.arch,
       cpus: os.cpus(),
       networkInterfaces: os.networkInterfaces(),
       host: os.hostname(),

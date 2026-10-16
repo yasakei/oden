@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! String display-width helpers ported from `01_console.js`
 //! (`getStringWidth`, `stripVTControlCharacters`, full/zero width tables).

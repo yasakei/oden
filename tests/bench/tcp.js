@@ -1,6 +1,6 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-const listener = Deno.listen({ port: 4500 });
+const listener = Oden.listen({ port: 4500 });
 const response = new TextEncoder().encode(
   "HTTP/1.1 200 OK\r\nContent-Length: 12\r\n\r\nHello World\n",
 );

@@ -1,4 +1,4 @@
-Deno.test(function throws() {
+Oden.test(function throws() {
   // Leak
   setTimeout(() => {}, 60_000);
   // But the exception should mask the leak

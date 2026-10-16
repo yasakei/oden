@@ -1,0 +1,7 @@
+{
+  "tasks": {
+    "oden-say": "cowsay 'do make say'",
+    "oden-think": "cowthink think"
+  },
+  "unstable": ["byonm"]
+}

@@ -1,9 +1,9 @@
-#!/usr/bin/env -S deno run --allow-all
+#!/usr/bin/env -S oden run --allow-all
 
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 /**
- * x - Developer CLI for contributing to Deno
+ * x - Developer CLI for contributing to Oden
  *
  * Inspired by Servo's mach tool, this script provides a unified
  * interface for common development tasks like building, testing, and more.
@@ -53,7 +53,7 @@ function cargoTestCommand(
         $.logError(
           "A filter argument is required. Use --list to see available tests.",
         );
-        Deno.exit(1);
+        Oden.exit(1);
       }
       $.logStep(`Running ${opts.stepName}...`);
       await $`cargo test ${baseArgs} -- ${args.join(" ")}`.cwd(root);
@@ -76,10 +76,10 @@ You should run this before committing any changes. It is also included
 in the './x verify' pre-commit workflow.
 
 Under the hood:
-  deno run -A tools/format.js`,
+  oden run -A tools/format.js`,
     async fn(_args: string[]) {
       $.logStep("Formatting code...");
-      await $`deno run -A tools/format.js`.cwd(root);
+      await $`oden run -A tools/format.js`.cwd(root);
       $.logStep("Formatting complete.");
     },
   };
@@ -91,19 +91,19 @@ clippy. This is significantly faster than './x lint' when you have
 not modified any Rust code.
 
 Under the hood:
-  deno run -A tools/lint.js --js`,
+  oden run -A tools/lint.js --js`,
     async fn(_args: string[]) {
       $.logStep("Linting JavaScript/TypeScript...");
-      await $`deno run -A tools/lint.js --js`.cwd(root);
+      await $`oden run -A tools/lint.js --js`.cwd(root);
       $.logStep("JS lint complete.");
     },
   };
 
   return {
     "setup": {
-      description: "Initial setup: build deno and test_server",
+      description: "Initial setup: build oden and test_server",
       help:
-        `Sets up the development environment by compiling both the main 'deno'
+        `Sets up the development environment by compiling both the main 'oden'
 binary and the 'test_server' binary used by the test suite.
 
 Run this once after cloning the repository, or after pulling changes that
@@ -111,18 +111,18 @@ modify Rust code, to ensure you have working binaries for development and
 testing.
 
 Under the hood:
-  cargo build --bin deno --bin test_server`,
+  cargo build --bin oden --bin test_server`,
       async fn(_args: string[]) {
         $.logStep("Setting up development environment...");
-        $.logStep("Building deno and test_server...");
-        await $`cargo build --bin deno --bin test_server`.cwd(root);
+        $.logStep("Building oden and test_server...");
+        await $`cargo build --bin oden --bin test_server`.cwd(root);
         $.logStep("Setup complete.");
       },
     },
     "build": {
-      description: "Build the deno binary (debug mode)",
-      help: `Compiles the main 'deno' binary in debug mode (unoptimized, with
-debug symbols). The resulting binary is placed at ./target/debug/deno.
+      description: "Build the oden binary (debug mode)",
+      help: `Compiles the main 'oden' binary in debug mode (unoptimized, with
+debug symbols). The resulting binary is placed at ./target/debug/oden.
 
 Use this during normal development iteration. For a release-optimized
 build, run 'cargo build --release' directly.
@@ -132,10 +132,10 @@ binary, use './x check' instead — it is significantly faster because
 it skips the linking step.
 
 Under the hood:
-  cargo build --bin deno`,
+  cargo build --bin oden`,
       async fn(_args: string[]) {
-        $.logStep("Building Deno...");
-        await $`cargo build --bin deno`.cwd(root);
+        $.logStep("Building Oden...");
+        await $`cargo build --bin oden`.cwd(root);
         $.logStep("Build complete.");
       },
     },
@@ -161,12 +161,12 @@ Under the hood:
       root,
       ["-p", "unit_tests", "--test", "unit"],
       {
-        description: "Run Deno runtime unit tests",
+        description: "Run Oden runtime unit tests",
         stepName: "unit tests",
         help:
-          `Runs the Deno runtime unit tests. These are JavaScript/TypeScript tests
-that exercise Deno's built-in APIs (e.g. Deno.readFile, Deno.serve,
-Web API implementations) by running them inside the Deno runtime itself.
+          `Runs the Oden runtime unit tests. These are JavaScript/TypeScript tests
+that exercise Oden's built-in APIs (e.g. Oden.readFile, Oden.serve,
+Web API implementations) by running them inside the Oden runtime itself.
 
 The test files live under tests/unit/ and are compiled into the
 'unit_tests' crate.
@@ -194,8 +194,8 @@ Under the hood:
     ], {
       description: "Run Node.js API unit tests",
       stepName: "Node.js unit tests",
-      help: `Runs unit tests for Deno's Node.js compatibility layer. These tests
-verify that Deno's implementations of Node.js built-in modules (fs,
+      help: `Runs unit tests for Oden's Node.js compatibility layer. These tests
+verify that Oden's implementations of Node.js built-in modules (fs,
 path, http, crypto, etc.) behave correctly.
 
 The test files live under tests/unit_node/ and are compiled into the
@@ -219,7 +219,7 @@ Under the hood:
       description: "Run Node.js compatibility tests",
       stepName: "Node.js compatibility tests",
       help: `Runs the Node.js compatibility test suite. These tests use actual
-Node.js test cases (ported or adapted) to verify that Deno's node:*
+Node.js test cases (ported or adapted) to verify that Oden's node:*
 module implementations match Node.js behavior.
 
 The test runner lives in tests/node_compat/runner/.
@@ -248,7 +248,7 @@ Under the hood:
       stepName: "spec tests",
       help:
         `Runs the spec integration tests. These are the primary integration tests
-for Deno's CLI — each test defines CLI commands to execute and asserts
+for Oden's CLI — each test defines CLI commands to execute and asserts
 on their stdout/stderr output.
 
 Spec tests live under tests/specs/. Each test directory contains a
@@ -270,52 +270,52 @@ Under the hood:
   cargo test -p specs_tests --test specs -- <filter>`,
     }),
     "test-core": {
-      description: "Run deno_core and related crate tests (nextest)",
+      description: "Run oden_core and related crate tests (nextest)",
       help:
-        `Runs the deno_core test suite and related crates using cargo-nextest,
-matching what CI runs in the 'deno_core test' job.
+        `Runs the oden_core test suite and related crates using cargo-nextest,
+matching what CI runs in the 'oden_core test' job.
 
-This includes tests for: deno_core, deno_ops, serde_v8, deno_core_testing,
-build-your-own-js-snapshot, dcore, and deno_ops_compile_test_runner.
+This includes tests for: oden_core, oden_ops, serde_v8, oden_core_testing,
+build-your-own-js-snapshot, dcore, and oden_ops_compile_test_runner.
 
 Requires cargo-nextest to be installed:
   cargo binstall cargo-nextest
 
 Usage:
-  ./x test-core              Run all deno_core tests
+  ./x test-core              Run all oden_core tests
   ./x test-core <filter>     Run tests matching the filter
 
 Under the hood:
-  cargo nextest run --features "deno_core/default deno_core/unsafe_use_unprotected_platform deno_core/v8" \\
+  cargo nextest run --features "oden_core/default oden_core/unsafe_use_unprotected_platform oden_core/v8" \\
     --tests --examples \\
-    -p deno_core -p deno_v8 -p build-your-own-js-snapshot -p dcore -p deno_ops -p deno_ops_compile_test_runner -p serde_v8 -p deno_core_testing
-  cargo nextest run -p deno_ops_compile_test_runner -p deno_v8
-  cargo test --doc -p deno_core -p deno_v8 -p build-your-own-js-snapshot -p deno_ops -p serde_v8 -p deno_core_testing`,
+    -p oden_core -p oden_v8 -p build-your-own-js-snapshot -p dcore -p oden_ops -p oden_ops_compile_test_runner -p serde_v8 -p oden_core_testing
+  cargo nextest run -p oden_ops_compile_test_runner -p oden_v8
+  cargo test --doc -p oden_core -p oden_v8 -p build-your-own-js-snapshot -p oden_ops -p serde_v8 -p oden_core_testing`,
       async fn(args: string[]) {
         const filterArgs = args.length > 0
           ? ["-E", `test(${args.join(" ")})`]
           : [];
-        $.logStep("Running deno_core nextest...");
+        $.logStep("Running oden_core nextest...");
         await $`cargo nextest run ${filterArgs}
-          --features ${"deno_core/default deno_core/unsafe_use_unprotected_platform deno_core/v8"}
+          --features ${"oden_core/default oden_core/unsafe_use_unprotected_platform oden_core/v8"}
           --tests --examples
-          -p deno_core -p deno_v8 -p build-your-own-js-snapshot -p dcore -p deno_ops -p deno_ops_compile_test_runner -p serde_v8 -p deno_core_testing`
+          -p oden_core -p oden_v8 -p build-your-own-js-snapshot -p dcore -p oden_ops -p oden_ops_compile_test_runner -p serde_v8 -p oden_core_testing`
           .cwd(root);
-        $.logStep("Running deno_ops compile test runner...");
-        await $`cargo nextest run ${filterArgs} -p deno_ops_compile_test_runner -p deno_v8`
+        $.logStep("Running oden_ops compile test runner...");
+        await $`cargo nextest run ${filterArgs} -p oden_ops_compile_test_runner -p oden_v8`
           .cwd(root);
         if (filterArgs.length === 0) {
           $.logStep("Running doc tests...");
-          await $`cargo test --doc -p deno_core -p deno_v8 -p build-your-own-js-snapshot -p deno_ops -p serde_v8 -p deno_core_testing`
+          await $`cargo test --doc -p oden_core -p oden_v8 -p build-your-own-js-snapshot -p oden_ops -p serde_v8 -p oden_core_testing`
             .cwd(root);
         }
-        $.logStep("deno_core tests complete.");
+        $.logStep("oden_core tests complete.");
       },
     },
     "test-napi": {
       description: "Run NAPI (native addon) tests",
       help: `Builds the test_napi native module and runs the NAPI test suite.
-These tests verify Deno's Node-API compatibility by loading a native
+These tests verify Oden's Node-API compatibility by loading a native
 addon (cdylib) and calling its exported functions from JavaScript.
 
 The native module source is in tests/napi/src/ and the JS tests are
@@ -333,7 +333,7 @@ Examples:
 
 Under the hood:
   cargo build -p test_napi
-  deno test --allow-read --allow-env --allow-ffi --allow-run \\
+  oden test --allow-read --allow-env --allow-ffi --allow-run \\
     --v8-flags=--expose-gc tests/napi/`,
       async fn(args: string[]) {
         $.logStep("Building test_napi native module...");
@@ -341,9 +341,9 @@ Under the hood:
         $.logStep("Running NAPI tests...");
         const filter = args.length > 0 ? args.map((a) => `--filter=${a}`) : [];
         await $`${
-          root.join("target/debug/deno").toString()
+          root.join("target/debug/oden").toString()
         } test --allow-read --allow-env --allow-ffi --allow-run --v8-flags=--expose-gc --config ${
-          root.join("tests/config/deno.json").toString()
+          root.join("tests/config/oden.json").toString()
         } --no-lock ${filter} .`.cwd(root.join("tests/napi"));
         $.logStep("NAPI tests complete.");
       },
@@ -352,17 +352,17 @@ Under the hood:
     "lint": {
       description: "Lint all code (JS/TS + Rust)",
       help: `Runs the full lint suite across the entire codebase, including both
-JavaScript/TypeScript linting (via deno lint) and Rust
+JavaScript/TypeScript linting (via oden lint) and Rust
 linting (via clippy).
 
 Use this when you have changed both JS/TS and Rust code. If you only
 changed JS/TS files, './x lint-js' is faster.
 
 Under the hood:
-  deno run -A tools/lint.js`,
+  oden run -A tools/lint.js`,
       async fn(_args: string[]) {
         $.logStep("Linting code...");
-        await $`deno run -A tools/lint.js`.cwd(root);
+        await $`oden run -A tools/lint.js`.cwd(root);
         $.logStep("Linting complete.");
       },
     },
@@ -398,7 +398,7 @@ Equivalent to running:
 function printHelp(COMMANDS: Record<string, Command>) {
   console.log();
   console.log(
-    `  ${bold(cyan("x"))} ${dim("-")} Developer CLI for contributing to Deno`,
+    `  ${bold(cyan("x"))} ${dim("-")} Developer CLI for contributing to Oden`,
   );
   console.log();
   console.log(`  ${bold("USAGE")}`);
@@ -407,7 +407,7 @@ function printHelp(COMMANDS: Record<string, Command>) {
   console.log(`  ${bold("EXAMPLES")}`);
   console.log(
     `    ${dim("$")} ./x ${green("build")}              ${
-      dim("# build the deno binary")
+      dim("# build the oden binary")
     }`,
   );
   console.log(
@@ -465,14 +465,14 @@ function printCommandHelp(name: string, cmd: Command) {
 
 const root = $.path(import.meta.dirname).parent();
 const COMMANDS = buildCommands(root);
-const args = Deno.args;
+const args = Oden.args;
 
 if (
   args.length === 0 || args[0] === "--help" || args[0] === "-h" ||
   args[0] === "help"
 ) {
   printHelp(COMMANDS);
-  Deno.exit(0);
+  Oden.exit(0);
 }
 
 const subcommand = args[0];
@@ -482,12 +482,12 @@ if (!cmd) {
   $.logError(`Unknown command '${subcommand}'.`);
   console.log();
   printHelp(COMMANDS);
-  Deno.exit(1);
+  Oden.exit(1);
 }
 
 if (args.includes("--help") || args.includes("-h")) {
   printCommandHelp(subcommand, cmd);
-  Deno.exit(0);
+  Oden.exit(0);
 }
 
 await cmd.fn(args.slice(1));

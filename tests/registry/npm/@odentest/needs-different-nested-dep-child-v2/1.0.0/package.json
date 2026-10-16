@@ -1,0 +1,8 @@
+{
+  "name": "@odentest/needs-different-nested-dep-child-v2",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@odentest/different-nested-dep-child": "2.0.0"
+  }
+}

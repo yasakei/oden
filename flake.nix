@@ -1,6 +1,6 @@
-# This provides a Nix dev shell and Nix build for deno and denort binaries.
+# This provides a Nix dev shell and Nix build for oden and odenrt binaries.
 {
-  description = "Deno";
+  description = "Oden";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -24,7 +24,7 @@
         rustToolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
 
         cargoToml = builtins.fromTOML (builtins.readFile ./cli/Cargo.toml);
-        denoVersion = cargoToml.package.version;
+        odenVersion = cargoToml.package.version;
 
         cargoLock = builtins.fromTOML (builtins.readFile ./Cargo.lock);
         rustyV8Version = (builtins.head (builtins.filter (p: p.name == "v8") cargoLock.package)).version;
@@ -63,9 +63,9 @@
           glib
         ];
 
-        buildDenoBin = { pname, binName ? pname }: pkgs.rustPlatform.buildRustPackage {
+        buildOdenBin = { pname, binName ? pname }: pkgs.rustPlatform.buildRustPackage {
           inherit pname;
-          version = denoVersion;
+          version = odenVersion;
           src = ./.;
           cargoLock.lockFile = ./Cargo.lock;
 
@@ -92,10 +92,10 @@
       in
       {
         packages = {
-          deno = buildDenoBin { pname = "deno"; };
-          denort = buildDenoBin { pname = "denort"; };
+          oden = buildOdenBin { pname = "oden"; };
+          odenrt = buildOdenBin { pname = "odenrt"; };
 
-          default = self.packages.${system}.deno;
+          default = self.packages.${system}.oden;
         };
 
         apps.nix-update-rusty-v8 = {

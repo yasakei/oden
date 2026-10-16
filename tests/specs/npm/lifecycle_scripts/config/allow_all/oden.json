@@ -1,0 +1,7 @@
+{
+  "nodeModulesDir": "manual",
+  "imports": {
+    "@odentest/node-addon": "npm:@odentest/node-addon@1.0.0",
+    "@odentest/node-lifecycle-scripts": "npm:@odentest/node-lifecycle-scripts"
+  }
+}

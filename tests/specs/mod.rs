@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cell::RefCell;
@@ -283,9 +283,9 @@ pub fn main() {
       .hash_dir(tests.join("util"))
       .hash_dir(tests.join("testdata"))
       .hash_dir(tests.join("registry"))
-      .hash_file(test_util::deno_exe_path())
+      .hash_file(test_util::oden_exe_path())
       .hash_file(test_util::test_server_path())
-      .hash_file(test_util::denort_exe_path());
+      .hash_file(test_util::odenrt_exe_path());
   });
   if matches!(ci_hash, test_util::hash::CiHashStatus::Skip) {
     return;

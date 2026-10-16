@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "@denotest/say-hello": "1.0.0"
+    "@odentest/say-hello": "1.0.0"
   }
 }

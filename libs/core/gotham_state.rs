@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Forked from Gotham:
 // https://github.com/gotham-rs/gotham/blob/bcbbf8923789e341b7a0e62c59909428ca4e22e2/gotham/src/state/mod.rs
 // Copyright 2017 Gotham Project Developers. MIT license.
@@ -176,7 +176,7 @@ mod tests {
 
   #[test]
   #[should_panic(
-    expected = "required type deno_core::gotham_state::tests::MyStruct is not present in GothamState container"
+    expected = "required type oden_core::gotham_state::tests::MyStruct is not present in GothamState container"
   )]
   fn missing() {
     let state = GothamState::default();

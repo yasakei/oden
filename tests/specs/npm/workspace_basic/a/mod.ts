@@ -1,4 +1,4 @@
-import { getValue, setValue } from "@denotest/esm-basic";
+import { getValue, setValue } from "@odentest/esm-basic";
 
 export function sayHello() {
   setValue(5);

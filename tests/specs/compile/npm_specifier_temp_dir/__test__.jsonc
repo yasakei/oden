@@ -12,7 +12,7 @@
     // current working directory
     "args": [
       "eval",
-      "['node_modules', 'Deno.lock'].forEach(dirName => { try { Deno.statSync(dirName) } catch (err) { console.log(err instanceof Deno.errors.NotFound) } })"
+      "['node_modules', 'Oden.lock'].forEach(dirName => { try { Oden.statSync(dirName) } catch (err) { console.log(err instanceof Oden.errors.NotFound) } })"
     ],
     "output": "true\ntrue\n"
   }]

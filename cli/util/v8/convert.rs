@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_core::FromV8;
-use deno_core::ToV8;
-use deno_core::v8;
+use oden_core::FromV8;
+use oden_core::ToV8;
+use oden_core::v8;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// A wrapper type for `Option<T>` that (de)serializes `None` as `null`

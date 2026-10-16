@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 const {
   op_async_barrier_create,
   op_async_barrier_await,
@@ -11,7 +11,7 @@ const {
   op_async_never_resolves,
   op_async_fake,
   op_async_promise_id,
-} = Deno
+} = Oden
   .core
   .ops;
 
@@ -34,7 +34,7 @@ export async function asyncSpin() {
 
 export function asyncNeverResolves() {
   const prom = op_async_never_resolves();
-  Deno.core.refOpPromise(prom);
+  Oden.core.refOpPromise(prom);
   return prom;
 }
 

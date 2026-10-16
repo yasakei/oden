@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. All rights reserved. MIT license.
+// Copyright 2018-2026 the Oden authors. All rights reserved. MIT license.
 
 const wt = new WebTransport("https://127.0.0.1:65535");
 

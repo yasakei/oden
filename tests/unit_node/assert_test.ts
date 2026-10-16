@@ -1,7 +1,7 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import * as assert from "node:assert";
 
-Deno.test("[node/assert] .throws() compares Error instance", () => {
+Oden.test("[node/assert] .throws() compares Error instance", () => {
   assert.throws(
     () => {
       throw new Error("FAIL");
@@ -17,7 +17,7 @@ Deno.test("[node/assert] .throws() compares Error instance", () => {
   );
 });
 
-Deno.test("[node/assert] deepStrictEqual(0, -0)", () => {
+Oden.test("[node/assert] deepStrictEqual(0, -0)", () => {
   assert.throws(
     () => {
       assert.deepStrictEqual(0, -0);
@@ -25,7 +25,7 @@ Deno.test("[node/assert] deepStrictEqual(0, -0)", () => {
   );
 });
 
-Deno.test("[node/assert] formats multibyte source expressions", () => {
+Oden.test("[node/assert] formats multibyte source expressions", () => {
   const 汉汉: typeof assert = assert;
   assert.throws(
     () => {
@@ -35,13 +35,13 @@ Deno.test("[node/assert] formats multibyte source expressions", () => {
   );
 });
 
-Deno.test("[node/assert] CallTracker correctly exported", () => {
+Oden.test("[node/assert] CallTracker correctly exported", () => {
   assert.strictEqual(typeof assert.CallTracker, "function");
   assert.strictEqual(typeof assert.default.CallTracker, "function");
   assert.strictEqual(assert.CallTracker, assert.default.CallTracker);
 });
 
-Deno.test("[node/assert] error message from strictEqual should be the same as AssertionError message", () => {
+Oden.test("[node/assert] error message from strictEqual should be the same as AssertionError message", () => {
   const { message } = new assert.AssertionError({
     actual: 1,
     expected: 2,
@@ -56,7 +56,7 @@ Deno.test("[node/assert] error message from strictEqual should be the same as As
   );
 });
 
-Deno.test("[node/assert] deepStrictEqual throws for different Number objects", () => {
+Oden.test("[node/assert] deepStrictEqual throws for different Number objects", () => {
   // Test case from issue #31172
   assert.throws(
     () => {
@@ -66,14 +66,14 @@ Deno.test("[node/assert] deepStrictEqual throws for different Number objects", (
   );
 });
 
-Deno.test("[node/assert] deepStrictEqual passes for equal Number objects", () => {
+Oden.test("[node/assert] deepStrictEqual passes for equal Number objects", () => {
   // Equal Number objects should pass
   assert.doesNotThrow(() => {
     assert.deepStrictEqual(new Number(1), new Number(1));
   });
 });
 
-Deno.test("[node/assert] throws with 2 parameters", () => {
+Oden.test("[node/assert] throws with 2 parameters", () => {
   assert.throws(
     () => {
       throw new Error("test error");
@@ -82,7 +82,7 @@ Deno.test("[node/assert] throws with 2 parameters", () => {
   );
 });
 
-Deno.test("[node/assert] throws with 3 parameters", () => {
+Oden.test("[node/assert] throws with 3 parameters", () => {
   assert.throws(
     () => {
       throw new TypeError("test error");
@@ -92,14 +92,14 @@ Deno.test("[node/assert] throws with 3 parameters", () => {
   );
 });
 
-Deno.test("[node/assert] doesNotThrow with 2 parameters", () => {
+Oden.test("[node/assert] doesNotThrow with 2 parameters", () => {
   assert.doesNotThrow(
     () => {},
     "custom message",
   );
 });
 
-Deno.test("[node/assert] doesNotThrow with 3 parameters", () => {
+Oden.test("[node/assert] doesNotThrow with 3 parameters", () => {
   assert.doesNotThrow(
     () => {},
     TypeError,
@@ -107,7 +107,7 @@ Deno.test("[node/assert] doesNotThrow with 3 parameters", () => {
   );
 });
 
-Deno.test("[node/assert] rejects with 2 parameters", async () => {
+Oden.test("[node/assert] rejects with 2 parameters", async () => {
   await assert.rejects(
     // deno-lint-ignore require-await
     async () => {
@@ -117,7 +117,7 @@ Deno.test("[node/assert] rejects with 2 parameters", async () => {
   );
 });
 
-Deno.test("[node/assert] rejects with 3 parameters", async () => {
+Oden.test("[node/assert] rejects with 3 parameters", async () => {
   await assert.rejects(
     // deno-lint-ignore require-await
     async () => {
@@ -128,14 +128,14 @@ Deno.test("[node/assert] rejects with 3 parameters", async () => {
   );
 });
 
-Deno.test("[node/assert] doesNotReject with 2 parameters", async () => {
+Oden.test("[node/assert] doesNotReject with 2 parameters", async () => {
   await assert.doesNotReject(
     async () => {},
     "custom message",
   );
 });
 
-Deno.test("[node/assert] doesNotReject with 3 parameters", async () => {
+Oden.test("[node/assert] doesNotReject with 3 parameters", async () => {
   await assert.doesNotReject(
     async () => {},
     TypeError,

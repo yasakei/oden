@@ -1,19 +1,19 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 mod sync_fetch;
 
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use deno_core::CancelFuture;
-use deno_core::DetachedBuffer;
-use deno_core::JsBuffer;
-use deno_core::JsRuntimeInspector;
-use deno_core::OpState;
-use deno_core::op2;
-use deno_web::JsMessageData;
-use deno_web::MessagePortError;
-use deno_web::RecvMessageData;
+use oden_core::CancelFuture;
+use oden_core::DetachedBuffer;
+use oden_core::JsBuffer;
+use oden_core::JsRuntimeInspector;
+use oden_core::OpState;
+use oden_core::op2;
+use oden_web::JsMessageData;
+use oden_web::MessagePortError;
+use oden_web::RecvMessageData;
 pub use sync_fetch::SyncFetchError;
 
 use self::sync_fetch::op_worker_sync_fetch;
@@ -21,8 +21,8 @@ use crate::web_worker::WebWorkerInternalHandle;
 use crate::web_worker::WorkerControlEvent;
 use crate::web_worker::WorkerThreadType;
 
-deno_core::extension!(
-  deno_web_worker,
+oden_core::extension!(
+  oden_web_worker,
   ops = [
     op_worker_post_message,
     op_worker_post_message_raw,
@@ -108,7 +108,7 @@ fn op_worker_maybe_wait_for_debugger(state: &mut OpState) {
 fn op_worker_close(state: &mut OpState) {
   // Notify parent that we're finished
   let exit_code = state
-    .try_borrow::<deno_os::ExitCode>()
+    .try_borrow::<oden_os::ExitCode>()
     .map(|e| e.get())
     .unwrap_or(0);
   let mut handle = state.borrow_mut::<WebWorkerInternalHandle>().clone();

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! `WebIdlConverter` that extracts every field a `SubtleCrypto` method
 //! needs from a `CryptoKey` argument, eagerly and synchronously, so the
@@ -11,11 +11,11 @@
 
 use std::borrow::Cow;
 
-use deno_core::v8;
-use deno_core::webidl::ContextFn;
-use deno_core::webidl::WebIdlConverter;
-use deno_core::webidl::WebIdlError;
-use deno_core::webidl::WebIdlErrorKind;
+use oden_core::v8;
+use oden_core::webidl::ContextFn;
+use oden_core::webidl::WebIdlConverter;
+use oden_core::webidl::WebIdlError;
+use oden_core::webidl::WebIdlErrorKind;
 use deno_error::JsErrorBox;
 
 use crate::crypto_key::CryptoKey;
@@ -65,7 +65,7 @@ impl<'a> WebIdlConverter<'a> for SubtleKey {
     _options: &Self::Options,
   ) -> Result<Self, WebIdlError> {
     let Some(key_ptr) =
-      deno_core::cppgc::try_unwrap_cppgc_object::<CryptoKey>(scope, value)
+      oden_core::cppgc::try_unwrap_cppgc_object::<CryptoKey>(scope, value)
     else {
       return Err(WebIdlError::new(
         prefix,

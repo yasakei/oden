@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cell::RefCell;
@@ -11,7 +11,7 @@ use aes::cipher::KeyIvInit;
 use aes::cipher::KeySizeUser;
 use aes::cipher::StreamCipher;
 use aes::cipher::block_padding::Pkcs7;
-use deno_core::Resource;
+use oden_core::Resource;
 use deno_error::JsErrorClass;
 use digest::KeyInit;
 use digest::generic_array::GenericArray;
@@ -673,7 +673,7 @@ pub enum CipherContextError {
   ContextInUse,
   #[class(inherit)]
   #[error("{0}")]
-  Resource(#[from] deno_core::error::ResourceError),
+  Resource(#[from] oden_core::error::ResourceError),
   #[class(inherit)]
   #[error(transparent)]
   Cipher(#[from] CipherError),
@@ -729,7 +729,7 @@ pub enum DecipherContextError {
   ContextInUse,
   #[class(inherit)]
   #[error("{0}")]
-  Resource(#[from] deno_core::error::ResourceError),
+  Resource(#[from] oden_core::error::ResourceError),
   #[class(inherit)]
   #[error(transparent)]
   Decipher(#[from] DecipherError),

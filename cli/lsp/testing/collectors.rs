@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 use std::collections::HashSet;
@@ -8,7 +8,7 @@ use deno_ast::SourceTextInfo;
 use deno_ast::swc::ast;
 use deno_ast::swc::ecma_visit::Visit;
 use deno_ast::swc::ecma_visit::VisitWith;
-use deno_core::ModuleSpecifier;
+use oden_core::ModuleSpecifier;
 use lsp::Range;
 use tower_lsp::lsp_types as lsp;
 
@@ -502,7 +502,7 @@ impl Visit for TestStepCollector<'_> {
   }
 }
 
-/// Walk an AST and determine if it contains any `Deno.test` tests.
+/// Walk an AST and determine if it contains any `Oden.test` tests.
 pub struct TestCollector {
   test_module: TestModule,
   vars: HashSet<String>,
@@ -560,7 +560,7 @@ impl Visit for TestCollector {
       return;
     };
     let is_describe = match prop_chain {
-      ["", "Deno", "test"] | ["Deno", "test", "ignore" | "only"] => false,
+      ["", "Oden", "test"] | ["Oden", "test", "ignore" | "only"] => false,
       ["", "", "describe"] | ["", "describe", "ignore" | "only" | "skip"] => {
         true
       }
@@ -583,9 +583,9 @@ impl Visit for TestCollector {
       let Some(init) = &decl.init else { continue };
 
       match init.as_ref() {
-        // Identify destructured assignments of `test` from `Deno`
+        // Identify destructured assignments of `test` from `Oden`
         ast::Expr::Ident(ident) => {
-          if ident.sym != "Deno" {
+          if ident.sym != "Oden" {
             continue;
           }
 
@@ -616,13 +616,13 @@ impl Visit for TestCollector {
             }
           }
         }
-        // Identify variable assignments where the init is `Deno.test`
+        // Identify variable assignments where the init is `Oden.test`
         ast::Expr::Member(member_expr) => {
           let ast::Expr::Ident(obj_ident) = member_expr.obj.as_ref() else {
             continue;
           };
 
-          if obj_ident.sym != "Deno" {
+          if obj_ident.sym != "Oden" {
             continue;
           };
 
@@ -652,7 +652,7 @@ impl Visit for TestCollector {
 
 #[cfg(test)]
 pub mod tests {
-  use deno_core::resolve_url;
+  use oden_core::resolve_url;
   use lsp::Position;
   use pretty_assertions::assert_eq;
 
@@ -685,7 +685,7 @@ pub mod tests {
   fn test_test_collector_test() {
     let test_module = collect(
       r#"
-      Deno.test("test", () => {});
+      Oden.test("test", () => {});
     "#,
     );
 
@@ -718,7 +718,7 @@ pub mod tests {
   fn test_test_collector_test_tpl() {
     let test_module = collect(
       r#"
-      Deno.test(`test`, () => {});
+      Oden.test(`test`, () => {});
     "#,
     );
 
@@ -751,7 +751,7 @@ pub mod tests {
   fn test_test_collector_a() {
     let test_module = collect(
       r#"
-      Deno.test({
+      Oden.test({
         name: "test",
         async fn(t) {
           await t.step("step", ({ step }) => {
@@ -815,7 +815,7 @@ pub mod tests {
   fn test_test_collector_a_tpl() {
     let test_module = collect(
       r#"
-      Deno.test({
+      Oden.test({
         name: `test`,
         async fn(t) {
           await t.step(`step`, ({ step }) => {
@@ -879,7 +879,7 @@ pub mod tests {
   fn test_test_collector_destructure() {
     let test_module = collect(
       r#"
-      const { test } = Deno;
+      const { test } = Oden;
       test("test", () => {});
     "#,
     );
@@ -913,7 +913,7 @@ pub mod tests {
   fn test_test_collector_destructure_rebind_step() {
     let test_module = collect(
       r#"
-      Deno.test(async function useFnName({ step: s }) {
+      Oden.test(async function useFnName({ step: s }) {
         await s("step", () => {});
       });
     "#,
@@ -957,7 +957,7 @@ pub mod tests {
   fn test_test_collector_rebind() {
     let test_module = collect(
       r#"
-      const t = Deno.test;
+      const t = Oden.test;
       t("test", () => {});
     "#,
     );
@@ -992,7 +992,7 @@ pub mod tests {
     let test_module = collect(
       r#"
       function someFunction() {}
-      Deno.test("test", someFunction);
+      Oden.test("test", someFunction);
     "#,
     );
 
@@ -1025,9 +1025,9 @@ pub mod tests {
   fn test_test_collector_function_only() {
     let test_module = collect(
       r#"
-      Deno.test(async function someFunction() {});
-      Deno.test.ignore(function foo() {});
-      Deno.test.only(function bar() {});
+      Oden.test(async function someFunction() {});
+      Oden.test.ignore(function foo() {});
+      Oden.test.only(function bar() {});
     "#,
     );
 
@@ -1084,7 +1084,7 @@ pub mod tests {
     let test_module = collect(
       r#"
       async function someFunction() {}
-      Deno.test(someFunction);
+      Oden.test(someFunction);
     "#,
     );
 
@@ -1118,7 +1118,7 @@ pub mod tests {
     let test_module = collect(
       r#"
       const someFunction = () => ({ name: "test", fn: () => {} });
-      Deno.test(someFunction());
+      Oden.test(someFunction());
     "#,
     );
 
@@ -1152,7 +1152,7 @@ pub mod tests {
   fn test_test_collector_nested_steps_same_name_and_level() {
     let test_module = collect(
       r#"
-      Deno.test("1", async (t) => {
+      Oden.test("1", async (t) => {
         await t.step("step 1", async (t) => {
           await t.step("nested step", () => {});
         });
@@ -1371,9 +1371,9 @@ pub mod tests {
   fn test_test_collector_duplicate_test_names() {
     let test_module = collect(
       r#"
-      Deno.test(function foo() {});
-      Deno.test(function foo() {});
-      Deno.test(function foo() {});
+      Oden.test(function foo() {});
+      Oden.test(function foo() {});
+      Oden.test(function foo() {});
     "#,
     );
 
@@ -1406,10 +1406,10 @@ pub mod tests {
   fn test_test_collector_duplicate_test_names_with_steps() {
     let test_module = collect(
       r#"
-      Deno.test("foo", async (t) => {
+      Oden.test("foo", async (t) => {
         await t.step("step", () => {});
       });
-      Deno.test("foo", async (t) => {
+      Oden.test("foo", async (t) => {
         await t.step("step", () => {});
       });
     "#,

@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::RefCell;
 use std::thread;
 
-use deno_core::ModuleSpecifier;
-use deno_core::v8;
-use deno_node::ops::ipc::ChildIpcSerialization;
-use deno_telemetry::OtelConfig;
+use oden_core::ModuleSpecifier;
+use oden_core::v8;
+use oden_node::ops::ipc::ChildIpcSerialization;
+use oden_telemetry::OtelConfig;
 use deno_terminal::colors;
 use serde::Serialize;
 
@@ -18,26 +18,26 @@ pub enum WorkerExecutionMode {
 
   /// Running in a worker.
   Worker,
-  /// `deno run`
+  /// `oden run`
   Run,
-  /// `deno repl`
+  /// `oden repl`
   Repl,
-  /// `deno eval`
+  /// `oden eval`
   Eval,
-  /// `deno test`
+  /// `oden test`
   Test,
-  /// `deno bench`
+  /// `oden bench`
   Bench,
-  /// `deno serve`
+  /// `oden serve`
   ServeMain {
     worker_count: usize,
   },
   ServeWorker {
     worker_index: usize,
   },
-  /// `deno jupyter`
+  /// `oden jupyter`
   Jupyter,
-  /// `deno deploy`
+  /// `oden deploy`
   Deploy,
 }
 
@@ -91,8 +91,8 @@ impl From<log::Level> for WorkerLogLevel {
 /// Common bootstrap options for MainWorker & WebWorker
 #[derive(Clone)]
 pub struct BootstrapOptions {
-  pub deno_version: String,
-  /// Sets `Deno.args` in JS runtime.
+  pub oden_version: String,
+  /// Sets `Oden.args` in JS runtime.
   pub args: Vec<String>,
   pub cpu_count: usize,
   pub log_level: WorkerLogLevel,
@@ -104,7 +104,7 @@ pub struct BootstrapOptions {
   pub unstable_features: Vec<i32>,
   pub user_agent: String,
   pub inspect: bool,
-  /// If this is a `deno compile`-ed executable.
+  /// If this is a `oden compile`-ed executable.
   pub is_standalone: bool,
   pub has_node_modules_dir: bool,
   pub argv0: Option<String>,
@@ -114,7 +114,7 @@ pub struct BootstrapOptions {
   pub node_ipc_init: Option<(i64, ChildIpcSerialization)>,
   pub mode: WorkerExecutionMode,
   pub no_legacy_abort: bool,
-  // Used by `deno serve`
+  // Used by `oden serve`
   pub serve_port: Option<u16>,
   pub serve_host: Option<String>,
   pub auto_serve: bool,
@@ -130,13 +130,13 @@ impl Default for BootstrapOptions {
       .map(|p| p.get())
       .unwrap_or(1);
 
-    // this version is not correct as its the version of deno_runtime
+    // this version is not correct as its the version of oden_runtime
     // and the implementor should supply a user agent that makes sense
     let runtime_version = env!("CARGO_PKG_VERSION");
-    let user_agent = format!("Deno/{runtime_version}");
+    let user_agent = format!("Oden/{runtime_version}");
 
     Self {
-      deno_version: runtime_version.to_string(),
+      oden_version: runtime_version.to_string(),
       user_agent,
       cpu_count,
       color_level: colors::get_color_level(),
@@ -177,7 +177,7 @@ impl Default for BootstrapOptions {
 /// Keep this in sync with `99_main.js`.
 #[derive(Serialize)]
 struct BootstrapV8<'a>(
-  // deno version
+  // oden version
   &'a str,
   // location
   Option<&'a str>,
@@ -226,10 +226,10 @@ impl BootstrapOptions {
     scope: &mut v8::PinScope<'s, '_>,
   ) -> v8::Local<'s, v8::Value> {
     let scope = RefCell::new(scope);
-    let ser = deno_core::serde_v8::Serializer::new(&scope);
+    let ser = oden_core::serde_v8::Serializer::new(&scope);
 
     let bootstrap = BootstrapV8(
-      &self.deno_version,
+      &self.oden_version,
       self.location.as_ref().map(|l| l.as_str()),
       self.unstable_features.as_ref(),
       self.inspect,

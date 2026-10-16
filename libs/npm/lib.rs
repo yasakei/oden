@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![deny(clippy::print_stderr)]
 #![deny(clippy::print_stdout)]
@@ -432,7 +432,7 @@ impl NpmSystemInfo {
 }
 
 /// Extracts the package name from a specifier that may contain a subpath.
-/// For example, "@denotest/add2/sub.js" -> "@denotest/add2", "foo/bar" -> "foo".
+/// For example, "@odentest/add2/sub.js" -> "@odentest/add2", "foo/bar" -> "foo".
 pub fn package_name_without_subpath(name: &str) -> &str {
   let mut search_start_index = 0;
   if name.starts_with('@')

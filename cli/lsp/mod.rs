@@ -1,6 +1,6 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_core::error::AnyError;
+use oden_core::error::AnyError;
 use tower_lsp::LspService;
 use tower_lsp::Server;
 

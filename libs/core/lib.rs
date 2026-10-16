@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![deny(clippy::print_stderr)]
 #![deny(clippy::print_stdout)]
@@ -50,12 +50,12 @@ pub mod webidl;
 
 // Re-exports
 pub use anyhow;
-pub use deno_ops::CppgcBase;
-pub use deno_ops::CppgcInherits;
-pub use deno_ops::FromV8;
-pub use deno_ops::ToV8;
-pub use deno_ops::WebIDL;
-pub use deno_ops::op2;
+pub use oden_ops::CppgcBase;
+pub use oden_ops::CppgcInherits;
+pub use oden_ops::FromV8;
+pub use oden_ops::ToV8;
+pub use oden_ops::WebIDL;
+pub use oden_ops::op2;
 pub use deno_path_util::normalize_path;
 pub use deno_path_util::resolve_path;
 pub use deno_path_util::resolve_url_or_path;
@@ -208,10 +208,10 @@ pub use crate::source_map::SourceMapper;
 pub use crate::tasks::V8CrossThreadTaskSpawner;
 pub use crate::tasks::V8TaskSpawner;
 
-// Ensure we can use op2 in deno_core without any hackery.
-extern crate self as deno_core;
+// Ensure we can use op2 in oden_core without any hackery.
+extern crate self as oden_core;
 
-/// An internal module re-exporting functions used by the #[op] (`deno_ops`) macro
+/// An internal module re-exporting functions used by the #[op] (`oden_ops`) macro
 #[doc(hidden)]
 pub mod _ops {
   pub use inventory;
@@ -289,12 +289,12 @@ mod tests {
     assert_eq!(&name[..expected.len()], expected);
   }
 
-  // If the deno command is available, we ensure the async stubs are correctly rebuilt.
+  // If the oden command is available, we ensure the async stubs are correctly rebuilt.
   #[test]
   #[cfg_attr(all(target_os = "windows", target_arch = "aarch64"), ignore)]
   fn test_rebuild_async_stubs() {
-    // Check for deno first
-    if let Err(e) = Command::new("deno")
+    // Check for oden first
+    if let Err(e) = Command::new("oden")
       .arg("--version")
       .stderr(Stdio::null())
       .stdout(Stdio::null())
@@ -305,13 +305,13 @@ mod tests {
         reason = "intentional test diagnostic output"
       )]
       {
-        eprintln!("Ignoring test because we couldn't find deno: {e:?}");
+        eprintln!("Ignoring test because we couldn't find oden: {e:?}");
       }
     }
 
     let path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
       .join("rebuild_async_stubs.js");
-    let status = Command::new("deno")
+    let status = Command::new("oden")
       .args(["run", "-A", path.as_os_str().to_str().unwrap(), "--check"])
       .stderr(Stdio::null())
       .stdout(Stdio::null())

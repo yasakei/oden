@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! Value inspection engine ported from `01_console.js` (`formatValue`,
 //! `formatRaw` and friends). The goal is byte-for-byte identical output with
@@ -8,7 +8,7 @@
 
 use std::collections::HashMap;
 
-use deno_core::v8;
+use oden_core::v8;
 
 use super::quote;
 use super::width::get_string_width;
@@ -696,8 +696,8 @@ fn try_custom_inspect<'s, 'i>(
     return Ok(None);
   };
 
-  let custom_inspect = symbol_for(scope, "Deno.customInspect");
-  let private_custom_inspect = symbol_for(scope, "Deno.privateCustomInspect");
+  let custom_inspect = symbol_for(scope, "Oden.customInspect");
+  let private_custom_inspect = symbol_for(scope, "Oden.privateCustomInspect");
 
   for (sym, _private) in
     [(custom_inspect, false), (private_custom_inspect, true)]
@@ -992,7 +992,7 @@ pub fn ctx_stylize_js_fn<'s, 'i>(
 }
 
 /// Materialize the engine context as a JS ctx object compatible with the
-/// historical `inspectOptions`/ctx shape, for `Deno.customInspect` hooks
+/// historical `inspectOptions`/ctx shape, for `Oden.customInspect` hooks
 /// that pass it back into `inspect(value, ctx)`.
 pub fn materialize_ctx<'s, 'i>(
   scope: &mut v8::PinScope<'s, 'i>,

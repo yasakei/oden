@@ -1,11 +1,11 @@
 self.onmessage = async () => {
-  const env = await Deno.permissions.query({ name: "env" });
-  const ffi = await Deno.permissions.query({ name: "ffi" });
-  const net = await Deno.permissions.query({ name: "net" });
-  const read = await Deno.permissions.query({ name: "read" });
-  const run = await Deno.permissions.query({ name: "run" });
-  const write = await Deno.permissions.query({ name: "write" });
-  const imports = await Deno.permissions.query({ name: "import" });
+  const env = await Oden.permissions.query({ name: "env" });
+  const ffi = await Oden.permissions.query({ name: "ffi" });
+  const net = await Oden.permissions.query({ name: "net" });
+  const read = await Oden.permissions.query({ name: "read" });
+  const run = await Oden.permissions.query({ name: "run" });
+  const write = await Oden.permissions.query({ name: "write" });
+  const imports = await Oden.permissions.query({ name: "import" });
   self.postMessage({
     env: env.state,
     ffi: ffi.state,

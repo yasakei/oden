@@ -1,0 +1,8 @@
+{
+  "name": "@odentest/cjs-exportstar-reexport",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "@odentest/cjs-reexport-noext-main": "1.0.0"
+  }
+}

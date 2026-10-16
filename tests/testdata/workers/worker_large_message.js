@@ -1,4 +1,4 @@
-// Copyright 2020 the Deno authors. All rights reserved. MIT license.
+// Copyright 2020 the Oden authors. All rights reserved. MIT license.
 
 const dataSmall = "";
 const dataLarge = "x".repeat(10 * 1024);

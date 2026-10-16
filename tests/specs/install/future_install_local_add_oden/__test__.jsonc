@@ -1,0 +1,21 @@
+{
+  "tempDir": true,
+  "steps": [
+    {
+      "args": "install npm:@odentest/esm-basic",
+      "output": "install.out"
+    },
+    {
+      // make sure the dep got cached
+      "args": "run --cached-only main.js",
+      "output": ""
+    },
+    {
+      "args": [
+        "eval",
+        "console.log(Oden.readTextFileSync('oden.json').trim())"
+      ],
+      "output": "oden.json.out"
+    }
+  ]
+}

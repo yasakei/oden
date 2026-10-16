@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_core::JsBuffer;
-use deno_core::OpState;
-use deno_core::op2;
-use deno_core::url::Url;
-use deno_core::url::form_urlencoded;
-use deno_core::url::quirks;
+use oden_core::JsBuffer;
+use oden_core::OpState;
+use oden_core::op2;
+use oden_core::url::Url;
+use oden_core::url::form_urlencoded;
+use oden_core::url::quirks;
 use deno_error::JsErrorBox;
 
 /// Parse `href` with a `base_href`. Fills the out `buf` with URL components.

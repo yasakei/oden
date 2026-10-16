@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -6,10 +6,10 @@ use std::rc::Rc;
 use async_stream::try_stream;
 use base64::Engine;
 use bytes::Bytes;
-use deno_core::BufMutView;
-use deno_core::Resource;
-use deno_core::convert::ByteString;
-use deno_core::unsync::spawn;
+use oden_core::BufMutView;
+use oden_core::Resource;
+use oden_core::convert::ByteString;
+use oden_core::unsync::spawn;
 use futures::StreamExt;
 use futures::TryStreamExt;
 use http::HeaderMap;
@@ -312,7 +312,7 @@ impl LscBackend {
     Err(CacheError::KeysNotSupported)
   }
 }
-impl deno_core::Resource for LscBackend {
+impl oden_core::Resource for LscBackend {
   fn name(&self) -> std::borrow::Cow<'_, str> {
     "LscBackend".into()
   }

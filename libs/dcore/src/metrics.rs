@@ -1,16 +1,16 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use deno_core::OpMetricsEvent;
-use deno_core::OpMetricsFactoryFn;
-use deno_core::OpMetricsSource;
-use deno_core::anyhow::Error;
+use oden_core::OpMetricsEvent;
+use oden_core::OpMetricsFactoryFn;
+use oden_core::OpMetricsSource;
+use oden_core::anyhow::Error;
 
-#[derive(Default, Debug, Clone, deno_core::serde::Serialize)]
-#[serde(crate = "deno_core::serde")]
+#[derive(Default, Debug, Clone, oden_core::serde::Serialize)]
+#[serde(crate = "oden_core::serde")]
 struct OpCount {
   slow: u64,
   fast: u64,
@@ -18,8 +18,8 @@ struct OpCount {
   async_: u64,
 }
 
-#[derive(Default, Debug, Clone, deno_core::serde::Serialize)]
-#[serde(crate = "deno_core::serde")]
+#[derive(Default, Debug, Clone, oden_core::serde::Serialize)]
+#[serde(crate = "oden_core::serde")]
 struct OpMetricsSummaryInner {
   counts: HashMap<String, OpCount>,
   completed_sync: u64,

@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // deno-lint-ignore-file no-console
 
-// Note: when benchmarking across different Deno version, make sure to clear
-// the DENO_DIR cache.
-let [total, count] = typeof Deno !== "undefined" ? Deno.args : [];
+// Note: when benchmarking across different Oden version, make sure to clear
+// the ODEN_DIR cache.
+let [total, count] = typeof Oden !== "undefined" ? Oden.args : [];
 
 total = total ? parseInt(total, 0) : 50;
 count = count ? parseInt(count, 10) : 1000000;

@@ -1,9 +1,9 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assertEquals } from "@std/assert";
 import { Buffer } from "node:buffer";
 import { StringDecoder } from "node:string_decoder";
 
-Deno.test({
+Oden.test({
   name: "String decoder is encoding utf8 correctly",
   fn() {
     let decoder;
@@ -38,7 +38,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name:
     "String decoder replaces invalid utf8 bytes the same way as Node (#34930)",
   fn() {
@@ -61,7 +61,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "String decoder is encoding base64 correctly",
   fn() {
     let decoder;
@@ -96,7 +96,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "String decoder is encoding base64url correctly",
   fn() {
     let decoder;
@@ -131,7 +131,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "String decoder is encoding hex correctly",
   fn() {
     let decoder;
@@ -166,7 +166,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name:
     "String decoder with utf8 would handle incomplete character correctly when append",
   fn() {
@@ -189,7 +189,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "String decoder would have default encoding option as utf8",
   fn() {
     let decoder;

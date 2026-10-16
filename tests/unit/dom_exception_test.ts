@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import {
   assert,
@@ -8,13 +8,13 @@ import {
   assertThrows,
 } from "./test_util.ts";
 
-Deno.test(function customInspectFunction() {
+Oden.test(function customInspectFunction() {
   const exception = new DOMException("test");
-  assertEquals(Deno.inspect(exception), exception.stack);
-  assertStringIncludes(Deno.inspect(DOMException.prototype), "DOMException");
+  assertEquals(Oden.inspect(exception), exception.stack);
+  assertStringIncludes(Oden.inspect(DOMException.prototype), "DOMException");
 });
 
-Deno.test(function nameToCodeMappingPrototypeAccess() {
+Oden.test(function nameToCodeMappingPrototypeAccess() {
   const newCode = 100;
   const objectPrototype = Object.prototype as unknown as {
     pollution: number;
@@ -24,7 +24,7 @@ Deno.test(function nameToCodeMappingPrototypeAccess() {
   Reflect.deleteProperty(objectPrototype, "pollution");
 });
 
-Deno.test(function hasStackAccessor() {
+Oden.test(function hasStackAccessor() {
   const e2 = new DOMException("asdf");
   const desc = Object.getOwnPropertyDescriptor(e2, "stack");
   assert(desc);
@@ -33,14 +33,14 @@ Deno.test(function hasStackAccessor() {
 });
 
 // QuotaExceededError still maps to code 22 in the DOMException names table
-Deno.test(function domExceptionQuotaExceededErrorCode() {
+Oden.test(function domExceptionQuotaExceededErrorCode() {
   const e = new DOMException("test", "QuotaExceededError");
   assertEquals(e.code, 22);
   assertEquals(e.name, "QuotaExceededError");
 });
 
 // QuotaExceededError as a DOMException derived interface
-Deno.test(function quotaExceededErrorBasic() {
+Oden.test(function quotaExceededErrorBasic() {
   const e = new QuotaExceededError("quota exceeded");
   assert(e instanceof QuotaExceededError);
   assert(e instanceof DOMException);
@@ -52,7 +52,7 @@ Deno.test(function quotaExceededErrorBasic() {
   assertEquals(e.requested, null);
 });
 
-Deno.test(function quotaExceededErrorWithOptions() {
+Oden.test(function quotaExceededErrorWithOptions() {
   const e = new QuotaExceededError("too much", { quota: 100, requested: 200 });
   assertEquals(e.name, "QuotaExceededError");
   assertEquals(e.message, "too much");
@@ -61,7 +61,7 @@ Deno.test(function quotaExceededErrorWithOptions() {
   assertEquals(e.requested, 200);
 });
 
-Deno.test(function quotaExceededErrorDefaultMessage() {
+Oden.test(function quotaExceededErrorDefaultMessage() {
   const e = new QuotaExceededError();
   assertEquals(e.message, "");
   assertEquals(e.name, "QuotaExceededError");
@@ -70,7 +70,7 @@ Deno.test(function quotaExceededErrorDefaultMessage() {
   assertEquals(e.requested, null);
 });
 
-Deno.test(function quotaExceededErrorPartialOptions() {
+Oden.test(function quotaExceededErrorPartialOptions() {
   const e1 = new QuotaExceededError("msg", { quota: 50 });
   assertEquals(e1.quota, 50);
   assertEquals(e1.requested, null);
@@ -80,31 +80,31 @@ Deno.test(function quotaExceededErrorPartialOptions() {
   assertEquals(e2.requested, 75);
 });
 
-Deno.test(function quotaExceededErrorNegativeQuotaThrows() {
+Oden.test(function quotaExceededErrorNegativeQuotaThrows() {
   assertThrows(
     () => new QuotaExceededError("msg", { quota: -1 }),
     RangeError,
   );
 });
 
-Deno.test(function quotaExceededErrorNegativeRequestedThrows() {
+Oden.test(function quotaExceededErrorNegativeRequestedThrows() {
   assertThrows(
     () => new QuotaExceededError("msg", { requested: -1 }),
     RangeError,
   );
 });
 
-Deno.test(function quotaExceededErrorLegacyCodeConstant() {
+Oden.test(function quotaExceededErrorLegacyCodeConstant() {
   assertEquals(DOMException.QUOTA_EXCEEDED_ERR, 22);
 });
 
-Deno.test(function quotaExceededErrorConstructorName() {
+Oden.test(function quotaExceededErrorConstructorName() {
   const e = new QuotaExceededError("test");
   assertEquals(e.constructor, QuotaExceededError);
   assertEquals(e.constructor.name, "QuotaExceededError");
 });
 
-Deno.test(function quotaExceededErrorHasStack() {
+Oden.test(function quotaExceededErrorHasStack() {
   const e = new QuotaExceededError("test");
   assert(typeof e.stack === "string");
   assertStringIncludes(e.stack, "QuotaExceededError");

@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and Node.js contributors. All rights reserved. MIT license.
 (function () {
 const { core, primordials } = __bootstrap;
 const { queueMicrotask, SymbolDispose } = primordials;
 const { validateAbortSignal, validateFunction } = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
-const { codes } = core.loadExtScript("ext:deno_node/internal/errors.ts");
+const { codes } = core.loadExtScript("ext:oden_node/internal/errors.ts");
 const { ERR_INVALID_ARG_TYPE } = codes;
 
 /**

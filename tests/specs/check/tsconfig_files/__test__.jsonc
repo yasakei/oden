@@ -1,5 +1,5 @@
 {
-  // deferred: deno.* libs -> #35985
+  // deferred: oden.* libs -> #35985
   "ignore": true,
   "args": "check --quiet",
   "output": "main.out",

@@ -1,6 +1,6 @@
 setInterval(() => {}, 10000);
 
-Deno.test({
+Oden.test({
   name: "test",
   sanitizeOps: false,
   sanitizeExit: false,

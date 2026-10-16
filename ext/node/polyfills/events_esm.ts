@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
-// @deno-types="./_events.d.ts"
+// Copyright 2018-2026 the Oden authors. MIT license.
+// @oden-types="./_events.d.ts"
 
 import { core } from "ext:core/mod.js";
-const mod = core.loadExtScript("ext:deno_node/_events.mjs");
+const mod = core.loadExtScript("ext:oden_node/_events.mjs");
 
 export const {
   addAbortListener,

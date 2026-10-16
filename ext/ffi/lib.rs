@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::mem::size_of;
 use std::os::raw::c_char;
@@ -21,8 +21,8 @@ pub use callback::CallbackError;
 use callback::op_ffi_unsafe_callback_close;
 use callback::op_ffi_unsafe_callback_create;
 use callback::op_ffi_unsafe_callback_ref;
-pub use denort_helper::DenoRtNativeAddonLoader;
-pub use denort_helper::DenoRtNativeAddonLoaderRc;
+pub use odenrt_helper::OdenRtNativeAddonLoader;
+pub use odenrt_helper::OdenRtNativeAddonLoaderRc;
 pub use dlfcn::DlfcnError;
 use dlfcn::ForeignFunction;
 use dlfcn::op_ffi_load;
@@ -46,8 +46,8 @@ const _: () = {
 
 pub const UNSTABLE_FEATURE_NAME: &str = "ffi";
 
-deno_core::extension!(deno_ffi,
-  deps = [ deno_web ],
+oden_core::extension!(oden_ffi,
+  deps = [ oden_web ],
   ops = [
     op_ffi_load,
     op_ffi_get_static,
@@ -82,10 +82,10 @@ deno_core::extension!(deno_ffi,
   ],
   lazy_loaded_js = [ "00_ffi.js" ],
   options = {
-    deno_rt_native_addon_loader: Option<DenoRtNativeAddonLoaderRc>,
+    oden_rt_native_addon_loader: Option<OdenRtNativeAddonLoaderRc>,
   },
   state = |state, options| {
-    if let Some(loader) = options.deno_rt_native_addon_loader {
+    if let Some(loader) = options.oden_rt_native_addon_loader {
       state.put(loader);
     }
   },

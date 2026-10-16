@@ -1,0 +1,8 @@
+{
+  "name": "@odentest/hoisted-nested-grandchild-parent",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@odentest/hoisted-nested-grandchild-chain": "2.0.0"
+  }
+}

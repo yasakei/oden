@@ -1,0 +1,22 @@
+[UNORDERED_START]
+Add npm:@odentest/esm-basic@1.0.0
+Add jsr:@odentest/add@1.0.0
+Add npm:@odentest/say-hello@1.0.0
+Download http://localhost:4260/@odentest%2fesm-basic
+Download http://localhost:4260/@odentest/esm-basic/1.0.0.tgz
+Download http://localhost:4260/@odentest%2fsay-hello
+Download http://localhost:4260/@odentest/say-hello/1.0.0.tgz
+Initialize @odentest/esm-basic@1.0.0
+Initialize @odentest/say-hello@1.0.0
+Download http://127.0.0.1:4250/@odentest/add/1.0.0/mod.ts
+[UNORDERED_END]
+Installed 2 packages in [WILDLINE]
+Reused 0 packages from cache
+Downloaded 0 packages from JSR
+Downloaded 2 packages from npm
+++
+
+Dependencies:
++ npm:@odentest/esm-basic 1.0.0
++ npm:@odentest/say-hello 1.0.0
+

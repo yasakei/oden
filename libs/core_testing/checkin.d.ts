@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 /// <reference lib="dom" />
 
@@ -23,7 +23,7 @@ declare global {
     transfer(size: number): SharedArrayBuffer;
   }
 
-  namespace Deno {
+  namespace Oden {
     export function refTimer(id: number): void;
     export function unrefTimer(id: number): void;
   }

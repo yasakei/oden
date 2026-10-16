@@ -1,16 +1,16 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 
 // Ports lib/internal/cluster/round_robin_handle.js.
 
 // TODO(petamoriken): enable prefer-primordials for node polyfills
-// deno-lint-ignore-file no-explicit-any deno-internal/prefer-primordials
+// deno-lint-ignore-file no-explicit-any oden-internal/prefer-primordials
 
 (function () {
 const { core, primordials } = __bootstrap;
 const lazyNet = core.createLazyLoader("node:net");
 const { sendHelper } = core.loadExtScript(
-  "ext:deno_node/internal/cluster/utils.ts",
+  "ext:oden_node/internal/cluster/utils.ts",
 );
 const {
   append,
@@ -18,16 +18,16 @@ const {
   isEmpty,
   peek,
   remove,
-} = core.loadExtScript("ext:deno_node/internal/cluster/linkedlist.ts");
+} = core.loadExtScript("ext:oden_node/internal/cluster/linkedlist.ts");
 const {
   constants: TCPConstants,
   setupListenWrap: setupTCPListenWrap,
   TCP,
-} = core.loadExtScript("ext:deno_node/internal_binding/tcp_wrap.ts");
+} = core.loadExtScript("ext:oden_node/internal_binding/tcp_wrap.ts");
 const {
   Pipe,
   setupListenWrap: setupPipeListenWrap,
-} = core.loadExtScript("ext:deno_node/internal_binding/pipe_wrap.ts");
+} = core.loadExtScript("ext:oden_node/internal_binding/pipe_wrap.ts");
 
 const { ArrayIsArray, Boolean, SafeMap } = primordials;
 
@@ -69,7 +69,7 @@ function RoundRobinHandle(
     this.handle = this.server._handle;
     // Replace the listen-wrap that net.Server set up: it captures the
     // onconnection at wrap time, so just assigning a new onconnection
-    // (as Node does) would skip our accept-wrap step in Deno's TCP/Pipe
+    // (as Node does) would skip our accept-wrap step in Oden's TCP/Pipe
     // bindings. Re-run setupListenWrap with the new user callback.
     this.handle.onconnection = (err: number, handle: any) =>
       this.distribute(err, handle);

@@ -5,6 +5,6 @@
     "postinstall": "echo c"
   },
   "dependencies": {
-    "@denotest/add": "^1.0.0"
+    "@odentest/add": "^1.0.0"
   }
 }

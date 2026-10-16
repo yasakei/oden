@@ -1,9 +1,9 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assertEquals } from "@std/assert";
 import cluster from "node:cluster";
 import * as clusterNamed from "node:cluster";
 
-Deno.test("[node/cluster] has all node exports", () => {
+Oden.test("[node/cluster] has all node exports", () => {
   assertEquals(cluster.isPrimary, true);
   assertEquals(cluster.isMaster, true);
   assertEquals(cluster.isWorker, false);

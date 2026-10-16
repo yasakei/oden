@@ -1,9 +1,9 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! Error formatting ported from `01_console.js` (`formatError`,
 //! `getStackString`, `improveStack`, stack-frame collapsing, cwd marking).
 
-use deno_core::v8;
+use oden_core::v8;
 
 use super::inspect::*;
 
@@ -657,14 +657,14 @@ fn is_ext_module_frame(line: &str) -> bool {
   match_module_frame(line, "ext:").is_some()
 }
 
-/// `^ {4}at (?:__node_internal_\S+|eventLoopTick|denoErrorToNodeError|__drainNextTickAndMacrotasks) `
+/// `^ {4}at (?:__node_internal_\S+|eventLoopTick|odenErrorToNodeError|__drainNextTickAndMacrotasks) `
 fn is_filtered_ext_frame(line: &str) -> bool {
   let Some(rest) = frame_after_at(line) else {
     return false;
   };
   for name in [
     "eventLoopTick",
-    "denoErrorToNodeError",
+    "odenErrorToNodeError",
     "__drainNextTickAndMacrotasks",
   ] {
     if rest.starts_with(name) && rest[name.len()..].starts_with(' ') {
@@ -941,7 +941,7 @@ pub fn format_error<'s, 'i>(
 }
 
 fn path_to_file_url_href(path: &str) -> String {
-  match deno_core::url::Url::from_file_path(path) {
+  match oden_core::url::Url::from_file_path(path) {
     Ok(url) => url.to_string(),
     Err(_) => String::new(),
   }

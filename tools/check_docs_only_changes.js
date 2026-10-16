@@ -1,26 +1,26 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // deno-lint-ignore-file no-console
 
 // Checks whether a pull request only touches files under the `doc/` directory.
-// When that's the case, CI skips the build, test, bench and deno_core jobs and
+// When that's the case, CI skips the build, test, bench and oden_core jobs and
 // runs the `lint` job alone (markdown formatting + lint), since there is no
 // code to compile or test.
 //
-// Usage: deno run --allow-run=git check_docs_only_changes.js <base_sha>
+// Usage: oden run --allow-run=git check_docs_only_changes.js <base_sha>
 // Writes "docs_only=true" or "docs_only=false" to $GITHUB_OUTPUT when running
 // in GitHub Actions.
 
 const DOCS_DIR = "doc/";
 
-const baseSha = Deno.args[0];
+const baseSha = Oden.args[0];
 if (!baseSha) {
   console.error("Usage: check_docs_only_changes.js <base_sha>");
-  Deno.exit(1);
+  Oden.exit(1);
 }
 
 // Get list of changed files between the base SHA and HEAD
-const { code, stdout, stderr } = await Deno.spawnAndWait("git", [
+const { code, stdout, stderr } = await Oden.spawnAndWait("git", [
   "diff",
   "--name-only",
   `${baseSha}..HEAD`,
@@ -30,7 +30,7 @@ if (code !== 0) {
   console.error("git diff failed:", stderr);
   console.log("Defaulting to running the full CI (docs_only=false)");
   await writeOutput(false);
-  Deno.exit(0);
+  Oden.exit(0);
 }
 
 const stdoutText = new TextDecoder().decode(stdout);
@@ -51,9 +51,9 @@ console.log(`docs_only: ${docsOnly}`);
 await writeOutput(docsOnly);
 
 async function writeOutput(docsOnly) {
-  const outputFile = Deno.env.get("GITHUB_OUTPUT");
+  const outputFile = Oden.env.get("GITHUB_OUTPUT");
   if (outputFile) {
-    await Deno.writeTextFile(outputFile, `docs_only=${docsOnly}\n`, {
+    await Oden.writeTextFile(outputFile, `docs_only=${docsOnly}\n`, {
       append: true,
     });
   }

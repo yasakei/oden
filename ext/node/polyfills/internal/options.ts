@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -22,7 +22,7 @@
 (function () {
 const { core, primordials } = __bootstrap;
 const { getExecArgvOptions, getOptions } = core.loadExtScript(
-  "ext:deno_node/internal_binding/node_options.ts",
+  "ext:oden_node/internal_binding/node_options.ts",
 );
 const {
   MapPrototypeGet,
@@ -34,11 +34,11 @@ const {
 const dummyOptions = new SafeMap<string, { value: string | boolean }>();
 
 function isWarmupPhase() {
-  return !Deno.build;
+  return !Oden.build;
 }
 
 function getOptionsFromBinding() {
-  // If Deno.build is not defined, this is in warmup phase.
+  // If Oden.build is not defined, this is in warmup phase.
   if (isWarmupPhase()) {
     return dummyOptions;
   }

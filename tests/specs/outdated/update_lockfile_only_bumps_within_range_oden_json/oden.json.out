@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "@odentest/has-patch-versions": "npm:@odentest/has-patch-versions@^0.1.0"
+  }
+}

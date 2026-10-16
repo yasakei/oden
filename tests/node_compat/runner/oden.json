@@ -1,0 +1,7 @@
+{
+  "importMap": "../../../import_map.json",
+  "tasks": {
+    "setup": "oden run --allow-read --allow-write ./setup.ts",
+    "test": "ODEN_TEST_UTIL_ODEN_EXE=\"$(oden eval 'console.log(Oden.execPath())')\" cargo test --test node_compat --"
+  }
+}

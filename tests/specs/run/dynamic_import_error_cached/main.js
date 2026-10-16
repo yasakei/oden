@@ -3,7 +3,7 @@ try {
 } catch {
   console.log("fail");
 }
-Deno.writeTextFileSync("a.ts", "");
+Oden.writeTextFileSync("a.ts", "");
 try {
   await import("./a.ts");
 } catch {

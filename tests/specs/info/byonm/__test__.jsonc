@@ -4,7 +4,7 @@
     "args": "install",
     "output": "[WILDCARD]"
   }, {
-    "args": "info npm:@denotest/add",
+    "args": "info npm:@odentest/add",
     "output": "info.out",
     "exitCode": 1
   }]

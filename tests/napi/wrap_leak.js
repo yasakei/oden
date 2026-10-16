@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Test that napi_wrap finalizers run at shutdown even when the wrapped
 // JS object is still reachable (not garbage collected). This matches

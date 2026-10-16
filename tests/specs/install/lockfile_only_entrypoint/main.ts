@@ -1,1 +1,1 @@
-import "npm:@denotest/esm-basic@1.0.0";
+import "npm:@odentest/esm-basic@1.0.0";

@@ -1,0 +1,17 @@
+{
+  "version": "5",
+  "specifiers": {
+    "npm:@odentest/pre-release-with-nightlies@^1.0.0-beta.13": "1.0.0-beta.13"
+  },
+  "npm": {
+    "@odentest/pre-release-with-nightlies@1.0.0-beta.13": {
+      "integrity": "sha512-QTCqS1ugCX0V+dzR8ZlJbLv7IiaTmvobnxaUWoBTLe2zI1jtYOpNA0DGjcR1z7M5X7Lk6jTHiIjF8aj8B53Tsw==",
+      "tarball": "http://localhost:4260/@odentest/pre-release-with-nightlies/1.0.0-beta.13.tgz"
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "npm:@odentest/pre-release-with-nightlies@^1.0.0-beta.13"
+    ]
+  }
+}

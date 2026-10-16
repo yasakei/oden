@@ -1,3 +1,3 @@
-console.log(Deno.env.get("FOO"));
-console.log(Deno.env.get("ANOTHER_FOO"));
-console.log(Deno.env.get("MULTILINE"));
+console.log(Oden.env.get("FOO"));
+console.log(Oden.env.get("ANOTHER_FOO"));
+console.log(Oden.env.get("MULTILINE"));

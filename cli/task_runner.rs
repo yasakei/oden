@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 use std::ffi::OsStr;
@@ -8,9 +8,9 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use deno_core::anyhow::Context;
-use deno_core::error::AnyError;
-use deno_core::futures::future::LocalBoxFuture;
+use oden_core::anyhow::Context;
+use oden_core::error::AnyError;
+use oden_core::futures::future::LocalBoxFuture;
 use deno_task_shell::ExecutableCommand;
 use deno_task_shell::ExecuteResult;
 use deno_task_shell::KillSignal;
@@ -183,10 +183,10 @@ pub async fn run_task(
     .with_context(|| format!("Error parsing script '{}'.", opts.task_name))?;
   let env_vars =
     prepare_env_vars(opts.env_vars, opts.init_cwd, opts.node_modules_bin_dirs);
-  if !opts.custom_commands.contains_key("deno") {
+  if !opts.custom_commands.contains_key("oden") {
     opts
       .custom_commands
-      .insert("deno".to_string(), Rc::new(DenoCommand::default()));
+      .insert("oden".to_string(), Rc::new(OdenCommand::default()));
   }
   let state = deno_task_shell::ShellState::new(
     env_vars,
@@ -301,7 +301,7 @@ pub fn real_env_vars() -> HashMap<OsString, OsString> {
 
 // WARNING: Do not depend on this env var in user code. It's not stable API.
 pub(crate) static USE_PKG_JSON_HIDDEN_ENV_VAR_NAME: &str =
-  "DENO_INTERNAL_TASK_USE_PKG_JSON";
+  "ODEN_INTERNAL_TASK_USE_PKG_JSON";
 
 pub struct NpmCommand;
 
@@ -316,7 +316,7 @@ impl ShellCommand for NpmCommand {
       // we don't handle stuff like `--workspaces` properly
       && !context.args.iter().any(|s| s.to_string_lossy().starts_with('-'))
     {
-      // run with deno task instead
+      // run with oden task instead
       let mut args: Vec<OsString> = Vec::with_capacity(context.args.len());
       args.push("task".into());
       args.extend(context.args.into_iter().skip(1));
@@ -327,7 +327,7 @@ impl ShellCommand for NpmCommand {
         OsStr::new("1"),
       );
       return ExecutableCommand::new(
-        "deno".to_string(),
+        "oden".to_string(),
         std::env::current_exe()
           .and_then(|p| canonicalize_path(&p))
           .unwrap(),
@@ -353,12 +353,12 @@ impl ShellCommand for NpmCommand {
   }
 }
 
-pub struct DenoCommand(ExecutableCommand);
+pub struct OdenCommand(ExecutableCommand);
 
-impl Default for DenoCommand {
+impl Default for OdenCommand {
   fn default() -> Self {
     Self(ExecutableCommand::new(
-      "deno".to_string(),
+      "oden".to_string(),
       std::env::current_exe()
         .and_then(|p| canonicalize_path(&p))
         .unwrap(),
@@ -366,7 +366,7 @@ impl Default for DenoCommand {
   }
 }
 
-impl ShellCommand for DenoCommand {
+impl ShellCommand for OdenCommand {
   fn execute(
     &self,
     context: ShellCommandContext,
@@ -411,7 +411,7 @@ impl ShellCommand for NodeCommand {
       OsStr::new("1"),
     );
     ExecutableCommand::new(
-      "deno".to_string(),
+      "oden".to_string(),
       std::env::current_exe()
         .and_then(|p| canonicalize_path(&p))
         .unwrap(),
@@ -432,7 +432,7 @@ impl ShellCommand for NodeGypCommand {
     context: ShellCommandContext,
   ) -> LocalBoxFuture<'static, ExecuteResult> {
     // at the moment this shell command is just to give a warning if node-gyp is not found
-    // in the future, we could try to run/install node-gyp for the user with deno
+    // in the future, we could try to run/install node-gyp for the user with oden
     if context
       .state
       .resolve_command_path(OsStr::new("node-gyp"))
@@ -511,14 +511,14 @@ impl ShellCommand for NodeModulesFileRunCommand {
     ];
     args.extend(context.args);
     let executable_command = deno_task_shell::ExecutableCommand::new(
-      "deno".to_string(),
+      "oden".to_string(),
       std::env::current_exe()
         .and_then(|p| canonicalize_path(&p))
         .unwrap(),
     );
     // set this environment variable so that the launched process knows the npm command name
     context.state.apply_env_var(
-      OsStr::new("DENO_INTERNAL_NPM_CMD_NAME"),
+      OsStr::new("ODEN_INTERNAL_NPM_CMD_NAME"),
       OsStr::new(&self.command_name),
     );
     executable_command.execute(ShellCommandContext { args, ..context })
@@ -617,7 +617,7 @@ fn resolve_managed_npm_commands(
   Ok(result)
 }
 
-/// Runs a deno task future forwarding any signals received
+/// Runs a oden task future forwarding any signals received
 /// to the process.
 ///
 /// Signal listeners and ctrl+c listening will be setup.
@@ -629,7 +629,7 @@ pub async fn run_future_forwarding_signals<TOutput>(
     future: impl std::future::Future<Output = ()> + 'static,
     token: CancellationToken,
   ) {
-    deno_core::unsync::spawn(async move {
+    oden_core::unsync::spawn(async move {
       tokio::select! {
         _ = future => {}
         _ = token.cancelled() => {}
@@ -667,7 +667,7 @@ async fn listen_ctrl_c(
   kill_signal: KillSignal,
   saved_terminal_mode: crate::util::console::SavedTerminalMode,
 ) {
-  while let Ok(()) = deno_signals::ctrl_c().await {
+  while let Ok(()) = oden_signals::ctrl_c().await {
     // On windows, ctrl+c is sent to the process group, so the signal would
     // have already been sent to the child process. We still want to listen
     // for ctrl+c here to keep the process alive when receiving it, but no
@@ -687,8 +687,8 @@ async fn listen_ctrl_c(
 
 #[cfg(unix)]
 async fn listen_and_forward_all_signals(kill_signal: KillSignal) {
-  use deno_core::futures::FutureExt;
-  use deno_signals::SIGNAL_NUMS;
+  use oden_core::futures::FutureExt;
+  use oden_signals::SIGNAL_NUMS;
 
   // listen and forward every signal we support
   let mut futures = Vec::with_capacity(SIGNAL_NUMS.len());
@@ -700,7 +700,7 @@ async fn listen_and_forward_all_signals(kill_signal: KillSignal) {
     let kill_signal = kill_signal.clone();
     futures.push(
       async move {
-        let Ok(mut stream) = deno_signals::signal_stream(signo) else {
+        let Ok(mut stream) = oden_signals::signal_stream(signo) else {
           return;
         };
         let signal_kind: deno_task_shell::SignalKind = signo.into();
@@ -711,7 +711,7 @@ async fn listen_and_forward_all_signals(kill_signal: KillSignal) {
       .boxed_local(),
     )
   }
-  deno_core::futures::future::join_all(futures).await;
+  oden_core::futures::future::join_all(futures).await;
 }
 
 #[cfg(test)]

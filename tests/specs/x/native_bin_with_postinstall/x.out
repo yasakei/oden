@@ -1,5 +1,5 @@
 Download [WILDLINE]
 Download [WILDLINE]
-Initialize @denotest/deno@1.0.0
-Initialize @denotest/deno@1.0.0: running 'postinstall' script
-deno [WILDCARD]
+Initialize @odentest/oden@1.0.0
+Initialize @odentest/oden@1.0.0: running 'postinstall' script
+oden [WILDCARD]

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![allow(clippy::disallowed_methods, reason = "benchmark code")]
 
@@ -7,13 +7,13 @@ use std::collections::HashMap;
 use std::rc::Rc;
 use std::sync::Arc;
 
-use deno_npm::registry::NpmPackageInfo;
-use deno_npm::registry::NpmRegistryApi;
-use deno_npm::registry::NpmRegistryPackageInfoLoadError;
-use deno_npm::registry::TestNpmRegistryApi;
-use deno_npm::resolution::AddPkgReqsOptions;
-use deno_npm::resolution::NpmResolutionSnapshot;
-use deno_npm::resolution::NpmVersionResolver;
+use oden_npm::registry::NpmPackageInfo;
+use oden_npm::registry::NpmRegistryApi;
+use oden_npm::registry::NpmRegistryPackageInfoLoadError;
+use oden_npm::registry::TestNpmRegistryApi;
+use oden_npm::resolution::AddPkgReqsOptions;
+use oden_npm::resolution::NpmResolutionSnapshot;
+use oden_npm::resolution::NpmVersionResolver;
 use deno_semver::package::PackageReq;
 use reqwest::StatusCode;
 
@@ -120,7 +120,7 @@ struct TargetFolderCachedRegistryApi {
 
 impl Default for TargetFolderCachedRegistryApi {
   fn default() -> Self {
-    std::fs::create_dir_all("target/.deno_npm").unwrap();
+    std::fs::create_dir_all("target/.oden_npm").unwrap();
     Self {
       data: Default::default(),
     }
@@ -166,7 +166,7 @@ impl NpmRegistryApi for TargetFolderCachedRegistryApi {
 }
 
 fn packument_cache_filepath(name: &str) -> String {
-  format!("target/.deno_npm/{}", encode_package_name(name))
+  format!("target/.oden_npm/{}", encode_package_name(name))
 }
 
 fn packument_url(name: &str) -> String {

@@ -1,2 +1,2 @@
-import { sayHello } from "npm:@denotest/say-hello";
+import { sayHello } from "npm:@odentest/say-hello";
 console.log(sayHello());

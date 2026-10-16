@@ -1,9 +1,9 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_core::OpState;
-use deno_core::op2;
-use deno_permissions::PermissionCheckError;
-use deno_permissions::PermissionsContainer;
+use oden_core::OpState;
+use oden_core::op2;
+use oden_permissions::PermissionCheckError;
+use oden_permissions::PermissionsContainer;
 
 // When a node:http / node:https request is routed through a proxy, the socket
 // is connected to the proxy endpoint, so the proxy is the only host the connect

@@ -1,27 +1,27 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_bench_util::bench_js_sync;
-use deno_bench_util::bench_or_profile;
-use deno_bench_util::bencher::Bencher;
-use deno_bench_util::bencher::benchmark_group;
-use deno_core::Extension;
+use oden_bench_util::bench_js_sync;
+use oden_bench_util::bench_or_profile;
+use oden_bench_util::bencher::Bencher;
+use oden_bench_util::bencher::benchmark_group;
+use oden_core::Extension;
 
 #[derive(Clone)]
 struct Permissions;
 
 fn setup() -> Vec<Extension> {
-  deno_core::extension!(
+  oden_core::extension!(
     bench_setup,
     esm_entry_point = "ext:bench_setup/setup",
     esm = ["ext:bench_setup/setup" = {
       source = r#"
-        import { TextDecoder, TextEncoder } from "ext:deno_web/08_text_encoding.js";
+        import { TextDecoder, TextEncoder } from "ext:oden_web/08_text_encoding.js";
         globalThis.TextDecoder = TextDecoder;
         globalThis.TextEncoder = TextEncoder;
-        globalThis.hello12k = Deno.core.encode("hello world\n".repeat(1e3));
-        globalThis.hello120 = Deno.core.encode("hello world\n".repeat(10));
+        globalThis.hello12k = Oden.core.encode("hello world\n".repeat(1e3));
+        globalThis.hello120 = Oden.core.encode("hello world\n".repeat(10));
         // Non-ASCII (4-byte UTF-8 emoji, ~2.4kB): exercises the non-ASCII path.
-        globalThis.utf8_2k = Deno.core.encode("\u{1F600} hello \u{4E2D}".repeat(64));
+        globalThis.utf8_2k = Oden.core.encode("\u{1F600} hello \u{4E2D}".repeat(64));
         globalThis.dec = new TextDecoder();
         globalThis.helloShort = "hello world\n";
         globalThis.encInto = new TextEncoder();
@@ -34,10 +34,10 @@ fn setup() -> Vec<Extension> {
   );
 
   vec![
-    deno_webidl::deno_webidl::init(),
-    deno_web::deno_web::init(
-      std::sync::Arc::new(deno_web::BlobStore::default())
-        as std::sync::Arc<dyn deno_web::BlobStoreTrait>,
+    oden_webidl::oden_webidl::init(),
+    oden_web::oden_web::init(
+      std::sync::Arc::new(oden_web::BlobStore::default())
+        as std::sync::Arc<dyn oden_web::BlobStoreTrait>,
       None,
       Default::default(),
       Default::default(),

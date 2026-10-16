@@ -1,5 +1,5 @@
-import { loadConfigFile } from "npm:@denotest/permissions-outside-package";
+import { loadConfigFile } from "npm:@odentest/permissions-outside-package";
 
-const fileName = `${Deno.cwd()}/foo/config.js`;
+const fileName = `${Oden.cwd()}/foo/config.js`;
 const config = loadConfigFile(fileName);
 console.log(config);

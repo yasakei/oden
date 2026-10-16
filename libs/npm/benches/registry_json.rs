@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::hint::black_box;
 use std::path::PathBuf;
 
-use deno_npm::fast_registry_json;
-use deno_npm::registry::NpmPackageInfo;
-use deno_npm::registry::NpmPackageVersionInfo;
+use oden_npm::fast_registry_json;
+use oden_npm::registry::NpmPackageInfo;
+use oden_npm::registry::NpmPackageVersionInfo;
 use divan::Bencher;
 use rustc_hash::FxHashMap;
 
@@ -97,7 +97,7 @@ fn read_packument(package_name: &str) -> String {
     panic!(
       "failed reading benchmark packument {}: {err}\n\
        set FAST_REGISTRY_JSON_PACKUMENT_DIR to a directory containing \
-       <package>/registry.json files, or set DENO_DIR to a populated Deno cache",
+       <package>/registry.json files, or set ODEN_DIR to a populated Oden cache",
       path.display()
     )
   })
@@ -111,15 +111,15 @@ fn registry_path(package_name: &str) -> PathBuf {
   if let Ok(dir) = std::env::var("FAST_REGISTRY_JSON_PACKUMENT_DIR") {
     return PathBuf::from(dir).join(package_name).join("registry.json");
   }
-  if let Ok(deno_dir) = std::env::var("DENO_DIR") {
-    return PathBuf::from(deno_dir)
+  if let Ok(oden_dir) = std::env::var("ODEN_DIR") {
+    return PathBuf::from(oden_dir)
       .join("npm")
       .join("registry.npmjs.org")
       .join(package_name)
       .join("registry.json");
   }
   panic!(
-    "set FAST_REGISTRY_JSON_PACKUMENT_DIR or DENO_DIR before running \
+    "set FAST_REGISTRY_JSON_PACKUMENT_DIR or ODEN_DIR before running \
      fast-registry-json benchmarks"
   );
 }

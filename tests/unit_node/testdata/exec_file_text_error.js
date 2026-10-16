@@ -1,2 +1,2 @@
 console.error("yikes!");
-Deno.exit(1);
+Oden.exit(1);

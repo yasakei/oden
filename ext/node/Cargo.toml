@@ -1,20 +1,20 @@
-# Copyright 2018-2026 the Deno authors. MIT license.
+# Copyright 2018-2026 the Oden authors. MIT license.
 
 [package]
-name = "deno_node"
+name = "oden_node"
 version = "0.197.0"
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 readme = "README.md"
 repository.workspace = true
-description = "Node compatibility for Deno"
+description = "Node compatibility for Oden"
 
 [lib]
 path = "lib.rs"
 
 [features]
-sync_fs = ["deno_fs/sync_fs", "deno_package_json/sync", "node_resolver/sync"]
+sync_fs = ["oden_fs/sync_fs", "oden_package_json/sync", "node_resolver/sync"]
 
 [dependencies]
 base64.workspace = true
@@ -22,22 +22,22 @@ boxed_error.workspace = true
 brotli.workspace = true
 bytes.workspace = true
 deno_ast = { workspace = true, features = ["type_strip"] }
-deno_core.workspace = true
-deno_dotenv.workspace = true
+oden_core.workspace = true
+oden_dotenv.workspace = true
 deno_error.workspace = true
-deno_fs.workspace = true
-deno_inspector_server.workspace = true
-deno_io.workspace = true
+oden_fs.workspace = true
+oden_inspector_server.workspace = true
+oden_io.workspace = true
 deno_native_certs.workspace = true
-deno_net.workspace = true
-deno_node_crypto.workspace = true
-deno_os.workspace = true
-deno_package_json.workspace = true
+oden_net.workspace = true
+oden_node_crypto.workspace = true
+oden_os.workspace = true
+oden_package_json.workspace = true
 deno_path_util.workspace = true
-deno_permissions.workspace = true
-deno_process.workspace = true
-deno_resolver.workspace = true
-deno_tls.workspace = true
+oden_permissions.workspace = true
+oden_process.workspace = true
+oden_resolver.workspace = true
+oden_tls.workspace = true
 deno_whoami.workspace = true
 filetime.workspace = true
 hdrhistogram.workspace = true
@@ -72,4 +72,4 @@ cc = "1"
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { workspace = true, features = ["Win32_Networking_WinSock", "Win32_NetworkManagement_IpHelper", "Win32_System_Console", "Win32_System_ProcessStatus", "Win32_System_SystemInformation", "Win32_System_Threading"] }
-deno_subprocess_windows.workspace = true
+oden_subprocess_windows.workspace = true

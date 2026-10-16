@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // deno-lint-ignore-file no-console
 
@@ -6,19 +6,19 @@ import { assertEquals, loadTestLibrary } from "./common.js";
 
 const lib = loadTestLibrary();
 
-if (Deno.args[0] === "install") {
+if (Oden.args[0] === "install") {
   lib.installAsyncCleanupHooks();
   console.log("installed async cleanup hooks");
-} else if (Deno.args[0] === "install_remove") {
+} else if (Oden.args[0] === "install_remove") {
   lib.installAndRemoveAsyncCleanupHook();
   console.log("installed and removed async cleanup hook");
 } else {
-  Deno.test("napi async cleanup hooks are called on exit", async () => {
-    const { stdout, stderr, code } = await new Deno.Command(Deno.execPath(), {
+  Oden.test("napi async cleanup hooks are called on exit", async () => {
+    const { stdout, stderr, code } = await new Oden.Command(Oden.execPath(), {
       args: [
         "run",
         "--config",
-        Deno.realPathSync("../config/deno.json"),
+        Oden.realPathSync("../config/oden.json"),
         "--no-lock",
         "-A",
         "--unstable-ffi",
@@ -37,16 +37,16 @@ if (Deno.args[0] === "install") {
     assertEquals(lines[2], "async_cleanup(10)");
   });
 
-  Deno.test(
+  Oden.test(
     "napi removed async cleanup hook is not called on exit",
     async () => {
-      const { stdout, stderr, code } = await new Deno.Command(
-        Deno.execPath(),
+      const { stdout, stderr, code } = await new Oden.Command(
+        Oden.execPath(),
         {
           args: [
             "run",
             "--config",
-            Deno.realPathSync("../config/deno.json"),
+            Oden.realPathSync("../config/oden.json"),
             "--no-lock",
             "-A",
             "--unstable-ffi",

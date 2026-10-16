@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cell::RefCell;
@@ -10,9 +10,9 @@ use brotli::enc::encode::BrotliEncoderOperation;
 use brotli::enc::encode::BrotliEncoderParameter;
 use brotli::enc::encode::BrotliEncoderStateStruct;
 use brotli::ffi;
-use deno_core::op2;
-use deno_core::v8;
-use deno_core::v8_static_strings;
+use oden_core::op2;
+use oden_core::v8;
+use oden_core::v8_static_strings;
 use deno_error::JsErrorBox;
 use libc::c_ulong;
 use zlib::*;
@@ -325,15 +325,15 @@ pub struct Zlib {
 }
 
 // SAFETY: we're sure this can be GCed
-unsafe impl deno_core::GarbageCollected for Zlib {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+unsafe impl oden_core::GarbageCollected for Zlib {
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"Zlib"
   }
 }
 
-impl deno_core::Resource for Zlib {
+impl oden_core::Resource for Zlib {
   fn name(&self) -> Cow<'_, str> {
     "zlib".into()
   }
@@ -604,8 +604,8 @@ pub struct BrotliEncoder {
 }
 
 // SAFETY: we're sure this can be GCed
-unsafe impl deno_core::GarbageCollected for BrotliEncoder {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+unsafe impl oden_core::GarbageCollected for BrotliEncoder {
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"BrotliEncoder"
@@ -819,8 +819,8 @@ pub struct BrotliDecoder {
 }
 
 // SAFETY: we're sure this can be GCed
-unsafe impl deno_core::GarbageCollected for BrotliDecoder {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+unsafe impl oden_core::GarbageCollected for BrotliDecoder {
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"BrotliDecoder"
@@ -1047,8 +1047,8 @@ pub struct ZstdCompress {
 }
 
 // SAFETY: we're sure this can be GCed
-unsafe impl deno_core::GarbageCollected for ZstdCompress {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+unsafe impl oden_core::GarbageCollected for ZstdCompress {
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"ZstdCompress"
@@ -1339,8 +1339,8 @@ pub struct ZstdDecompress {
 }
 
 // SAFETY: we're sure this can be GCed
-unsafe impl deno_core::GarbageCollected for ZstdDecompress {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+unsafe impl oden_core::GarbageCollected for ZstdDecompress {
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"ZstdDecompress"

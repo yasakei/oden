@@ -1,23 +1,23 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use deno_core::FromV8;
-use deno_core::OpState;
-use deno_core::ToV8;
-use deno_core::convert::Uint8Array;
-use deno_core::error::AnyError;
-use deno_core::op2;
+use oden_core::FromV8;
+use oden_core::OpState;
+use oden_core::ToV8;
+use oden_core::convert::Uint8Array;
+use oden_core::error::AnyError;
+use oden_core::op2;
 use deno_error::JsErrorBox;
-use deno_permissions::PermissionsContainer;
+use oden_permissions::PermissionsContainer;
 
-deno_core::extension!(
-  deno_bundle_runtime,
+oden_core::extension!(
+  oden_bundle_runtime,
   deps = [
-    deno_web
+    oden_web
   ],
   ops = [
     op_bundle,
@@ -44,14 +44,14 @@ impl BundleProvider for () {
     _options: BundleOptions,
     _permissions: PermissionsContainer,
   ) -> Result<BuildResponse, AnyError> {
-    // Embedders that don't wire up a real provider (notably `denort`, used
-    // by `deno compile` outputs) fall through to this no-op implementation.
+    // Embedders that don't wire up a real provider (notably `odenrt`, used
+    // by `oden compile` outputs) fall through to this no-op implementation.
     // Surface that limitation directly to the user instead of leaking the
     // historical "default BundleProvider does not do anything" string.
     // See denoland/deno#31597.
-    Err(deno_core::anyhow::anyhow!(
-      "Deno.bundle() is not available in compiled binaries (`deno compile`). \
-       Run with `deno run` instead, or pre-bundle the entrypoints at build time."
+    Err(oden_core::anyhow::anyhow!(
+      "Oden.bundle() is not available in compiled binaries (`oden compile`). \
+       Run with `oden run` instead, or pre-bundle the entrypoints at build time."
     ))
   }
 }
@@ -97,7 +97,7 @@ pub struct BundleOptions {
 pub enum BundlePlatform {
   Browser,
   #[default]
-  Deno,
+  Oden,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Copy, Default, serde::Deserialize)]
@@ -236,7 +236,7 @@ pub async fn op_bundle(
       .cloned()
       .ok_or_else(|| {
         JsErrorBox::generic(
-          "Deno.bundle() requires a runtime permissions context",
+          "Oden.bundle() requires a runtime permissions context",
         )
       })?;
     (

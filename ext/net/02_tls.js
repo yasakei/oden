@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core, internals, primordials } = __bootstrap;
@@ -29,7 +29,7 @@ const {
 const EMPTY_OPTIONS = ObjectFreeze(ObjectSetPrototypeOf({}, null));
 
 const { Conn, Listener, validatePort } = core.loadExtScript(
-  "ext:deno_net/01_net.js",
+  "ext:oden_net/01_net.js",
 );
 
 const _getPeerCertificate = Symbol("getPeerCertificate");
@@ -73,13 +73,13 @@ async function connectTls({
     throw new TypeError(`Unsupported transport: '${transport}'`);
   }
 
-  const keyPair = loadTlsKeyPair("Deno.connectTls", {
+  const keyPair = loadTlsKeyPair("Oden.connectTls", {
     keyFormat,
     cert,
     key,
   });
   // TODO(mmastrac): We only expose this feature via symbol for now. This should actually be a feature
-  // in Deno.connectTls, however.
+  // in Oden.connectTls, however.
   const serverName = arguments[0][serverNameSymbol] ?? null;
   const { 0: rid, 1: localAddr, 2: remoteAddr } = await op_net_connect_tls(
     { hostname, port },
@@ -181,10 +181,10 @@ function listenTls({
 
   if (!hasTlsKeyPairOptions(arguments[0])) {
     throw new TypeError(
-      "A key and certificate are required for `Deno.listenTls`",
+      "A key and certificate are required for `Oden.listenTls`",
     );
   }
-  const keyPair = loadTlsKeyPair("Deno.listenTls", arguments[0]);
+  const keyPair = loadTlsKeyPair("Oden.listenTls", arguments[0]);
   const { 0: rid, 1: localAddr } = op_net_listen_tls(
     { hostname, port },
     { alpnProtocols, reusePort, tcpBacklog },
@@ -251,7 +251,7 @@ function createTlsKeyResolver(callback) {
           if (!hasTlsKeyPairOptions(key)) {
             op_tls_cert_resolver_resolve_error(lookup, sni, "Invalid key");
           } else {
-            const resolved = loadTlsKeyPair("Deno.listenTls", key);
+            const resolved = loadTlsKeyPair("Oden.listenTls", key);
             op_tls_cert_resolver_resolve(lookup, sni, resolved);
           }
         } catch (e) {

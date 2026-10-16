@@ -1,0 +1,17 @@
+{
+  "tempDir": true,
+  "tests": {
+    "oden_exit": {
+      "steps": [
+        {
+          "args": "run --coverage=cov_out main.js",
+          "output": "calling Oden.exit()\n"
+        },
+        {
+          "args": "coverage cov_out",
+          "output": "coverage.out"
+        }
+      ]
+    }
+  }
+}

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 use std::io::BufReader;
@@ -9,14 +9,14 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use deno_core::anyhow::bail;
-use deno_core::error::AnyError;
-use deno_core::parking_lot::Mutex;
-use deno_core::unsync::sync::AtomicFlag;
-use deno_lib::util::hash::FastInsecureHasher;
+use oden_core::anyhow::bail;
+use oden_core::error::AnyError;
+use oden_core::parking_lot::Mutex;
+use oden_core::unsync::sync::AtomicFlag;
+use oden_lib::util::hash::FastInsecureHasher;
 use deno_path_util::get_atomic_path;
-use deno_runtime::code_cache::CodeCache;
-use deno_runtime::code_cache::CodeCacheType;
+use oden_runtime::code_cache::CodeCache;
+use oden_runtime::code_cache::CodeCacheType;
 use url::Url;
 
 enum CodeCacheStrategy {
@@ -25,16 +25,16 @@ enum CodeCacheStrategy {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DenoCompileCodeCacheEntry {
+pub struct OdenCompileCodeCacheEntry {
   pub source_hash: u64,
   pub data: Vec<u8>,
 }
 
-pub struct DenoCompileCodeCache {
+pub struct OdenCompileCodeCache {
   strategy: CodeCacheStrategy,
 }
 
-impl DenoCompileCodeCache {
+impl OdenCompileCodeCache {
   pub fn new(file_path: PathBuf, cache_key: u64) -> Self {
     // attempt to deserialize the cache data
     match deserialize(&file_path, cache_key) {
@@ -74,7 +74,7 @@ impl DenoCompileCodeCache {
     }
   }
 
-  pub fn for_deno_core(self: Arc<Self>) -> Arc<dyn CodeCache> {
+  pub fn for_oden_core(self: Arc<Self>) -> Arc<dyn CodeCache> {
     self.clone()
   }
 
@@ -90,7 +90,7 @@ impl DenoCompileCodeCache {
   }
 }
 
-impl CodeCache for DenoCompileCodeCache {
+impl CodeCache for OdenCompileCodeCache {
   fn get_sync(
     &self,
     specifier: &Url,
@@ -133,7 +133,7 @@ impl CodeCache for DenoCompileCodeCache {
           let mut data = strategy.data.lock();
           data.cache.insert(
             (specifier.to_string(), code_cache_type),
-            DenoCompileCodeCacheEntry {
+            OdenCompileCodeCacheEntry {
               source_hash,
               data: bytes.to_vec(),
             },
@@ -167,7 +167,7 @@ impl CodeCache for DenoCompileCodeCache {
 type CodeCacheKey = (String, CodeCacheType);
 
 struct FirstRunCodeCacheData {
-  cache: HashMap<CodeCacheKey, DenoCompileCodeCacheEntry>,
+  cache: HashMap<CodeCacheKey, OdenCompileCodeCacheEntry>,
   add_count: usize,
 }
 
@@ -181,7 +181,7 @@ struct FirstRunCodeCacheStrategy {
 impl FirstRunCodeCacheStrategy {
   fn write_cache_data(
     &self,
-    cache_data: &HashMap<CodeCacheKey, DenoCompileCodeCacheEntry>,
+    cache_data: &HashMap<CodeCacheKey, OdenCompileCodeCacheEntry>,
   ) {
     let count = cache_data.len();
     let temp_file =
@@ -205,7 +205,7 @@ impl FirstRunCodeCacheStrategy {
 
 struct SubsequentRunCodeCacheStrategy {
   is_finished: AtomicFlag,
-  data: Mutex<HashMap<CodeCacheKey, DenoCompileCodeCacheEntry>>,
+  data: Mutex<HashMap<CodeCacheKey, OdenCompileCodeCacheEntry>>,
 }
 
 impl SubsequentRunCodeCacheStrategy {
@@ -243,7 +243,7 @@ impl SubsequentRunCodeCacheStrategy {
 fn serialize(
   file_path: &Path,
   cache_key: u64,
-  cache: &HashMap<CodeCacheKey, DenoCompileCodeCacheEntry>,
+  cache: &HashMap<CodeCacheKey, OdenCompileCodeCacheEntry>,
 ) -> Result<(), AnyError> {
   let cache_file = std::fs::OpenOptions::new()
     .create(true)
@@ -257,7 +257,7 @@ fn serialize(
 fn serialize_with_writer<T: Write>(
   writer: &mut BufWriter<T>,
   cache_key: u64,
-  cache: &HashMap<CodeCacheKey, DenoCompileCodeCacheEntry>,
+  cache: &HashMap<CodeCacheKey, OdenCompileCodeCacheEntry>,
 ) -> Result<(), AnyError> {
   // header
   writer.write_all(&cache_key.to_le_bytes())?;
@@ -278,7 +278,7 @@ fn serialize_with_writer<T: Write>(
     writer.write_all(specifier.as_bytes())?;
     writer.write_all(&(specifier.len() as u32).to_le_bytes())?;
     writer.write_all(&entry.source_hash.to_le_bytes())?;
-    let hash: u64 = FastInsecureHasher::new_without_deno_version()
+    let hash: u64 = FastInsecureHasher::new_without_oden_version()
       .write(&entry.data)
       .finish();
     writer.write_all(&hash.to_le_bytes())?;
@@ -292,7 +292,7 @@ fn serialize_with_writer<T: Write>(
 fn deserialize(
   file_path: &Path,
   expected_cache_key: u64,
-) -> Result<HashMap<CodeCacheKey, DenoCompileCodeCacheEntry>, AnyError> {
+) -> Result<HashMap<CodeCacheKey, OdenCompileCodeCacheEntry>, AnyError> {
   let cache_file = std::fs::File::open(file_path)?;
   let mut reader = BufReader::new(cache_file);
   deserialize_with_reader(&mut reader, expected_cache_key)
@@ -301,7 +301,7 @@ fn deserialize(
 fn deserialize_with_reader<T: Read>(
   reader: &mut BufReader<T>,
   expected_cache_key: u64,
-) -> Result<HashMap<CodeCacheKey, DenoCompileCodeCacheEntry>, AnyError> {
+) -> Result<HashMap<CodeCacheKey, OdenCompileCodeCacheEntry>, AnyError> {
   // it's very important to use this below so that a corrupt cache file
   // doesn't cause a memory allocation error
   fn new_vec_sized<T: Clone>(
@@ -370,7 +370,7 @@ fn deserialize_with_reader<T: Read>(
     };
     buffer.truncate(code_cache_type_pos);
     let actual_entry_data_hash: u64 =
-      FastInsecureHasher::new_without_deno_version()
+      FastInsecureHasher::new_without_oden_version()
         .write(&buffer)
         .finish();
     if expected_entry_data_hash != actual_entry_data_hash {
@@ -378,7 +378,7 @@ fn deserialize_with_reader<T: Read>(
     }
     map.insert(
       (specifier, code_cache_type),
-      DenoCompileCodeCacheEntry {
+      OdenCompileCodeCacheEntry {
         source_hash,
         data: buffer,
       },
@@ -401,21 +401,21 @@ mod test {
       let mut cache = HashMap::new();
       cache.insert(
         ("specifier1".to_string(), CodeCacheType::EsModule),
-        DenoCompileCodeCacheEntry {
+        OdenCompileCodeCacheEntry {
           source_hash: 1,
           data: vec![1, 2, 3],
         },
       );
       cache.insert(
         ("specifier2".to_string(), CodeCacheType::EsModule),
-        DenoCompileCodeCacheEntry {
+        OdenCompileCodeCacheEntry {
           source_hash: 2,
           data: vec![4, 5, 6],
         },
       );
       cache.insert(
         ("specifier2".to_string(), CodeCacheType::Script),
-        DenoCompileCodeCacheEntry {
+        OdenCompileCodeCacheEntry {
           source_hash: 2,
           data: vec![6, 5, 1],
         },
@@ -460,7 +460,7 @@ mod test {
     let url2 = Url::parse("https://deno.land/example2.js").unwrap();
     // first run
     {
-      let code_cache = DenoCompileCodeCache::new(file_path.clone(), 1234);
+      let code_cache = OdenCompileCodeCache::new(file_path.clone(), 1234);
       assert!(
         code_cache
           .get_sync(&url1, CodeCacheType::EsModule, 0)
@@ -481,7 +481,7 @@ mod test {
     }
     // second run
     {
-      let code_cache = DenoCompileCodeCache::new(file_path.clone(), 1234);
+      let code_cache = OdenCompileCodeCache::new(file_path.clone(), 1234);
       assert!(code_cache.enabled());
       let result1 = code_cache
         .get_sync(&url1, CodeCacheType::EsModule, 0)
@@ -497,7 +497,7 @@ mod test {
 
     // new cache key first run
     {
-      let code_cache = DenoCompileCodeCache::new(file_path.clone(), 54321);
+      let code_cache = OdenCompileCodeCache::new(file_path.clone(), 54321);
       assert!(
         code_cache
           .get_sync(&url1, CodeCacheType::EsModule, 0)
@@ -513,7 +513,7 @@ mod test {
     }
     // new cache key second run
     {
-      let code_cache = DenoCompileCodeCache::new(file_path.clone(), 54321);
+      let code_cache = OdenCompileCodeCache::new(file_path.clone(), 54321);
       let result1 = code_cache
         .get_sync(&url1, CodeCacheType::EsModule, 0)
         .unwrap();

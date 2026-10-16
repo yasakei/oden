@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 
 (function () {
 const { core } = __bootstrap;
 const lazyInspector = core.createLazyLoader("node:inspector");
-const { promisify } = core.loadExtScript("ext:deno_node/internal/util.mjs");
+const { promisify } = core.loadExtScript("ext:oden_node/internal/util.mjs");
 
 const inspector = lazyInspector().default;
 

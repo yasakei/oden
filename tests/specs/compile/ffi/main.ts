@@ -2,10 +2,10 @@ const [libPrefix, libSuffix] = {
   darwin: ["lib", "dylib"],
   linux: ["lib", "so"],
   windows: ["", "dll"],
-}[Deno.build.os];
+}[Oden.build.os];
 const libPath = `${import.meta.dirname}/${libPrefix}test_ffi.${libSuffix}`;
 
-const dylib = Deno.dlopen(
+const dylib = Oden.dlopen(
   libPath,
   {
     print_something: {

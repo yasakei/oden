@@ -1,0 +1,33 @@
+{
+  "version": "5",
+  "specifiers": {
+    "npm:@odentest/add@1.0.0": "1.0.0",
+    "npm:@odentest/esm-basic@1.0.0": "1.0.0"
+  },
+  "npm": {
+    "@odentest/add@1.0.0": {
+      "integrity": "[WILDCARD]",
+      "tarball": "http://localhost:4260/@odentest/add/1.0.0.tgz"
+    },
+    "@odentest/esm-basic@1.0.0": {
+      "integrity": "[WILDCARD]",
+      "tarball": "http://localhost:4260/@odentest/esm-basic/1.0.0.tgz"
+    }
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@odentest/add@1.0.0"
+      ]
+    },
+    "members": {
+      "packages/app": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@odentest/esm-basic@1.0.0"
+          ]
+        }
+      }
+    }
+  }
+}

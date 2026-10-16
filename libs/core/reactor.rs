@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! Reactor abstraction for timer and I/O primitives.
 //!
@@ -17,7 +17,7 @@ use std::task::Poll;
 use std::time::Duration;
 
 /// Abstraction over the async I/O reactor (tokio, mio, io_uring, custom).
-/// This is the only seam between deno_core and the underlying async runtime.
+/// This is the only seam between oden_core and the underlying async runtime.
 pub trait Reactor: 'static {
   type Timer: ReactorTimer;
   type Instant: ReactorInstant;

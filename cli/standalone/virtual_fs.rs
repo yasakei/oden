@@ -1,19 +1,19 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::collections::HashSet;
 use std::path::PathBuf;
 
-use deno_lib::standalone::virtual_fs::BuiltVfs;
-use deno_lib::standalone::virtual_fs::DENO_COMPILE_GLOBAL_NODE_MODULES_DIR_NAME;
-use deno_lib::standalone::virtual_fs::OffsetWithLength;
-use deno_lib::standalone::virtual_fs::VfsEntry;
-use deno_lib::standalone::virtual_fs::VirtualDirectory;
-use deno_lib::standalone::virtual_fs::VirtualDirectoryEntries;
-use deno_lib::standalone::virtual_fs::VirtualFile;
-use deno_lib::standalone::virtual_fs::VirtualSymlinkParts;
-use deno_lib::standalone::virtual_fs::WindowsSystemRootablePath;
-use deno_resolver::display::DisplayTreeNode;
+use oden_lib::standalone::virtual_fs::BuiltVfs;
+use oden_lib::standalone::virtual_fs::ODEN_COMPILE_GLOBAL_NODE_MODULES_DIR_NAME;
+use oden_lib::standalone::virtual_fs::OffsetWithLength;
+use oden_lib::standalone::virtual_fs::VfsEntry;
+use oden_lib::standalone::virtual_fs::VirtualDirectory;
+use oden_lib::standalone::virtual_fs::VirtualDirectoryEntries;
+use oden_lib::standalone::virtual_fs::VirtualFile;
+use oden_lib::standalone::virtual_fs::VirtualSymlinkParts;
+use oden_lib::standalone::virtual_fs::WindowsSystemRootablePath;
+use oden_resolver::display::DisplayTreeNode;
 
 use crate::util::display::human_size;
 
@@ -271,7 +271,7 @@ fn vfs_as_display_tree(
     }
 
     // in this scenario, we want to show
-    // .deno_compile_node_modules/localhost/<package_name>/<version>/*
+    // .oden_compile_node_modules/localhost/<package_name>/<version>/*
     show_subset(vfs_dir, 3, seen_offsets)
   }
 
@@ -310,7 +310,7 @@ fn vfs_as_display_tree(
     vfs_dir: &'a VirtualDirectory,
     seen_offsets: &mut HashSet<u64>,
   ) -> EntryOutput<'a> {
-    if vfs_dir.name == DENO_COMPILE_GLOBAL_NODE_MODULES_DIR_NAME {
+    if vfs_dir.name == ODEN_COMPILE_GLOBAL_NODE_MODULES_DIR_NAME {
       return EntryOutput::Subset(show_global_node_modules_dir(
         vfs_dir,
         seen_offsets,
@@ -338,7 +338,7 @@ fn vfs_as_display_tree(
       } else {
         EntryOutput::Subset(children)
       }
-    } else if vfs_dir.name == DENO_COMPILE_GLOBAL_NODE_MODULES_DIR_NAME {
+    } else if vfs_dir.name == ODEN_COMPILE_GLOBAL_NODE_MODULES_DIR_NAME {
       EntryOutput::Subset(show_global_node_modules_dir(vfs_dir, seen_offsets))
     } else {
       EntryOutput::Subset(include_all_entries(
@@ -369,7 +369,7 @@ fn vfs_as_display_tree(
 #[cfg(test)]
 mod test {
   use console_static_text::ansi::strip_ansi_codes;
-  use deno_lib::standalone::virtual_fs::VfsBuilder;
+  use oden_lib::standalone::virtual_fs::VfsBuilder;
   use pretty_assertions::assert_eq;
   use test_util::TempDir;
 

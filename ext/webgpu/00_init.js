@@ -1,9 +1,9 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core } = __bootstrap;
 
-const loadWebGPU = core.createLazyLoader("ext:deno_webgpu/01_webgpu.js");
+const loadWebGPU = core.createLazyLoader("ext:oden_webgpu/01_webgpu.js");
 
 return { loadWebGPU };
 })();

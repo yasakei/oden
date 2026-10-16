@@ -1,3 +1,3 @@
-Deno.bench("no prompt", async () => {
-  await Deno.readTextFile("./some_file.txt");
+Oden.bench("no prompt", async () => {
+  await Oden.readTextFile("./some_file.txt");
 });

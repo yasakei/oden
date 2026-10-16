@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cell::RefCell;
@@ -15,32 +15,32 @@ use std::sync::Arc;
 
 use dashmap::DashMap;
 use deno_ast::MediaType;
-use deno_cache_dir::GlobalOrLocalHttpCache;
-use deno_cache_dir::file_fetcher::CacheSetting;
-use deno_core::ModuleSpecifier;
-use deno_core::anyhow::anyhow;
-use deno_core::error::AnyError;
-use deno_core::futures::FutureExt;
-use deno_core::parking_lot::Mutex;
-use deno_core::serde_json;
-use deno_core::serde_json::Value;
-use deno_core::serde_json::json;
-use deno_core::unsync::spawn;
-use deno_core::url;
-use deno_core::url::Url;
+use oden_cache_dir::GlobalOrLocalHttpCache;
+use oden_cache_dir::file_fetcher::CacheSetting;
+use oden_core::ModuleSpecifier;
+use oden_core::anyhow::anyhow;
+use oden_core::error::AnyError;
+use oden_core::futures::FutureExt;
+use oden_core::parking_lot::Mutex;
+use oden_core::serde_json;
+use oden_core::serde_json::Value;
+use oden_core::serde_json::json;
+use oden_core::unsync::spawn;
+use oden_core::url;
+use oden_core::url::Url;
 use deno_graph::CheckJsOption;
 use deno_graph::GraphKind;
 use deno_graph::Resolution;
-use deno_lib::args::CaData;
-use deno_lib::args::get_root_cert_store;
-use deno_lib::version::DENO_VERSION_INFO;
-use deno_npm::resolution::NpmVersionResolver;
-use deno_npm_installer::graph::NpmCachingStrategy;
+use oden_lib::args::CaData;
+use oden_lib::args::get_root_cert_store;
+use oden_lib::version::ODEN_VERSION_INFO;
+use oden_npm::resolution::NpmVersionResolver;
+use oden_npm_installer::graph::NpmCachingStrategy;
 use deno_path_util::url_to_file_path;
-use deno_resolver::deno_json::CompilerOptionsKey;
-use deno_resolver::loader::MemoryFilesRc;
-use deno_runtime::deno_tls::RootCertStoreProvider;
-use deno_runtime::deno_tls::rustls::RootCertStore;
+use oden_resolver::oden_json::CompilerOptionsKey;
+use oden_resolver::loader::MemoryFilesRc;
+use oden_runtime::oden_tls::RootCertStoreProvider;
+use oden_runtime::oden_tls::rustls::RootCertStore;
 use deno_semver::jsr::JsrPackageReqReference;
 use indexmap::IndexSet;
 use log::error;
@@ -110,7 +110,7 @@ use crate::http_util::HttpClientProvider;
 use crate::lsp::compiler_options::LspCompilerOptionsResolver;
 use crate::lsp::completions::CompletionItemData;
 use crate::lsp::config::ConfigWatchedFileType;
-use crate::lsp::diagnostics::DenoDiagnostic;
+use crate::lsp::diagnostics::OdenDiagnostic;
 use crate::lsp::diagnostics::generate_import_map_diagnostics;
 use crate::lsp::diagnostics::generate_module_diagnostics;
 use crate::lsp::lint::LspLinterResolver;
@@ -392,8 +392,8 @@ impl LanguageServer {
     }
   }
 
-  /// Similar to `deno install --entrypoint` on the command line, where modules will be cached
-  /// in the Deno cache, including any of their dependencies.
+  /// Similar to `oden install --entrypoint` on the command line, where modules will be cached
+  /// in the Oden cache, including any of their dependencies.
   #[cfg_attr(feature = "lsp-tracing", tracing::instrument(skip_all))]
   pub async fn cache(
     &self,
@@ -627,7 +627,7 @@ impl Inner {
     let cache = LspCache::default();
     let http_client_provider = Arc::new(HttpClientProvider::new(None, None));
     let module_registry = ModuleRegistry::new(
-      cache.deno_dir().registries_folder_path(),
+      cache.oden_dir().registries_folder_path(),
       http_client_provider.clone(),
     );
     let jsr_search_api =
@@ -695,7 +695,7 @@ impl Inner {
     let Some(document) = self.document_modules.documents.get(uri) else {
       match exists {
         Exists::Enforce
-          if !uri.scheme().as_str().eq_ignore_ascii_case("deno") =>
+          if !uri.scheme().as_str().eq_ignore_ascii_case("oden") =>
         {
           return Err(LspError::invalid_params(format!(
             "Unable to find document for: {}",
@@ -776,7 +776,7 @@ impl Inner {
         .tracing
         .clone()
         .or_else(|| {
-          std::env::var("DENO_LSP_TRACE").ok().map(|_| {
+          std::env::var("ODEN_LSP_TRACE").ok().map(|_| {
             super::trace::TracingConfig {
               enable: true,
               ..Default::default()
@@ -820,7 +820,7 @@ impl Inner {
       }
     });
     self.cache = LspCache::new(global_cache_url);
-    let deno_dir = self.cache.deno_dir();
+    let oden_dir = self.cache.oden_dir();
     let workspace_settings = self.config.workspace_settings();
     let maybe_root_path = self
       .config
@@ -843,7 +843,7 @@ impl Inner {
         .clone(),
     ));
     self.module_registry = ModuleRegistry::new(
-      deno_dir.registries_folder_path(),
+      oden_dir.registries_folder_path(),
       self.http_client_provider.clone(),
     );
     let workspace_settings = self.config.workspace_settings();
@@ -934,7 +934,7 @@ impl Inner {
     &mut self,
     params: InitializeParams,
   ) -> LspResult<InitializeResult> {
-    lsp_log!("Starting Deno language server...");
+    lsp_log!("Starting Oden language server...");
     let mark = self.performance.mark_with_args("lsp.initialize", &params);
 
     // exit this process when the parent is lost
@@ -944,7 +944,7 @@ impl Inner {
 
     let version = format!(
       "{} ({}, {})",
-      DENO_VERSION_INFO.deno,
+      ODEN_VERSION_INFO.oden,
       env!("PROFILE"),
       env!("TARGET")
     );
@@ -954,7 +954,7 @@ impl Inner {
     }
 
     let server_info = ServerInfo {
-      name: "deno-language-server".to_string(),
+      name: "oden-language-server".to_string(),
       version: Some(version),
     };
 
@@ -1096,8 +1096,8 @@ impl Inner {
       }
     }
     for root_ancestor in root_ancestors {
-      for deno_json in ["deno.json", "deno.jsonc"] {
-        let path = root_ancestor.join(deno_json);
+      for oden_json in ["oden.json", "oden.jsonc"] {
+        let path = root_ancestor.join(oden_json);
         if path.exists() {
           workspace_files.insert(path);
         }
@@ -1136,7 +1136,7 @@ impl Inner {
           ) {
             continue;
           }
-          // ignore cargo target directories for anyone using Deno with Rust
+          // ignore cargo target directories for anyone using Oden with Rust
           if dir_name == "target"
             && path
               .parent()
@@ -1208,9 +1208,9 @@ impl Inner {
         lsp_warn!(
           concat!(
             "Hit the language server document preload limit of {} file system entries. ",
-            "You may want to use the \"deno.enablePaths\" configuration setting to only have Deno ",
-            "partially enable a workspace or increase the limit via \"deno.documentPreloadLimit\". ",
-            "In cases where Deno ends up using too much memory, you may want to lower the limit."
+            "You may want to use the \"oden.enablePaths\" configuration setting to only have Oden ",
+            "partially enable a workspace or increase the limit via \"oden.documentPreloadLimit\". ",
+            "In cases where Oden ends up using too much memory, you may want to lower the limit."
           ),
           document_preload_limit,
         );
@@ -1223,8 +1223,8 @@ impl Inner {
   #[cfg_attr(feature = "lsp-tracing", tracing::instrument(skip_all))]
   async fn refresh_config_tree(&mut self, reason: &str) {
     let file_fetcher = create_cli_file_fetcher(
-      Arc::new(deno_runtime::deno_web::BlobStore::default())
-        as Arc<dyn deno_runtime::deno_web::BlobStoreTrait>,
+      Arc::new(oden_runtime::oden_web::BlobStore::default())
+        as Arc<dyn oden_runtime::oden_web::BlobStoreTrait>,
       GlobalOrLocalHttpCache::Global(self.cache.global().clone()),
       self.http_client_provider.clone(),
       MemoryFilesRc::default(),
@@ -1245,13 +1245,13 @@ impl Inner {
         &self.workspace_files,
         &file_fetcher,
         &self.http_client_provider,
-        self.cache.deno_dir(),
+        self.cache.oden_dir(),
         reason,
       )
       .await;
     self
       .client
-      .send_did_refresh_deno_configuration_tree_notification(
+      .send_did_refresh_oden_configuration_tree_notification(
         self.config.tree.to_did_refresh_params(),
       );
   }
@@ -1314,14 +1314,14 @@ impl Inner {
   #[cfg_attr(feature = "lsp-tracing", tracing::instrument(skip_all))]
   fn did_open(&mut self, params: DidOpenTextDocumentParams) {
     let mark = self.performance.mark_with_args("lsp.did_open", &params);
-    // `deno:` documents are read-only and should only be handled as server
+    // `oden:` documents are read-only and should only be handled as server
     // documents.
     if params
       .text_document
       .uri
       .scheme()
       .as_str()
-      .eq_ignore_ascii_case("deno")
+      .eq_ignore_ascii_case("oden")
     {
       return;
     }
@@ -1366,13 +1366,13 @@ impl Inner {
     let mark = self
       .performance
       .mark_with_args("lsp.did_change_batched", &batch_queue.uri);
-    // `deno:` documents are read-only and should only be handled as server
+    // `oden:` documents are read-only and should only be handled as server
     // documents.
     if batch_queue
       .uri
       .scheme()
       .as_str()
-      .eq_ignore_ascii_case("deno")
+      .eq_ignore_ascii_case("oden")
     {
       batch_queue.clear();
       return;
@@ -1495,14 +1495,14 @@ impl Inner {
   #[cfg_attr(feature = "lsp-tracing", tracing::instrument(skip_all))]
   fn did_close(&mut self, params: DidCloseTextDocumentParams) {
     let mark = self.performance.mark_with_args("lsp.did_close", &params);
-    // `deno:` documents are read-only and should only be handled as server
+    // `oden:` documents are read-only and should only be handled as server
     // documents.
     if params
       .text_document
       .uri
       .scheme()
       .as_str()
-      .eq_ignore_ascii_case("deno")
+      .eq_ignore_ascii_case("oden")
     {
       return;
     }
@@ -1638,13 +1638,13 @@ impl Inner {
   ) {
     if !self.config.workspace_configuration_capable() {
       let config = params.settings.as_object().map(|settings| {
-        let deno =
+        let oden =
           serde_json::to_value(settings.get(SETTINGS_SECTION)).unwrap();
         let javascript =
           serde_json::to_value(settings.get("javascript")).unwrap();
         let typescript =
           serde_json::to_value(settings.get("typescript")).unwrap();
-        WorkspaceSettings::from_raw_settings(deno, javascript, typescript)
+        WorkspaceSettings::from_raw_settings(oden, javascript, typescript)
       });
       if let Some(settings) = config {
         self.config.set_workspace_settings(settings, vec![]);
@@ -1712,36 +1712,36 @@ impl Inner {
     let has_config_changes = changes.iter().any(|(specifier, _)| {
       let path = specifier.path();
       !path.contains("/node_modules/")
-        && (path.ends_with("/deno.json")
-          || path.ends_with("/deno.jsonc")
+        && (path.ends_with("/oden.json")
+          || path.ends_with("/oden.jsonc")
           || path.ends_with("/package.json")
           || path.ends_with("/tsconfig.json"))
         || path.ends_with("/node_modules/.package-lock.json")
         || path.ends_with("/node_modules/.yarn-integrity.json")
         || path.ends_with("/node_modules/.modules.yaml")
-        || path.ends_with("/node_modules/.deno/.setup-cache.bin")
+        || path.ends_with("/node_modules/.oden/.setup-cache.bin")
         || self.config.tree.is_watched_file(specifier)
         || self.compiler_options_resolver.is_watched_file(specifier)
     });
     if has_config_changes {
-      let mut deno_config_changes = IndexSet::with_capacity(changes.len());
-      let mut changed_deno_json = false;
-      deno_config_changes.extend(changes.iter().filter_map(|(s, e)| {
+      let mut oden_config_changes = IndexSet::with_capacity(changes.len());
+      let mut changed_oden_json = false;
+      oden_config_changes.extend(changes.iter().filter_map(|(s, e)| {
         self.config.tree.watched_file_type(s).and_then(|t| {
           let configuration_type = match t.1 {
-            ConfigWatchedFileType::DenoJson => {
-              changed_deno_json = true;
-              lsp_custom::DenoConfigurationType::DenoJson
+            ConfigWatchedFileType::OdenJson => {
+              changed_oden_json = true;
+              lsp_custom::OdenConfigurationType::OdenJson
             }
             ConfigWatchedFileType::PackageJson => {
-              lsp_custom::DenoConfigurationType::PackageJson
+              lsp_custom::OdenConfigurationType::PackageJson
             }
             _ => return None,
           };
-          Some(lsp_custom::DenoConfigurationChangeEvent {
+          Some(lsp_custom::OdenConfigurationChangeEvent {
             scope_uri: url_to_uri(t.0).ok()?,
             file_uri: e.uri.clone(),
-            typ: lsp_custom::DenoConfigurationChangeType::from_file_change_type(
+            typ: lsp_custom::OdenConfigurationChangeType::from_file_change_type(
               e.typ,
             ),
             configuration_type,
@@ -1775,31 +1775,31 @@ impl Inner {
         self.client.refresh_diagnostics();
       }
       self.send_testing_update();
-      deno_config_changes.extend(changes.iter().filter_map(|(s, e)| {
+      oden_config_changes.extend(changes.iter().filter_map(|(s, e)| {
         self.config.tree.watched_file_type(s).and_then(|t| {
           let configuration_type = match t.1 {
-            ConfigWatchedFileType::DenoJson => {
-              lsp_custom::DenoConfigurationType::DenoJson
+            ConfigWatchedFileType::OdenJson => {
+              lsp_custom::OdenConfigurationType::OdenJson
             }
             ConfigWatchedFileType::PackageJson => {
-              lsp_custom::DenoConfigurationType::PackageJson
+              lsp_custom::OdenConfigurationType::PackageJson
             }
             _ => return None,
           };
-          Some(lsp_custom::DenoConfigurationChangeEvent {
+          Some(lsp_custom::OdenConfigurationChangeEvent {
             scope_uri: url_to_uri(t.0).ok()?,
             file_uri: e.uri.clone(),
-            typ: lsp_custom::DenoConfigurationChangeType::from_file_change_type(
+            typ: lsp_custom::OdenConfigurationChangeType::from_file_change_type(
               e.typ,
             ),
             configuration_type,
           })
         })
       }));
-      if !deno_config_changes.is_empty() {
-        self.client.send_did_change_deno_configuration_notification(
-          lsp_custom::DidChangeDenoConfigurationNotificationParams {
-            changes: deno_config_changes.into_iter().collect(),
+      if !oden_config_changes.is_empty() {
+        self.client.send_did_change_oden_configuration_notification(
+          lsp_custom::DidChangeOdenConfigurationNotificationParams {
+            changes: oden_config_changes.into_iter().collect(),
           },
         );
       }
@@ -1901,14 +1901,14 @@ impl Inner {
       })?;
 
     // spawn a blocking task to allow doing other work while this is occurring
-    let text_edits = deno_core::unsync::spawn_blocking({
+    let text_edits = oden_core::unsync::spawn_blocking({
       let mut fmt_options = fmt_config.options.clone();
       let config_data = self.config.tree.data_for_specifier(&module.specifier);
       #[allow(
         clippy::nonminimal_bool,
         reason = "clippy's suggestion is more confusing"
       )]
-      if !config_data.is_some_and(|d| d.maybe_deno_json().is_some()) {
+      if !config_data.is_some_and(|d| d.maybe_oden_json().is_some()) {
         fmt_options.use_tabs = Some(!params.options.insert_spaces);
         fmt_options.indent_width = Some(params.options.tab_size as u8);
       }
@@ -2175,14 +2175,14 @@ impl Inner {
         .diagnostics
         .iter()
         .filter(|diagnostic| {
-          diagnostic.source.as_deref() == Some("deno")
-            && diagnostics::DenoDiagnostic::is_fixable(diagnostic)
+          diagnostic.source.as_deref() == Some("oden")
+            && diagnostics::OdenDiagnostic::is_fixable(diagnostic)
         })
         .filter_map(|diagnostic| {
-          DenoDiagnostic::get_code_action(document.uri(), &url, diagnostic)
+          OdenDiagnostic::get_code_action(document.uri(), &url, diagnostic)
             .inspect_err(|err| {
               lsp_warn!(
-                "Error getting deno code action: {:#}\nDiagnostic: {:#?}",
+                "Error getting oden code action: {:#}\nDiagnostic: {:#?}",
                 err,
                 diagnostic
               );
@@ -2214,9 +2214,9 @@ impl Inner {
     let Some(module) = self.get_primary_module(&document)? else {
       return Ok(None);
     };
-    let mut deno_actions = Vec::new();
+    let mut oden_actions = Vec::new();
     let mut deno_lint_actions = Vec::new();
-    let mut deno_test_actions = Vec::new();
+    let mut oden_test_actions = Vec::new();
     let mut includes_no_cache = false;
     if params.context.only.as_ref().is_none_or(|only| {
       only.iter().any(|kind| {
@@ -2242,7 +2242,7 @@ impl Inner {
           }
         })?;
       if let Some(response) = response {
-        deno_actions.push(CodeAction {
+        oden_actions.push(CodeAction {
           title: "Copy inferred type".to_string(),
           kind: Some(INFERRED_TYPE_CODE_ACTION_KIND.clone()),
           command: Some(Command {
@@ -2288,7 +2288,7 @@ impl Inner {
         })
       })
     {
-      deno_test_actions.extend(collect_test_code_actions(
+      oden_test_actions.extend(collect_test_code_actions(
         document.uri(),
         parsed_source,
         params.range,
@@ -2307,8 +2307,8 @@ impl Inner {
     .shared();
     for diagnostic in &params.context.diagnostics {
       match diagnostic.source.as_deref() {
-        Some("deno") => {
-          if !diagnostics::DenoDiagnostic::is_fixable(diagnostic) {
+        Some("oden") => {
+          if !diagnostics::OdenDiagnostic::is_fixable(diagnostic) {
             continue;
           }
           if diagnostic.code
@@ -2320,17 +2320,17 @@ impl Inner {
           {
             includes_no_cache = true;
           }
-          match DenoDiagnostic::get_code_action(
+          match OdenDiagnostic::get_code_action(
             document.uri(),
             &module.specifier,
             diagnostic,
           ) {
             Ok(action) => {
-              deno_actions.push(action);
+              oden_actions.push(action);
             }
             Err(err) => {
               lsp_warn!(
-                "Error getting deno code action: {:#}\nDiagnostic: {:#?}",
+                "Error getting oden code action: {:#}\nDiagnostic: {:#?}",
                 err,
                 diagnostic
               );
@@ -2348,7 +2348,7 @@ impl Inner {
             }
             Err(err) => {
               lsp_warn!(
-                "Error getting deno lint code actions: {:#}\nDiagnostic: {:#?}",
+                "Error getting oden lint code actions: {:#}\nDiagnostic: {:#?}",
                 err,
                 diagnostic
               );
@@ -2393,13 +2393,13 @@ impl Inner {
           })
           .collect::<HashSet<_>>();
         if uncached_deps.len() > 1 {
-          deno_actions.push(CodeAction {
+          oden_actions.push(CodeAction {
             title: "Cache all dependencies of this module.".to_string(),
             kind: Some(CodeActionKind::QUICKFIX),
             diagnostics: Some(no_cache_diagnostics.as_ref().clone()),
             command: Some(Command {
               title: "".to_string(),
-              command: "deno.cache".to_string(),
+              command: "oden.cache".to_string(),
               arguments: Some(vec![json!([]), json!(&module.specifier)]),
             }),
             ..Default::default()
@@ -2414,7 +2414,7 @@ impl Inner {
         params.range,
         &params.context,
         file_diagnostics,
-        !deno_actions.is_empty(),
+        !oden_actions.is_empty(),
         self,
         self.snapshot(),
         token,
@@ -2435,7 +2435,7 @@ impl Inner {
 
     let code_action_disabled_capable =
       self.config.code_action_disabled_capable();
-    let actions = deno_actions.into_iter().map(CodeActionOrCommand::CodeAction).chain(deno_test_actions.into_iter().map(CodeActionOrCommand::CodeAction)).chain(ts_actions).chain(deno_lint_actions.into_iter().map(CodeActionOrCommand::CodeAction)).filter(|a| code_action_disabled_capable
+    let actions = oden_actions.into_iter().map(CodeActionOrCommand::CodeAction).chain(oden_test_actions.into_iter().map(CodeActionOrCommand::CodeAction)).chain(ts_actions).chain(deno_lint_actions.into_iter().map(CodeActionOrCommand::CodeAction)).filter(|a| code_action_disabled_capable
         || matches!(a, CodeActionOrCommand::CodeAction(ca) if ca.disabled.is_none())).collect::<Vec<_>>();
     let response = if actions.is_empty() {
       None
@@ -2498,7 +2498,7 @@ impl Inner {
           }
         })?;
       if combined_code_actions.commands.is_some() {
-        error!("Deno does not support code actions with commands.");
+        error!("Oden does not support code actions with commands.");
         return Err(LspError::invalid_request());
       }
 
@@ -2921,7 +2921,7 @@ impl Inner {
   ) -> LspResult<Option<CompletionResponse>> {
     let mark = self.performance.mark_with_args("lsp.completion", &params);
     let uri = &params.text_document_position.text_document.uri;
-    // Handle completions inside Deno configuration files (deno.json/jsonc)
+    // Handle completions inside Oden configuration files (oden.json/jsonc)
     // separately, since they're not "diagnosable" documents but still benefit
     // from registry (jsr:/npm:/node:) import-specifier completion in the
     // `imports` and `scopes` fields. Use `Enabled::Ignore` because a config
@@ -2935,8 +2935,8 @@ impl Inner {
       && matches!(open_doc.language_id, LanguageId::Json | LanguageId::JsonC)
     {
       let url = uri_to_url(uri);
-      if completions::is_deno_config_url(&url) {
-        let response = completions::get_deno_json_import_completions(
+      if completions::is_oden_config_url(&url) {
+        let response = completions::get_oden_json_import_completions(
           &url,
           &open_doc.text,
           &open_doc.line_index,
@@ -2967,7 +2967,7 @@ impl Inner {
       return Ok(None);
     }
 
-    // Import specifiers are something wholly internal to Deno, so for
+    // Import specifiers are something wholly internal to Oden, so for
     // completions, we will use internal logic and if there are completions
     // for imports, we will return those and not send a message into tsc, where
     // other completions come from.
@@ -3732,7 +3732,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
     _token: CancellationToken,
   ) -> LspResult<Option<Value>> {
     self.init_flag.wait_raised().await;
-    if params.command == "deno.cache" {
+    if params.command == "oden.cache" {
       #[derive(Default, Deserialize)]
       #[serde(rename_all = "camelCase")]
       struct Options {
@@ -3747,7 +3747,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
       self
         .cache(specifiers, referrer, options.force_global_cache)
         .await
-    } else if params.command == "deno.reloadImportRegistries" {
+    } else if params.command == "oden.reloadImportRegistries" {
       *self.did_change_batch_queue.borrow_mut() = None;
       self.inner.write().await.reload_import_registries().await
     } else {
@@ -4319,30 +4319,30 @@ impl Inner {
       let Ok(scope_uri) = url_to_uri(scope_url) else {
         continue;
       };
-      if let Some(config_file) = config_data.maybe_deno_json()
+      if let Some(config_file) = config_data.maybe_oden_json()
         && let Ok(file_uri) = url_to_uri(&config_file.specifier)
       {
-        config_events.push(lsp_custom::DenoConfigurationChangeEvent {
+        config_events.push(lsp_custom::OdenConfigurationChangeEvent {
           scope_uri: scope_uri.clone(),
           file_uri,
-          typ: lsp_custom::DenoConfigurationChangeType::Added,
-          configuration_type: lsp_custom::DenoConfigurationType::DenoJson,
+          typ: lsp_custom::OdenConfigurationChangeType::Added,
+          configuration_type: lsp_custom::OdenConfigurationType::OdenJson,
         });
       }
       if let Some(package_json) = config_data.maybe_pkg_json()
         && let Ok(file_uri) = url_to_uri(&package_json.specifier())
       {
-        config_events.push(lsp_custom::DenoConfigurationChangeEvent {
+        config_events.push(lsp_custom::OdenConfigurationChangeEvent {
           scope_uri,
           file_uri,
-          typ: lsp_custom::DenoConfigurationChangeType::Added,
-          configuration_type: lsp_custom::DenoConfigurationType::PackageJson,
+          typ: lsp_custom::OdenConfigurationChangeType::Added,
+          configuration_type: lsp_custom::OdenConfigurationType::PackageJson,
         });
       }
     }
     if !config_events.is_empty() {
-      self.client.send_did_change_deno_configuration_notification(
-        lsp_custom::DidChangeDenoConfigurationNotificationParams {
+      self.client.send_did_change_oden_configuration_notification(
+        lsp_custom::DidChangeOdenConfigurationNotificationParams {
           changes: config_events,
         },
       );
@@ -4416,7 +4416,7 @@ impl Inner {
       .unwrap_or_else(|| self.initial_cwd.clone());
     let mut cli_factory = CliFactory::from_flags(Arc::new(Flags {
       internal: InternalFlags {
-        cache_path: Some(self.cache.deno_dir().root.clone()),
+        cache_path: Some(self.cache.oden_dir().root.clone()),
         lockfile_skip_write: true,
         ..Default::default()
       },
@@ -4665,7 +4665,7 @@ impl Inner {
       .uri
       .scheme()
       .as_str()
-      .eq_ignore_ascii_case("deno")
+      .eq_ignore_ascii_case("oden")
       && params.text_document.uri.path().as_str() == "/status.md"
     {
       let mut contents = String::new();
@@ -4681,7 +4681,7 @@ impl Inner {
 
       write!(
         contents,
-        r#"# Deno Language Server Status
+        r#"# Oden Language Server Status
 
 ## Workspace Settings
 
@@ -4872,7 +4872,7 @@ mod tests {
     temp_dir.write("root3/mod.ts", ""); // no, not enabled
 
     temp_dir.create_dir_all("root4_parent/root4");
-    temp_dir.write("root4_parent/deno.json", ""); // yes, enabled as deno.json above root
+    temp_dir.write("root4_parent/oden.json", ""); // yes, enabled as oden.json above root
     temp_dir.write("root4_parent/root4/main.ts", ""); // yes, enabled
 
     let mut config = Config::new_with_roots(vec![
@@ -4942,7 +4942,7 @@ mod tests {
     assert_eq!(
       json!(workspace_files),
       json!([
-        temp_dir.url().join("root4_parent/deno.json").unwrap(),
+        temp_dir.url().join("root4_parent/oden.json").unwrap(),
         temp_dir.url().join("root1/mod0.ts").unwrap(),
         temp_dir.url().join("root1/mod1.js").unwrap(),
         temp_dir.url().join("root1/mod2.tsx").unwrap(),
@@ -4971,7 +4971,7 @@ mod tests {
     let temp_dir = TempDir::new();
     temp_dir.write("repo/root.ts", ""); // no, root is disabled
     temp_dir.write(
-      "repo/apps/backend/deno.json",
+      "repo/apps/backend/oden.json",
       r#"{ "importMap": "import_map.json" }"#,
     ); // yes
     temp_dir.write(
@@ -5042,7 +5042,7 @@ mod tests {
     assert_eq!(
       json!(workspace_files),
       json!([
-        backend_url.join("deno.json").unwrap(),
+        backend_url.join("oden.json").unwrap(),
         backend_url.join("import_map.json").unwrap(),
         backend_url.join("src/run.ts").unwrap(),
       ])

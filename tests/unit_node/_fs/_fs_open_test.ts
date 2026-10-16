@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   O_APPEND,
   O_CREAT,
@@ -24,12 +24,12 @@ import {
 import { open as openPromise } from "node:fs/promises";
 import { join, parse } from "node:path";
 
-const tempDir = parse(Deno.makeTempFileSync()).dir;
+const tempDir = parse(Oden.makeTempFileSync()).dir;
 
-Deno.test({
+Oden.test({
   name: "ASYNC: open file",
   async fn() {
-    const file = Deno.makeTempFileSync();
+    const file = Oden.makeTempFileSync();
     let fd1: number;
     await new Promise<number>((resolve, reject) => {
       open(file, (err, fd) => {
@@ -44,16 +44,16 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "SYNC: open file",
   fn() {
-    const file = Deno.makeTempFileSync();
+    const file = Oden.makeTempFileSync();
     const fd = openSync(file, "r");
     closeSync(fd);
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with string flag 'a'",
   fn() {
     const file = join(tempDir, "some_random_file");
@@ -64,10 +64,10 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with string flag 'ax'",
   fn() {
-    const file = Deno.makeTempFileSync();
+    const file = Oden.makeTempFileSync();
     assertThrows(
       () => {
         openSync(file, "ax");
@@ -75,11 +75,11 @@ Deno.test({
       Error,
       `EEXIST: file already exists, open '${file}'`,
     );
-    Deno.removeSync(file);
+    Oden.removeSync(file);
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with string flag 'a+'",
   fn() {
     const file = join(tempDir, "some_random_file2");
@@ -90,10 +90,10 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with string flag 'ax+'",
   fn() {
-    const file = Deno.makeTempFileSync();
+    const file = Oden.makeTempFileSync();
     assertThrows(
       () => {
         openSync(file, "ax+");
@@ -101,11 +101,11 @@ Deno.test({
       Error,
       `EEXIST: file already exists, open '${file}'`,
     );
-    Deno.removeSync(file);
+    Oden.removeSync(file);
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with string flag 'as'",
   fn() {
     const file = join(tempDir, "some_random_file10");
@@ -116,7 +116,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with string flag 'as+'",
   fn() {
     const file = join(tempDir, "some_random_file10");
@@ -127,7 +127,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with string flag 'r'",
   fn() {
     const file = join(tempDir, "some_random_file3");
@@ -137,7 +137,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with string flag 'r+'",
   fn() {
     const file = join(tempDir, "some_random_file4");
@@ -147,14 +147,14 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with string flag 'w'",
   fn() {
-    const file = Deno.makeTempFileSync();
-    Deno.writeTextFileSync(file, "hi there");
+    const file = Oden.makeTempFileSync();
+    Oden.writeTextFileSync(file, "hi there");
     const fd = openSync(file, "w");
     assertEquals(typeof fd, "number");
-    assertEquals(Deno.readTextFileSync(file), "");
+    assertEquals(Oden.readTextFileSync(file), "");
     closeSync(fd);
 
     const file2 = join(tempDir, "some_random_file5");
@@ -165,17 +165,17 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with string flag 'wx'",
   fn() {
-    const file = Deno.makeTempFileSync();
-    Deno.writeTextFileSync(file, "hi there");
+    const file = Oden.makeTempFileSync();
+    Oden.writeTextFileSync(file, "hi there");
     const fd = openSync(file, "w");
     assertEquals(typeof fd, "number");
-    assertEquals(Deno.readTextFileSync(file), "");
+    assertEquals(Oden.readTextFileSync(file), "");
     closeSync(fd);
 
-    const file2 = Deno.makeTempFileSync();
+    const file2 = Oden.makeTempFileSync();
     assertThrows(
       () => {
         openSync(file2, "wx");
@@ -186,14 +186,14 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with string flag 'w+'",
   fn() {
-    const file = Deno.makeTempFileSync();
-    Deno.writeTextFileSync(file, "hi there");
+    const file = Oden.makeTempFileSync();
+    Oden.writeTextFileSync(file, "hi there");
     const fd = openSync(file, "w+");
     assertEquals(typeof fd, "number");
-    assertEquals(Deno.readTextFileSync(file), "");
+    assertEquals(Oden.readTextFileSync(file), "");
     closeSync(fd);
 
     const file2 = join(tempDir, "some_random_file6");
@@ -204,10 +204,10 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with string flag 'wx+'",
   fn() {
-    const file = Deno.makeTempFileSync();
+    const file = Oden.makeTempFileSync();
     assertThrows(
       () => {
         openSync(file, "wx+");
@@ -215,11 +215,11 @@ Deno.test({
       Error,
       `EEXIST: file already exists, open '${file}'`,
     );
-    Deno.removeSync(file);
+    Oden.removeSync(file);
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with numeric flag `O_APPEND | O_CREAT | O_WRONLY` ('a')",
   fn() {
     const file = join(tempDir, "some_random_file");
@@ -230,11 +230,11 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name:
     "open with numeric flag `O_APPEND | O_CREAT | O_WRONLY | O_EXCL` ('ax')",
   fn() {
-    const file = Deno.makeTempFileSync();
+    const file = Oden.makeTempFileSync();
     assertThrows(
       () => {
         openSync(file, O_APPEND | O_CREAT | O_WRONLY | O_EXCL);
@@ -242,11 +242,11 @@ Deno.test({
       Error,
       `EEXIST: file already exists, open '${file}'`,
     );
-    Deno.removeSync(file);
+    Oden.removeSync(file);
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with numeric flag `O_APPEND | O_CREAT | O_RDWR` ('a+')",
   fn() {
     const file = join(tempDir, "some_random_file2");
@@ -257,10 +257,10 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with numeric flag `O_APPEND | O_CREAT | O_RDWR | O_EXCL` ('ax+')",
   fn() {
-    const file = Deno.makeTempFileSync();
+    const file = Oden.makeTempFileSync();
     assertThrows(
       () => {
         openSync(file, O_APPEND | O_CREAT | O_RDWR | O_EXCL);
@@ -268,11 +268,11 @@ Deno.test({
       Error,
       `EEXIST: file already exists, open '${file}'`,
     );
-    Deno.removeSync(file);
+    Oden.removeSync(file);
   },
 });
 
-Deno.test({
+Oden.test({
   name:
     "open with numeric flag `O_APPEND | O_CREAT | O_WRONLY | O_SYNC` ('as')",
   fn() {
@@ -284,7 +284,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with numeric flag `O_APPEND | O_CREAT | O_RDWR | O_SYNC` ('as+')",
   fn() {
     const file = join(tempDir, "some_random_file10");
@@ -295,7 +295,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with numeric flag `O_RDONLY` ('r')",
   fn() {
     const file = join(tempDir, "some_random_file3");
@@ -305,7 +305,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with numeric flag `O_RDWR` ('r+')",
   fn() {
     const file = join(tempDir, "some_random_file4");
@@ -315,14 +315,14 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with numeric flag `O_TRUNC | O_CREAT | O_WRONLY` ('w')",
   fn() {
-    const file = Deno.makeTempFileSync();
-    Deno.writeTextFileSync(file, "hi there");
+    const file = Oden.makeTempFileSync();
+    Oden.writeTextFileSync(file, "hi there");
     const fd = openSync(file, O_TRUNC | O_CREAT | O_WRONLY);
     assertEquals(typeof fd, "number");
-    assertEquals(Deno.readTextFileSync(file), "");
+    assertEquals(Oden.readTextFileSync(file), "");
     closeSync(fd);
 
     const file2 = join(tempDir, "some_random_file5");
@@ -333,17 +333,17 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with numeric flag `O_TRUNC | O_CREAT | O_WRONLY | O_EXCL` ('wx')",
   fn() {
-    const file = Deno.makeTempFileSync();
-    Deno.writeTextFileSync(file, "hi there");
+    const file = Oden.makeTempFileSync();
+    Oden.writeTextFileSync(file, "hi there");
     const fd = openSync(file, "w");
     assertEquals(typeof fd, "number");
-    assertEquals(Deno.readTextFileSync(file), "");
+    assertEquals(Oden.readTextFileSync(file), "");
     closeSync(fd);
 
-    const file2 = Deno.makeTempFileSync();
+    const file2 = Oden.makeTempFileSync();
     assertThrows(
       () => {
         openSync(file2, O_TRUNC | O_CREAT | O_WRONLY | O_EXCL);
@@ -354,14 +354,14 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with numeric flag `O_TRUNC | O_CREAT | O_RDWR` ('w+')",
   fn() {
-    const file = Deno.makeTempFileSync();
-    Deno.writeTextFileSync(file, "hi there");
+    const file = Oden.makeTempFileSync();
+    Oden.writeTextFileSync(file, "hi there");
     const fd = openSync(file, O_TRUNC | O_CREAT | O_RDWR);
     assertEquals(typeof fd, "number");
-    assertEquals(Deno.readTextFileSync(file), "");
+    assertEquals(Oden.readTextFileSync(file), "");
     closeSync(fd);
 
     const file2 = join(tempDir, "some_random_file6");
@@ -372,10 +372,10 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with numeric flag `O_TRUNC | O_CREAT | O_RDWR | O_EXCL` ('wx+')",
   fn() {
-    const file = Deno.makeTempFileSync();
+    const file = Oden.makeTempFileSync();
     assertThrows(
       () => {
         openSync(file, O_TRUNC | O_CREAT | O_RDWR | O_EXCL);
@@ -383,33 +383,33 @@ Deno.test({
       Error,
       `EEXIST: file already exists, open '${file}'`,
     );
-    Deno.removeSync(file);
+    Oden.removeSync(file);
   },
 });
 
-Deno.test("[std/node/fs] open callback isn't called twice if error is thrown", async () => {
-  const tempFile = await Deno.makeTempFile();
+Oden.test("[std/node/fs] open callback isn't called twice if error is thrown", async () => {
+  const tempFile = await Oden.makeTempFile();
   const importUrl = new URL("node:fs", import.meta.url);
   await assertCallbackErrorUncaught({
     prelude: `import { open } from ${JSON.stringify(importUrl)}`,
     invocation: `open(${JSON.stringify(tempFile)}, `,
     async cleanup() {
-      await Deno.remove(tempFile);
+      await Oden.remove(tempFile);
     },
   });
 });
 
-Deno.test("SYNC: open file with flag set to 0 (readonly)", async () => {
-  const file = Deno.makeTempFileSync();
+Oden.test("SYNC: open file with flag set to 0 (readonly)", async () => {
+  const file = Oden.makeTempFileSync();
   const fd = openSync(file, 0);
   closeSync(fd);
-  await Deno.remove(file);
+  await Oden.remove(file);
 });
 
-Deno.test("[std/node/fs] openSync with custom flag", {
-  ignore: Deno.build.os === "windows",
+Oden.test("[std/node/fs] openSync with custom flag", {
+  ignore: Oden.build.os === "windows",
 }, async () => {
-  const file = await Deno.makeTempFile();
+  const file = await Oden.makeTempFile();
   assertThrows(
     () => {
       // Should throw error if path is not a directory
@@ -418,13 +418,13 @@ Deno.test("[std/node/fs] openSync with custom flag", {
     Error,
     `ENOTDIR: not a directory, open '${file}'`,
   );
-  await Deno.remove(file);
+  await Oden.remove(file);
 });
 
-Deno.test("[std/node/fs] open with custom flag", {
-  ignore: Deno.build.os === "windows",
+Oden.test("[std/node/fs] open with custom flag", {
+  ignore: Oden.build.os === "windows",
 }, async () => {
-  const file = await Deno.makeTempFile();
+  const file = await Oden.makeTempFile();
   await assertRejects(
     async () => {
       // Should throw error if path is not a directory
@@ -434,28 +434,28 @@ Deno.test("[std/node/fs] open with custom flag", {
     Error,
     `ENOTDIR: not a directory, open '${file}'`,
   );
-  await Deno.remove(file);
+  await Oden.remove(file);
 });
 
 let invalidFlag: number | undefined;
 // On linux it refers to the `O_TMPFILE` constant in libc.
 // It should throw EINVAL when it's not followed by `O_RDWR` or `O_WRONLY`.
 // https://docs.rs/libc/latest/libc/constant.O_TMPFILE.html
-if (Deno.build.os === "linux" || Deno.build.os === "android") {
-  if (Deno.build.arch === "x86_64") {
+if (Oden.build.os === "linux" || Oden.build.os === "android") {
+  if (Oden.build.arch === "x86_64") {
     invalidFlag = 4_259_840;
   } else {
     invalidFlag = 4_210_688;
   }
-} else if (Deno.build.os === "darwin") {
+} else if (Oden.build.os === "darwin") {
   // On macOS it's a random value that is not a valid flag.
   invalidFlag = 0x7FFFFFFF;
 }
 
-Deno.test("[std/node/fs] openSync throws on invalid flags", {
-  ignore: Deno.build.os === "windows",
+Oden.test("[std/node/fs] openSync throws on invalid flags", {
+  ignore: Oden.build.os === "windows",
 }, async () => {
-  const file = await Deno.makeTempFile();
+  const file = await Oden.makeTempFile();
   assertThrows(
     () => {
       openSync(file, invalidFlag as number);
@@ -463,13 +463,13 @@ Deno.test("[std/node/fs] openSync throws on invalid flags", {
     Error,
     `EINVAL: invalid argument, open '${file}'`,
   );
-  await Deno.remove(file);
+  await Oden.remove(file);
 });
 
-Deno.test("[std/node/fs] open throws on invalid flags", {
-  ignore: Deno.build.os === "windows",
+Oden.test("[std/node/fs] open throws on invalid flags", {
+  ignore: Oden.build.os === "windows",
 }, async () => {
-  const file = await Deno.makeTempFile();
+  const file = await Oden.makeTempFile();
   await assertRejects(
     async () => {
       // `openPromise` uses `open` under the hood.
@@ -478,16 +478,16 @@ Deno.test("[std/node/fs] open throws on invalid flags", {
     Error,
     `EINVAL: invalid argument, open '${file}'`,
   );
-  await Deno.remove(file);
+  await Oden.remove(file);
 });
 
-Deno.test(
+Oden.test(
   "[std/node/fs] openSync: only enable read permission when a custom flag is not followed by file access flags",
   {
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
   },
   async () => {
-    const path = await Deno.makeTempFile();
+    const path = await Oden.makeTempFile();
     writeFileSync(path, "Hello, world!");
 
     const fd = openSync(path, O_SYNC);
@@ -500,17 +500,17 @@ Deno.test(
     );
 
     closeSync(fd);
-    await Deno.remove(path);
+    await Oden.remove(path);
   },
 );
 
-Deno.test(
+Oden.test(
   "[std/node/fs] open: only enable read permission when a custom flag is not followed by file access flags",
   {
-    ignore: Deno.build.os === "windows",
+    ignore: Oden.build.os === "windows",
   },
   async () => {
-    const path = await Deno.makeTempFile();
+    const path = await Oden.makeTempFile();
     writeFileSync(path, "Hello, world!");
 
     const fileHandle = await openPromise(path, O_SYNC);
@@ -523,14 +523,14 @@ Deno.test(
     );
 
     await fileHandle.close();
-    await Deno.remove(path);
+    await Oden.remove(path);
   },
 );
 
-Deno.test(
+Oden.test(
   "[std/node/fs] open: only enable write permission",
   async () => {
-    const path = await Deno.makeTempFile();
+    const path = await Oden.makeTempFile();
     const fileHandle = await openPromise(path, O_WRONLY);
 
     writeSync(fileHandle.fd, "Hello, world!");
@@ -542,14 +542,14 @@ Deno.test(
     );
 
     await fileHandle.close();
-    await Deno.remove(path);
+    await Oden.remove(path);
   },
 );
 
-Deno.test(
+Oden.test(
   "[std/node/fs] openSync: only enable write permission",
   async () => {
-    const path = await Deno.makeTempFile();
+    const path = await Oden.makeTempFile();
     const fd = openSync(path, O_WRONLY);
 
     writeSync(fd, "Hello, world!");
@@ -561,18 +561,18 @@ Deno.test(
     );
 
     closeSync(fd);
-    await Deno.remove(path);
+    await Oden.remove(path);
   },
 );
 
-Deno.test({
+Oden.test({
   name:
     "open with numeric flag `O_RDONLY | O_CREAT` creates file and opens for reading",
   fn() {
     const file = join(tempDir, "o_rdonly_o_creat_test");
     // Ensure file doesn't exist
     try {
-      Deno.removeSync(file);
+      Oden.removeSync(file);
     } catch {
       // ignore
     }
@@ -590,16 +590,16 @@ Deno.test({
     assertEquals(bytesRead, 0);
 
     closeSync(fd);
-    Deno.removeSync(file);
+    Oden.removeSync(file);
   },
 });
 
-Deno.test({
+Oden.test({
   name:
     "open with numeric flag `O_RDONLY | O_CREAT` opens existing file for reading",
   fn() {
-    const file = Deno.makeTempFileSync();
-    Deno.writeTextFileSync(file, "hello");
+    const file = Oden.makeTempFileSync();
+    Oden.writeTextFileSync(file, "hello");
 
     const fd = openSync(file, O_RDONLY | O_CREAT);
     assertEquals(typeof fd, "number");
@@ -610,11 +610,11 @@ Deno.test({
     assertEquals(bytesRead, 5);
 
     closeSync(fd);
-    Deno.removeSync(file);
+    Oden.removeSync(file);
   },
 });
 
-Deno.test({
+Oden.test({
   name: "open with numeric flag `O_RDONLY | O_CREAT` requires read access",
   permissions: { read: false, write: true },
   async fn() {
@@ -622,11 +622,11 @@ Deno.test({
 
     assertThrows(
       () => openSync(file, O_RDONLY | O_CREAT),
-      Deno.errors.NotCapable,
+      Oden.errors.NotCapable,
     );
     await assertRejects(
       () => openPromise(file, O_RDONLY | O_CREAT),
-      Deno.errors.NotCapable,
+      Oden.errors.NotCapable,
     );
   },
 });

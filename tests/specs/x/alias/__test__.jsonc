@@ -33,11 +33,11 @@
       "if": "${IF}",
       "steps": [
         {
-          "args": "x --install-alias deno-x-shim",
+          "args": "x --install-alias oden-x-shim",
           "output": ""
         },
         {
-          "commandName": "deno-x-shim${COMMAND_SUFFIX}",
+          "commandName": "oden-x-shim${COMMAND_SUFFIX}",
           "args": "",
           "output": "alias.out"
         }

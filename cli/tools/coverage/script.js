@@ -1,6 +1,6 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-const STORAGE_KEY = "deno-coverage-theme";
+const STORAGE_KEY = "oden-coverage-theme";
 
 function getStoredTheme() {
   try {

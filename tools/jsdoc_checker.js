@@ -1,27 +1,27 @@
-#!/usr/bin/env -S deno run --allow-read --allow-env --allow-sys --config=tests/config/deno.json
-// Copyright 2018-2026 the Deno authors. MIT license.
+#!/usr/bin/env -S oden run --allow-read --allow-env --allow-sys --config=tests/config/oden.json
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { Node, Project, ts } from "npm:ts-morph@25.0.1";
 import { join, ROOT_PATH } from "./util.js";
 
 const libs = [
-  join(ROOT_PATH, "cli/tsc/dts/lib.deno_cache.d.ts"),
-  join(ROOT_PATH, "cli/tsc/dts/lib.deno_console.d.ts"),
-  join(ROOT_PATH, "cli/tsc/dts/lib.deno_url.d.ts"),
-  join(ROOT_PATH, "cli/tsc/dts/lib.deno_web.d.ts"),
-  join(ROOT_PATH, "cli/tsc/dts/lib.deno_fetch.d.ts"),
-  join(ROOT_PATH, "cli/tsc/dts/lib.deno_websocket.d.ts"),
-  join(ROOT_PATH, "cli/tsc/dts/lib.deno_webstorage.d.ts"),
-  join(ROOT_PATH, "cli/tsc/dts/lib.deno_canvas.d.ts"),
-  join(ROOT_PATH, "cli/tsc/dts/lib.deno_crypto.d.ts"),
-  join(ROOT_PATH, "cli/tsc/dts/lib.deno_net.d.ts"),
-  join(ROOT_PATH, "cli/tsc/dts/lib.deno.ns.d.ts"),
-  join(ROOT_PATH, "cli/tsc/dts/lib.deno.shared_globals.d.ts"),
-  join(ROOT_PATH, "cli/tsc/dts/lib.deno.window.d.ts"),
-  join(ROOT_PATH, "cli/tsc/dts/lib.deno_broadcast_channel.d.ts"),
+  join(ROOT_PATH, "cli/tsc/dts/lib.oden_cache.d.ts"),
+  join(ROOT_PATH, "cli/tsc/dts/lib.oden_console.d.ts"),
+  join(ROOT_PATH, "cli/tsc/dts/lib.oden_url.d.ts"),
+  join(ROOT_PATH, "cli/tsc/dts/lib.oden_web.d.ts"),
+  join(ROOT_PATH, "cli/tsc/dts/lib.oden_fetch.d.ts"),
+  join(ROOT_PATH, "cli/tsc/dts/lib.oden_websocket.d.ts"),
+  join(ROOT_PATH, "cli/tsc/dts/lib.oden_webstorage.d.ts"),
+  join(ROOT_PATH, "cli/tsc/dts/lib.oden_canvas.d.ts"),
+  join(ROOT_PATH, "cli/tsc/dts/lib.oden_crypto.d.ts"),
+  join(ROOT_PATH, "cli/tsc/dts/lib.oden_net.d.ts"),
+  join(ROOT_PATH, "cli/tsc/dts/lib.oden.ns.d.ts"),
+  join(ROOT_PATH, "cli/tsc/dts/lib.oden.shared_globals.d.ts"),
+  join(ROOT_PATH, "cli/tsc/dts/lib.oden.window.d.ts"),
+  join(ROOT_PATH, "cli/tsc/dts/lib.oden_broadcast_channel.d.ts"),
 ];
 
 const unstableLibs = [
-  join(ROOT_PATH, "cli/tsc/dts/lib.deno.unstable.d.ts"),
+  join(ROOT_PATH, "cli/tsc/dts/lib.oden.unstable.d.ts"),
 ];
 
 const errors = [];
@@ -38,7 +38,7 @@ for (const file of project.getSourceFiles()) {
   ) {
     if (
       node.getKind() === ts.SyntaxKind.ModuleDeclaration &&
-      node.getName() === "Deno"
+      node.getName() === "Oden"
     ) {
       continue;
     }

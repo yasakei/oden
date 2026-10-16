@@ -1,9 +1,9 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Installs `internals.__inspectorNetwork`, the bridge that other
 // extensions (ext/fetch, http, websocket) use to emit `Network.*` CDP
 // events without depending on ext/node directly. It needs to be
-// installed eagerly so that `deno run --inspect` alone is enough to
+// installed eagerly so that `oden run --inspect` alone is enough to
 // see fetch traffic in DevTools - previously the bridge lived in the
 // `node:inspector` polyfill and only appeared if user code imported
 // that module.

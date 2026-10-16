@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::sync::Arc;
 
-use deno_core::error::AnyError;
+use oden_core::error::AnyError;
 use deno_semver::Version;
 use deno_semver::package::PackageNv;
 
@@ -18,7 +18,7 @@ pub trait PackageSearchApi {
 pub mod tests {
   use std::collections::BTreeMap;
 
-  use deno_core::anyhow::anyhow;
+  use oden_core::anyhow::anyhow;
 
   use super::*;
 

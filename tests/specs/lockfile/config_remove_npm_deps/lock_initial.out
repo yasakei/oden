@@ -1,23 +1,23 @@
 {
   "version": "5",
   "specifiers": {
-    "npm:@denotest/add@1": "1.0.0",
-    "npm:@denotest/esm-basic@1": "1.0.0"
+    "npm:@odentest/add@1": "1.0.0",
+    "npm:@odentest/esm-basic@1": "1.0.0"
   },
   "npm": {
-    "@denotest/add@1.0.0": {
+    "@odentest/add@1.0.0": {
       "integrity": "sha512-[WILDLINE]",
-      "tarball": "http://localhost:4260/@denotest/add/1.0.0.tgz"
+      "tarball": "http://localhost:4260/@odentest/add/1.0.0.tgz"
     },
-    "@denotest/esm-basic@1.0.0": {
+    "@odentest/esm-basic@1.0.0": {
       "integrity": "sha512-[WILDLINE]",
-      "tarball": "http://localhost:4260/@denotest/esm-basic/1.0.0.tgz"
+      "tarball": "http://localhost:4260/@odentest/esm-basic/1.0.0.tgz"
     }
   },
   "workspace": {
     "dependencies": [
-      "npm:@denotest/add@1",
-      "npm:@denotest/esm-basic@1"
+      "npm:@odentest/add@1",
+      "npm:@odentest/esm-basic@1"
     ]
   }
 }

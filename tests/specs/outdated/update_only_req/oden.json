@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "@odentest/update-latest-semver": "npm:@odentest/update-latest-semver@^1.0.0"
+  }
+}

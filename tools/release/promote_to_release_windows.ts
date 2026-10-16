@@ -1,25 +1,25 @@
-#!/usr/bin/env -S deno run -A
-// Copyright 2018-2026 the Deno authors. MIT license.
+#!/usr/bin/env -S oden run -A
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // deno-lint-ignore-file no-console
 
-import { patchver } from "jsr:@deno/patchver@0.5.1";
+import { patchver } from "jsr:@oden/patchver@0.5.1";
 
-const CHANNEL = Deno.args[0];
+const CHANNEL = Oden.args[0];
 if (CHANNEL !== "rc" && CHANNEL !== "lts") {
   throw new Error(`Invalid channel: ${CHANNEL}`);
 }
 
-const BINARIES = ["deno.exe", "denort.exe"];
+const BINARIES = ["oden.exe", "odenrt.exe"];
 
 async function patchBinary(inputPath: string, channel: string) {
   console.log(`Patching ${inputPath}...`);
 
-  await Deno.rename(inputPath, `${inputPath}.bak`);
-  const input = await Deno.readFile(`${inputPath}.bak`);
+  await Oden.rename(inputPath, `${inputPath}.bak`);
+  const input = await Oden.readFile(`${inputPath}.bak`);
   const output = patchver(input, channel);
 
-  await Deno.writeFile(inputPath, output);
+  await Oden.writeFile(inputPath, output);
   console.log(`Created ${inputPath}`);
 }
 

@@ -1,2 +1,2 @@
-import config from "./deno-jsx.json" with { type: "json" };
+import config from "./oden-jsx.json" with { type: "json" };
 console.log(config);

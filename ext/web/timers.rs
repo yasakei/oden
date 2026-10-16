@@ -1,14 +1,14 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-//! This module helps deno implement timers and performance APIs.
+//! This module helps oden implement timers and performance APIs.
 
 use std::time::Duration;
 use std::time::Instant;
 use std::time::SystemTime;
 use std::time::UNIX_EPOCH;
 
-use deno_core::OpState;
-use deno_core::op2;
+use oden_core::OpState;
+use oden_core::op2;
 
 pub struct StartTime(Instant);
 

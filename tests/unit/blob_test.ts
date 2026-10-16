@@ -1,15 +1,15 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assert, assertEquals, assertStringIncludes } from "./test_util.ts";
 import { concat } from "@std/bytes/concat";
 
-Deno.test(function blobString() {
+Oden.test(function blobString() {
   const b1 = new Blob(["Hello World"]);
   const str = "Test";
   const b2 = new Blob([b1, str]);
   assertEquals(b2.size, b1.size + str.length);
 });
 
-Deno.test(function blobBuffer() {
+Oden.test(function blobBuffer() {
   const buffer = new ArrayBuffer(12);
   const u8 = new Uint8Array(buffer);
   const f1 = new Float32Array(buffer);
@@ -19,8 +19,8 @@ Deno.test(function blobBuffer() {
   assertEquals(b2.size, 3 * u8.length);
 });
 
-Deno.test(function blobSlice() {
-  const blob = new Blob(["Deno", "Foo"]);
+Oden.test(function blobSlice() {
+  const blob = new Blob(["Oden", "Foo"]);
   const b1 = blob.slice(0, 3, "Text/HTML");
   assert(b1 instanceof Blob);
   assertEquals(b1.size, 3);
@@ -33,7 +33,7 @@ Deno.test(function blobSlice() {
   assertEquals(b4.size, blob.size);
 });
 
-Deno.test(function blobInvalidType() {
+Oden.test(function blobInvalidType() {
   const blob = new Blob(["foo"], {
     type: "\u0521",
   });
@@ -41,7 +41,7 @@ Deno.test(function blobInvalidType() {
   assertEquals(blob.type, "");
 });
 
-Deno.test(function blobShouldNotThrowError() {
+Oden.test(function blobShouldNotThrowError() {
   let hasThrown = false;
 
   try {
@@ -61,22 +61,22 @@ Deno.test(function blobShouldNotThrowError() {
 });
 
 /* TODO https://github.com/denoland/deno/issues/7540
-Deno.test(function nativeEndLine() {
+Oden.test(function nativeEndLine() {
   const options = {
     ending: "native",
   } as const;
   const blob = new Blob(["Hello\nWorld"], options);
 
-  assertEquals(blob.size, Deno.build.os === "windows" ? 12 : 11);
+  assertEquals(blob.size, Oden.build.os === "windows" ? 12 : 11);
 });
 */
 
-Deno.test(async function blobText() {
+Oden.test(async function blobText() {
   const blob = new Blob(["Hello World"]);
   assertEquals(await blob.text(), "Hello World");
 });
 
-Deno.test(async function blobStream() {
+Oden.test(async function blobStream() {
   const blob = new Blob(["Hello World"]);
   const stream = blob.stream();
   assert(stream instanceof ReadableStream);
@@ -94,7 +94,7 @@ Deno.test(async function blobStream() {
   assertEquals(decoder.decode(bytes), "Hello World");
 });
 
-Deno.test(async function blobTextStream() {
+Oden.test(async function blobTextStream() {
   const text = "Hello 👋 wörld";
   const blob = new Blob([text]);
   const stream = blob.textStream();
@@ -109,22 +109,22 @@ Deno.test(async function blobTextStream() {
   assertEquals(result, text);
 });
 
-Deno.test(async function blobArrayBuffer() {
+Oden.test(async function blobArrayBuffer() {
   const uint = new Uint8Array([102, 111, 111]);
   const blob = new Blob([uint]);
   assertEquals(await blob.arrayBuffer(), uint.buffer);
 });
 
-Deno.test(function blobConstructorNameIsBlob() {
+Oden.test(function blobConstructorNameIsBlob() {
   const blob = new Blob();
   assertEquals(blob.constructor.name, "Blob");
 });
 
-Deno.test(function blobCustomInspectFunction() {
+Oden.test(function blobCustomInspectFunction() {
   const blob = new Blob();
   assertEquals(
-    Deno.inspect(blob),
+    Oden.inspect(blob),
     `Blob { size: 0, type: "" }`,
   );
-  assertStringIncludes(Deno.inspect(Blob.prototype), "Blob");
+  assertStringIncludes(Oden.inspect(Blob.prototype), "Blob");
 });

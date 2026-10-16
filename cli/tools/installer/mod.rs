@@ -1,16 +1,16 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::sync::Arc;
 
 use dashmap::DashSet;
-use deno_core::error::AnyError;
-use deno_core::parking_lot::Mutex;
-use deno_core::url::Url;
-use deno_lib::version::DENO_VERSION;
-use deno_lib::version::NODE_VERSION;
-use deno_npm_installer::lifecycle_scripts::LifecycleScriptsWarning;
-use deno_package_json::EngineMismatchKind;
-use deno_resolver::workspace::WorkspaceResolver;
+use oden_core::error::AnyError;
+use oden_core::parking_lot::Mutex;
+use oden_core::url::Url;
+use oden_lib::version::ODEN_VERSION;
+use oden_lib::version::NODE_VERSION;
+use oden_npm_installer::lifecycle_scripts::LifecycleScriptsWarning;
+use oden_package_json::EngineMismatchKind;
+use oden_resolver::workspace::WorkspaceResolver;
 
 pub use self::bin_name_resolver::BinNameResolver;
 use crate::args::Flags;
@@ -111,7 +111,7 @@ impl InstallReporter {
   }
 }
 
-impl deno_npm_installer::InstallProgressReporter for InstallReporter {
+impl oden_npm_installer::InstallProgressReporter for InstallReporter {
   fn initializing(&self, _nv: &deno_semver::package::PackageNv) {}
 
   fn initialized(&self, nv: &deno_semver::package::PackageNv) {
@@ -122,7 +122,7 @@ impl deno_npm_installer::InstallProgressReporter for InstallReporter {
 
   fn scripts_not_run_warning(
     &self,
-    warning: deno_npm_installer::lifecycle_scripts::LifecycleScriptsWarning,
+    warning: oden_npm_installer::lifecycle_scripts::LifecycleScriptsWarning,
   ) {
     self.scripts_warnings.lock().push(warning);
   }
@@ -160,7 +160,7 @@ impl deno_graph::source::Reporter for InstallReporter {
   }
 }
 
-impl deno_npm::resolution::Reporter for InstallReporter {
+impl oden_npm::resolution::Reporter for InstallReporter {
   fn on_resolved(
     &self,
     package_req: &deno_semver::package::PackageReq,
@@ -170,7 +170,7 @@ impl deno_npm::resolution::Reporter for InstallReporter {
   }
 }
 
-impl deno_npm_cache::TarballCacheReporter for InstallReporter {
+impl oden_npm_cache::TarballCacheReporter for InstallReporter {
   fn download_started(&self, _nv: &deno_semver::package::PackageNv) {}
 
   fn downloaded(&self, nv: &deno_semver::package::PackageNv) {
@@ -182,18 +182,18 @@ impl deno_npm_cache::TarballCacheReporter for InstallReporter {
   }
 }
 
-impl deno_resolver::file_fetcher::GraphLoaderReporter for InstallReporter {
+impl oden_resolver::file_fetcher::GraphLoaderReporter for InstallReporter {
   fn on_load(
     &self,
     specifier: &Url,
-    loaded_from: deno_cache_dir::file_fetcher::LoadedFrom,
+    loaded_from: oden_cache_dir::file_fetcher::LoadedFrom,
   ) {
     if let Some(nv) = package_nv_from_url(specifier) {
       match loaded_from {
-        deno_cache_dir::file_fetcher::LoadedFrom::Cache => {
+        oden_cache_dir::file_fetcher::LoadedFrom::Cache => {
           self.stats.reused_jsr.insert(nv);
         }
-        deno_cache_dir::file_fetcher::LoadedFrom::Remote => {
+        oden_cache_dir::file_fetcher::LoadedFrom::Remote => {
           self.stats.downloaded_jsr.insert(nv);
         }
         _ => {}
@@ -400,14 +400,14 @@ pub fn print_install_report(
 }
 
 /// Emit a warning for each package.json in the workspace whose `engines.node`
-/// or `engines.deno` field is not satisfied by the current runtime.
+/// or `engines.oden` field is not satisfied by the current runtime.
 ///
 /// Modeled on `npm`/`yarn`'s default behavior: this is a warning, never an
-/// error. Engines other than `node` and `deno` are ignored — Deno has no way
+/// error. Engines other than `node` and `oden` are ignored — Oden has no way
 /// to verify them.
 fn warn_on_engines_mismatch(workspace: &WorkspaceResolver<CliSys>) {
   for pkg_json in workspace.package_jsons() {
-    let mismatches = pkg_json.check_engines(DENO_VERSION, NODE_VERSION);
+    let mismatches = pkg_json.check_engines(ODEN_VERSION, NODE_VERSION);
     if mismatches.is_empty() {
       continue;
     }

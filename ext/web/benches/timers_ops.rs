@@ -1,21 +1,21 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_bench_util::bench_js_async;
-use deno_bench_util::bench_or_profile;
-use deno_bench_util::bencher::Bencher;
-use deno_bench_util::bencher::benchmark_group;
-use deno_core::Extension;
+use oden_bench_util::bench_js_async;
+use oden_bench_util::bench_or_profile;
+use oden_bench_util::bencher::Bencher;
+use oden_bench_util::bencher::benchmark_group;
+use oden_core::Extension;
 
 #[derive(Clone)]
 struct Permissions;
 
 fn setup() -> Vec<Extension> {
-  deno_core::extension!(
+  oden_core::extension!(
     bench_setup,
     esm_entry_point = "ext:bench_setup/setup",
     esm = ["ext:bench_setup/setup" = {
       source = r#"
-        import { setTimeout } from "ext:deno_web/02_timers.js";
+        import { setTimeout } from "ext:oden_web/02_timers.js";
         globalThis.setTimeout = setTimeout;
       "#
     }],
@@ -25,10 +25,10 @@ fn setup() -> Vec<Extension> {
   );
 
   vec![
-    deno_webidl::deno_webidl::init(),
-    deno_web::deno_web::init(
-      std::sync::Arc::new(deno_web::BlobStore::default())
-        as std::sync::Arc<dyn deno_web::BlobStoreTrait>,
+    oden_webidl::oden_webidl::init(),
+    oden_web::oden_web::init(
+      std::sync::Arc::new(oden_web::BlobStore::default())
+        as std::sync::Arc<dyn oden_web::BlobStoreTrait>,
       None,
       Default::default(),
       Default::default(),

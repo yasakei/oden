@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { buildPath, existsSync, join } from "./util.js";
 
 const currentDataFile = join(buildPath(), "bench.json");
@@ -9,15 +9,15 @@ const recentDataFile = "gh-pages/recent.json"; // Includes recent 20 benchmark d
 const recentDataJsonlFile = "gh-pages/recent.jsonl"; // JSONL version of recent benchmark data.
 
 function readJson(filename) {
-  return JSON.parse(Deno.readTextFileSync(filename));
+  return JSON.parse(Oden.readTextFileSync(filename));
 }
 
 function writeJson(filename, data) {
-  return Deno.writeTextFileSync(filename, JSON.stringify(data));
+  return Oden.writeTextFileSync(filename, JSON.stringify(data));
 }
 
 function writeJsonl(filename, data) {
-  return Deno.writeTextFileSync(
+  return Oden.writeTextFileSync(
     filename,
     data.map((row) => JSON.stringify(row)).join("\n") + "\n",
   );

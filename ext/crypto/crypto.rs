@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! WebCrypto top-level `Crypto` interface as a cppgc-wrapped Rust object.
 //!
@@ -9,11 +9,11 @@
 
 use std::ffi::CStr;
 
-use deno_core::GarbageCollected;
-use deno_core::OpState;
-use deno_core::op2;
-use deno_core::v8;
-use deno_core::webidl::WebIdlInterfaceConverter;
+use oden_core::GarbageCollected;
+use oden_core::OpState;
+use oden_core::op2;
+use oden_core::v8;
+use oden_core::webidl::WebIdlInterfaceConverter;
 use rand::Rng;
 use rand::rngs::StdRng;
 use rand::thread_rng;
@@ -158,7 +158,7 @@ impl Crypto {
 
   /// `Crypto.registerSymbols(webidlBrand, kKeyObject)` — internal static
   /// method called by the crypto module bootstrap to hand the WebIDL brand
-  /// symbol (a private of `ext:deno_webidl/00_webidl.js`) and the
+  /// symbol (a private of `ext:oden_webidl/00_webidl.js`) and the
   /// `kKeyObject` symbol (a private of ext/node) over to the crypto cppgc
   /// methods, which need them to brand every freshly-constructed
   /// `CryptoKey`. Idempotent and effect-only; returns `true` on success.

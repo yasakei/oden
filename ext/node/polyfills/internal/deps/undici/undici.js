@@ -1,14 +1,14 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 (function () {
 const { core, internals, primordials } = __bootstrap;
 const { isArrayBufferView } = core.loadExtScript(
-  "ext:deno_node/internal/util/types.ts",
+  "ext:oden_node/internal/util/types.ts",
 );
 const { TextDecoder } = core.loadExtScript(
-  "ext:deno_web/08_text_encoding.js",
+  "ext:oden_web/08_text_encoding.js",
 );
 const { kEmptyObject } = core.loadExtScript(
-  "ext:deno_node/internal/util.mjs",
+  "ext:oden_node/internal/util.mjs",
 );
 
 const {
@@ -21,10 +21,10 @@ const {
 const { isAnyArrayBuffer } = core;
 
 const kDispatcherOptions = SymbolFor(
-  "Deno.internal.node.undici.dispatcherOptions",
+  "Oden.internal.node.undici.dispatcherOptions",
 );
 const kGlobalDispatcher = SymbolFor(
-  "Deno.internal.node.undici.globalDispatcher",
+  "Oden.internal.node.undici.globalDispatcher",
 );
 
 function normalizeCaCerts(ca) {

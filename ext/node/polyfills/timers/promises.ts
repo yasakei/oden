@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core } = __bootstrap;
-const timers = core.loadExtScript("ext:deno_node/timers.ts");
+const timers = core.loadExtScript("ext:oden_node/timers.ts");
 
 const setTimeout = timers.promises.setTimeout;
 const setImmediate = timers.promises.setImmediate;

@@ -1,5 +1,5 @@
 try {
-  new Deno.Command("deno", {
+  new Oden.Command("oden", {
     args: ["--version"],
   }).outputSync();
 } catch (err) {
@@ -7,7 +7,7 @@ try {
 }
 
 try {
-  new Deno.Command(Deno.execPath(), {
+  new Oden.Command(Oden.execPath(), {
     args: ["--version"],
   }).outputSync();
 } catch (err) {

@@ -3,8 +3,8 @@
 // signal. Verify the cached registry.json kept just compact markers (dropping
 // the heavy sub-fields) so caching the full packument by default stays cheap.
 const registryJson = JSON.parse(
-  Deno.readTextFileSync(
-    "deno_dir/npm/localhost_4260/@denotest/trusted-publisher/registry.json",
+  Oden.readTextFileSync(
+    "oden_dir/npm/localhost_4260/@odentest/trusted-publisher/registry.json",
   ),
 );
 const version = registryJson.versions["1.0.0"];

@@ -1,0 +1,8 @@
+{
+  "imports": {
+    "@odentest/add": "jsr:@odentest/add"
+  },
+  "links": [
+    "./add"
+  ]
+}

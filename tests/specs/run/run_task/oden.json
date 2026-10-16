@@ -1,0 +1,6 @@
+{
+  "tasks": {
+    "main": "oden run main.ts",
+    "main:foo": "oden run main.ts"
+  }
+}

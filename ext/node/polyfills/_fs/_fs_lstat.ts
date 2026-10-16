@@ -1,18 +1,18 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core, primordials } = __bootstrap;
-const { denoErrorToNodeError } = core.loadExtScript(
-  "ext:deno_node/internal/errors.ts",
+const { odenErrorToNodeError } = core.loadExtScript(
+  "ext:oden_node/internal/errors.ts",
 );
 
 const lazyStatUtils = core.createLazyLoader(
-  "ext:deno_node/internal/fs/stat_utils.ts",
+  "ext:oden_node/internal/fs/stat_utils.ts",
 );
 const lazyFsUtils = core.createLazyLoader(
-  "ext:deno_node/internal/fs/utils.mjs",
+  "ext:oden_node/internal/fs/utils.mjs",
 );
-const { promisify } = core.loadExtScript("ext:deno_node/internal/util.mjs");
+const { promisify } = core.loadExtScript("ext:oden_node/internal/util.mjs");
 
 const {
   Error,
@@ -37,20 +37,20 @@ function lstat(
   // Match Node: errors carry the requested path (see lib/fs.js lstat).
   const validatedPath = lazyFsUtils().getValidatedPathToString(path);
   PromisePrototypeThen(
-    Deno.lstat(validatedPath),
+    Oden.lstat(validatedPath),
     (stat) => callback(null, lazyStatUtils().CFISBIS(stat, options.bigint)),
     (err) => {
       // Match Node: `{ throwIfNoEntry: false }` suppresses ENOENT and yields
       // undefined stats (see lib/fs.js lstat()).
       if (
         options?.throwIfNoEntry === false &&
-        ObjectPrototypeIsPrototypeOf(Deno.errors.NotFound.prototype, err)
+        ObjectPrototypeIsPrototypeOf(Oden.errors.NotFound.prototype, err)
       ) {
         callback(null, undefined);
         return;
       }
       callback(
-        denoErrorToNodeError(err, {
+        odenErrorToNodeError(err, {
           syscall: "lstat",
           path: validatedPath,
         }),
@@ -67,16 +67,16 @@ function lstatSync(
 ) {
   const validatedPath = lazyFsUtils().getValidatedPathToString(path);
   try {
-    const origin = Deno.lstatSync(validatedPath);
+    const origin = Oden.lstatSync(validatedPath);
     return lazyStatUtils().CFISBIS(origin, options?.bigint || false);
   } catch (err) {
     if (
       options?.throwIfNoEntry === false &&
-      ObjectPrototypeIsPrototypeOf(Deno.errors.NotFound.prototype, err)
+      ObjectPrototypeIsPrototypeOf(Oden.errors.NotFound.prototype, err)
     ) {
       return;
     }
-    throw denoErrorToNodeError(err, {
+    throw odenErrorToNodeError(err, {
       syscall: "lstat",
       path: validatedPath,
     });

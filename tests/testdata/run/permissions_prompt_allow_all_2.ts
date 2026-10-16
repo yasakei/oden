@@ -1,8 +1,8 @@
-Deno.env.get("FOO");
-Deno.env.get("BAR");
+Oden.env.get("FOO");
+Oden.env.get("BAR");
 
-Deno.loadavg();
-Deno.hostname();
+Oden.loadavg();
+Oden.hostname();
 
-Deno.cwd();
-Deno.lstatSync(new URL("../", import.meta.url));
+Oden.cwd();
+Oden.lstatSync(new URL("../", import.meta.url));

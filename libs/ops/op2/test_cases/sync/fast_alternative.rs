@@ -1,9 +1,9 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![deny(warnings)]
-deno_ops_compile_test_runner::prelude!();
+oden_ops_compile_test_runner::prelude!();
 
-use deno_core::v8;
+use oden_core::v8;
 
 // Unused scope would normally make this a slow-only op
 #[op2(fast(op_fast))]

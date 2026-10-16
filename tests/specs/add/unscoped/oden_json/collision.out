@@ -1,0 +1,1 @@
+error: jsr:@odentest/add and npm:@odentest/add would both be added as "add". Provide an explicit alias for one of them (ex. `oden add my-alias@npm:@odentest/add`).

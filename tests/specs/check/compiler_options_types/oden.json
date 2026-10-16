@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "@odentest/augments-global": "npm:@odentest/augments-global@1"
+  },
+  "compilerOptions": { "types": ["@odentest/augments-global"] }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "@odentest/using-vuln",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@odentest/with-vuln2": "1.5.0"
+  }
+}

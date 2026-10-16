@@ -1,6 +1,6 @@
-# deno_os
+# oden_os
 
-This crate implements OS specific APIs for Deno
+This crate implements OS specific APIs for Oden
 
 `loadavg`
 

@@ -1,1 +1,1 @@
-import "npm:@denotest/exec-file@1.0.0";
+import "npm:@odentest/exec-file@1.0.0";

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import {
   clearScriptNamesCache,
@@ -21,8 +21,8 @@ import {
   SOURCE_REF_COUNTS,
 } from "./97_ts_host.js";
 
-/** @type {DenoCore} */
-const core = globalThis.Deno.core;
+/** @type {OdenCore} */
+const core = globalThis.Oden.core;
 const ops = core.ops;
 
 const ChangeKind = {

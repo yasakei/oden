@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! Minimal bsdiff CLI tool for generating binary delta patches.
 //! Used by the release CI to create .bsdiff files for delta upgrades.

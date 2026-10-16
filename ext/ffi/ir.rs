@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::ffi::c_void;
 use std::ptr;
 use std::ptr::NonNull;
 
-use deno_core::v8;
+use oden_core::v8;
 use libffi::middle::Arg;
 
 use crate::symbol::NativeType;
@@ -463,9 +463,9 @@ pub fn parse_buffer_arg(
     const {
       // We don't keep `buffer` around when this function returns,
       // so assert that it will be unused.
-      assert!(deno_core::v8::TYPED_ARRAY_MAX_SIZE_IN_HEAP == 0);
+      assert!(oden_core::v8::TYPED_ARRAY_MAX_SIZE_IN_HEAP == 0);
     }
-    let mut buffer = [0; deno_core::v8::TYPED_ARRAY_MAX_SIZE_IN_HEAP];
+    let mut buffer = [0; oden_core::v8::TYPED_ARRAY_MAX_SIZE_IN_HEAP];
     // SAFETY: `buffer` is unused due to above, returned pointer is not
     // dereferenced by rust code, and we keep it alive at least as long
     // as the turbocall.

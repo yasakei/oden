@@ -1,6 +1,6 @@
-Deno.test("foo 1 0", () => runDenoCommand("run foo.ts 1 0"));
-Deno.test("foo 0 1", () => runDenoCommand("run foo.ts 0 1"));
+Oden.test("foo 1 0", () => runOdenCommand("run foo.ts 1 0"));
+Oden.test("foo 0 1", () => runOdenCommand("run foo.ts 0 1"));
 
-async function runDenoCommand(args: string) {
-  await new Deno.Command(Deno.execPath(), { args: args.split(" ") }).output();
+async function runOdenCommand(args: string) {
+  await new Oden.Command(Oden.execPath(), { args: args.split(" ") }).output();
 }

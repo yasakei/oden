@@ -1,13 +1,13 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 mod interface;
 mod ops;
 mod std_fs;
 
-pub use deno_io::fs::FsError;
-pub use deno_maybe_sync as sync;
-pub use deno_maybe_sync::MaybeSend;
-pub use deno_maybe_sync::MaybeSync;
+pub use oden_io::fs::FsError;
+pub use oden_maybe_sync as sync;
+pub use oden_maybe_sync::MaybeSend;
+pub use oden_maybe_sync::MaybeSync;
 
 pub use crate::interface::FileSystem;
 pub use crate::interface::FileSystemRc;
@@ -25,8 +25,8 @@ pub use crate::std_fs::open_options_for_checked_path;
 
 pub const UNSTABLE_FEATURE_NAME: &str = "fs";
 
-deno_core::extension!(deno_fs,
-  deps = [ deno_web ],
+oden_core::extension!(oden_fs,
+  deps = [ oden_web ],
   ops = [
     op_fs_cwd,
     op_fs_umask,

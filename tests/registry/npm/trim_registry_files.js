@@ -1,19 +1,19 @@
-#!/usr/bin/env -S deno run --allow-write=. --allow-read=.
-// Copyright 2018-2026 the Deno authors. MIT license.
+#!/usr/bin/env -S oden run --allow-write=. --allow-read=.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Run this to trim the registry.json files
 
 for (const dirPath of getPackageDirs()) {
-  if (dirPath.includes("@denotest") || dirPath.includes("@types/denotest__")
-    || dirPath.includes("denotest-packagejson-missing-info")) {
+  if (dirPath.includes("@odentest") || dirPath.includes("@types/odentest__")
+    || dirPath.includes("odentest-packagejson-missing-info")) {
     continue;
   }
-  const versions = Array.from(Deno.readDirSync(dirPath)
+  const versions = Array.from(Oden.readDirSync(dirPath)
     .map(e => extractVersion(e.name)))
     .filter(e => e != null);
 
   const registryPath = dirPath + "/registry.json";
-  const data = JSON.parse(Deno.readTextFileSync(registryPath));
+  const data = JSON.parse(Oden.readTextFileSync(registryPath));
   // this is to save data
   delete data.readme;
   delete data.time;
@@ -50,7 +50,7 @@ for (const dirPath of getPackageDirs()) {
       }
     }
   }
-  Deno.writeTextFileSync(registryPath, JSON.stringify(data, null, 2) + "\n");
+  Oden.writeTextFileSync(registryPath, JSON.stringify(data, null, 2) + "\n");
 }
 
 function extractVersion(name) {
@@ -61,14 +61,14 @@ function extractVersion(name) {
 }
 
 function* getPackageDirs() {
-  for (const entry of Deno.readDirSync(import.meta.dirname)) {
+  for (const entry of Oden.readDirSync(import.meta.dirname)) {
     if (!entry.isDirectory) {
       continue;
     }
 
     if (entry.name.startsWith("@")) {
       const dirPath = import.meta.dirname + "/" + entry.name;
-      for (const entry of Deno.readDirSync(dirPath)) {
+      for (const entry of Oden.readDirSync(dirPath)) {
         if (!entry.isDirectory) {
           continue;
         }

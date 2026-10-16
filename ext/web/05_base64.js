@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // @ts-check
 /// <reference path="../../core/internal.d.ts" />
@@ -14,8 +14,8 @@ const {
   TypeErrorPrototype,
 } = primordials;
 
-const webidl = core.loadExtScript("ext:deno_webidl/00_webidl.js");
-const { DOMException } = core.loadExtScript("ext:deno_web/01_dom_exception.js");
+const webidl = core.loadExtScript("ext:oden_webidl/00_webidl.js");
+const { DOMException } = core.loadExtScript("ext:oden_web/01_dom_exception.js");
 
 /**
  * @param {string} data

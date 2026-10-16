@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cell::Cell;
@@ -13,16 +13,16 @@ use std::ptr::NonNull;
 use std::ptr::null;
 use std::rc::Rc;
 
-use deno_core::FromV8;
-use deno_core::GarbageCollected;
-use deno_core::OpState;
-use deno_core::convert::OptionUndefined;
-use deno_core::cppgc;
-use deno_core::op2;
-use deno_core::v8;
-use deno_core::v8_static_strings;
-use deno_permissions::OpenAccessKind;
-use deno_permissions::PermissionsContainer;
+use oden_core::FromV8;
+use oden_core::GarbageCollected;
+use oden_core::OpState;
+use oden_core::convert::OptionUndefined;
+use oden_core::cppgc;
+use oden_core::op2;
+use oden_core::v8;
+use oden_core::v8_static_strings;
+use oden_permissions::OpenAccessKind;
+use oden_permissions::PermissionsContainer;
 use rusqlite::ffi as libsqlite3_sys;
 use rusqlite::ffi::SQLITE_DBCONFIG_DEFENSIVE;
 use rusqlite::ffi::SQLITE_DBCONFIG_DQS_DDL;
@@ -683,7 +683,7 @@ impl Drop for CallbackDepthGuard {
 
 // SAFETY: we're sure this can be GCed
 unsafe impl GarbageCollected for DatabaseSync {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"DatabaseSync"
@@ -3111,7 +3111,7 @@ pub struct DatabaseSyncLimits {
 
 // SAFETY: we're sure this can be GCed
 unsafe impl GarbageCollected for DatabaseSyncLimits {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"DatabaseSyncLimits"

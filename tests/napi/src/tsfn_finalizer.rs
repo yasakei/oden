@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Regression test for https://github.com/denoland/deno/issues/36499.
 //
 // A `napi_threadsafe_function` callback repeatedly wraps freshly created
 // objects with a `napi_wrap` finalizer, then churns allocations so the GC
-// runs while those wraps are still pending. Under `deno test`, the runner
+// runs while those wraps are still pending. Under `oden test`, the runner
 // drains the NAPI finalizer queue at worker teardown; a wrap finalized there
 // but garbage collected afterwards must NOT have its finalizer invoked twice.
 // The finalizer below aborts on a double invocation so a regression fails the

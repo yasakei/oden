@@ -1,0 +1,5 @@
+{
+    "name": "@odentest/require-non-existent",
+    "version": "1.0.0",
+    "main": "index.cjs"
+  }

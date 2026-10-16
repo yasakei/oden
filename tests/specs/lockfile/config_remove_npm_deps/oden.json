@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "add": "npm:@odentest/add@1",
+    "esm-basic": "npm:@odentest/esm-basic@1"
+  }
+}

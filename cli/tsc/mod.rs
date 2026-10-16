@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 //
 mod js;
 
@@ -14,26 +14,26 @@ use std::sync::LazyLock;
 use std::sync::OnceLock;
 
 use deno_ast::MediaType;
-use deno_core::ModuleSpecifier;
-use deno_core::serde::Deserialize;
-use deno_core::serde::Deserializer;
-use deno_core::serde::Serialize;
-use deno_core::serde::Serializer;
-use deno_core::url::Url;
+use oden_core::ModuleSpecifier;
+use oden_core::serde::Deserialize;
+use oden_core::serde::Deserializer;
+use oden_core::serde::Serialize;
+use oden_core::serde::Serializer;
+use oden_core::url::Url;
 use deno_graph::Module;
 use deno_graph::ModuleGraph;
-use deno_lib::util::checksum;
-use deno_lib::util::hash::FastInsecureHasher;
-use deno_resolver::deno_json::JsxImportSourceConfigResolver;
-use deno_resolver::npm::ResolvePkgFolderFromDenoReqError;
-use deno_resolver::npm::managed::ResolvePkgFolderFromDenoModuleError;
+use oden_lib::util::checksum;
+use oden_lib::util::hash::FastInsecureHasher;
+use oden_resolver::oden_json::JsxImportSourceConfigResolver;
+use oden_resolver::npm::ResolvePkgFolderFromOdenReqError;
+use oden_resolver::npm::managed::ResolvePkgFolderFromOdenModuleError;
 use deno_semver::npm::NpmPackageReqReference;
 use indexmap::IndexMap;
 use node_resolver::NodeResolutionKind;
 use node_resolver::ResolutionMode;
 use node_resolver::errors::NodeJsErrorCode;
 use node_resolver::errors::NodeJsErrorCoded;
-use node_resolver::errors::PackageSubpathFromDenoModuleResolveError;
+use node_resolver::errors::PackageSubpathFromOdenModuleResolveError;
 use node_resolver::resolve_specifier_into_node_modules;
 use once_cell::sync::Lazy;
 use thiserror::Error;
@@ -59,32 +59,32 @@ pub use self::js::TscConstants;
 
 pub fn get_types_declaration_file_text() -> String {
   concat_lib_texts(&[
-    "deno.ns",
-    "deno.console",
-    "deno.url",
-    "deno.web",
-    "deno.fetch",
-    "deno.webgpu",
-    "deno.websocket",
-    "deno.webstorage",
-    "deno.canvas",
-    "deno.crypto",
-    "deno.broadcast_channel",
-    "deno.net",
-    "deno.shared_globals",
-    "deno.cache",
+    "oden.ns",
+    "oden.console",
+    "oden.url",
+    "oden.web",
+    "oden.fetch",
+    "oden.webgpu",
+    "oden.websocket",
+    "oden.webstorage",
+    "oden.canvas",
+    "oden.crypto",
+    "oden.broadcast_channel",
+    "oden.net",
+    "oden.shared_globals",
+    "oden.cache",
     "esnext.temporal",
-    "deno.window",
-    "deno.unstable",
+    "oden.window",
+    "oden.unstable",
   ])
 }
 
-/// The `Deno` namespace only, without Deno's web-platform globals (`fetch`,
+/// The `Oden` namespace only, without Oden's web-platform globals (`fetch`,
 /// `FormData`, `console`, WebGPU, ...). For projects that opt into the `dom`
-/// lib those globals come from `dom` instead, and including Deno's copies too
-/// collides. Mirrors the userland `"lib": ["deno.ns", "dom"]` pattern.
-pub fn get_deno_ns_declaration_file_text() -> String {
-  concat_lib_texts(&["deno.ns", "deno.net"])
+/// lib those globals come from `dom` instead, and including Oden's copies too
+/// collides. Mirrors the userland `"lib": ["oden.ns", "dom"]` pattern.
+pub fn get_oden_ns_declaration_file_text() -> String {
+  concat_lib_texts(&["oden.ns", "oden.net"])
 }
 
 fn concat_lib_texts(lib_names: &[&str]) -> String {
@@ -205,30 +205,30 @@ pub static LAZILY_LOADED_STATIC_ASSETS: Lazy<
 > = Lazy::new(|| {
   Vec::from([
     // compressed in build.rs
-    maybe_compressed_lib!("lib.deno.console.d.ts", "lib.deno_console.d.ts"),
-    maybe_compressed_lib!("lib.deno.url.d.ts", "lib.deno_url.d.ts"),
-    maybe_compressed_lib!("lib.deno.web.d.ts", "lib.deno_web.d.ts"),
-    maybe_compressed_lib!("lib.deno.fetch.d.ts", "lib.deno_fetch.d.ts"),
-    maybe_compressed_lib!("lib.deno.websocket.d.ts", "lib.deno_websocket.d.ts"),
+    maybe_compressed_lib!("lib.oden.console.d.ts", "lib.oden_console.d.ts"),
+    maybe_compressed_lib!("lib.oden.url.d.ts", "lib.oden_url.d.ts"),
+    maybe_compressed_lib!("lib.oden.web.d.ts", "lib.oden_web.d.ts"),
+    maybe_compressed_lib!("lib.oden.fetch.d.ts", "lib.oden_fetch.d.ts"),
+    maybe_compressed_lib!("lib.oden.websocket.d.ts", "lib.oden_websocket.d.ts"),
     maybe_compressed_lib!(
-      "lib.deno.webstorage.d.ts",
-      "lib.deno_webstorage.d.ts"
+      "lib.oden.webstorage.d.ts",
+      "lib.oden_webstorage.d.ts"
     ),
-    maybe_compressed_lib!("lib.deno.canvas.d.ts", "lib.deno_canvas.d.ts"),
-    maybe_compressed_lib!("lib.deno.crypto.d.ts", "lib.deno_crypto.d.ts"),
+    maybe_compressed_lib!("lib.oden.canvas.d.ts", "lib.oden_canvas.d.ts"),
+    maybe_compressed_lib!("lib.oden.crypto.d.ts", "lib.oden_crypto.d.ts"),
     maybe_compressed_lib!(
-      "lib.deno.broadcast_channel.d.ts",
-      "lib.deno_broadcast_channel.d.ts"
+      "lib.oden.broadcast_channel.d.ts",
+      "lib.oden_broadcast_channel.d.ts"
     ),
-    maybe_compressed_lib!("lib.deno.net.d.ts", "lib.deno_net.d.ts"),
-    maybe_compressed_lib!("lib.deno.cache.d.ts", "lib.deno_cache.d.ts"),
-    maybe_compressed_lib!("lib.deno.webgpu.d.ts", "lib.deno_webgpu.d.ts"),
-    maybe_compressed_lib!("lib.deno.window.d.ts"),
-    maybe_compressed_lib!("lib.deno.worker.d.ts"),
-    maybe_compressed_lib!("lib.deno.desktop.d.ts"),
-    maybe_compressed_lib!("lib.deno.shared_globals.d.ts"),
-    maybe_compressed_lib!("lib.deno.ns.d.ts"),
-    maybe_compressed_lib!("lib.deno.unstable.d.ts"),
+    maybe_compressed_lib!("lib.oden.net.d.ts", "lib.oden_net.d.ts"),
+    maybe_compressed_lib!("lib.oden.cache.d.ts", "lib.oden_cache.d.ts"),
+    maybe_compressed_lib!("lib.oden.webgpu.d.ts", "lib.oden_webgpu.d.ts"),
+    maybe_compressed_lib!("lib.oden.window.d.ts"),
+    maybe_compressed_lib!("lib.oden.worker.d.ts"),
+    maybe_compressed_lib!("lib.oden.desktop.d.ts"),
+    maybe_compressed_lib!("lib.oden.shared_globals.d.ts"),
+    maybe_compressed_lib!("lib.oden.ns.d.ts"),
+    maybe_compressed_lib!("lib.oden.unstable.d.ts"),
     maybe_compressed_lib!("lib.decorators.d.ts"),
     maybe_compressed_lib!("lib.decorators.legacy.d.ts"),
     maybe_compressed_lib!("lib.dom.asynciterable.d.ts"),
@@ -372,7 +372,7 @@ pub fn lib_names() -> Vec<String> {
     let lib = key
       .replace("lib.", "")
       .replace(".d.ts", "")
-      .replace("deno_", "deno.");
+      .replace("oden_", "oden.");
     out.push(lib);
   }
   out
@@ -427,7 +427,7 @@ fn get_maybe_hash(
 }
 
 fn get_hash(source: &str, hash_data: u64) -> String {
-  FastInsecureHasher::new_without_deno_version()
+  FastInsecureHasher::new_without_oden_version()
     .write_str(source)
     .write_u64(hash_data)
     .finish()
@@ -544,7 +544,7 @@ pub struct Request {
 
   pub initial_cwd: PathBuf,
   /// When true, .d.ts and .d.ts.map files emitted by TSC will be captured
-  /// in the response. Only set this for `deno transpile --declaration`.
+  /// in the response. Only set this for `oden transpile --declaration`.
   pub capture_emitted_files: bool,
 }
 
@@ -600,7 +600,7 @@ pub enum LoadError {
   ResolveUrlOrPathError(#[from] deno_path_util::ResolveUrlOrPathError),
   #[class(inherit)]
   #[error("Error converting a string module specifier for \"op_resolve\": {0}")]
-  ModuleResolution(#[from] deno_core::ModuleResolutionError),
+  ModuleResolution(#[from] oden_core::ModuleResolutionError),
   #[class(inherit)]
   #[error("{0}")]
   ClosestPkgJson(#[from] node_resolver::errors::PackageJsonLoadError),
@@ -631,7 +631,7 @@ pub enum RawImportKind {
 }
 
 /// We store the raw import kind in the fragment of the Url
-/// like `#denoRawImport=text`. This is necessary because
+/// like `#odenRawImport=text`. This is necessary because
 /// TypeScript can't handle different modules at the same
 /// specifier.
 fn get_specifier_raw_import(specifier: &Url) -> Option<RawImportKind> {
@@ -639,7 +639,7 @@ fn get_specifier_raw_import(specifier: &Url) -> Option<RawImportKind> {
   // code less complex. If someone is doing something to cause this to
   // incorrectly match then they most likely deserve the bug they sought.
   let fragment = specifier.fragment()?;
-  let key_text = "denoRawImport=";
+  let key_text = "odenRawImport=";
   let raw_import_index = fragment.find(key_text)?;
   let remaining = &fragment[raw_import_index + key_text.len()..];
   if remaining.starts_with("text") {
@@ -657,25 +657,25 @@ fn get_specifier_raw_import(specifier: &Url) -> Option<RawImportKind> {
 pub enum ResolveError {
   #[class(inherit)]
   #[error("Error converting a string module specifier for \"op_resolve\": {0}")]
-  ModuleResolution(#[from] deno_core::ModuleResolutionError),
+  ModuleResolution(#[from] oden_core::ModuleResolutionError),
   #[class(inherit)]
   #[error(transparent)]
   FilePathToUrl(#[from] deno_path_util::PathToUrlError),
   #[class(inherit)]
   #[error("{0}")]
-  PackageSubpathResolve(PackageSubpathFromDenoModuleResolveError),
+  PackageSubpathResolve(PackageSubpathFromOdenModuleResolveError),
   #[class(inherit)]
   #[error("{0}")]
   ResolveUrlOrPathError(#[from] deno_path_util::ResolveUrlOrPathError),
   #[class(inherit)]
   #[error("{0}")]
-  ResolvePkgFolderFromDenoModule(#[from] ResolvePkgFolderFromDenoModuleError),
+  ResolvePkgFolderFromOdenModule(#[from] ResolvePkgFolderFromOdenModuleError),
   #[class(inherit)]
   #[error("{0}")]
   ResolveNonGraphSpecifierTypes(#[from] ResolveNonGraphSpecifierTypesError),
   #[class(inherit)]
   #[error("{0}")]
-  ResolvePkgFolderFromDenoReq(#[from] ResolvePkgFolderFromDenoReqError),
+  ResolvePkgFolderFromOdenReq(#[from] ResolvePkgFolderFromOdenReqError),
   #[class(inherit)]
   #[error(transparent)]
   Specifier(#[from] deno_path_util::SpecifierError),
@@ -742,12 +742,12 @@ fn resolve_graph_specifier_types(
     Some(Module::Npm(module)) => {
       if let Some(npm) = maybe_npm {
         let package_folder =
-          npm.npm_resolver.resolve_pkg_folder_from_deno_module_req(
+          npm.npm_resolver.resolve_pkg_folder_from_oden_module_req(
             module.pkg_req_ref.req(),
             referrer,
           )?;
         let res_result =
-          npm.node_resolver.resolve_package_subpath_from_deno_module(
+          npm.node_resolver.resolve_package_subpath_from_oden_module(
             &package_folder,
             module.pkg_req_ref.sub_path(),
             Some(referrer),
@@ -792,10 +792,10 @@ pub enum ResolveNonGraphSpecifierTypesError {
   FilePathToUrl(#[from] deno_path_util::PathToUrlError),
   #[class(inherit)]
   #[error(transparent)]
-  ResolvePkgFolderFromDenoReq(#[from] ResolvePkgFolderFromDenoReqError),
+  ResolvePkgFolderFromOdenReq(#[from] ResolvePkgFolderFromOdenReqError),
   #[class(inherit)]
   #[error(transparent)]
-  PackageSubpathResolve(#[from] PackageSubpathFromDenoModuleResolveError),
+  PackageSubpathResolve(#[from] PackageSubpathFromOdenModuleResolveError),
 }
 
 fn resolve_non_graph_specifier_types(
@@ -832,12 +832,12 @@ fn resolve_non_graph_specifier_types(
         // This could occur when resolving npm:@types/node when it is
         // injected and not part of the graph
         let package_folder =
-          npm.npm_resolver.resolve_pkg_folder_from_deno_module_req(
+          npm.npm_resolver.resolve_pkg_folder_from_oden_module_req(
             npm_req_ref.req(),
             referrer,
           )?;
         let res_result = node_resolver
-          .resolve_package_subpath_from_deno_module(
+          .resolve_package_subpath_from_oden_module(
             &package_folder,
             npm_req_ref.sub_path(),
             Some(referrer),
@@ -881,7 +881,7 @@ fn resolve_transitive_types_node(
   let package_folder = managed.resolve_pkg_folder_from_pkg_id(&pkg_id).ok()?;
   let url_or_path = npm
     .node_resolver
-    .resolve_package_subpath_from_deno_module(
+    .resolve_package_subpath_from_oden_module(
       &package_folder,
       None,
       Some(referrer),
@@ -899,7 +899,7 @@ pub enum ExecError {
   ResponseNotSet,
   #[class(inherit)]
   #[error(transparent)]
-  Js(Box<deno_core::error::JsError>),
+  Js(Box<oden_core::error::JsError>),
 }
 
 #[derive(Clone)]
@@ -949,7 +949,7 @@ pub(crate) fn decompress_source(contents: &[u8]) -> Arc<str> {
 /// optionally an updated TypeScript build info.
 pub fn exec(
   request: Request,
-  code_cache: Option<Arc<dyn deno_runtime::code_cache::CodeCache>>,
+  code_cache: Option<Arc<dyn oden_runtime::code_cache::CodeCache>>,
 ) -> Result<Response, ExecError> {
   // tsc cannot handle root specifiers that don't have one of the "acceptable"
   // extensions.  Therefore, we have to check the root modules against their
@@ -1059,8 +1059,8 @@ pub fn resolve_specifier_for_tsc(
         Ok(maybe_result) => maybe_result,
         Err(
           err
-          @ ResolveNonGraphSpecifierTypesError::ResolvePkgFolderFromDenoReq(
-            ResolvePkgFolderFromDenoReqError::Managed(_),
+          @ ResolveNonGraphSpecifierTypesError::ResolvePkgFolderFromOdenReq(
+            ResolvePkgFolderFromOdenReqError::Managed(_),
           ),
         ) => {
           // it's most likely requesting the jsxImportSource, which isn't loaded
@@ -1285,7 +1285,7 @@ pub fn load_for_tsc<T: LoadContent, M: Mapper>(
           if module.specifier.scheme() != "file" {
             None
           } else {
-            // means it's Deno code importing an npm module
+            // means it's Oden code importing an npm module
             let specifier = resolve_specifier_into_node_modules(
               &CliSys::default(),
               &module.specifier,
@@ -1370,7 +1370,7 @@ pub static IGNORED_DIAGNOSTIC_CODES: LazyLock<HashSet<u64>> =
       // so we will ignore complaints about this compiler setting.
       5070,
       // TS6200: Definitions of the following identifiers conflict with those in another file.
-      // Deno provides its own web API types (WebAssembly, BufferSource, etc.) that intentionally
+      // Oden provides its own web API types (WebAssembly, BufferSource, etc.) that intentionally
       // overlap with lib.dom.d.ts or @types/node. This is expected when both are loaded together.
       6200,
       // TS7016: Could not find a declaration file for module '...'. '...'
@@ -1378,7 +1378,7 @@ pub static IGNORED_DIAGNOSTIC_CODES: LazyLock<HashSet<u64>> =
       // default but importing of a JavaScript module.
       7016,
       // TS18060: Deferred imports are only supported when the '--module' flag
-      // is set to 'esnext' or 'preserve'. Deno uses its own module resolution
+      // is set to 'esnext' or 'preserve'. Oden uses its own module resolution
       // and supports import defer natively.
       18060,
     ]
@@ -1386,10 +1386,10 @@ pub static IGNORED_DIAGNOSTIC_CODES: LazyLock<HashSet<u64>> =
     .collect()
   });
 
-// Names of globals that `@types/node` redeclares but that Deno already
-// declares natively (typically in `lib.deno.web.d.ts`). When the TypeScript
+// Names of globals that `@types/node` redeclares but that Oden already
+// declares natively (typically in `lib.oden.web.d.ts`). When the TypeScript
 // fork merges `@types/node` into the global symbol table, declarations for
-// these names are dropped so the user-visible global remains Deno's.
+// these names are dropped so the user-visible global remains Oden's.
 //
 // This keeps `new AbortController().signal` assignable to the `AbortSignal`
 // parameters of `node:fs`, `node:timers/promises`, etc., and avoids the

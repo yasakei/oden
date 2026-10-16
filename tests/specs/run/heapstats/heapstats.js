@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 "use strict";
 
 function allocTest(alloc, allocAssert, deallocAssert) {
@@ -6,7 +6,7 @@ function allocTest(alloc, allocAssert, deallocAssert) {
   const sample = () => {
     // deno-lint-ignore no-undef
     gc();
-    return Deno.memoryUsage();
+    return Oden.memoryUsage();
   };
   const delta = (t1, t2) => t2.heapUsed - t1.heapUsed;
 

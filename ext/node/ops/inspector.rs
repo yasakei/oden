@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::RefCell;
 use std::net::IpAddr;
@@ -6,20 +6,20 @@ use std::net::SocketAddr;
 use std::net::ToSocketAddrs;
 use std::rc::Rc;
 
-use deno_core::GarbageCollected;
-use deno_core::InspectorMsg;
-use deno_core::InspectorSessionKind;
-use deno_core::JsRuntimeInspector;
-use deno_core::ModuleSpecifier;
-use deno_core::OpState;
-use deno_core::op2;
-use deno_core::serde_json;
-use deno_core::v8;
-use deno_inspector_server::InspectPublishUid;
-use deno_inspector_server::InspectorServerUrl;
-use deno_inspector_server::create_inspector_server;
-use deno_inspector_server::stop_inspector_server;
-use deno_permissions::PermissionsContainer;
+use oden_core::GarbageCollected;
+use oden_core::InspectorMsg;
+use oden_core::InspectorSessionKind;
+use oden_core::JsRuntimeInspector;
+use oden_core::ModuleSpecifier;
+use oden_core::OpState;
+use oden_core::op2;
+use oden_core::serde_json;
+use oden_core::v8;
+use oden_inspector_server::InspectPublishUid;
+use oden_inspector_server::InspectorServerUrl;
+use oden_inspector_server::create_inspector_server;
+use oden_inspector_server::stop_inspector_server;
+use oden_permissions::PermissionsContainer;
 
 #[op2(fast)]
 pub fn op_inspector_enabled(state: &OpState) -> bool {
@@ -105,7 +105,7 @@ pub fn op_inspector_open(
   }
 
   let server =
-    create_inspector_server(addr, "deno", InspectPublishUid::default())?;
+    create_inspector_server(addr, "oden", InspectPublishUid::default())?;
 
   let inspector = state.borrow::<Rc<JsRuntimeInspector>>().clone();
   let main_module = state.borrow::<ModuleSpecifier>().to_string();
@@ -291,12 +291,12 @@ fn capture_initiator(scope: &mut v8::PinScope<'_, '_>) -> serde_json::Value {
 }
 
 struct JSInspectorSession {
-  session: RefCell<Option<deno_core::LocalInspectorSession>>,
+  session: RefCell<Option<oden_core::LocalInspectorSession>>,
 }
 
 // SAFETY: we're sure this can be GCed
 unsafe impl GarbageCollected for JSInspectorSession {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"JSInspectorSession"
@@ -310,14 +310,14 @@ pub enum InspectorOpenError {
   Permission(
     #[from]
     #[inherit]
-    deno_permissions::PermissionCheckError,
+    oden_permissions::PermissionCheckError,
   ),
   #[class(inherit)]
   #[error(transparent)]
   Server(
     #[from]
     #[inherit]
-    deno_inspector_server::InspectorServerError,
+    oden_inspector_server::InspectorServerError,
   ),
   #[class(generic)]
   #[error("{0}")]
@@ -331,7 +331,7 @@ pub enum InspectorConnectError {
   Permission(
     #[from]
     #[inherit]
-    deno_permissions::PermissionCheckError,
+    oden_permissions::PermissionCheckError,
   ),
   #[class(generic)]
   #[error("connectToMainThread not supported")]

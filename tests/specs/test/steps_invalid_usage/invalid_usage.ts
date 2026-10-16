@@ -1,5 +1,5 @@
-Deno.test("capturing", async (t) => {
-  let capturedContext!: Deno.TestContext;
+Oden.test("capturing", async (t) => {
+  let capturedContext!: Oden.TestContext;
   await t.step("some step", (t) => {
     capturedContext = t;
   });
@@ -7,13 +7,13 @@ Deno.test("capturing", async (t) => {
   await capturedContext.step("next step", () => {});
 });
 
-Deno.test("top level missing await", (t) => {
+Oden.test("top level missing await", (t) => {
   t.step("step", () => {
     return new Promise(() => {});
   });
 });
 
-Deno.test({
+Oden.test({
   name: "inner missing await",
   fn: async (t) => {
     await t.step("step", (t) => {
@@ -28,7 +28,7 @@ Deno.test({
   sanitizeExit: false,
 });
 
-Deno.test("parallel steps with sanitizers", async (t) => {
+Oden.test("parallel steps with sanitizers", async (t) => {
   // not allowed because steps with sanitizers cannot be run in parallel
   const step1Entered = Promise.withResolvers<void>();
   const testFinished = Promise.withResolvers<void>();
@@ -40,7 +40,7 @@ Deno.test("parallel steps with sanitizers", async (t) => {
   await t.step("step 2", () => {});
 });
 
-Deno.test("parallel steps when first has sanitizer", async (t) => {
+Oden.test("parallel steps when first has sanitizer", async (t) => {
   const step1Entered = Promise.withResolvers<void>();
   const step2Finished = Promise.withResolvers<void>();
   const step1 = t.step({
@@ -62,7 +62,7 @@ Deno.test("parallel steps when first has sanitizer", async (t) => {
   await step1;
 });
 
-Deno.test("parallel steps when second has sanitizer", async (t) => {
+Oden.test("parallel steps when second has sanitizer", async (t) => {
   const step1Entered = Promise.withResolvers<void>();
   const step2Finished = Promise.withResolvers<void>();
   const step1 = t.step({
@@ -86,7 +86,7 @@ Deno.test("parallel steps when second has sanitizer", async (t) => {
   await step1;
 });
 
-Deno.test({
+Oden.test({
   name: "parallel steps where only inner tests have sanitizers",
   fn: async (t) => {
     const step1Entered = Promise.withResolvers<void>();

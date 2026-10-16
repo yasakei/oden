@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::rc::Rc;
 use std::time::Duration;
@@ -9,13 +9,13 @@ use deno_ast::MediaType;
 use deno_ast::ModuleKind;
 use deno_ast::ParseParams;
 use deno_ast::SourceMapOption;
-use deno_core::Extension;
-use deno_core::JsRuntime;
-use deno_core::JsRuntimeForSnapshot;
-use deno_core::ModuleCodeString;
-use deno_core::ModuleName;
-use deno_core::RuntimeOptions;
-use deno_core::SourceMapData;
+use oden_core::Extension;
+use oden_core::JsRuntime;
+use oden_core::JsRuntimeForSnapshot;
+use oden_core::ModuleCodeString;
+use oden_core::ModuleName;
+use oden_core::RuntimeOptions;
+use oden_core::SourceMapData;
 use deno_error::JsErrorBox;
 use url::Url;
 
@@ -24,7 +24,7 @@ macro_rules! fake_extensions {
     {
       $(
         mod $name {
-          deno_core::extension!(
+          oden_core::extension!(
             $name,
             ops = [ ops::$name ],
             esm_entry_point = concat!("ext:", stringify!($name), "/file.js"),
@@ -32,7 +32,7 @@ macro_rules! fake_extensions {
           );
 
           mod ops {
-            #[deno_core::op2(fast)]
+            #[oden_core::op2(fast)]
             pub fn $name() {
             }
           }

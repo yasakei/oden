@@ -1,15 +1,15 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::Cell;
 use std::cell::RefCell;
 use std::ffi::c_void;
 use std::rc::Rc;
 
-use deno_core::FromV8;
-use deno_core::GarbageCollected;
-use deno_core::op2;
-use deno_core::v8;
-use deno_core::v8_static_strings;
+use oden_core::FromV8;
+use oden_core::GarbageCollected;
+use oden_core::op2;
+use oden_core::v8;
+use oden_core::v8_static_strings;
 use rusqlite::ffi;
 
 use super::SqliteError;
@@ -98,7 +98,7 @@ pub(crate) type InnerSessionPtr = Rc<Cell<Option<*mut ffi::sqlite3_session>>>;
 
 // SAFETY: we're sure this can be GCed
 unsafe impl GarbageCollected for Session {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"Session"

@@ -1,4 +1,4 @@
-import * as foo from "@deno-test/foo";
-import * as bar from "@deno-test/bar";
+import * as foo from "@oden-test/foo";
+import * as bar from "@oden-test/bar";
 
 console.log(foo, bar);

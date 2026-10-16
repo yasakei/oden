@@ -1,3 +1,3 @@
-Deno.writeTextFileSync("./a.ts", "console.log(1);");
+Oden.writeTextFileSync("./a.ts", "console.log(1);");
 await import("./a.ts");
-Deno.writeTextFileSync("./a.ts", "console.log(2);");
+Oden.writeTextFileSync("./a.ts", "console.log(2);");

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! `SubtleCrypto.deriveKey()` body in Rust.
 //!
@@ -8,8 +8,8 @@
 //! through the Rust `raw-secret` import path
 //! ([`crate::subtle_import_key::run`]).
 
-use deno_core::ToV8;
-use deno_core::v8;
+use oden_core::ToV8;
+use oden_core::v8;
 use deno_error::JsErrorBox;
 
 use crate::CryptoError;

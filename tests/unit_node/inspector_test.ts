@@ -1,28 +1,28 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import inspector, { Session } from "node:inspector";
 import inspectorPromises, {
   Session as SessionPromise,
 } from "node:inspector/promises";
 import { assertEquals, assertThrows } from "@std/assert";
 
-Deno.test("[node/inspector] - importing inspector works", () => {
+Oden.test("[node/inspector] - importing inspector works", () => {
   assertEquals(typeof inspector.open, "function");
 });
 
-Deno.test("[node/inspector] - Session constructor should not throw", () => {
+Oden.test("[node/inspector] - Session constructor should not throw", () => {
   new Session();
 });
 
-Deno.test("[node/inspector/promises] - importing inspector works", () => {
+Oden.test("[node/inspector/promises] - importing inspector works", () => {
   assertEquals(typeof inspectorPromises.open, "function");
 });
 
-Deno.test("[node/inspector/promises] - Session constructor should not throw", () => {
+Oden.test("[node/inspector/promises] - Session constructor should not throw", () => {
   new SessionPromise();
 });
 
 // Regression test for: https://github.com/denoland/deno/issues/31020
-Deno.test({
+Oden.test({
   name: "[node/inspector] - deeply nested session.post() calls",
   fn: async () => {
     const session = new Session();
@@ -51,7 +51,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name:
     "[node/inspector] - multiple session.post() calls in same callback are queued",
   fn: async () => {
@@ -95,13 +95,13 @@ Deno.test({
   },
 });
 
-Deno.test("[node/inspector] - url() requires sys permission", {
+Oden.test("[node/inspector] - url() requires sys permission", {
   permissions: { sys: false },
 }, () => {
-  assertThrows(() => inspector.url(), Deno.errors.NotCapable);
+  assertThrows(() => inspector.url(), Oden.errors.NotCapable);
 });
 
-Deno.test("[node/inspector] - url() returns undefined when no --inspect flag", {
+Oden.test("[node/inspector] - url() returns undefined when no --inspect flag", {
   permissions: { sys: true },
 }, () => {
   const url = inspector.url();

@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
-/// <reference path="../../cli/tsc/dts/lib.deno.unstable.d.ts" />
+// Copyright 2018-2026 the Oden authors. MIT license.
+/// <reference path="../../cli/tsc/dts/lib.oden.unstable.d.ts" />
 import { op_bundle } from "ext:core/ops";
 import { core, primordials } from "ext:core/mod.js";
-const { TextDecoder } = core.loadExtScript("ext:deno_web/08_text_encoding.js");
+const { TextDecoder } = core.loadExtScript("ext:oden_web/08_text_encoding.js");
 
 const { SafeArrayIterator, Uint8Array, ObjectPrototypeIsPrototypeOf } =
   primordials;
@@ -10,8 +10,8 @@ const { SafeArrayIterator, Uint8Array, ObjectPrototypeIsPrototypeOf } =
 const decoder = new TextDecoder();
 
 export async function bundle(
-  options: Deno.bundle.Options,
-): Promise<Deno.bundle.Result> {
+  options: Oden.bundle.Options,
+): Promise<Oden.bundle.Result> {
   const result = {
     success: false,
     ...await op_bundle(

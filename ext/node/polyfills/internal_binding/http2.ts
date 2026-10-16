@@ -1,9 +1,9 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 (function () {
 const { core } = __bootstrap;
 const { op_http2_error_string } = core.ops;
 const constants = core.loadExtScript(
-  "ext:deno_node/internal/http2/constants.ts",
+  "ext:oden_node/internal/http2/constants.ts",
 );
 
 class Http2Stream {

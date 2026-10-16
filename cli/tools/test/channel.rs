@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::fmt::Display;
 use std::future::Future;
@@ -11,13 +11,13 @@ use std::task::Poll;
 use std::task::ready;
 use std::time::Duration;
 
-use deno_core::parking_lot;
-use deno_core::parking_lot::lock_api::RawMutex;
-use deno_core::parking_lot::lock_api::RawMutexTimed;
-use deno_runtime::deno_io::AsyncPipeRead;
-use deno_runtime::deno_io::PipeRead;
-use deno_runtime::deno_io::PipeWrite;
-use deno_runtime::deno_io::pipe;
+use oden_core::parking_lot;
+use oden_core::parking_lot::lock_api::RawMutex;
+use oden_core::parking_lot::lock_api::RawMutexTimed;
+use oden_runtime::oden_io::AsyncPipeRead;
+use oden_runtime::oden_io::PipeRead;
+use oden_runtime::oden_io::PipeWrite;
+use oden_runtime::oden_io::pipe;
 use tokio::io::AsyncRead;
 use tokio::io::AsyncReadExt;
 use tokio::io::ReadBuf;
@@ -440,8 +440,8 @@ impl TestEventSender {
 #[allow(clippy::print_stderr, reason = "test code")]
 #[cfg(test)]
 mod tests {
-  use deno_core::unsync::spawn;
-  use deno_core::unsync::spawn_blocking;
+  use oden_core::unsync::spawn;
+  use oden_core::unsync::spawn_blocking;
 
   use super::*;
   use crate::tools::test::TestResult;
@@ -629,7 +629,7 @@ mod tests {
       eprintln!("Receiver closed");
       i
     });
-    let send_handle: deno_core::unsync::JoinHandle<()> =
+    let send_handle: oden_core::unsync::JoinHandle<()> =
       spawn_blocking(move || {
         for i in 0..MESSAGE_COUNT {
           worker

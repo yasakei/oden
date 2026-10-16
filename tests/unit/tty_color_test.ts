@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assertEquals } from "./test_util.ts";
 
-// Note tests for Deno.stdin.setRaw is in integration tests.
+// Note tests for Oden.stdin.setRaw is in integration tests.
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
   async function noColorIfNotTty() {
-    const { stdout } = await new Deno.Command(Deno.execPath(), {
+    const { stdout } = await new Oden.Command(Oden.execPath(), {
       args: ["eval", "console.log(1)"],
     }).output();
     const output = new TextDecoder().decode(stdout);
@@ -14,22 +14,22 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
-  async function denoNoColorIsNotAffectedByNonTty() {
-    const { stdout } = await new Deno.Command(Deno.execPath(), {
-      args: ["eval", "console.log(Deno.noColor)"],
+  async function odenNoColorIsNotAffectedByNonTty() {
+    const { stdout } = await new Oden.Command(Oden.execPath(), {
+      args: ["eval", "console.log(Oden.noColor)"],
     }).output();
     const output = new TextDecoder().decode(stdout);
     assertEquals(output, "false\n");
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
-  async function denoNoColorTrueEmptyVar() {
-    const { stdout } = await new Deno.Command(Deno.execPath(), {
-      args: ["eval", "console.log(Deno.noColor)"],
+  async function odenNoColorTrueEmptyVar() {
+    const { stdout } = await new Oden.Command(Oden.execPath(), {
+      args: ["eval", "console.log(Oden.noColor)"],
       env: {
         // https://no-color.org/ -- should not be true when empty
         NO_COLOR: "",
@@ -40,11 +40,11 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { run: true, read: true } },
-  async function denoNoColorTrueEmptyVar() {
-    const { stdout } = await new Deno.Command(Deno.execPath(), {
-      args: ["eval", "console.log(Deno.noColor)"],
+  async function odenNoColorTrueEmptyVar() {
+    const { stdout } = await new Oden.Command(Oden.execPath(), {
+      args: ["eval", "console.log(Oden.noColor)"],
       env: {
         NO_COLOR: "1",
       },

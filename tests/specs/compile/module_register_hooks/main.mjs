@@ -3,12 +3,12 @@ import { pathToFileURL } from "node:url";
 import { join } from "node:path";
 import assert from "node:assert/strict";
 
-const cwdUrl = pathToFileURL(Deno.cwd() + "/").href;
+const cwdUrl = pathToFileURL(Oden.cwd() + "/").href;
 const resolvedExternalUrl = pathToFileURL(
-  join(Deno.cwd(), "external_resolved.mjs"),
+  join(Oden.cwd(), "external_resolved.mjs"),
 ).href;
 const loadedExternalUrl = pathToFileURL(
-  join(Deno.cwd(), "external_loaded.mjs"),
+  join(Oden.cwd(), "external_loaded.mjs"),
 ).href;
 
 const calls = [];

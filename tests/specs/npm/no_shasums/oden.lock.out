@@ -1,0 +1,18 @@
+{
+  "version": "5",
+  "specifiers": {
+    "npm:@odentest/no-shasums@*": "1.0.0"
+  },
+  "npm": {
+    "@odentest/no-shasums@1.0.0": {
+      "tarball": "http://localhost:4260/@odentest/no-shasums/1.0.0.tgz"
+    }
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@odentest/no-shasums@*"
+      ]
+    }
+  }
+}

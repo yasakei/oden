@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! Code for global npm cache resolution.
 
 use std::borrow::Cow;
 use std::path::PathBuf;
 
-use deno_npm::NpmPackageCacheFolderId;
-use deno_npm::NpmPackageId;
+use oden_npm::NpmPackageCacheFolderId;
+use oden_npm::NpmPackageId;
 use deno_semver::StackString;
 use deno_semver::Version;
 use deno_semver::package::PackageNv;
@@ -102,8 +102,8 @@ impl<TSys: GlobalNpmPackageResolverSys> GlobalNpmPackageResolver<TSys> {
     let Ok(referrer_path) = referrer.path() else {
       return Ok(None);
     };
-    // strip any subpath (e.g. "@denotest/add2/sub.js" -> "@denotest/add2")
-    let name = deno_npm::package_name_without_subpath(name);
+    // strip any subpath (e.g. "@odentest/add2/sub.js" -> "@odentest/add2")
+    let name = oden_npm::package_name_without_subpath(name);
     let cache_location = self.cache.root_dir();
     for current_folder in referrer_path
       .ancestors()
@@ -146,7 +146,7 @@ impl<TSys: GlobalNpmPackageResolverSys> NpmPackageFolderResolver
     name: &str,
     referrer: &UrlOrPathRef,
   ) -> Result<PathBuf, PackageFolderResolveError> {
-    use deno_npm::resolution::PackageNotFoundFromReferrerError;
+    use oden_npm::resolution::PackageNotFoundFromReferrerError;
     let Some(referrer_cache_folder_id) = self
       .resolve_package_cache_folder_id_from_specifier_inner(referrer.url()?)
     else {

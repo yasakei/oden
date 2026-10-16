@@ -1,16 +1,16 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-mod deno_dir;
+mod oden_dir;
 mod disk_cache;
 mod emit;
 #[cfg(feature = "deno_ast")]
 mod parsed_source;
 
-pub use deno_dir::DenoDir;
-pub use deno_dir::DenoDirOptions;
-pub use deno_dir::DenoDirProvider;
-pub use deno_dir::DenoDirProviderRc;
-pub use deno_dir::DenoDirSys;
+pub use oden_dir::OdenDir;
+pub use oden_dir::OdenDirOptions;
+pub use oden_dir::OdenDirProvider;
+pub use oden_dir::OdenDirProviderRc;
+pub use oden_dir::OdenDirSys;
 pub use disk_cache::DiskCache;
 pub use disk_cache::DiskCacheSys;
 pub use emit::EmitCache;

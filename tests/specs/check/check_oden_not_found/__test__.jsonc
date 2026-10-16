@@ -1,0 +1,8 @@
+{
+  // ignored: Oden/oden.ns types are always injected now, so 'Oden' resolves
+  // and no error is reported. https://github.com/denoland/deno/issues/36085
+  "ignore": true,
+  "args": "check --quiet oden_not_found/main.ts",
+  "output": "oden_not_found/main.out",
+  "exitCode": 1
+}

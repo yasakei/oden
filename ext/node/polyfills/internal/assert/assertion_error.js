@@ -1,28 +1,28 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Node.js contributors. All rights reserved. MIT License.
 
 (function () {
 const { core, primordials } = __bootstrap;
 const { inspect } = core.loadExtScript(
-  "ext:deno_node/internal/util/inspect.mjs",
+  "ext:oden_node/internal/util/inspect.mjs",
 );
-const { isError } = core.loadExtScript("ext:deno_node/internal/util.mjs");
+const { isError } = core.loadExtScript("ext:oden_node/internal/util.mjs");
 const { isErrorStackTraceLimitWritable } = core.loadExtScript(
-  "ext:deno_node/internal/errors.ts",
+  "ext:oden_node/internal/errors.ts",
 );
-const colors = core.loadExtScript("ext:deno_node/internal/util/colors.ts");
+const colors = core.loadExtScript("ext:oden_node/internal/util/colors.ts");
 const { myersDiff, printMyersDiff, printSimpleMyersDiff } = core
   .loadExtScript(
-    "ext:deno_node/internal/assert/myers_diff.js",
+    "ext:oden_node/internal/assert/myers_diff.js",
   );
 const { validateObject } = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
-const io = core.loadExtScript("ext:deno_io/12_io.js");
+const io = core.loadExtScript("ext:oden_io/12_io.js");
 
 function getConsoleWidth() {
   try {
-    return Deno.consoleSize().columns;
+    return Oden.consoleSize().columns;
   } catch {
     return 80;
   }

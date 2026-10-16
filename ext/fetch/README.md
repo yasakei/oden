@@ -1,4 +1,4 @@
-# deno_fetch
+# oden_fetch
 
 **This crate implements the Fetch API.**
 
@@ -12,12 +12,12 @@ properties to the global scope:
 ```javascript
 import { core } from "ext:core/mod.js";
 
-const headers = core.loadExtScript("ext:deno_fetch/20_headers.js");
-const formData = core.loadExtScript("ext:deno_fetch/21_formdata.js");
-const request = core.loadExtScript("ext:deno_fetch/23_request.js");
-const response = core.loadExtScript("ext:deno_fetch/23_response.js");
-const fetch = core.loadExtScript("ext:deno_fetch/26_fetch.js");
-const eventSource = core.loadExtScript("ext:deno_fetch/27_eventsource.js");
+const headers = core.loadExtScript("ext:oden_fetch/20_headers.js");
+const formData = core.loadExtScript("ext:oden_fetch/21_formdata.js");
+const request = core.loadExtScript("ext:oden_fetch/23_request.js");
+const response = core.loadExtScript("ext:oden_fetch/23_response.js");
+const fetch = core.loadExtScript("ext:oden_fetch/26_fetch.js");
+const eventSource = core.loadExtScript("ext:oden_fetch/27_eventsource.js");
 
 // Set up the callback for Wasm streaming ops
 core.setWasmStreamingCallback(fetch.handleWasmStreaming);
@@ -58,22 +58,22 @@ Object.defineProperty(globalThis, "FormData", {
 });
 ```
 
-Then from rust, provide `deno_fetch::deno_fetch::init(Default::default())` in
+Then from rust, provide `oden_fetch::oden_fetch::init(Default::default())` in
 the `extensions` field of your `RuntimeOptions`
 
 Where:
 
-- Options: `deno_fetch::Options`, which implements `Default`
+- Options: `oden_fetch::Options`, which implements `Default`
 
 ## Dependencies
 
-- **deno_webidl**: Provided by the `deno_webidl` crate
-- **deno_web**: Provided by the `deno_web` crate
-- **deno_console**: Provided by the `deno_console` crate
+- **oden_webidl**: Provided by the `oden_webidl` crate
+- **oden_web**: Provided by the `oden_web` crate
+- **oden_console**: Provided by the `oden_console` crate
 
 ## Provided ops
 
-Following ops are provided, which can be accessed through `Deno.ops`:
+Following ops are provided, which can be accessed through `Oden.ops`:
 
 - op_fetch
 - op_fetch_send

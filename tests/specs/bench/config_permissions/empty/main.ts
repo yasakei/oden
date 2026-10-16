@@ -1,3 +1,3 @@
-Deno.bench("empty permissions bench", () => {
+Oden.bench("empty permissions bench", () => {
   // noop
 });

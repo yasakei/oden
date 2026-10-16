@@ -1,2 +1,2 @@
-import { setValue } from "@denotest/deprecated-package";
+import { setValue } from "@odentest/deprecated-package";
 setValue(5);

@@ -1,10 +1,10 @@
 console.error("[ISOLATE] Registering test-cron");
-Deno.cron("test-cron", "* * * * *", () => {
+Oden.cron("test-cron", "* * * * *", () => {
   console.error("[ISOLATE] test-cron executed");
 });
 
 console.error("[ISOLATE] Registering other-cron");
-Deno.cron("other-cron", "*/5 * * * *", () => {
+Oden.cron("other-cron", "*/5 * * * *", () => {
   console.error("[ISOLATE] other-cron executed");
 });
 

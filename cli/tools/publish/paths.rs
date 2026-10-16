@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Validation logic in this file is shared with registry/api/src/ids.rs
 
@@ -7,9 +7,9 @@ use std::path::Path;
 use std::path::PathBuf;
 
 use deno_ast::ModuleSpecifier;
-use deno_config::glob::FileCollector;
-use deno_config::glob::FilePatterns;
-use deno_core::error::AnyError;
+use oden_config::glob::FileCollector;
+use oden_config::glob::FilePatterns;
+use oden_core::error::AnyError;
 use thiserror::Error;
 
 use super::diagnostics::PublishDiagnostic;

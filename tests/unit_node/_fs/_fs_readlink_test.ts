@@ -1,21 +1,21 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assertCallbackErrorUncaught } from "../_test_utils.ts";
 import { readlink, readlinkSync } from "node:fs";
 import { assert, assertEquals } from "@std/assert";
 import * as path from "@std/path";
 import { Buffer } from "node:buffer";
 
-const testDir = Deno.makeTempDirSync();
+const testDir = Oden.makeTempDirSync();
 const oldname = path.join(testDir, "oldname");
 const newname = path.join(testDir, "newname");
 
-if (Deno.build.os === "windows") {
-  Deno.symlinkSync(oldname, newname, { type: "file" });
+if (Oden.build.os === "windows") {
+  Oden.symlinkSync(oldname, newname, { type: "file" });
 } else {
-  Deno.symlinkSync(oldname, newname);
+  Oden.symlinkSync(oldname, newname);
 }
 
-Deno.test({
+Oden.test({
   name: "readlinkSuccess",
   async fn() {
     const data = await new Promise((res, rej) => {
@@ -32,7 +32,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "readlinkEncodeBufferSuccess",
   async fn() {
     const data = await new Promise((res, rej) => {
@@ -49,7 +49,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "readlinkSyncSuccess",
   fn() {
     const data = readlinkSync(newname);
@@ -58,7 +58,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "readlinkEncodeBufferSuccess",
   fn() {
     const data = readlinkSync(newname, { encoding: "buffer" });
@@ -67,7 +67,7 @@ Deno.test({
   },
 });
 
-Deno.test("[std/node/fs] readlink callback isn't called twice if error is thrown", async () => {
+Oden.test("[std/node/fs] readlink callback isn't called twice if error is thrown", async () => {
   const importUrl = new URL("node:fs", import.meta.url);
   await assertCallbackErrorUncaught({
     prelude: `import { readlink } from ${JSON.stringify(importUrl)}`,
@@ -75,7 +75,7 @@ Deno.test("[std/node/fs] readlink callback isn't called twice if error is thrown
   });
 });
 
-Deno.test("[node/fs] readlink accepts Buffer as path", async () => {
+Oden.test("[node/fs] readlink accepts Buffer as path", async () => {
   const data = await new Promise((res, rej) => {
     readlink(Buffer.from(newname), (err, data) => {
       if (err) {
@@ -87,7 +87,7 @@ Deno.test("[node/fs] readlink accepts Buffer as path", async () => {
   assertEquals(data, oldname);
 });
 
-Deno.test("[node/fs] readlinkSync accepts Buffer as path", () => {
+Oden.test("[node/fs] readlinkSync accepts Buffer as path", () => {
   const data = readlinkSync(Buffer.from(newname));
   assertEquals(data, oldname);
 });

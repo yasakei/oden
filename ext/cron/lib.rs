@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 mod cron;
 mod handler_impl;
@@ -11,13 +11,13 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
 
-use deno_core::OpState;
-use deno_core::Resource;
-use deno_core::ResourceId;
-use deno_core::op2;
+use oden_core::OpState;
+use oden_core::Resource;
+use oden_core::ResourceId;
+use oden_core::op2;
 use deno_error::JsErrorBox;
 use deno_error::JsErrorClass;
-use deno_features::FeatureChecker;
+use oden_features::FeatureChecker;
 pub use handler_impl::CronHandlerImpl;
 pub use socket::SocketCronHandle;
 pub use socket::SocketCronHandler;
@@ -26,7 +26,7 @@ pub use crate::interface::*;
 
 pub const UNSTABLE_FEATURE_NAME: &str = "cron";
 
-deno_core::extension!(deno_cron,
+oden_core::extension!(oden_cron,
   ops = [
     op_cron_create,
     op_cron_next,
@@ -58,7 +58,7 @@ impl Resource for CronResource {
 pub enum CronError {
   #[class(inherit)]
   #[error(transparent)]
-  Resource(#[from] deno_core::error::ResourceError),
+  Resource(#[from] oden_core::error::ResourceError),
   #[class(type)]
   #[error("Cron name cannot exceed 64 characters: current length {0}")]
   NameExceeded(usize),
@@ -105,7 +105,7 @@ fn op_cron_create(
     let state = state.borrow();
     state
       .borrow::<Arc<FeatureChecker>>()
-      .check_or_exit(UNSTABLE_FEATURE_NAME, "Deno.cron");
+      .check_or_exit(UNSTABLE_FEATURE_NAME, "Oden.cron");
     state.borrow::<Rc<dyn CronHandler>>().clone()
   };
 

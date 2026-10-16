@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Two concurrent dynamic imports that both transitively depend on the same
 // lazy-loaded ESM module ("custom:lazy_shared"). Each import() spawns its

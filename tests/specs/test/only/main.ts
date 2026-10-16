@@ -1,20 +1,20 @@
-Deno.test({
+Oden.test({
   name: "before",
   fn() {},
 });
 
-Deno.test({
+Oden.test({
   only: true,
   name: "only",
   fn() {},
 });
 
-Deno.test.only({
+Oden.test.only({
   name: "only2",
   fn() {},
 });
 
-Deno.test({
+Oden.test({
   name: "after",
   fn() {},
 });

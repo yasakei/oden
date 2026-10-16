@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::BTreeSet;
 use std::collections::HashMap;
@@ -384,7 +384,7 @@ impl<'a> NpmPackageVersionResolver<'a> {
   /// registry.
   ///
   /// This is the canonical prerelease fallback used by the npm graph resolver.
-  /// `deno_config`'s `version_req_matches_including_pre` keeps an identical
+  /// `oden_config`'s `version_req_matches_including_pre` keeps an identical
   /// copy for the workspace/byonm paths (it can't depend on this crate, since
   /// the dependency goes the other way). Keep the two in sync.
   fn link_version_req_satisfies(
@@ -1141,16 +1141,16 @@ mod test {
       date: Some(NewestDependencyDate(
         "2025-01-01T00:00:00.000Z".parse().unwrap(),
       )),
-      exclude: BTreeSet::from(["@denotest/exact".into()]),
+      exclude: BTreeSet::from(["@odentest/exact".into()]),
       exclude_prefixes: vec!["@scope/".into()],
     };
     // exact match
-    assert!(options.get_for_package(&"@denotest/exact".into()).is_none());
+    assert!(options.get_for_package(&"@odentest/exact".into()).is_none());
     // prefix match (from a `@scope/*` wildcard entry)
     assert!(options.get_for_package(&"@scope/foo".into()).is_none());
     assert!(options.get_for_package(&"@scope/bar".into()).is_none());
     // no match
-    assert!(options.get_for_package(&"@denotest/other".into()).is_some());
+    assert!(options.get_for_package(&"@odentest/other".into()).is_some());
     assert!(options.get_for_package(&"@scoped/foo".into()).is_some());
     assert!(options.get_for_package(&"@scope".into()).is_some());
   }

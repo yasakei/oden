@@ -1,13 +1,13 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::RefCell;
 use std::collections::HashSet;
 use std::net::IpAddr;
 use std::net::SocketAddr;
 
-use deno_core::OpState;
-use deno_core::ToV8;
-use deno_core::op2;
+use oden_core::OpState;
+use oden_core::ToV8;
+use oden_core::op2;
 use ipnet::IpNet;
 use ipnet::Ipv4Net;
 use ipnet::Ipv6Net;
@@ -17,8 +17,8 @@ pub struct BlockListResource {
 }
 
 // SAFETY: we're sure this can be GCed
-unsafe impl deno_core::GarbageCollected for BlockListResource {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+unsafe impl oden_core::GarbageCollected for BlockListResource {
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"BlockListResource"

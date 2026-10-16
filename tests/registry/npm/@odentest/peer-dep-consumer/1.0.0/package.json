@@ -1,0 +1,7 @@
+{
+  "name": "@odentest/peer-dep-consumer",
+  "version": "1.0.0",
+  "peerDependencies": {
+    "@odentest/peer-dep-base": "*"
+  }
+}

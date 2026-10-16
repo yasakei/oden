@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! `SubtleCrypto.getPublicKey()` body in Rust.
 //!
@@ -13,7 +13,7 @@
 
 use base64::Engine;
 use base64::prelude::BASE64_URL_SAFE_NO_PAD;
-use deno_core::v8;
+use oden_core::v8;
 use deno_error::JsErrorBox;
 
 use crate::CryptoError;

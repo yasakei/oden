@@ -1,0 +1,5 @@
+{
+  "tasks": {
+    "listener": "oden run listener.ts"
+  }
+}

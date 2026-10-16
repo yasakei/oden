@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! This module provides traits and macros that facilitate the conversion of Rust objects into v8 objects.
 //!
@@ -449,7 +449,7 @@ impl<'a, T: crate::cppgc::GarbageCollected + 'static> RustToV8<'a>
     self,
     scope: &mut v8::PinScope<'a, 'i>,
   ) -> v8::Local<'a, v8::Value> {
-    v8::Local::<v8::Value>::from(deno_core::cppgc::make_cppgc_object(
+    v8::Local::<v8::Value>::from(oden_core::cppgc::make_cppgc_object(
       scope, self.0,
     ))
   }

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cell::RefCell;
@@ -568,7 +568,7 @@ mod tests {
   /// For slower tests. Doesn't guarantee a JIT.
   pub const JIT_SLOW_ITERATIONS: usize = 500;
 
-  deno_core::extension!(
+  oden_core::extension!(
     testing,
     ops = [
       op_test_fail,
@@ -707,7 +707,7 @@ mod tests {
         "",
         format!(
           r"
-          const {{ op_test_fail, op_test_print_debug, {op} }} = Deno.core.ops;
+          const {{ op_test_fail, op_test_print_debug, {op} }} = Oden.core.ops;
           function assert(b) {{
             if (!b) {{
               op_test_fail();
@@ -758,7 +758,7 @@ mod tests {
         "",
         format!(
           r"
-          const {{ op_test_fail, op_test_print_debug, {op} }} = Deno.core.ops;
+          const {{ op_test_fail, op_test_print_debug, {op} }} = Oden.core.ops;
           function assert(b) {{
             if (!b) {{
               op_test_fail();

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use deno_ast::EmitOptions;
 use deno_ast::ImportsNotUsedAsValues;
@@ -8,8 +8,8 @@ use deno_ast::SourceMapOption;
 use deno_ast::TranspileModuleOptions;
 use deno_ast::TranspileOptions;
 use deno_ast::TypeStripOptions;
-use deno_core::op2;
-use deno_core::url::Url;
+use oden_core::op2;
+use oden_core::url::Url;
 use deno_error::JsErrorBox;
 
 deno_error::js_error_wrapper!(

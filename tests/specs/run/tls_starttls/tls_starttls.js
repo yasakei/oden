@@ -9,11 +9,11 @@ const { promise, resolve } = Promise.withResolvers();
 const hostname = "localhost";
 const port = 3504;
 
-const listener = Deno.listenTls({
+const listener = Oden.listenTls({
   hostname,
   port,
-  cert: Deno.readTextFileSync("./localhost.crt"),
-  key: Deno.readTextFileSync("./localhost.key"),
+  cert: Oden.readTextFileSync("./localhost.crt"),
+  key: Oden.readTextFileSync("./localhost.key"),
 });
 
 const response = encoder.encode(
@@ -33,8 +33,8 @@ listener.accept().then(
   },
 );
 
-let conn = await Deno.connect({ hostname, port });
-conn = await Deno.startTls(conn, { hostname });
+let conn = await Oden.connect({ hostname, port });
+conn = await Oden.startTls(conn, { hostname });
 const w = new BufWriter(conn);
 const r = new BufReader(conn);
 const body = `GET / HTTP/1.1\r\nHost: ${hostname}:${port}\r\n\r\n`;

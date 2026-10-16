@@ -95,9 +95,9 @@
           "description": "Overrides the per-test timeout in milliseconds (default 10s, 20s on macOS). Use sparingly — only for tests that are legitimately slow, such as pummel tests that allocate multi-gigabyte buffers.",
           "minimum": 1
         },
-        "extraDenoArgs": {
+        "extraOdenArgs": {
           "type": "array",
-          "description": "Extra deno run/test CLI flags for this test only. Use sparingly — typically for security knobs like --unsafely-ignore-certificate-errors that one specific test requires.",
+          "description": "Extra oden run/test CLI flags for this test only. Use sparingly — typically for security knobs like --unsafely-ignore-certificate-errors that one specific test requires.",
           "items": { "type": "string" }
         }
       },

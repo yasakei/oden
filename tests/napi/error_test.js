@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import {
   assert,
@@ -31,7 +31,7 @@ function assertThrowsWithCode(fn, value) {
   }
 }
 
-Deno.test("napi error", function () {
+Oden.test("napi error", function () {
   class MyError extends Error {}
   const myError = new MyError("Some MyError");
 

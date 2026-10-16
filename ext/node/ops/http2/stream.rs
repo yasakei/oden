@@ -1,13 +1,13 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::Cell;
 use std::cell::RefCell;
 use std::collections::VecDeque;
 
-use deno_core::cppgc;
-use deno_core::op2;
-use deno_core::uv_compat::UV_ECANCELED;
-use deno_core::v8;
+use oden_core::cppgc;
+use oden_core::op2;
+use oden_core::uv_compat::UV_ECANCELED;
+use oden_core::v8;
 use libnghttp2 as ffi;
 use serde::Serialize;
 
@@ -247,7 +247,7 @@ pub struct Http2Stream {
 }
 
 // SAFETY: Http2Stream is GC-traced by cppgc
-unsafe impl deno_core::GarbageCollected for Http2Stream {
+unsafe impl oden_core::GarbageCollected for Http2Stream {
   fn trace(&self, _: &mut v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
@@ -345,7 +345,7 @@ impl Http2Stream {
     //
     // Node's `Http2Stream::AddHeader` additionally rejects when the session
     // would exceed its `maxSessionMemory` budget (see `src/node_http2.cc`).
-    // Deno does not yet track per-session memory, so that arm is omitted; if
+    // Oden does not yet track per-session memory, so that arm is omitted; if
     // session memory accounting is added later, gate it here as well.
     if current_pairs >= max_header_pairs
       || current_length.saturating_add(header_length as u64) > max_header_length

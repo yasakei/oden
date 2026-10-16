@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 use bencher::Bencher;
 use bencher::benchmark_group;
 use bencher::benchmark_main;
-use deno_http::compressible::is_content_compressible;
+use oden_http::compressible::is_content_compressible;
 
 fn compressible_simple_hit(b: &mut Bencher) {
   b.iter(|| {

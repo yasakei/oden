@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Borrow;
 use std::ffi::OsStr;
@@ -169,7 +169,7 @@ impl std::fmt::Display for FastStringV8AllocationError {
 /// Examples of ways to construct a [`FastString`]:
 ///
 /// ```rust
-/// # use deno_core::{ascii_str, FastString};
+/// # use oden_core::{ascii_str, FastString};
 ///
 /// let code: FastString = ascii_str!("a string").into();
 /// let code: FastString = format!("a string").into();

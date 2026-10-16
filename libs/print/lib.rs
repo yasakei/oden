@@ -1,17 +1,17 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! Replacements for the std `print!`, `println!`, `eprint!` and `eprintln!`
 //! macros that drop write errors instead of panicking, named after Cargo's
 //! macros with the same semantics.
 //!
 //! The Rust runtime ignores `SIGPIPE`, so when the other end of a pipe is
-//! closed (ex. `deno test | head`) writes to stdout surface as `EPIPE`
+//! closed (ex. `oden test | head`) writes to stdout surface as `EPIPE`
 //! errors, which make the std print macros panic. The macros in this crate
 //! drop write errors instead, matching how Node.js treats `EPIPE` on stdout
 //! and how `env_logger` treats write errors.
 //!
 //! ```
-//! use deno_print::drop_println;
+//! use oden_print::drop_println;
 //!
 //! drop_println!("hello there");
 //! ```
@@ -96,7 +96,7 @@ mod tests {
     reason = "test spawns itself as a child process"
   )]
   fn does_not_panic_on_closed_stdout() {
-    if std::env::var_os("DENO_PRINT_TEST_CHILD").is_some() {
+    if std::env::var_os("ODEN_PRINT_TEST_CHILD").is_some() {
       // more than any pipe buffer holds, so writes keep happening after
       // the parent closes the read end
       for i in 0..1_000_000 {
@@ -111,7 +111,7 @@ mod tests {
     let mut child = std::process::Command::new(exe)
       .arg("tests::does_not_panic_on_closed_stdout")
       .arg("--exact")
-      .env("DENO_PRINT_TEST_CHILD", "1")
+      .env("ODEN_PRINT_TEST_CHILD", "1")
       .stdout(std::process::Stdio::piped())
       .stderr(std::process::Stdio::null())
       .spawn()

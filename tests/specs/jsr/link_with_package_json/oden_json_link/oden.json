@@ -1,0 +1,6 @@
+{
+  "links": ["./dep"],
+  "imports": {
+    "@odentest/dep": "jsr:@odentest/dep@^1.0.0"
+  }
+}

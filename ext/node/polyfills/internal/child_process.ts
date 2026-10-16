@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // This module implements 'child_process' module of Node.JS API.
 // ref: https://nodejs.org/api/child_process.html
@@ -71,16 +71,16 @@ const {
   StringPrototypeIncludes,
   StringPrototypeStartsWith,
   StringPrototypeToUpperCase,
-} = core.loadExtScript("ext:deno_node/internal/primordials.mjs");
-const { default: assert } = core.loadExtScript("ext:deno_node/assert.ts");
-const { EventEmitter } = core.loadExtScript("ext:deno_node/_events.mjs");
+} = core.loadExtScript("ext:oden_node/internal/primordials.mjs");
+const { default: assert } = core.loadExtScript("ext:oden_node/assert.ts");
+const { EventEmitter } = core.loadExtScript("ext:oden_node/_events.mjs");
 const { os } = core.loadExtScript(
-  "ext:deno_node/internal_binding/constants.ts",
+  "ext:oden_node/internal_binding/constants.ts",
 );
-const { notImplemented } = core.loadExtScript("ext:deno_node/_utils.ts");
+const { notImplemented } = core.loadExtScript("ext:oden_node/_utils.ts");
 const lazyStream = core.createLazyLoader("node:stream");
-const { isWindows } = core.loadExtScript("ext:deno_node/_util/os.ts");
-const { nextTick } = core.loadExtScript("ext:deno_node/_next_tick.ts");
+const { isWindows } = core.loadExtScript("ext:oden_node/_util/os.ts");
+const { nextTick } = core.loadExtScript("ext:oden_node/_next_tick.ts");
 const {
   AbortError,
   ERR_INVALID_ARG_TYPE,
@@ -92,17 +92,17 @@ const {
   ERR_IPC_SYNC_FORK,
   ERR_MISSING_ARGS,
   ERR_UNKNOWN_SIGNAL,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
-const { Buffer } = core.loadExtScript("ext:deno_node/internal/buffer.mjs");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
+const { Buffer } = core.loadExtScript("ext:oden_node/internal/buffer.mjs");
 const { FastBuffer } = core.loadExtScript(
-  "ext:deno_node/internal/buffer.mjs",
+  "ext:oden_node/internal/buffer.mjs",
 );
 const {
   ERR_IPC_DISCONNECTED,
   errnoException,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
 const { codeMap } = core.loadExtScript(
-  "ext:deno_node/internal_binding/uv.ts",
+  "ext:oden_node/internal_binding/uv.ts",
 );
 const {
   validateBoolean,
@@ -110,41 +110,41 @@ const {
   validateObject,
   validateOneOf,
   validateString,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
 const { kEmptyObject } = core.loadExtScript(
-  "ext:deno_node/internal/util.mjs",
+  "ext:oden_node/internal/util.mjs",
 );
 const lazyFsUtils = core.createLazyLoader(
-  "ext:deno_node/internal/fs/utils.mjs",
+  "ext:oden_node/internal/fs/utils.mjs",
 );
 const lazyProcess = core.createLazyLoader("node:process");
 const { StringPrototypeSlice } = core.loadExtScript(
-  "ext:deno_node/internal/primordials.mjs",
+  "ext:oden_node/internal/primordials.mjs",
 );
 const { Pipe, socketType } = core.loadExtScript(
-  "ext:deno_node/internal_binding/pipe_wrap.ts",
+  "ext:oden_node/internal_binding/pipe_wrap.ts",
 );
 const {
   socketType: tcpSocketType,
   TCP,
-} = core.loadExtScript("ext:deno_node/internal_binding/tcp_wrap.ts");
+} = core.loadExtScript("ext:oden_node/internal_binding/tcp_wrap.ts");
 const lazyNet = core.createLazyLoader("node:net");
 const { channel: createDiagnosticsChannel, tracingChannel } = core
   .loadExtScript(
-    "ext:deno_node/diagnostics_channel.js",
+    "ext:oden_node/diagnostics_channel.js",
   );
 const childProcessChannel = createDiagnosticsChannel("child_process");
 const childProcessSpawnChannel = tracingChannel("child_process.spawn");
 const lazyDgram = core.createLazyLoader("node:dgram");
 const lazyDgramInternal = () =>
-  core.loadExtScript("ext:deno_node/internal/dgram.ts");
+  core.loadExtScript("ext:oden_node/internal/dgram.ts");
 const lazyUdpWrap = () =>
-  core.loadExtScript("ext:deno_node/internal_binding/udp_wrap.ts");
+  core.loadExtScript("ext:oden_node/internal_binding/udp_wrap.ts");
 const {
   kNeedsNpmProcessState,
   nodeSpawnChild,
   nodeSpawnSyncChild,
-} = core.loadExtScript("ext:deno_process/40_process.js");
+} = core.loadExtScript("ext:oden_process/40_process.js");
 
 // Precompiled regular expressions (captured as SafeRegExp so the prototype
 // can't be tampered with at runtime).
@@ -414,7 +414,7 @@ class ChildProcess extends EventEmitter {
     const { Stream } = lazyStream();
     const { Socket } = lazyNet();
 
-    // buildCommand handles Node.js to Deno CLI arg translation when spawning Deno
+    // buildCommand handles Node.js to Oden CLI arg translation when spawning Oden
     // args[0] is argv0 (prepended by normalizeSpawnArguments). Capture it
     // before slicing so we can pass it via kArgv0 for OS-level argv[0].
     const argv0 = args.length > 0 ? args[0] : command;
@@ -450,7 +450,7 @@ class ChildProcess extends EventEmitter {
         ArrayPrototypePush(extraStdioNormalized, "null");
         continue;
       }
-      ArrayPrototypePush(extraStdioNormalized, toDenoStdio(extraStdio[i]));
+      ArrayPrototypePush(extraStdioNormalized, toOdenStdio(extraStdio[i]));
     }
 
     // Windows does not support uid/gid options - throw ENOTSUP synchronously.
@@ -468,9 +468,9 @@ class ChildProcess extends EventEmitter {
         clearEnv: true,
         cwd,
         env,
-        stdin: toDenoStdio(stdin),
-        stdout: toDenoStdio(stdout),
-        stderr: toDenoStdio(stderr),
+        stdin: toOdenStdio(stdin),
+        stdout: toOdenStdio(stdout),
+        stderr: toOdenStdio(stderr),
         windowsRawArguments: windowsVerbatimArguments,
         windowsHide,
         uid,
@@ -708,7 +708,7 @@ class ChildProcess extends EventEmitter {
     } catch (err) {
       const { Readable, Writable } = lazyStream();
       let e = err;
-      if (ObjectPrototypeIsPrototypeOf(Deno.errors.NotFound.prototype, e)) {
+      if (ObjectPrototypeIsPrototypeOf(Oden.errors.NotFound.prototype, e)) {
         // args.slice(1) to exclude argv0 (prepended by normalizeSpawnArguments)
         e = _createSpawnError(
           "ENOENT",
@@ -717,11 +717,11 @@ class ChildProcess extends EventEmitter {
         );
       } else if (
         ObjectPrototypeIsPrototypeOf(
-          Deno.errors.PermissionDenied.prototype,
+          Oden.errors.PermissionDenied.prototype,
           e,
         )
       ) {
-        // Node distinguishes two failure modes that Deno collapses into
+        // Node distinguishes two failure modes that Oden collapses into
         // PermissionDenied:
         //   * setuid/setgid refused by the kernel -> EPERM, thrown sync,
         //     matching `process_handle_init` in libuv.
@@ -756,7 +756,7 @@ class ChildProcess extends EventEmitter {
       }
 
       // Publish 'child_process.spawn'.error for the non-rethrow cases (ENOENT
-      // and other Deno spawn failures that turn into an async 'error' event
+      // and other Oden spawn failures that turn into an async 'error' event
       // on the child). Subscribers see the synthesized Node-style error.
       if (childProcessSpawnChannel.hasSubscribers) {
         childProcessSpawnChannel.error.publish({ process: this, error: e });
@@ -845,7 +845,7 @@ class ChildProcess extends EventEmitter {
     // must not prevent later signals from reaching a still-running process.
     // In particular, SIGSTOP followed by SIGCONT is a supported way to
     // suspend and resume a child.
-    let signalName = signal == null ? "SIGTERM" : toDenoSignal(signal);
+    let signalName = signal == null ? "SIGTERM" : toOdenSignal(signal);
     try {
       this.#process.kill(signalName);
     } catch (err) {
@@ -859,11 +859,11 @@ class ChildProcess extends EventEmitter {
           const alreadyClosed =
             ObjectPrototypeIsPrototypeOf(TypeErrorPrototype, err2) ||
             ObjectPrototypeIsPrototypeOf(
-              Deno.errors.NotFound.prototype,
+              Oden.errors.NotFound.prototype,
               err2,
             ) ||
             ObjectPrototypeIsPrototypeOf(
-              Deno.errors.PermissionDenied.prototype,
+              Oden.errors.PermissionDenied.prototype,
               err2,
             );
           if (!alreadyClosed) {
@@ -875,11 +875,11 @@ class ChildProcess extends EventEmitter {
         const alreadyClosed =
           ObjectPrototypeIsPrototypeOf(TypeErrorPrototype, err) ||
           ObjectPrototypeIsPrototypeOf(
-            Deno.errors.NotFound.prototype,
+            Oden.errors.NotFound.prototype,
             err,
           ) ||
           ObjectPrototypeIsPrototypeOf(
-            Deno.errors.PermissionDenied.prototype,
+            Oden.errors.PermissionDenied.prototype,
             err,
           );
         if (!alreadyClosed) {
@@ -985,7 +985,7 @@ function markChildStdioUsedAsInput(fd) {
   }
 }
 
-function toDenoStdio(
+function toOdenStdio(
   pipe,
 ) {
   const { Stream } = lazyStream();
@@ -1027,7 +1027,7 @@ function toDenoStdio(
   }
 }
 
-function toDenoSignal(signal) {
+function toOdenSignal(signal) {
   const nodeSignals = os.signals;
   if (typeof signal === "number") {
     for (const name of new SafeArrayIterator(keys(nodeSignals))) {
@@ -1059,11 +1059,11 @@ function copyProcessEnvToEnv(
   optionEnv,
 ) {
   if (
-    Deno.env.get(name) &&
+    Oden.env.get(name) &&
     (!optionEnv ||
       !ObjectHasOwn(optionEnv, name))
   ) {
-    env[name] = Deno.env.get(name);
+    env[name] = Oden.env.get(name);
   }
 }
 
@@ -1262,9 +1262,9 @@ function normalizeSpawnArguments(
   }
 
   // Validate detached, if present.
-  // deno-lint-ignore deno-internal/prefer-primordials
+  // deno-lint-ignore oden-internal/prefer-primordials
   if (options.detached != null) {
-    // deno-lint-ignore deno-internal/prefer-primordials
+    // deno-lint-ignore oden-internal/prefer-primordials
     validateBoolean(options.detached, "options.detached");
   }
 
@@ -1347,14 +1347,14 @@ function normalizeSpawnArguments(
       command = file;
     }
     // Set the shell, switches, and commands.
-    // Note: transformDenoShellCommand is NOT called here because buildCommand()
+    // Note: transformOdenShellCommand is NOT called here because buildCommand()
     // already handles it for both `-c` (POSIX) and `/d /s /c` (cmd.exe) cases.
     // Calling it here would cause double transformation.
     if (process.platform === "win32") {
       if (typeof options.shell === "string") {
         file = options.shell;
       } else {
-        file = Deno.env.get("comspec") || "cmd.exe";
+        file = Oden.env.get("comspec") || "cmd.exe";
       }
       // '/d /s /c' is used only for cmd.exe.
       if (RegExpPrototypeExec(cmdExeRe, file) !== null) {
@@ -1380,7 +1380,7 @@ function normalizeSpawnArguments(
     ArrayPrototypeUnshift(args, file);
   }
 
-  const env = options.env || Deno.env.toObject();
+  const env = options.env || Oden.env.toObject();
   const envPairs = [];
 
   // process.env.NODE_V8_COVERAGE always propagates, making it possible to
@@ -1429,7 +1429,7 @@ function normalizeSpawnArguments(
     ...options,
     args,
     cwd,
-    // deno-lint-ignore deno-internal/prefer-primordials
+    // deno-lint-ignore oden-internal/prefer-primordials
     detached: !!options.detached,
     env,
     envPairs,
@@ -1532,57 +1532,57 @@ function escapeShellArg(arg) {
 }
 
 /**
- * Transforms a shell command that invokes Deno with Node.js flags into Deno-compatible flags.
+ * Transforms a shell command that invokes Oden with Node.js flags into Oden-compatible flags.
  * Uses the Rust CLI parser (op_node_translate_cli_args) to handle argument translation,
  * including subcommand detection, -c/--check flag handling, and adding "run -A".
  */
-function transformDenoShellCommand(
+function transformOdenShellCommand(
   command,
   env,
   isCmdExe = false,
 ) {
-  const denoPath = Deno.execPath();
+  const odenPath = Oden.execPath();
 
-  // Check if the command starts with the Deno executable (possibly quoted)
-  const quotedDenoPath = `"${denoPath}"`;
-  const singleQuotedDenoPath = `'${denoPath}'`;
+  // Check if the command starts with the Oden executable (possibly quoted)
+  const quotedOdenPath = `"${odenPath}"`;
+  const singleQuotedOdenPath = `'${odenPath}'`;
 
-  let startsWithDeno = false;
-  let denoPathLength = 0;
+  let startsWithOden = false;
+  let odenPathLength = 0;
   let shellVarPrefix = "";
 
-  if (StringPrototypeStartsWith(command, quotedDenoPath)) {
-    startsWithDeno = true;
-    denoPathLength = quotedDenoPath.length;
-  } else if (StringPrototypeStartsWith(command, singleQuotedDenoPath)) {
-    startsWithDeno = true;
-    denoPathLength = singleQuotedDenoPath.length;
-  } else if (StringPrototypeStartsWith(command, denoPath)) {
-    startsWithDeno = true;
-    denoPathLength = denoPath.length;
+  if (StringPrototypeStartsWith(command, quotedOdenPath)) {
+    startsWithOden = true;
+    odenPathLength = quotedOdenPath.length;
+  } else if (StringPrototypeStartsWith(command, singleQuotedOdenPath)) {
+    startsWithOden = true;
+    odenPathLength = singleQuotedOdenPath.length;
+  } else if (StringPrototypeStartsWith(command, odenPath)) {
+    startsWithOden = true;
+    odenPathLength = odenPath.length;
   } else if (env) {
-    // Check for shell variable that references the Deno path
+    // Check for shell variable that references the Oden path
     // Pattern: "${VARNAME}", "$VARNAME", ${VARNAME}, or $VARNAME at start of command
     const shellVarMatch = StringPrototypeMatch(command, shellVarMatchRe);
     if (shellVarMatch) {
       const varName = shellVarMatch[1] || shellVarMatch[2] ||
         shellVarMatch[3] || shellVarMatch[4];
       const varValue = env[varName];
-      if (varValue !== undefined && String(varValue) === denoPath) {
-        startsWithDeno = true;
+      if (varValue !== undefined && String(varValue) === odenPath) {
+        startsWithOden = true;
         shellVarPrefix = shellVarMatch[0];
-        denoPathLength = shellVarMatch[0].length;
+        odenPathLength = shellVarMatch[0].length;
       }
     }
   }
 
-  if (!startsWithDeno) {
-    // The command doesn't start with deno, but it may contain a deno
+  if (!startsWithOden) {
+    // The command doesn't start with oden, but it may contain a oden
     // invocation after a shell compound operator (&&, ||, ;).
     // Split on the first operator and try to transform the remainder.
     // NOTE: This regex doesn't handle quoted strings, so an operator
     // inside quotes (e.g. `echo "foo && bar"`) would be matched.
-    // This is safe because if no real `deno` invocation follows, the
+    // This is safe because if no real `oden` invocation follows, the
     // `transformedRest !== rest` guard returns the original command.
     const operatorMatch = StringPrototypeMatch(
       command,
@@ -1592,7 +1592,7 @@ function transformDenoShellCommand(
       const prefix = operatorMatch[1];
       const operator = operatorMatch[2];
       const rest = StringPrototypeSlice(command, operatorMatch[0].length);
-      const transformedRest = transformDenoShellCommand(rest, env, isCmdExe);
+      const transformedRest = transformOdenShellCommand(rest, env, isCmdExe);
       if (transformedRest !== rest) {
         return prefix + " " + operator + " " + transformedRest;
       }
@@ -1600,9 +1600,9 @@ function transformDenoShellCommand(
     return command;
   }
 
-  // Extract the rest of the command after the Deno path
+  // Extract the rest of the command after the Oden path
   const rest = StringPrototypeTrimStart(
-    StringPrototypeSlice(command, denoPathLength),
+    StringPrototypeSlice(command, odenPathLength),
   );
 
   if (rest.length === 0) {
@@ -1621,7 +1621,7 @@ function transformDenoShellCommand(
     // Shell-quote translated args that contain metacharacters so they are
     // safe to embed in a shell command string.
     const quotedArgs = isWindows
-      ? ArrayPrototypeMap(result.denoArgs, (a) => {
+      ? ArrayPrototypeMap(result.odenArgs, (a) => {
         // Windows cmd.exe: use double quotes for args with spaces or
         // special chars. Backslash is a path separator, not an escape.
         if (RegExpPrototypeTest(winQuoteCharsRe, a)) {
@@ -1639,7 +1639,7 @@ function transformDenoShellCommand(
         }
         return a;
       })
-      : ArrayPrototypeMap(result.denoArgs, (a) => {
+      : ArrayPrototypeMap(result.odenArgs, (a) => {
         // POSIX shell quoting for translated args.
         const hasShellVarRef = RegExpPrototypeTest(shellVarRefRe, a);
         const unsafeInDoubleQuotes = RegExpPrototypeTest(
@@ -1659,14 +1659,14 @@ function transformDenoShellCommand(
         return a;
       });
     const prefix = shellVarPrefix ||
-      StringPrototypeSlice(command, 0, denoPathLength);
+      StringPrototypeSlice(command, 0, odenPathLength);
     let transformed = prefix + " " + ArrayPrototypeJoin(quotedArgs, " ");
     if (shellSuffix) {
       transformed += " " + shellSuffix;
     }
 
     // If the shell suffix starts with a pipe, the command after the pipe
-    // may also be a Deno invocation that needs transformation.
+    // may also be a Oden invocation that needs transformation.
     if (env) {
       const pipeMatch = StringPrototypeMatch(shellSuffix, pipePrefixRe);
       if (pipeMatch) {
@@ -1674,7 +1674,7 @@ function transformDenoShellCommand(
           shellSuffix,
           pipeMatch[0].length,
         );
-        const transformedAfter = transformDenoShellCommand(
+        const transformedAfter = transformOdenShellCommand(
           afterPipe,
           env,
           isCmdExe,
@@ -1694,7 +1694,7 @@ function transformDenoShellCommand(
 
 /**
  * Find the first non-flag argument in a list of command line arguments.
- * This is used to determine if the user is spawning a Deno subcommand
+ * This is used to determine if the user is spawning a Oden subcommand
  * or a script, and to check if the script is in an npm package.
  */
 function findFirstNonFlagArg(args) {
@@ -1735,7 +1735,7 @@ function buildCommand(
   env,
 ) {
   let includeNpmProcessState = false;
-  if (file === Deno.execPath() && !Deno.build.standalone) {
+  if (file === Oden.execPath() && !Oden.build.standalone) {
     // Ensure all args are strings (Node allows numbers in args array)
     args = ArrayPrototypeMap(args, (arg) => String(arg));
 
@@ -1745,26 +1745,26 @@ function buildCommand(
       ? op_node_in_npm_package(firstNonFlagArg)
       : false;
 
-    // Use the Rust parser to translate Node.js args to Deno args
-    // The parser handles Deno-style args (e.g., "run -A script.js") by passing them through unchanged
+    // Use the Rust parser to translate Node.js args to Oden args
+    // The parser handles Oden-style args (e.g., "run -A script.js") by passing them through unchanged
     if (ArrayPrototypeIncludes(args, "--use-env-proxy")) {
       env.NODE_USE_ENV_PROXY = "1";
     } else if (ArrayPrototypeIncludes(args, "--no-use-env-proxy")) {
       env.NODE_USE_ENV_PROXY = "0";
     }
     const result = op_node_translate_cli_args(args, scriptInNpmPackage, true);
-    args = result.denoArgs;
+    args = result.odenArgs;
     includeNpmProcessState = result.needsNpmProcessState;
     if (result.caStores?.length) {
-      env.DENO_TLS_CA_STORE = ArrayPrototypeJoin(result.caStores, ",");
+      env.ODEN_TLS_CA_STORE = ArrayPrototypeJoin(result.caStores, ",");
     }
     if (result.useOpensslCa) {
-      env.DENO_NODE_USE_OPENSSL_CA = "1";
+      env.ODEN_NODE_USE_OPENSSL_CA = "1";
     } else {
-      delete env.DENO_NODE_USE_OPENSSL_CA;
+      delete env.ODEN_NODE_USE_OPENSSL_CA;
     }
     if (result.traceEventCategories) {
-      env.DENO_NODE_TRACE_EVENT_CATEGORIES = result.traceEventCategories;
+      env.ODEN_NODE_TRACE_EVENT_CATEGORIES = result.traceEventCategories;
     }
 
     // Update NODE_OPTIONS if needed
@@ -1779,14 +1779,14 @@ function buildCommand(
   }
 
   // When spawning a shell with `-c` (e.g. spawn('/bin/sh', ['-c', cmd])),
-  // transform any Deno commands inside the shell command string so that
+  // transform any Oden commands inside the shell command string so that
   // Node.js flags are translated and `-A` is added.
   if (
-    file !== Deno.execPath() &&
+    file !== Oden.execPath() &&
     args.length >= 2 &&
     args[0] === "-c"
   ) {
-    const transformed = transformDenoShellCommand(args[1], env, false);
+    const transformed = transformOdenShellCommand(args[1], env, false);
     if (transformed !== args[1]) {
       args = ArrayPrototypeSlice(args);
       args[1] = transformed;
@@ -1795,7 +1795,7 @@ function buildCommand(
 
   // Windows cmd.exe: args are ["/d", "/s", "/c", '"command"']
   if (
-    file !== Deno.execPath() &&
+    file !== Oden.execPath() &&
     args.length >= 4 &&
     args[0] === "/d" && args[1] === "/s" && args[2] === "/c"
   ) {
@@ -1806,35 +1806,35 @@ function buildCommand(
     if (hasWrappingQuotes) {
       cmdStr = StringPrototypeSlice(cmdStr, 1, -1);
     }
-    const transformed = transformDenoShellCommand(cmdStr, env, true);
+    const transformed = transformOdenShellCommand(cmdStr, env, true);
     if (transformed !== cmdStr) {
       args = ArrayPrototypeSlice(args);
       args[3] = hasWrappingQuotes ? `"${transformed}"` : transformed;
     }
   }
 
-  // When spawning a non-deno process that has Deno.execPath() in its args
-  // (e.g. Python given deno's path to re-invoke it), pre-translate the args
-  // that follow so the child deno process gets the correct Node.js compat
+  // When spawning a non-oden process that has Oden.execPath() in its args
+  // (e.g. Python given oden's path to re-invoke it), pre-translate the args
+  // that follow so the child oden process gets the correct Node.js compat
   // flags (-A, --unstable-bare-node-builtins, etc.).
   // This covers cases like test-stdio-closed.js on Windows, where a Python
-  // intermediary closes stdio then calls deno directly via subprocess.call.
-  if (file !== Deno.execPath()) {
-    const denoPath = Deno.execPath();
-    const denoArgIndex = ArrayPrototypeFindIndex(
+  // intermediary closes stdio then calls oden directly via subprocess.call.
+  if (file !== Oden.execPath()) {
+    const odenPath = Oden.execPath();
+    const odenArgIndex = ArrayPrototypeFindIndex(
       args,
-      (arg) => arg === denoPath,
+      (arg) => arg === odenPath,
     );
-    if (denoArgIndex !== -1) {
-      const argsForDeno = ArrayPrototypeSlice(args, denoArgIndex + 1);
-      if (argsForDeno.length > 0) {
+    if (odenArgIndex !== -1) {
+      const argsForOden = ArrayPrototypeSlice(args, odenArgIndex + 1);
+      if (argsForOden.length > 0) {
         try {
-          const result = op_node_translate_cli_args(argsForDeno, false, true);
+          const result = op_node_translate_cli_args(argsForOden, false, true);
           args = [
             ...new SafeArrayIterator(
-              ArrayPrototypeSlice(args, 0, denoArgIndex + 1),
+              ArrayPrototypeSlice(args, 0, odenArgIndex + 1),
             ),
-            ...new SafeArrayIterator(result.denoArgs),
+            ...new SafeArrayIterator(result.odenArgs),
           ];
         } catch {
           // If translation fails (unknown flags), leave args unchanged
@@ -1927,7 +1927,7 @@ function spawnSync(
   options,
 ) {
   const {
-    env = Deno.env.toObject(),
+    env = Oden.env.toObject(),
     input,
     stdio = ["pipe", "pipe", "pipe"],
     cwd,
@@ -1963,7 +1963,7 @@ function spawnSync(
       // "inherit" for extra FDs means pass the parent's FD at this index
       ArrayPrototypePush(extraStdioNormalized, fd);
     } else {
-      ArrayPrototypePush(extraStdioNormalized, toDenoStdio(val));
+      ArrayPrototypePush(extraStdioNormalized, toOdenStdio(val));
     }
   }
 
@@ -1989,11 +1989,11 @@ function spawnSync(
     const output = nodeSpawnSyncChild({
       args: [command, ...new SafeArrayIterator(args)],
       cwd,
-      // deno-lint-ignore deno-internal/prefer-primordials
+      // deno-lint-ignore oden-internal/prefer-primordials
       env: mapValues(env, (value) => value.toString()),
       argv0: argv0 !== command ? argv0 : undefined,
-      stdout: toDenoStdio(stdout_),
-      stderr: toDenoStdio(stderr_),
+      stdout: toOdenStdio(stdout_),
+      stderr: toOdenStdio(stderr_),
       stdin: stdin_ == "inherit" ? "inherit" : "null",
       uid,
       gid,
@@ -2029,9 +2029,9 @@ function spawnSync(
     }
 
     if (encoding && encoding !== "buffer") {
-      // deno-lint-ignore deno-internal/prefer-primordials
+      // deno-lint-ignore oden-internal/prefer-primordials
       stdout = stdout && stdout.toString(encoding);
-      // deno-lint-ignore deno-internal/prefer-primordials
+      // deno-lint-ignore oden-internal/prefer-primordials
       stderr = stderr && stderr.toString(encoding);
     }
 
@@ -2040,16 +2040,16 @@ function spawnSync(
     // Node.js behavior). On Windows there are no real Unix signals, but
     // Node still reports the configured killSignal so callers can detect
     // why the child was terminated.
-    const killedByDeno = output.killedByTimeout || output.killedByMaxBuffer;
-    result.status = killedByDeno ? null : status;
-    result.signal = killedByDeno
+    const killedByOden = output.killedByTimeout || output.killedByMaxBuffer;
+    result.status = killedByOden ? null : status;
+    result.signal = killedByOden
       ? _resolveKillSignalName(killSignal)
       : output.signal;
     result.stdout = stdout;
     result.stderr = stderr;
     result.output = [output.signal, stdout, stderr];
   } catch (err) {
-    if (ObjectPrototypeIsPrototypeOf(Deno.errors.NotFound.prototype, err)) {
+    if (ObjectPrototypeIsPrototypeOf(Oden.errors.NotFound.prototype, err)) {
       result.error = _createSpawnError("ENOENT", command, args, true);
     }
   }
@@ -2512,7 +2512,7 @@ function createIpcHandle(message, rawFd) {
     // socket.bind(handle).  The `bind(udpHandle)` path in dgram.ts calls
     // replaceHandle + startListening, making the socket immediately usable.
     const socket = new DgramSocket(message.dgramType);
-    // deno-lint-ignore deno-internal/prefer-primordials
+    // deno-lint-ignore oden-internal/prefer-primordials
     socket.bind(udp);
     return socket;
   }
@@ -2522,16 +2522,16 @@ function createIpcHandle(message, rawFd) {
 // The IPC channel was torn down underneath us: either the resource is gone or
 // the peer reset the connection.
 function isChannelClosedError(err) {
-  return ObjectPrototypeIsPrototypeOf(Deno.errors.BadResource.prototype, err) ||
-    ObjectPrototypeIsPrototypeOf(Deno.errors.ConnectionReset.prototype, err);
+  return ObjectPrototypeIsPrototypeOf(Oden.errors.BadResource.prototype, err) ||
+    ObjectPrototypeIsPrototypeOf(Oden.errors.ConnectionReset.prototype, err);
 }
 
 function isInterruptedError(err) {
-  return ObjectPrototypeIsPrototypeOf(Deno.errors.Interrupted.prototype, err);
+  return ObjectPrototypeIsPrototypeOf(Oden.errors.Interrupted.prototype, err);
 }
 
 function isBrokenPipeError(err) {
-  return ObjectPrototypeIsPrototypeOf(Deno.errors.BrokenPipe.prototype, err);
+  return ObjectPrototypeIsPrototypeOf(Oden.errors.BrokenPipe.prototype, err);
 }
 
 function setupChannel(
@@ -2826,7 +2826,7 @@ function setupChannel(
           } else if (handleSocketListMessage(msg)) {
             continue;
           } else {
-            // TODO(nathanwhit): if we want to support deno-node IPC interop,
+            // TODO(nathanwhit): if we want to support oden-node IPC interop,
             // handle any future NODE_HANDLE_* control messages here.
             // Emit as internalMessage for internal consumers.
             if (serialization === "json") {

@@ -1,6 +1,6 @@
-# `deno_maybe_sync`
+# `oden_maybe_sync`
 
-Optionally `Sync` structures used in Deno.
+Optionally `Sync` structures used in Oden.
 
-Deno uses the `Sync` feature, while Deno Deploy doesn't, so that's why we have
+Oden uses the `Sync` feature, while Oden Deploy doesn't, so that's why we have
 this code.

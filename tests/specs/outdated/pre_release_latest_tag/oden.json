@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "@odentest/pre-release-with-nightlies": "npm:@odentest/pre-release-with-nightlies@^1.0.0-beta.13"
+  }
+}

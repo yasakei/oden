@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // @ts-check
 
@@ -16,7 +16,7 @@ const {
   op_is_cancelled,
 } = core.ops;
 
-/** @type {(id: string, message: string, hint: string | undefined, start: number, end: number, fix: Deno.lint.Fix[]) => void} */
+/** @type {(id: string, message: string, hint: string | undefined, start: number, end: number, fix: Oden.lint.Fix[]) => void} */
 let doReport = op_lint_report;
 /** @type {() => string} */
 let doGetSource = op_lint_get_source;
@@ -46,7 +46,7 @@ const AST_PROP_RANGE = 3;
 const AST_PROP_LENGTH = 4;
 
 // Keep in sync with Rust
-// Each node property is tagged with this enum to denote
+// Each node property is tagged with this enum to odente
 // what kind of value it holds.
 /** @enum {number} */
 const PropFlags = {
@@ -107,10 +107,10 @@ class CancellationToken {
   }
 }
 
-/** @implements {Deno.lint.Fixer} */
+/** @implements {Oden.lint.Fixer} */
 class Fixer {
   /**
-   * @param {Deno.lint.Node} node
+   * @param {Oden.lint.Node} node
    * @param {string} text
    */
   insertTextAfter(node, text) {
@@ -121,7 +121,7 @@ class Fixer {
   }
 
   /**
-   * @param {Deno.lint.Node["range"]} range
+   * @param {Oden.lint.Node["range"]} range
    * @param {string} text
    */
   insertTextAfterRange(range, text) {
@@ -132,7 +132,7 @@ class Fixer {
   }
 
   /**
-   * @param {Deno.lint.Node} node
+   * @param {Oden.lint.Node} node
    * @param {string} text
    */
   insertTextBefore(node, text) {
@@ -143,7 +143,7 @@ class Fixer {
   }
 
   /**
-   * @param {Deno.lint.Node["range"]} range
+   * @param {Oden.lint.Node["range"]} range
    * @param {string} text
    */
   insertTextBeforeRange(range, text) {
@@ -154,7 +154,7 @@ class Fixer {
   }
 
   /**
-   * @param {Deno.lint.Node} node
+   * @param {Oden.lint.Node} node
    */
   remove(node) {
     return {
@@ -164,7 +164,7 @@ class Fixer {
   }
 
   /**
-   * @param {Deno.lint.Node["range"]} range
+   * @param {Oden.lint.Node["range"]} range
    */
   removeRange(range) {
     return {
@@ -174,7 +174,7 @@ class Fixer {
   }
 
   /**
-   * @param {Deno.lint.Node} node
+   * @param {Oden.lint.Node} node
    * @param {string} text
    */
   replaceText(node, text) {
@@ -185,7 +185,7 @@ class Fixer {
   }
 
   /**
-   * @param {Deno.lint.Node["range"]} range
+   * @param {Oden.lint.Node["range"]} range
    * @param {string} text
    */
   replaceTextRange(range, text) {
@@ -197,7 +197,7 @@ class Fixer {
 }
 
 /**
- * @implements {Deno.lint.SourceCode}
+ * @implements {Oden.lint.SourceCode}
  */
 export class SourceCode {
   /** @type {string | null} */
@@ -227,7 +227,7 @@ export class SourceCode {
   }
 
   /**
-   * @param {Deno.lint.Node} [node]
+   * @param {Oden.lint.Node} [node]
    * @returns {string}
    */
   getText(node) {
@@ -240,12 +240,12 @@ export class SourceCode {
   }
 
   /**
-   * @param {Deno.lint.Node} node
+   * @param {Oden.lint.Node} node
    */
   getAncestors(node) {
     const { buf } = this.#ctx;
 
-    /** @type {Deno.lint.Node[]} */
+    /** @type {Oden.lint.Node[]} */
     const ancestors = [];
 
     let parent = /** @type {*} */ (node)[INTERNAL_IDX];
@@ -264,7 +264,7 @@ export class SourceCode {
   }
 
   /**
-   * @returns {Array<Deno.lint.LineComment | Deno.lint.BlockComment>}
+   * @returns {Array<Oden.lint.LineComment | Oden.lint.BlockComment>}
    */
   getAllComments() {
     materializeComments(this.#ctx);
@@ -272,13 +272,13 @@ export class SourceCode {
   }
 
   /**
-   * @param {Deno.lint.Node} node
-   * @returns {Array<Deno.lint.LineComment | Deno.lint.BlockComment>}
+   * @param {Oden.lint.Node} node
+   * @returns {Array<Oden.lint.LineComment | Oden.lint.BlockComment>}
    */
   getCommentsBefore(node) {
     materializeComments(this.#ctx);
 
-    /** @type {Array<Deno.lint.LineComment | Deno.lint.BlockComment>} */
+    /** @type {Array<Oden.lint.LineComment | Oden.lint.BlockComment>} */
     const before = [];
 
     const { comments } = this.#ctx;
@@ -293,13 +293,13 @@ export class SourceCode {
   }
 
   /**
-   * @param {Deno.lint.Node} node
-   * @returns {Array<Deno.lint.LineComment | Deno.lint.BlockComment>}
+   * @param {Oden.lint.Node} node
+   * @returns {Array<Oden.lint.LineComment | Oden.lint.BlockComment>}
    */
   getCommentsAfter(node) {
     materializeComments(this.#ctx);
 
-    /** @type {Array<Deno.lint.LineComment | Deno.lint.BlockComment>} */
+    /** @type {Array<Oden.lint.LineComment | Oden.lint.BlockComment>} */
     const after = [];
 
     const { comments } = this.#ctx;
@@ -314,13 +314,13 @@ export class SourceCode {
   }
 
   /**
-   * @param {Deno.lint.Node} node
-   * @returns {Array<Deno.lint.LineComment | Deno.lint.BlockComment>}
+   * @param {Oden.lint.Node} node
+   * @returns {Array<Oden.lint.LineComment | Oden.lint.BlockComment>}
    */
   getCommentsInside(node) {
     materializeComments(this.#ctx);
 
-    /** @type {Array<Deno.lint.LineComment | Deno.lint.BlockComment>} */
+    /** @type {Array<Oden.lint.LineComment | Oden.lint.BlockComment>} */
     const inside = [];
 
     const { comments } = this.#ctx;
@@ -350,7 +350,7 @@ export class SourceCode {
 /**
  * Every rule gets their own instance of this class. This is the main
  * API lint rules interact with.
- * @implements {Deno.lint.RuleContext}
+ * @implements {Oden.lint.RuleContext}
  */
 export class Context {
   id;
@@ -378,7 +378,7 @@ export class Context {
   }
 
   /**
-   * @param {Deno.lint.ReportData} data
+   * @param {Oden.lint.ReportData} data
    */
   report(data) {
     const range = data.node ? data.node.range : data.range ? data.range : null;
@@ -397,7 +397,7 @@ export class Context {
       );
     }
 
-    /** @type {Deno.lint.Fix[]} */
+    /** @type {Oden.lint.Fix[]} */
     const fixes = [];
 
     if (typeof data.fix === "function") {
@@ -453,7 +453,7 @@ function materializeComments(ctx) {
 }
 
 /**
- * @param {Deno.lint.Plugin[]} plugins
+ * @param {Oden.lint.Plugin[]} plugins
  * @param {string[]} exclude
  * @param {string[]} [specifiers] The specifiers each plugin was loaded from,
  *   parallel to `plugins`, used to make error messages actionable.
@@ -469,7 +469,7 @@ export function installPlugins(plugins, exclude, specifiers) {
 }
 
 /**
- * @param {Deno.lint.Plugin} plugin
+ * @param {Oden.lint.Plugin} plugin
  * @param {string} [specifier] The specifier the plugin was loaded from, if any.
  */
 function installPlugin(plugin, specifier) {
@@ -590,15 +590,15 @@ class FacadeNode {
    *
    * This is only expected to be used during development of a rule.
    * @param {*} _
-   * @param {Deno.InspectOptions} options
+   * @param {Oden.InspectOptions} options
    * @returns {string}
    */
-  [Symbol.for("Deno.customInspect")](_, options) {
+  [Symbol.for("Oden.customInspect")](_, options) {
     const json = nodeToJson(this[INTERNAL_CTX], this[INTERNAL_IDX]);
-    return Deno.inspect(json, options);
+    return Oden.inspect(json, options);
   }
 
-  [Symbol.for("Deno.lint.toJsValue")]() {
+  [Symbol.for("Oden.lint.toJsValue")]() {
     return nodeToJson(this[INTERNAL_CTX], this[INTERNAL_IDX]);
   }
 }
@@ -689,7 +689,7 @@ function readType(buf, idx) {
 /**
  * @param {AstContext} ctx
  * @param {number} idx
- * @returns {Deno.lint.Node["range"]}
+ * @returns {Oden.lint.Node["range"]}
  */
 function readSpan(ctx, idx) {
   let offset = ctx.spansOffset + (idx * SPAN_SIZE);
@@ -1597,14 +1597,14 @@ internals.runPluginsForFile = runPluginsForFile;
 internals.resetState = resetState;
 
 /**
- * @param {Deno.lint.Plugin} plugin
+ * @param {Oden.lint.Plugin} plugin
  * @param {string} fileName
  * @param {string} sourceText
  */
 function runLintPlugin(plugin, fileName, sourceText) {
   installPlugin(plugin);
 
-  /** @type {Deno.lint.Diagnostic[]} */
+  /** @type {Oden.lint.Diagnostic[]} */
   const diagnostics = [];
   doReport = (id, message, hint, start, end, fix) => {
     diagnostics.push({
@@ -1630,10 +1630,10 @@ function runLintPlugin(plugin, fileName, sourceText) {
   return diagnostics;
 }
 
-// `op_lint_create_serialized_ast` is only available in the `deno test`
+// `op_lint_create_serialized_ast` is only available in the `oden test`
 // subcommand. In other subcommands that load this module (e.g. the REPL) the op
-// is missing, so keep the stub `Deno.lint.runPlugin` from 99_main.js which
+// is missing, so keep the stub `Oden.lint.runPlugin` from 99_main.js which
 // throws a helpful error instead of a cryptic "op is not a function".
 if (op_lint_create_serialized_ast) {
-  Deno.lint.runPlugin = runLintPlugin;
+  Oden.lint.runPlugin = runLintPlugin;
 }

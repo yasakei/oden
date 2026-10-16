@@ -1,17 +1,17 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 
 (function () {
 const { core, primordials } = __bootstrap;
 // deno-lint-ignore camelcase
 const async_wrap = core.loadExtScript(
-  "ext:deno_node/internal_binding/async_wrap.ts",
+  "ext:oden_node/internal_binding/async_wrap.ts",
 );
 const { ERR_ASYNC_CALLBACK } = core.loadExtScript(
-  "ext:deno_node/internal/errors.ts",
+  "ext:oden_node/internal/errors.ts",
 );
 const { asyncIdSymbol, ownerSymbol } = core.loadExtScript(
-  "ext:deno_node/internal_binding/symbols.ts",
+  "ext:oden_node/internal_binding/symbols.ts",
 );
 const {
   ArrayPrototypeIncludes,

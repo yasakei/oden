@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 (function () {
 const { core, primordials } = __bootstrap;
@@ -18,19 +18,19 @@ const {
   validatePort,
   validateString,
   validateUint32,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
 const {
   ERR_INVALID_ARG_TYPE,
   ERR_INVALID_ARG_VALUE,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
 const { customInspectSymbol, kEmptyObject } = core.loadExtScript(
-  "ext:deno_node/internal/util.mjs",
+  "ext:oden_node/internal/util.mjs",
 );
 const { inspect } = core.loadExtScript(
-  "ext:deno_node/internal/util/inspect.mjs",
+  "ext:oden_node/internal/util/inspect.mjs",
 );
 const { isIP, isIPv6 } = core.loadExtScript(
-  "ext:deno_node/internal/net.ts",
+  "ext:oden_node/internal/net.ts",
 );
 
 const {
@@ -342,7 +342,7 @@ class SocketAddress {
     } = options;
 
     if (typeof family === "string") {
-      // deno-lint-ignore deno-internal/prefer-primordials
+      // deno-lint-ignore oden-internal/prefer-primordials
       family = family.toLowerCase();
     }
     switch (family) {

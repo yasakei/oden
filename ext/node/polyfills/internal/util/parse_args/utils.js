@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 (function () {
 const { core, primordials } = __bootstrap;
@@ -12,7 +12,7 @@ const {
 } = primordials;
 
 const { validateObject } = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
 
 // These are internal utilities to make the parsing logic easier to read, and

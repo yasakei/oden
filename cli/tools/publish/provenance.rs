@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 use std::env;
@@ -9,12 +9,12 @@ use aws_lc_rs::signature::KeyPair;
 use base64::Engine as _;
 use base64::engine::general_purpose::STANDARD_NO_PAD;
 use base64::prelude::BASE64_STANDARD;
-use deno_core::anyhow;
-use deno_core::anyhow::anyhow;
-use deno_core::anyhow::bail;
-use deno_core::error::AnyError;
-use deno_core::serde_json;
-use deno_core::url::Url;
+use oden_core::anyhow;
+use oden_core::anyhow::anyhow;
+use oden_core::anyhow::bail;
+use oden_core::error::AnyError;
+use oden_core::serde_json;
+use oden_core::url::Url;
 use http_body_util::BodyExt;
 use once_cell::sync::Lazy;
 use p256::elliptic_curve;
@@ -735,7 +735,7 @@ mod tests {
         env::set_var("GITHUB_ACTIONS", "true");
         env::set_var("ACTIONS_ID_TOKEN_REQUEST_URL", "https://example.com");
         env::set_var("ACTIONS_ID_TOKEN_REQUEST_TOKEN", "dummy");
-        env::set_var("GITHUB_REPOSITORY", "littledivy/deno_sdl2");
+        env::set_var("GITHUB_REPOSITORY", "littledivy/oden_sdl2");
         env::set_var("GITHUB_SERVER_URL", "https://github.com");
         env::set_var("GITHUB_REF", "refs/tags/sdl2@0.0.1");
         env::set_var("GITHUB_SHA", "lol");
@@ -744,7 +744,7 @@ mod tests {
         env::set_var("RUNNER_ENVIRONMENT", "github-hosted");
         env::set_var(
           "GITHUB_WORKFLOW_REF",
-          "littledivy/deno_sdl2@refs/tags/sdl2@0.0.1",
+          "littledivy/oden_sdl2@refs/tags/sdl2@0.0.1",
         )
       }
     }

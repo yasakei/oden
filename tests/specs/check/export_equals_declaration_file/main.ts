@@ -1,4 +1,4 @@
-// @deno-types="./other.d.ts"
+// @oden-types="./other.d.ts"
 import Test, { type Attributes } from "./other.js";
 
 const other: Attributes = {};

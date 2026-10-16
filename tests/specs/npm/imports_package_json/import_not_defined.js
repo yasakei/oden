@@ -1,3 +1,3 @@
-import data from "@denotest/imports-package-json/import-not-defined";
+import data from "@odentest/imports-package-json/import-not-defined";
 
 console.log(data);

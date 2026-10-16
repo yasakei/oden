@@ -1,0 +1,12 @@
+{
+  "name": "@odentest/bundled-add",
+  "version": "1.0.0",
+  "bin": "./index.js",
+  "dependencies": {
+    "@odentest/add": "1"
+  },
+  "bundleDependencies": [
+    "@odentest/add"
+  ],
+  "exports": "./index.js"
+}

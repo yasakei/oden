@@ -1,0 +1,17 @@
+{
+  "tempDir": true,
+  "tests": {
+    "oden_exit": {
+      "steps": [
+        {
+          "args": "run --cpu-prof-dir=. main.js",
+          "output": "calling Oden.exit()\n"
+        },
+        {
+          "args": "run --allow-read verify.js",
+          "output": "Valid profile with [WILDCARD] nodes\n"
+        }
+      ]
+    }
+  }
+}

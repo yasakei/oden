@@ -2,15 +2,15 @@
   "tempDir": true,
   "steps": [
     {
-      "args": "install -D npm:@denotest/insiders-tag@~0.0.0-insiders.fc3a063",
+      "args": "install -D npm:@odentest/insiders-tag@~0.0.0-insiders.fc3a063",
       "output": "install.out"
     },
     {
-      "args": "eval globalThis.console.log(Deno.readTextFileSync('package.json'))",
+      "args": "eval globalThis.console.log(Oden.readTextFileSync('package.json'))",
       "output": "package_json.out"
     },
     {
-      "args": "eval globalThis.console.log(Deno.readTextFileSync('deno.lock'))",
+      "args": "eval globalThis.console.log(Oden.readTextFileSync('oden.lock'))",
       "output": "lock.out"
     }
   ]

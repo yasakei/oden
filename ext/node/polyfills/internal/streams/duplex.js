@@ -1,5 +1,5 @@
 // deno-lint-ignore-file
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -29,25 +29,25 @@
 (function () {
 const { core, primordials } = __bootstrap;
 const _mod1 =
-  core.loadExtScript("ext:deno_node/internal/streams/legacy.js").default;
+  core.loadExtScript("ext:oden_node/internal/streams/legacy.js").default;
 const Readable = core.loadExtScript(
-  "ext:deno_node/internal/streams/readable.js",
+  "ext:oden_node/internal/streams/readable.js",
 ).default;
 const Writable = core.loadExtScript(
-  "ext:deno_node/internal/streams/writable.js",
+  "ext:oden_node/internal/streams/writable.js",
 ).default;
 const { addAbortSignal } = core.loadExtScript(
-  "ext:deno_node/internal/streams/add-abort-signal.js",
+  "ext:oden_node/internal/streams/add-abort-signal.js",
 );
 const destroyImpl =
-  core.loadExtScript("ext:deno_node/internal/streams/destroy.js").default;
+  core.loadExtScript("ext:oden_node/internal/streams/destroy.js").default;
 const { kOnConstructed } = core.loadExtScript(
-  "ext:deno_node/internal/streams/utils.js",
+  "ext:oden_node/internal/streams/utils.js",
 );
 const webStreamsAdaptersSpecifier =
-  "ext:deno_node/internal/webstreams/adapters.js";
+  "ext:oden_node/internal/webstreams/adapters.js";
 const lazyDuplexify = core.createLazyLoader(
-  "ext:deno_node/internal/streams/duplexify.js",
+  "ext:oden_node/internal/streams/duplexify.js",
 );
 const Stream = _mod1.Stream;
 

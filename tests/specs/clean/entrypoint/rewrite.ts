@@ -1,8 +1,8 @@
-const path = Deno.args[0];
-const contents = Deno.readTextFileSync(path);
+const path = Oden.args[0];
+const contents = Oden.readTextFileSync(path);
 
-const denoDir = Deno.env.getEnv("DENO_DIR");
-const cwd = Deno.cwd();
+const odenDir = Oden.env.getEnv("ODEN_DIR");
+const cwd = Oden.cwd();
 
-const newContents = contents.replace(cwd, "$CWD").replace(denoDir, "$DENO_DIR");
-Deno.writeTextFileSync(path, newContents);
+const newContents = contents.replace(cwd, "$CWD").replace(odenDir, "$ODEN_DIR");
+Oden.writeTextFileSync(path, newContents);

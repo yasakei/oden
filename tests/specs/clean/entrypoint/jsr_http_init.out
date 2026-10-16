@@ -1,4 +1,4 @@
-./denodir
+./odendir
 [WILDCARD]- gen
 -- file
 [WILDCARD]--- jsr_http1.ts.js

@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Minimal protobuf decoder for OTLP messages. Uses the JSON proto descriptor
 // (otlp_proto.json) as the schema. No external dependencies.
 
 const descriptor = JSON.parse(
-  Deno.readTextFileSync(new URL("./otlp_proto.json", import.meta.url)),
+  Oden.readTextFileSync(new URL("./otlp_proto.json", import.meta.url)),
 );
 
 // Build a lookup table: fully-qualified type name -> type definition

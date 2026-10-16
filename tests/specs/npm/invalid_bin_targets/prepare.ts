@@ -1,14 +1,14 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-const linker = Deno.args[0];
+const linker = Oden.args[0];
 const outsidePath = linker === "isolated"
-  ? "node_modules/.deno/@denotest+invalid-bin-target@1.0.0/node_modules/@denotest/outside.js"
-  : "node_modules/@denotest/outside.js";
+  ? "node_modules/.oden/@odentest+invalid-bin-target@1.0.0/node_modules/@odentest/outside.js"
+  : "node_modules/@odentest/outside.js";
 
-await Deno.mkdir(outsidePath.slice(0, outsidePath.lastIndexOf("/")), {
+await Oden.mkdir(outsidePath.slice(0, outsidePath.lastIndexOf("/")), {
   recursive: true,
 });
-await Deno.writeTextFile(outsidePath, "outside marker\n");
-if (Deno.build.os !== "windows") {
-  await Deno.chmod(outsidePath, 0o644);
+await Oden.writeTextFile(outsidePath, "outside marker\n");
+if (Oden.build.os !== "windows") {
+  await Oden.chmod(outsidePath, 0o644);
 }

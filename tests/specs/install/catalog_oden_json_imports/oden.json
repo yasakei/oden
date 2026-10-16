@@ -1,0 +1,15 @@
+{
+  "catalog": {
+    "@odentest/esm-basic": "^1.0.0"
+  },
+  "catalogs": {
+    "my-deps": {
+      "@odentest/add": "^1.0.0"
+    }
+  },
+  "imports": {
+    "@odentest/esm-basic": "catalog:",
+    "@odentest/add": "catalog:my-deps"
+  },
+  "nodeModulesDir": "manual"
+}

@@ -1,0 +1,4 @@
+{
+  "args": "run -A --quiet npm:@odentest/bin/cli-no-ext this is a test",
+  "output": "oden_run_no_ext.out"
+}

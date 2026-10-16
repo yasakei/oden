@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Node.js contributors. All rights reserved. MIT License.
 (function () {
 const { core } = __bootstrap;
-const io = core.loadExtScript("ext:deno_io/12_io.js");
+const io = core.loadExtScript("ext:oden_io/12_io.js");
 
 let blue = "";
 let green = "";
@@ -19,7 +19,7 @@ function shouldColorize() {
     return false;
   }
 
-  return !Deno.noColor;
+  return !Oden.noColor;
 }
 
 function refresh() {

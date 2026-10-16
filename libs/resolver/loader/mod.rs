@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 mod npm;
 
@@ -8,7 +8,7 @@ mod module_loader;
 use std::borrow::Cow;
 use std::collections::HashMap;
 
-use deno_cache_dir::file_fetcher::File;
+use oden_cache_dir::file_fetcher::File;
 use deno_media_type::MediaType;
 #[cfg(all(feature = "graph", feature = "deno_ast"))]
 pub use module_loader::*;
@@ -104,7 +104,7 @@ impl LoadedModuleSource {
 }
 
 #[allow(clippy::disallowed_types, reason = "definition")]
-pub type MemoryFilesRc = deno_maybe_sync::MaybeArc<MemoryFiles>;
+pub type MemoryFilesRc = oden_maybe_sync::MaybeArc<MemoryFiles>;
 
 #[derive(Debug, Default)]
 pub struct MemoryFiles(RwLock<HashMap<Url, File>>);
@@ -119,7 +119,7 @@ impl MemoryFiles {
   }
 }
 
-impl deno_cache_dir::file_fetcher::MemoryFiles for MemoryFiles {
+impl oden_cache_dir::file_fetcher::MemoryFiles for MemoryFiles {
   fn get(&self, specifier: &Url) -> Option<File> {
     self.0.read().get(specifier).cloned()
   }

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   assert,
   assertEquals,
@@ -8,14 +8,14 @@ import {
 } from "./test_util.ts";
 
 // `resourceForReadableStream` is registered on the internals object only when
-// `ext:deno_web/06_streams.js` first evaluates, which is now lazy. Touch the
+// `ext:oden_web/06_streams.js` first evaluates, which is now lazy. Touch the
 // lazy `ReadableStream` global so the polyfill loads before we read it below.
 const { ReadableStream: _ReadableStream } = globalThis;
 const {
   core,
   resourceForReadableStream,
   // @ts-expect-error TypeScript (as of 3.7) does not support indexing namespaces by symbol
-} = Deno[Deno.internal];
+} = Oden[Oden.internal];
 
 const LOREM =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
@@ -190,7 +190,7 @@ function makeStreamWithCount(
 }
 
 // Normal stream operation
-Deno.test(async function readableStream() {
+Oden.test(async function readableStream() {
   const rid = resourceForReadableStream(helloWorldStream());
   const buffer = new Uint8Array(1024);
   const nread = await core.read(rid, buffer);
@@ -199,7 +199,7 @@ Deno.test(async function readableStream() {
 });
 
 // Close the stream after reading everything
-Deno.test(async function readableStreamClose() {
+Oden.test(async function readableStreamClose() {
   const cancel = Promise.withResolvers();
   const rid = resourceForReadableStream(
     helloWorldStream(false, cancel.resolve),
@@ -212,7 +212,7 @@ Deno.test(async function readableStreamClose() {
 });
 
 // Close the stream without reading everything
-Deno.test(async function readableStreamClosePartialRead() {
+Oden.test(async function readableStreamClosePartialRead() {
   const cancel = Promise.withResolvers();
   const rid = resourceForReadableStream(
     helloWorldStream(false, cancel.resolve),
@@ -225,7 +225,7 @@ Deno.test(async function readableStreamClosePartialRead() {
 });
 
 // Close the stream without reading anything
-Deno.test(async function readableStreamCloseWithoutRead() {
+Oden.test(async function readableStreamCloseWithoutRead() {
   const cancel = Promise.withResolvers();
   const rid = resourceForReadableStream(
     helloWorldStream(false, cancel.resolve),
@@ -235,7 +235,7 @@ Deno.test(async function readableStreamCloseWithoutRead() {
 });
 
 // Close the stream without reading anything
-Deno.test(async function readableStreamCloseWithoutRead2() {
+Oden.test(async function readableStreamCloseWithoutRead2() {
   const cancel = Promise.withResolvers();
   const rid = resourceForReadableStream(longAsyncStream(cancel.resolve));
   core.close(rid);
@@ -248,7 +248,7 @@ Deno.test(async function readableStreamCloseWithoutRead2() {
 // with its BYOB reader; readableStreamClose() does not run a BYOB reader's
 // read-into close steps, so without the fix the pending BYOB read on the first
 // branch (and the default drain on the other) would hang forever.
-Deno.test(async function readableByteStreamTeeByobReadResolvesOnSourceClose() {
+Oden.test(async function readableByteStreamTeeByobReadResolvesOnSourceClose() {
   function makeByteStream(chunks: number[][]) {
     let i = 0;
     return new ReadableStream({
@@ -282,7 +282,7 @@ Deno.test(async function readableByteStreamTeeByobReadResolvesOnSourceClose() {
   assertEquals((await bDone).length, 2);
 });
 
-Deno.test(async function readableStreamPartial() {
+Oden.test(async function readableStreamPartial() {
   const rid = resourceForReadableStream(helloWorldStream());
   const buffer = new Uint8Array(5);
   const nread = await core.read(rid, buffer);
@@ -293,28 +293,28 @@ Deno.test(async function readableStreamPartial() {
   core.close(rid);
 });
 
-Deno.test(async function readableStreamLongReadAll() {
+Oden.test(async function readableStreamLongReadAll() {
   const rid = resourceForReadableStream(longStream());
   const buffer = await core.readAll(rid);
   assertEquals(buffer.length, LOREM.length * 4);
   core.close(rid);
 });
 
-Deno.test(async function readableStreamLongAsyncReadAll() {
+Oden.test(async function readableStreamLongAsyncReadAll() {
   const rid = resourceForReadableStream(longAsyncStream());
   const buffer = await core.readAll(rid);
   assertEquals(buffer.length, LOREM.length * 100);
   core.close(rid);
 });
 
-Deno.test(async function readableStreamVeryLongReadAll() {
+Oden.test(async function readableStreamVeryLongReadAll() {
   const rid = resourceForReadableStream(veryLongTinyPacketStream(1_000_000));
   const buffer = await core.readAll(rid);
   assertEquals(buffer.length, 1_000_000);
   core.close(rid);
 });
 
-Deno.test(async function readableStreamLongByPiece() {
+Oden.test(async function readableStreamLongByPiece() {
   const rid = resourceForReadableStream(longStream());
   let total = 0;
   for (let i = 0; i < 100; i++) {
@@ -335,7 +335,7 @@ for (
     "controller",
   ] as ("string" | "TypeError" | "controller")[]
 ) {
-  Deno.test(`readableStreamError_${type}`, async function () {
+  Oden.test(`readableStreamError_${type}`, async function () {
     const rid = resourceForReadableStream(errorStream(type));
     let nread;
     try {
@@ -354,7 +354,7 @@ for (
   });
 }
 
-Deno.test(async function readableStreamEmptyOnStart() {
+Oden.test(async function readableStreamEmptyOnStart() {
   const rid = resourceForReadableStream(emptyStream(true));
   const buffer = new Uint8Array(1024);
   const nread = await core.read(rid, buffer);
@@ -362,7 +362,7 @@ Deno.test(async function readableStreamEmptyOnStart() {
   core.close(rid);
 });
 
-Deno.test(async function readableStreamEmptyOnPull() {
+Oden.test(async function readableStreamEmptyOnPull() {
   const rid = resourceForReadableStream(emptyStream(false));
   const buffer = new Uint8Array(1024);
   const nread = await core.read(rid, buffer);
@@ -370,21 +370,21 @@ Deno.test(async function readableStreamEmptyOnPull() {
   core.close(rid);
 });
 
-Deno.test(async function readableStreamEmptyReadAll() {
+Oden.test(async function readableStreamEmptyReadAll() {
   const rid = resourceForReadableStream(emptyStream(false));
   const buffer = await core.readAll(rid);
   assertEquals(buffer.length, 0);
   core.close(rid);
 });
 
-Deno.test(async function readableStreamWithEmptyChunk() {
+Oden.test(async function readableStreamWithEmptyChunk() {
   const rid = resourceForReadableStream(emptyChunkStream());
   const buffer = await core.readAll(rid);
   assertEquals(buffer, new Uint8Array([1, 2]));
   core.close(rid);
 });
 
-Deno.test(async function readableStreamWithEmptyChunkOneByOne() {
+Oden.test(async function readableStreamWithEmptyChunkOneByOne() {
   const rid = resourceForReadableStream(emptyChunkStream());
   assertEquals(1, await core.read(rid, new Uint8Array(1)));
   assertEquals(1, await core.read(rid, new Uint8Array(1)));
@@ -393,7 +393,7 @@ Deno.test(async function readableStreamWithEmptyChunkOneByOne() {
 });
 
 // Ensure that we correctly transmit all the sub-chunks of the larger chunks.
-Deno.test(async function readableStreamReadSmallerChunks() {
+Oden.test(async function readableStreamReadSmallerChunks() {
   const packetSize = 16 * 1024;
   const rid = resourceForReadableStream(largePacketStream(packetSize, 1));
   const buffer = new Uint8Array(packetSize);
@@ -410,7 +410,7 @@ Deno.test(async function readableStreamReadSmallerChunks() {
   core.close(rid);
 });
 
-Deno.test(async function readableStreamLargePackets() {
+Oden.test(async function readableStreamLargePackets() {
   const packetSize = 128 * 1024;
   const rid = resourceForReadableStream(largePacketStream(packetSize, 1024));
   for (let i = 0; i < 1024; i++) {
@@ -428,7 +428,7 @@ Deno.test(async function readableStreamLargePackets() {
   core.close(rid);
 });
 
-Deno.test(async function readableStreamVeryLargePackets() {
+Oden.test(async function readableStreamVeryLargePackets() {
   // 1024 packets of 1MB
   const rid = resourceForReadableStream(largePacketStream(1024 * 1024, 1024));
   let total = 0;
@@ -462,7 +462,7 @@ function createStreamTest(
   delay: number,
   action: "Throw" | "Close",
 ) {
-  Deno.test(`streamCount${count}Delay${delay}${action}`, async () => {
+  Oden.test(`streamCount${count}Delay${delay}${action}`, async () => {
     let rid;
     try {
       rid = resourceForReadableStream(
@@ -493,7 +493,7 @@ function createStreamTest(
 
 // 1024 is the size of the internal packet buffer -- we want to make sure we fill the internal pipe fully.
 for (const packetCount of [1, 1024]) {
-  Deno.test(`readableStreamWithAggressiveResourceClose_${packetCount}`, async function () {
+  Oden.test(`readableStreamWithAggressiveResourceClose_${packetCount}`, async function () {
     let first = true;
     const { promise, resolve } = Promise.withResolvers();
     const rid = resourceForReadableStream(
@@ -527,7 +527,7 @@ for (const packetCount of [1, 1024]) {
   });
 }
 
-Deno.test(async function compressionStreamWritableMayBeAborted() {
+Oden.test(async function compressionStreamWritableMayBeAborted() {
   await Promise.all([
     new CompressionStream("gzip").writable.getWriter().abort(),
     new CompressionStream("deflate").writable.getWriter().abort(),
@@ -536,7 +536,7 @@ Deno.test(async function compressionStreamWritableMayBeAborted() {
   ]);
 });
 
-Deno.test(async function compressionStreamReadableMayBeCancelled() {
+Oden.test(async function compressionStreamReadableMayBeCancelled() {
   await Promise.all([
     new CompressionStream("gzip").readable.getReader().cancel(),
     new CompressionStream("deflate").readable.getReader().cancel(),
@@ -545,7 +545,7 @@ Deno.test(async function compressionStreamReadableMayBeCancelled() {
   ]);
 });
 
-Deno.test(async function decompressionStreamWritableMayBeAborted() {
+Oden.test(async function decompressionStreamWritableMayBeAborted() {
   await Promise.all([
     new DecompressionStream("gzip").writable.getWriter().abort(),
     new DecompressionStream("deflate").writable.getWriter().abort(),
@@ -554,7 +554,7 @@ Deno.test(async function decompressionStreamWritableMayBeAborted() {
   ]);
 });
 
-Deno.test(async function decompressionStreamReadableMayBeCancelled() {
+Oden.test(async function decompressionStreamReadableMayBeCancelled() {
   await Promise.all([
     new DecompressionStream("gzip").readable.getReader().cancel(),
     new DecompressionStream("deflate").readable.getReader().cancel(),
@@ -563,7 +563,7 @@ Deno.test(async function decompressionStreamReadableMayBeCancelled() {
   ]);
 });
 
-Deno.test(async function decompressionStreamValidGzipDoesNotThrow() {
+Oden.test(async function decompressionStreamValidGzipDoesNotThrow() {
   const cs = new CompressionStream("gzip");
   const ds = new DecompressionStream("gzip");
   cs.readable.pipeThrough(ds);
@@ -626,7 +626,7 @@ const compressionFormats: CompressionFormat[] = [
   "brotli",
 ];
 
-Deno.test(async function compressionStreamOutputIsIndependentOfChunking() {
+Oden.test(async function compressionStreamOutputIsIndependentOfChunking() {
   const text = "hello world hello world";
   for (const format of compressionFormats) {
     const singleChunk = await compressChunks(format, [text]);
@@ -644,7 +644,7 @@ Deno.test(async function compressionStreamOutputIsIndependentOfChunking() {
   }
 });
 
-Deno.test(async function compressionStreamDoesNotFlushOnEveryWrite() {
+Oden.test(async function compressionStreamDoesNotFlushOnEveryWrite() {
   // 384 writes; a flush per write emits an empty block each time and stops
   // matches from crossing chunk boundaries, which inflated the output of this
   // input from ~80 bytes to ~3 KiB.
@@ -674,7 +674,7 @@ Deno.test(async function compressionStreamDoesNotFlushOnEveryWrite() {
   }
 });
 
-Deno.test(async function decompressionStreamValidBrotliDoesNotThrow() {
+Oden.test(async function decompressionStreamValidBrotliDoesNotThrow() {
   const cs = new CompressionStream("brotli");
   const ds = new DecompressionStream("brotli");
   cs.readable.pipeThrough(ds);
@@ -689,7 +689,7 @@ Deno.test(async function decompressionStreamValidBrotliDoesNotThrow() {
   assertEquals(result, new Uint8Array([1]));
 });
 
-Deno.test(async function brotliCompressionDecompressionRoundTrip() {
+Oden.test(async function brotliCompressionDecompressionRoundTrip() {
   const original = new TextEncoder().encode(LOREM);
   const cs = new CompressionStream("brotli");
   const ds = new DecompressionStream("brotli");
@@ -705,7 +705,7 @@ Deno.test(async function brotliCompressionDecompressionRoundTrip() {
   assertEquals(result, original);
 });
 
-Deno.test(async function decompressionStreamInvalidGzipStillReported() {
+Oden.test(async function decompressionStreamInvalidGzipStillReported() {
   await assertRejects(
     async () => {
       await new DecompressionStream("gzip").writable.close();
@@ -715,7 +715,7 @@ Deno.test(async function decompressionStreamInvalidGzipStillReported() {
   );
 });
 
-Deno.test(function readableStreamFromWithStringThrows() {
+Oden.test(function readableStreamFromWithStringThrows() {
   // Per Web IDL async_sequence conversion, strings are not Objects and are
   // rejected (they used to be accepted via GetIterator / String iteration).
   // https://github.com/whatwg/streams/pull/1372
@@ -727,7 +727,7 @@ Deno.test(function readableStreamFromWithStringThrows() {
   );
 });
 
-Deno.test(async function readableStreamFromWithStringThrows() {
+Oden.test(async function readableStreamFromWithStringThrows() {
   const serverPort = 4592;
   const upstreamServerPort = 4593;
 
@@ -735,7 +735,7 @@ Deno.test(async function readableStreamFromWithStringThrows() {
   const promise = Promise.withResolvers();
   // Response transforming server that crashes with an uncaught AbortError.
   function startServer() {
-    Deno.serve({ port: serverPort, signal: stopSignal.signal }, async (req) => {
+    Oden.serve({ port: serverPort, signal: stopSignal.signal }, async (req) => {
       const upstreamResponse = await fetch(
         `http://localhost:${upstreamServerPort}`,
         req,
@@ -762,7 +762,7 @@ Deno.test(async function readableStreamFromWithStringThrows() {
   // Upstream server that sends a response with a body that never ends.
   // This is not where the error happens (it handlers the cancellation correctly).
   function startUpstreamServer() {
-    Deno.serve({ port: upstreamServerPort, signal: stopSignal.signal }, (_) => {
+    Oden.serve({ port: upstreamServerPort, signal: stopSignal.signal }, (_) => {
       // Create an infinite readable stream that emits 'a'
       let pushTimeout: NodeJS.Timeout | null = null;
       const readableStream = new ReadableStream({
@@ -831,7 +831,7 @@ Deno.test(async function readableStreamFromWithStringThrows() {
   await p;
 });
 
-Deno.test(async function readableStreamEmittingManyChunks() {
+Oden.test(async function readableStreamEmittingManyChunks() {
   const code = `
     const serverPort = 4594;
     const stopSignal = new AbortController();
@@ -840,14 +840,14 @@ Deno.test(async function readableStreamEmittingManyChunks() {
     let after = 0;
 
     function startServer() {
-      Deno.serve({ port: serverPort, signal: stopSignal.signal }, (_) => {
+      Oden.serve({ port: serverPort, signal: stopSignal.signal }, (_) => {
         return new Response(
           new ReadableStream({
             start() {
-              before = Deno.memoryUsage().heapUsed;
+              before = Oden.memoryUsage().heapUsed;
             },
             pull(controller) {
-              const used = Deno.memoryUsage().heapUsed;
+              const used = Oden.memoryUsage().heapUsed;
 
               if (used > after) {
                 after = used;
@@ -893,7 +893,7 @@ Deno.test(async function readableStreamEmittingManyChunks() {
     // pushing the ratio from ~1.42 to ~1.50. Use 2x, which still flags any real
     // unbounded leak (those are >>2x) and is robust to baseline size.
     if (after / before > 2) {
-      Deno.exit(1);
+      Oden.exit(1);
     }
   `;
   // The in-process heap-growth heuristic above is sensitive to GC timing and
@@ -903,7 +903,7 @@ Deno.test(async function readableStreamEmittingManyChunks() {
   // times and only fail if every attempt reports a leak. See #35353.
   let codeResult = 1;
   for (let attempt = 0; attempt < 3 && codeResult !== 0; attempt++) {
-    const command = new Deno.Command(Deno.execPath(), {
+    const command = new Oden.Command(Oden.execPath(), {
       args: ["run", "-N", "-"],
       stdin: "piped",
     });
@@ -924,8 +924,8 @@ Deno.test(async function readableStreamEmittingManyChunks() {
 // (matching whatwg/streams#1367), so its type should be narrowed from
 // `ArrayBufferView | null` to `Uint8Array<ArrayBuffer> | null`. The runtime
 // check verifies the actual value, and the variable annotation acts as a
-// compile-time check via `deno check`.
-Deno.test("ReadableStreamBYOBRequest.view is a Uint8Array", async () => {
+// compile-time check via `oden check`.
+Oden.test("ReadableStreamBYOBRequest.view is a Uint8Array", async () => {
   let viewIsUint8Array = false;
   const stream = new ReadableStream({
     type: "bytes",
@@ -949,14 +949,14 @@ Deno.test("ReadableStreamBYOBRequest.view is a Uint8Array", async () => {
 });
 
 // https://github.com/denoland/deno/issues/22381
-// Resource-backed writable streams (e.g. `Deno.connect().writable`,
-// `Deno.open().writable`) should accept any ArrayBuffer / ArrayBufferView,
+// Resource-backed writable streams (e.g. `Oden.connect().writable`,
+// `Oden.open().writable`) should accept any ArrayBuffer / ArrayBufferView,
 // not only Uint8Array.
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function writableStreamForRidAcceptsAnyArrayBufferView() {
-    const listener = Deno.listen({ port: 0, hostname: "127.0.0.1" });
-    const port = (listener.addr as Deno.NetAddr).port;
+    const listener = Oden.listen({ port: 0, hostname: "127.0.0.1" });
+    const port = (listener.addr as Oden.NetAddr).port;
 
     const serverConnPromise = (async () => {
       const conn = await listener.accept();
@@ -979,7 +979,7 @@ Deno.test(
       return out;
     })();
 
-    const client = await Deno.connect({ hostname: "127.0.0.1", port });
+    const client = await Oden.connect({ hostname: "127.0.0.1", port });
     const writer = client.writable.getWriter();
 
     // Uint8Array (existing behavior)
@@ -1057,11 +1057,11 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: true } },
   async function writableStreamForRidRejectsNonBufferChunk() {
-    const listener = Deno.listen({ port: 0, hostname: "127.0.0.1" });
-    const port = (listener.addr as Deno.NetAddr).port;
+    const listener = Oden.listen({ port: 0, hostname: "127.0.0.1" });
+    const port = (listener.addr as Oden.NetAddr).port;
     const acceptPromise = (async () => {
       const conn = await listener.accept();
       const buf = new Uint8Array(16);
@@ -1069,7 +1069,7 @@ Deno.test(
       conn.close();
     })();
 
-    const client = await Deno.connect({ hostname: "127.0.0.1", port });
+    const client = await Oden.connect({ hostname: "127.0.0.1", port });
     const writer = client.writable.getWriter();
     await assertRejects(
       // deno-lint-ignore no-explicit-any
@@ -1087,74 +1087,74 @@ Deno.test(
 // When both the source and the sink are resource-backed (here a file readable
 // piped into a file writable), `pipeTo` takes the Rust `op_pipe` fast path.
 // This exercises byte-exact transfer and the default close behavior.
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function pipeToResourceBackedFastPath() {
-    const input = await Deno.makeTempFile();
-    const output = await Deno.makeTempFile();
+    const input = await Oden.makeTempFile();
+    const output = await Oden.makeTempFile();
     try {
       const data = new Uint8Array(1024 * 1024);
       for (let i = 0; i < data.length; i++) data[i] = i % 251;
-      await Deno.writeFile(input, data);
+      await Oden.writeFile(input, data);
 
-      using src = await Deno.open(input, { read: true });
-      using dst = await Deno.open(output, { write: true });
+      using src = await Oden.open(input, { read: true });
+      using dst = await Oden.open(output, { write: true });
       await src.readable.pipeTo(dst.writable);
 
-      assertEquals(await Deno.readFile(output), data);
+      assertEquals(await Oden.readFile(output), data);
     } finally {
-      await Deno.remove(input);
-      await Deno.remove(output);
+      await Oden.remove(input);
+      await Oden.remove(output);
     }
   },
 );
 
 // With `preventClose: true` the resource-backed sink must stay writable after
 // the fast-path pipe completes.
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function pipeToResourceBackedPreventClose() {
-    const input = await Deno.makeTempFile();
-    const output = await Deno.makeTempFile();
+    const input = await Oden.makeTempFile();
+    const output = await Oden.makeTempFile();
     try {
-      await Deno.writeTextFile(input, "hello ");
-      using src = await Deno.open(input, { read: true });
-      const dst = await Deno.open(output, { write: true });
+      await Oden.writeTextFile(input, "hello ");
+      using src = await Oden.open(input, { read: true });
+      const dst = await Oden.open(output, { write: true });
       await src.readable.pipeTo(dst.writable, { preventClose: true });
 
       const writer = dst.writable.getWriter();
       await writer.write(new TextEncoder().encode("world"));
       await writer.close();
 
-      assertEquals(await Deno.readTextFile(output), "hello world");
+      assertEquals(await Oden.readTextFile(output), "hello world");
     } finally {
-      await Deno.remove(input);
-      await Deno.remove(output);
+      await Oden.remove(input);
+      await Oden.remove(output);
     }
   },
 );
 
 // A present-but-never-aborted signal still takes the fast path (exercising the
 // cancel-handle wiring) and completes normally, byte-exact.
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function pipeToResourceBackedSignalNotAborted() {
-    const input = await Deno.makeTempFile();
-    const output = await Deno.makeTempFile();
+    const input = await Oden.makeTempFile();
+    const output = await Oden.makeTempFile();
     try {
       const data = new Uint8Array(128 * 1024);
       for (let i = 0; i < data.length; i++) data[i] = i % 251;
-      await Deno.writeFile(input, data);
+      await Oden.writeFile(input, data);
 
-      using src = await Deno.open(input, { read: true });
-      using dst = await Deno.open(output, { write: true });
+      using src = await Oden.open(input, { read: true });
+      using dst = await Oden.open(output, { write: true });
       const ac = new AbortController();
       await src.readable.pipeTo(dst.writable, { signal: ac.signal });
 
-      assertEquals(await Deno.readFile(output), data);
+      assertEquals(await Oden.readFile(output), data);
     } finally {
-      await Deno.remove(input);
-      await Deno.remove(output);
+      await Oden.remove(input);
+      await Oden.remove(output);
     }
   },
 );
@@ -1162,19 +1162,19 @@ Deno.test(
 // Aborting the signal mid-pump must unblock `op_pipe` (the source never
 // produces data, so without cancellation the pipe would hang forever), reject
 // with the abort reason, and tear both ends down.
-Deno.test(
+Oden.test(
   { permissions: { net: true, read: true, write: true } },
   async function pipeToResourceBackedAbortSignal() {
-    const listener = Deno.listen({ port: 0 });
-    const connectPromise = Deno.connect({ port: listener.addr.port });
+    const listener = Oden.listen({ port: 0 });
+    const connectPromise = Oden.connect({ port: listener.addr.port });
     const server = await listener.accept();
     const client = await connectPromise;
     listener.close();
 
     // The server never writes, so the resource-backed read blocks; only the
     // abort signal (via op_pipe cancellation) can unblock it.
-    const outPath = await Deno.makeTempFile();
-    const out = await Deno.open(outPath, { write: true });
+    const outPath = await Oden.makeTempFile();
+    const out = await Oden.open(outPath, { write: true });
 
     const ac = new AbortController();
     const piped = client.readable.pipeTo(out.writable, { signal: ac.signal });
@@ -1187,7 +1187,7 @@ Deno.test(
     // The abort cancelled `client.readable` (closing the conn) and aborted
     // `out.writable` (closing the file); only the server remains open.
     server.close();
-    await Deno.remove(outPath);
+    await Oden.remove(outPath);
   },
 );
 
@@ -1196,15 +1196,15 @@ Deno.test(
 // stream-level one — and still tear both ends down. Here the sink's underlying
 // resource is closed out from under the pipe, so `op_pipe` fails with a
 // bad-resource error rather than an abort.
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function pipeToResourceBackedSinkError() {
-    const input = await Deno.makeTempFile();
-    const output = await Deno.makeTempFile();
+    const input = await Oden.makeTempFile();
+    const output = await Oden.makeTempFile();
     try {
-      await Deno.writeTextFile(input, "some data to pipe");
-      using src = await Deno.open(input, { read: true });
-      const dst = await Deno.open(output, { write: true });
+      await Oden.writeTextFile(input, "some data to pipe");
+      using src = await Oden.open(input, { read: true });
+      const dst = await Oden.open(output, { write: true });
       // Close the sink's underlying resource, leaving its writable stream in the
       // "writable" state so the fast path is still taken.
       dst.close();
@@ -1219,8 +1219,8 @@ Deno.test(
         `unexpected error message: ${(error as Error).message}`,
       );
     } finally {
-      await Deno.remove(input);
-      await Deno.remove(output);
+      await Oden.remove(input);
+      await Oden.remove(output);
     }
   },
 );
@@ -1228,17 +1228,17 @@ Deno.test(
 // With `preventCancel: true`, an abort mid-pump must tear down the sink but
 // leave the source uncancelled, so its underlying connection stays open and
 // readable. This locks in the flag handling in the fast path's `catch` block.
-Deno.test(
+Oden.test(
   { permissions: { net: true, read: true, write: true } },
   async function pipeToResourceBackedPreventCancel() {
-    const listener = Deno.listen({ port: 0 });
-    const connectPromise = Deno.connect({ port: listener.addr.port });
+    const listener = Oden.listen({ port: 0 });
+    const connectPromise = Oden.connect({ port: listener.addr.port });
     const server = await listener.accept();
     const client = await connectPromise;
     listener.close();
 
-    const outPath = await Deno.makeTempFile();
-    const out = await Deno.open(outPath, { write: true });
+    const outPath = await Oden.makeTempFile();
+    const out = await Oden.open(outPath, { write: true });
 
     const ac = new AbortController();
     // The server never writes, so the pump blocks on the read; only the abort
@@ -1263,14 +1263,14 @@ Deno.test(
 
     client.close();
     server.close();
-    await Deno.remove(outPath);
+    await Oden.remove(outPath);
   },
 );
 
 // Cancelling a transferred ReadableStream while it is still open must close the
 // transfer's internal MessagePort. Otherwise the default resource sanitizer
 // reports a leaked message port (https://github.com/denoland/deno/issues/36015).
-Deno.test(
+Oden.test(
   async function transferredReadableCancelWhileOpenClosesPort() {
     const workerCode = `
       self.onmessage = async (e) => {

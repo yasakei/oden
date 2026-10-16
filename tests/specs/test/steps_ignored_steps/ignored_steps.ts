@@ -1,4 +1,4 @@
-Deno.test("ignored step", async (t) => {
+Oden.test("ignored step", async (t) => {
   let result = await t.step({
     name: "step 1",
     ignore: true,

@@ -1,9 +1,9 @@
 const tids = Array.from(
-  Deno.readDirSync("/proc/self/task"),
+  Oden.readDirSync("/proc/self/task"),
   ({ name }) => Number(name),
 );
 const names = tids.map((tid) =>
-  Deno.readTextFileSync(`/proc/self/task/${tid}/status`).match(
+  Oden.readTextFileSync(`/proc/self/task/${tid}/status`).match(
     /Name:\t(.*)/,
   )![1]
 );

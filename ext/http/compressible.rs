@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::str::FromStr;
 
@@ -645,7 +645,7 @@ mod tests {
 
   #[test]
   fn non_compressible_content_type() {
-    assert!(!is_content_compressible("application/vnd.deno+json"));
+    assert!(!is_content_compressible("application/vnd.oden+json"));
     assert!(!is_content_compressible("text/fake"));
   }
 

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cell::RefCell;
@@ -9,20 +9,20 @@ use std::rc::Rc;
 use std::str::FromStr;
 use std::time::Duration;
 
-use deno_core::AsyncRefCell;
-use deno_core::ByteString;
-use deno_core::CancelFuture;
-use deno_core::CancelHandle;
-use deno_core::CancelTryFuture;
-use deno_core::FromV8;
-use deno_core::JsBuffer;
-use deno_core::OpState;
-use deno_core::RcRef;
-use deno_core::Resource;
-use deno_core::ResourceId;
-use deno_core::ToV8;
-use deno_core::op2;
-use deno_permissions::PermissionsContainer;
+use oden_core::AsyncRefCell;
+use oden_core::ByteString;
+use oden_core::CancelFuture;
+use oden_core::CancelHandle;
+use oden_core::CancelTryFuture;
+use oden_core::FromV8;
+use oden_core::JsBuffer;
+use oden_core::OpState;
+use oden_core::RcRef;
+use oden_core::Resource;
+use oden_core::ResourceId;
+use oden_core::ToV8;
+use oden_core::op2;
+use oden_permissions::PermissionsContainer;
 use hickory_proto::ProtoError;
 use hickory_proto::ProtoErrorKind;
 use hickory_proto::op::ResponseCode;
@@ -89,7 +89,7 @@ impl From<TunnelAddr> for IpAddr {
   }
 }
 
-/// Options for TCP connection (used by Deno.connect and node:net)
+/// Options for TCP connection (used by Oden.connect and node:net)
 #[derive(Debug, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct TcpConnectOptions {
@@ -135,10 +135,10 @@ pub enum NetError {
   AcceptTaskOngoing,
   #[class(inherit)]
   #[error(transparent)]
-  Permission(#[from] deno_permissions::PermissionCheckError),
+  Permission(#[from] oden_permissions::PermissionCheckError),
   #[class(inherit)]
   #[error("{0}")]
-  Resource(#[from] deno_core::error::ResourceError),
+  Resource(#[from] oden_core::error::ResourceError),
   #[class(generic)]
   #[error("No resolved address found")]
   NoResolvedAddress,
@@ -150,7 +150,7 @@ pub enum NetError {
   Map(crate::io::MapError),
   #[class(inherit)]
   #[error("{0}")]
-  Canceled(#[from] deno_core::Canceled),
+  Canceled(#[from] oden_core::Canceled),
   #[class("NotFound")]
   #[error("{0}")]
   #[property("ares_code" = self.ares_code())]
@@ -186,12 +186,12 @@ pub enum NetError {
   TcpStreamBusy,
   #[class(generic)]
   #[error("{0}")]
-  Rustls(#[from] deno_tls::rustls::Error),
+  Rustls(#[from] oden_tls::rustls::Error),
   #[class(inherit)]
   #[error("{0}")]
-  Tls(#[from] deno_tls::TlsError),
+  Tls(#[from] oden_tls::TlsError),
   #[class("InvalidData")]
-  #[error("Error creating TLS certificate: Deno.listenTls requires a key")]
+  #[error("Error creating TLS certificate: Oden.listenTls requires a key")]
   ListenTlsRequiresKey,
   #[class(inherit)]
   #[error("{0}")]
@@ -326,7 +326,7 @@ pub async fn op_net_send_udp(
     let mut s = state.borrow_mut();
     s.borrow_mut::<PermissionsContainer>().check_net(
       &(&addr.hostname, Some(addr.port)),
-      "Deno.DatagramConn.send()",
+      "Oden.DatagramConn.send()",
     )?;
   }
   let addr = resolve_addr(&addr.hostname, addr.port)
@@ -341,7 +341,7 @@ pub async fn op_net_send_udp(
       .check_net_resolved(
         &addr.ip(),
         addr.port(),
-        "Deno.DatagramConn.send()",
+        "Oden.DatagramConn.send()",
       )?;
   }
 
@@ -399,7 +399,7 @@ pub async fn op_net_join_multi_v4_udp(
       state.borrow_mut::<PermissionsContainer>(),
       std::net::IpAddr::V4(addr),
       port,
-      "Deno.DatagramConn.joinMulticastV4()",
+      "Oden.DatagramConn.joinMulticastV4()",
     )?;
   }
 
@@ -431,7 +431,7 @@ pub async fn op_net_join_multi_v6_udp(
       state.borrow_mut::<PermissionsContainer>(),
       std::net::IpAddr::V6(addr),
       port,
-      "Deno.DatagramConn.joinMulticastV6()",
+      "Oden.DatagramConn.joinMulticastV6()",
     )?;
   }
 
@@ -551,8 +551,8 @@ pub struct NetPermToken {
 }
 
 // SAFETY: we're sure `NetPermToken` can be GCed
-unsafe impl deno_core::GarbageCollected for NetPermToken {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+unsafe impl oden_core::GarbageCollected for NetPermToken {
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"NetPermToken"
@@ -621,7 +621,7 @@ pub async fn op_net_connect_tcp_inner(
     };
     state_
       .borrow_mut::<PermissionsContainer>()
-      .check_net(&(&hostname_to_check, Some(addr.port)), "Deno.connect()")?;
+      .check_net(&(&hostname_to_check, Some(addr.port)), "Oden.connect()")?;
   }
 
   let options = options.unwrap_or_default();
@@ -671,7 +671,7 @@ pub async fn op_net_connect_tcp_inner(
         permissions.check_net_resolved(
           &addr.ip(),
           addr.port(),
-          "Deno.connect()",
+          "Oden.connect()",
         )?;
       }
     }
@@ -748,17 +748,17 @@ pub fn op_net_listen_tcp(
   tcp_backlog: i32,
 ) -> Result<(ResourceId, IpAddr), NetError> {
   if reuse_port {
-    super::check_unstable(state, "Deno.listen({ reusePort: true })");
+    super::check_unstable(state, "Oden.listen({ reusePort: true })");
   }
   state
     .borrow_mut::<PermissionsContainer>()
-    .check_net(&(&addr.hostname, Some(addr.port)), "Deno.listen()")?;
+    .check_net(&(&addr.hostname, Some(addr.port)), "Oden.listen()")?;
   let addr = resolve_addr_sync(&addr.hostname, addr.port)?
     .next()
     .ok_or_else(|| NetError::NoResolvedAddress)?;
   state
     .borrow_mut::<PermissionsContainer>()
-    .check_net_resolved(&addr.ip(), addr.port(), "Deno.listen()")?;
+    .check_net_resolved(&addr.ip(), addr.port(), "Oden.listen()")?;
 
   let listener = if load_balanced {
     TcpListener::bind_load_balanced(addr, tcp_backlog)
@@ -780,13 +780,13 @@ fn net_listen_udp(
 ) -> Result<(ResourceId, IpAddr), NetError> {
   state
     .borrow_mut::<PermissionsContainer>()
-    .check_net(&(&addr.hostname, Some(addr.port)), "Deno.listenDatagram()")?;
+    .check_net(&(&addr.hostname, Some(addr.port)), "Oden.listenDatagram()")?;
   let addr = resolve_addr_sync(&addr.hostname, addr.port)?
     .next()
     .ok_or_else(|| NetError::NoResolvedAddress)?;
   state
     .borrow_mut::<PermissionsContainer>()
-    .check_net_resolved(&addr.ip(), addr.port(), "Deno.listenDatagram()")?;
+    .check_net_resolved(&addr.ip(), addr.port(), "Oden.listenDatagram()")?;
 
   let domain = if addr.is_ipv4() {
     Domain::IPV4
@@ -846,7 +846,7 @@ pub fn op_net_listen_udp(
   reuse_address: bool,
   loopback: bool,
 ) -> Result<(ResourceId, IpAddr), NetError> {
-  super::check_unstable(state, "Deno.listenDatagram");
+  super::check_unstable(state, "Oden.listenDatagram");
   net_listen_udp(state, addr, reuse_address, loopback)
 }
 
@@ -869,19 +869,19 @@ pub async fn op_net_connect_vsock(
 ) -> Result<(ResourceId, (u32, u32), (u32, u32)), NetError> {
   use std::sync::Arc;
 
-  use deno_features::FeatureChecker;
+  use oden_features::FeatureChecker;
   use tokio_vsock::VsockAddr;
   use tokio_vsock::VsockStream;
 
   state
     .borrow()
     .borrow::<Arc<FeatureChecker>>()
-    .check_or_exit("vsock", "Deno.connect");
+    .check_or_exit("vsock", "Oden.connect");
 
   state
     .borrow_mut()
     .borrow_mut::<PermissionsContainer>()
-    .check_net_vsock(cid, port, "Deno.connect()")?;
+    .check_net_vsock(cid, port, "Oden.connect()")?;
 
   let addr = VsockAddr::new(cid, port);
   let vsock_stream = VsockStream::connect(addr).await?;
@@ -922,18 +922,18 @@ pub fn op_net_listen_vsock(
 ) -> Result<(ResourceId, u32, u32), NetError> {
   use std::sync::Arc;
 
-  use deno_features::FeatureChecker;
+  use oden_features::FeatureChecker;
   use tokio_vsock::VsockAddr;
   use tokio_vsock::VsockListener;
 
   state
     .borrow::<Arc<FeatureChecker>>()
-    .check_or_exit("vsock", "Deno.listen");
+    .check_or_exit("vsock", "Oden.listen");
 
   state.borrow_mut::<PermissionsContainer>().check_net_vsock(
     cid,
     port,
-    "Deno.listen()",
+    "Oden.listen()",
   )?;
 
   let addr = VsockAddr::new(cid, port);
@@ -1178,7 +1178,7 @@ pub async fn op_dns_resolve(
       let socker_addr = &ns.socket_addr;
       let ip = socker_addr.ip().to_string();
       let port = socker_addr.port();
-      perm.check_net(&(&ip, Some(port)), "Deno.resolveDns()")?;
+      perm.check_net(&(&ip, Some(port)), "Oden.resolveDns()")?;
     }
   }
 
@@ -1274,7 +1274,7 @@ pub fn op_net_get_system_dns_servers(
 ) -> Result<Vec<(String, u16)>, NetError> {
   // Reading the host resolver configuration (the system nameservers, e.g.
   // from /etc/resolv.conf) exposes host network configuration, so gate it
-  // behind the same `sys` permission as Deno.networkInterfaces(). Reachable
+  // behind the same `sys` permission as Oden.networkInterfaces(). Reachable
   // from JS via node:dns.getServers().
   state
     .borrow_mut::<PermissionsContainer>()
@@ -1408,9 +1408,9 @@ mod tests {
   use std::net::ToSocketAddrs;
   use std::sync::Mutex;
 
-  use deno_core::JsRuntime;
-  use deno_core::RuntimeOptions;
-  use deno_core::futures::FutureExt;
+  use oden_core::JsRuntime;
+  use oden_core::RuntimeOptions;
+  use oden_core::futures::FutureExt;
   use hickory_proto::rr::Name;
   use hickory_proto::rr::rdata::NULL;
   use hickory_proto::rr::rdata::SOA;
@@ -1752,9 +1752,9 @@ mod tests {
 
     use std::sync::Arc;
 
-    use deno_permissions::RuntimePermissionDescriptorParser;
+    use oden_permissions::RuntimePermissionDescriptorParser;
 
-    deno_core::extension!(
+    oden_core::extension!(
       test_ext,
       state = |state| {
         let parser = Arc::new(RuntimePermissionDescriptorParser::new(
@@ -1815,9 +1815,9 @@ mod tests {
     use std::sync::Arc;
     use std::task::Poll;
 
-    use deno_permissions::RuntimePermissionDescriptorParser;
+    use oden_permissions::RuntimePermissionDescriptorParser;
 
-    deno_core::extension!(
+    oden_core::extension!(
       test_ext,
       state = |state| {
         let parser = Arc::new(RuntimePermissionDescriptorParser::new(

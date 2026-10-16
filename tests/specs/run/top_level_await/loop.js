@@ -1,11 +1,11 @@
-const importsDir = Deno.readDirSync(
-  Deno.realPathSync("./tla2"),
+const importsDir = Oden.readDirSync(
+  Oden.realPathSync("./tla2"),
 );
 
 const resolvedPaths = [];
 
 for (const { name } of importsDir) {
-  const filePath = Deno.realPathSync(`./tla2/${name}`);
+  const filePath = Oden.realPathSync(`./tla2/${name}`);
   resolvedPaths.push(filePath);
 }
 

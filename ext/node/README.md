@@ -1,3 +1,3 @@
-# deno_node
+# oden_node
 
-`require` and other node related functionality for Deno.
+`require` and other node related functionality for Oden.

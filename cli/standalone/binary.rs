@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cell::Cell;
@@ -17,49 +17,49 @@ use capacity_builder::BytesAppendable;
 use deno_ast::MediaType;
 use deno_ast::ModuleKind;
 use deno_ast::ModuleSpecifier;
-use deno_cache_dir::CACHE_PERM;
-use deno_core::anyhow::Context;
-use deno_core::anyhow::bail;
-use deno_core::error::AnyError;
-use deno_core::serde_json;
-use deno_core::url::Url;
+use oden_cache_dir::CACHE_PERM;
+use oden_core::anyhow::Context;
+use oden_core::anyhow::bail;
+use oden_core::error::AnyError;
+use oden_core::serde_json;
+use oden_core::url::Url;
 use deno_graph::ModuleGraph;
-use deno_lib::args::CaData;
-use deno_lib::args::UnstableConfig;
-use deno_lib::shared::ReleaseChannel;
-use deno_lib::standalone::binary::CjsExportAnalysisEntry;
-use deno_lib::standalone::binary::MAGIC_BYTES;
-use deno_lib::standalone::binary::Metadata;
-use deno_lib::standalone::binary::NodeModules;
-use deno_lib::standalone::binary::RemoteModuleEntry;
-use deno_lib::standalone::binary::SerializedResolverWorkspaceJsrPackage;
-use deno_lib::standalone::binary::SerializedWorkspaceResolver;
-use deno_lib::standalone::binary::SerializedWorkspaceResolverImportMap;
-use deno_lib::standalone::binary::SpecifierDataStore;
-use deno_lib::standalone::binary::SpecifierId;
-use deno_lib::standalone::virtual_fs::BuiltVfs;
-use deno_lib::standalone::virtual_fs::DENO_COMPILE_GLOBAL_NODE_MODULES_DIR_NAME;
-use deno_lib::standalone::virtual_fs::OffsetWithLength;
-use deno_lib::standalone::virtual_fs::VfsBuilder;
-use deno_lib::standalone::virtual_fs::VfsEntry;
-use deno_lib::standalone::virtual_fs::VirtualDirectory;
-use deno_lib::standalone::virtual_fs::VirtualDirectoryEntries;
-use deno_lib::standalone::virtual_fs::WindowsSystemRootablePath;
-use deno_lib::util::hash::FastInsecureHasher;
-use deno_lib::util::text_encoding::is_valid_utf8;
-use deno_lib::util::v8::construct_v8_flags;
-use deno_lib::version::DENO_VERSION_INFO;
-use deno_npm::NpmSystemInfo;
-use deno_npm::resolution::SerializedNpmResolutionSnapshot;
-use deno_npm::resolution::ValidSerializedNpmResolutionSnapshot;
+use oden_lib::args::CaData;
+use oden_lib::args::UnstableConfig;
+use oden_lib::shared::ReleaseChannel;
+use oden_lib::standalone::binary::CjsExportAnalysisEntry;
+use oden_lib::standalone::binary::MAGIC_BYTES;
+use oden_lib::standalone::binary::Metadata;
+use oden_lib::standalone::binary::NodeModules;
+use oden_lib::standalone::binary::RemoteModuleEntry;
+use oden_lib::standalone::binary::SerializedResolverWorkspaceJsrPackage;
+use oden_lib::standalone::binary::SerializedWorkspaceResolver;
+use oden_lib::standalone::binary::SerializedWorkspaceResolverImportMap;
+use oden_lib::standalone::binary::SpecifierDataStore;
+use oden_lib::standalone::binary::SpecifierId;
+use oden_lib::standalone::virtual_fs::BuiltVfs;
+use oden_lib::standalone::virtual_fs::ODEN_COMPILE_GLOBAL_NODE_MODULES_DIR_NAME;
+use oden_lib::standalone::virtual_fs::OffsetWithLength;
+use oden_lib::standalone::virtual_fs::VfsBuilder;
+use oden_lib::standalone::virtual_fs::VfsEntry;
+use oden_lib::standalone::virtual_fs::VirtualDirectory;
+use oden_lib::standalone::virtual_fs::VirtualDirectoryEntries;
+use oden_lib::standalone::virtual_fs::WindowsSystemRootablePath;
+use oden_lib::util::hash::FastInsecureHasher;
+use oden_lib::util::text_encoding::is_valid_utf8;
+use oden_lib::util::v8::construct_v8_flags;
+use oden_lib::version::ODEN_VERSION_INFO;
+use oden_npm::NpmSystemInfo;
+use oden_npm::resolution::SerializedNpmResolutionSnapshot;
+use oden_npm::resolution::ValidSerializedNpmResolutionSnapshot;
 use deno_path_util::fs::atomic_write_file_with_retries;
 use deno_path_util::url_from_directory_path;
 use deno_path_util::url_to_file_path;
-use deno_resolver::file_fetcher::FetchLocalOptions;
-use deno_resolver::file_fetcher::FetchOptions;
-use deno_resolver::file_fetcher::FetchPermissionsOptionRef;
-use deno_resolver::loader::GraphCjsAnalysisSourceProvider;
-use deno_resolver::workspace::WorkspaceResolver;
+use oden_resolver::file_fetcher::FetchLocalOptions;
+use oden_resolver::file_fetcher::FetchOptions;
+use oden_resolver::file_fetcher::FetchPermissionsOptionRef;
+use oden_resolver::loader::GraphCjsAnalysisSourceProvider;
+use oden_resolver::workspace::WorkspaceResolver;
 use deno_semver::npm::NpmPackageReqReference;
 use indexmap::IndexMap;
 use node_resolver::analyze::CjsAnalysisSourceProvider;
@@ -72,7 +72,7 @@ use crate::args::CompileFlags;
 use crate::args::JavaScriptEngine;
 use crate::args::get_default_v8_flags;
 use crate::args::resolve_compile_target;
-use crate::cache::DenoDir;
+use crate::cache::OdenDir;
 use crate::file_fetcher::CliFileFetcher;
 use crate::http_util::HttpClientProvider;
 use crate::module_loader::CliEmitter;
@@ -153,7 +153,7 @@ impl CjsAnalysisSourceProvider for VfsCjsAnalysisSourceProvider<'_> {
   }
 }
 
-// `deno compile` is a trusted local build step, so sources absent from the
+// `oden compile` is a trusted local build step, so sources absent from the
 // graph and VFS may be read directly to preserve compile-time CJS analysis.
 struct FileSystemCjsAnalysisSourceProvider<'a> {
   sys: &'a CliSys,
@@ -240,9 +240,9 @@ impl<'a> BytesAppendable<'a> for &'a SpecifierStoreForSerialization<'a> {
 }
 
 /// Given a canonical npm package folder (e.g.
-/// `<.deno>/<id>/node_modules/@scope/name`), walk up to the enclosing
+/// `<.oden>/<id>/node_modules/@scope/name`), walk up to the enclosing
 /// `node_modules/` directory. Embedding from there picks up sibling
-/// symlinks the deno linker creates for direct dependencies, which the
+/// symlinks the oden linker creates for direct dependencies, which the
 /// canonical folder itself doesn't contain.
 fn pkg_folder_node_modules_root(folder: &Path) -> Option<&Path> {
   let mut current = folder.parent()?;
@@ -336,7 +336,7 @@ fn default_app_name(display_output_filename: &str, is_desktop: bool) -> String {
 
 /// Resolve the stable app identity baked into a compiled binary: an explicit
 /// `--app-name`, otherwise the output file name (minus the executable extension
-/// added by Deno). The derived default is held to the same rules as an explicit
+/// added by Oden). The derived default is held to the same rules as an explicit
 /// flag, since it becomes a single directory component at runtime (possibly on
 /// a different target OS when cross-compiling); otherwise an output name like
 /// `aux` or one with a trailing dot would silently break persistent storage on
@@ -364,11 +364,11 @@ pub struct WriteBinOptions<'a> {
   pub compile_flags: &'a CompileFlags,
 }
 
-pub struct DenoCompileBinaryWriter<'a> {
+pub struct OdenCompileBinaryWriter<'a> {
   cjs_module_export_analyzer: &'a CliCjsModuleExportAnalyzer,
   cjs_tracker: &'a CliCjsTracker,
   cli_options: &'a CliOptions,
-  deno_dir: &'a DenoDir,
+  oden_dir: &'a OdenDir,
   emitter: &'a CliEmitter,
   file_fetcher: &'a CliFileFetcher,
   http_client_provider: &'a HttpClientProvider,
@@ -378,13 +378,13 @@ pub struct DenoCompileBinaryWriter<'a> {
   is_desktop: bool,
 }
 
-impl<'a> DenoCompileBinaryWriter<'a> {
+impl<'a> OdenCompileBinaryWriter<'a> {
   #[allow(clippy::too_many_arguments, reason = "construction")]
   pub fn new(
     cjs_module_export_analyzer: &'a CliCjsModuleExportAnalyzer,
     cjs_tracker: &'a CliCjsTracker,
     cli_options: &'a CliOptions,
-    deno_dir: &'a DenoDir,
+    oden_dir: &'a OdenDir,
     emitter: &'a CliEmitter,
     file_fetcher: &'a CliFileFetcher,
     http_client_provider: &'a HttpClientProvider,
@@ -397,7 +397,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
       cjs_module_export_analyzer,
       cjs_tracker,
       cli_options,
-      deno_dir,
+      oden_dir,
       emitter,
       file_fetcher,
       http_client_provider,
@@ -460,37 +460,37 @@ impl<'a> DenoCompileBinaryWriter<'a> {
 
     // Used for testing.
     //
-    // Phase 2 of the 'min sized' deno compile RFC talks
+    // Phase 2 of the 'min sized' oden compile RFC talks
     // about adding this as a flag.
     if let Some(path) = get_dev_binary_path() {
       if compile_flags.engine == JavaScriptEngine::QuickJs {
         log::warn!(
-          "--engine quickjs is ignored when using the development denort at {}",
+          "--engine quickjs is ignored when using the development odenrt at {}",
           path.to_string_lossy()
         );
       }
-      log::debug!("Resolved denort: {}", path.to_string_lossy());
+      log::debug!("Resolved odenrt: {}", path.to_string_lossy());
       return std::fs::read(&path).with_context(|| {
-        format!("Could not find denort at '{}'", path.to_string_lossy())
+        format!("Could not find odenrt at '{}'", path.to_string_lossy())
       });
     }
 
     let target = resolve_compile_target(compile_flags);
     let binary_name =
-      runtime_archive_name("denort", &compile_flags.engine, &target);
+      runtime_archive_name("odenrt", &compile_flags.engine, &target);
 
-    let binary_path_suffix = match DENO_VERSION_INFO.release_channel {
+    let binary_path_suffix = match ODEN_VERSION_INFO.release_channel {
       ReleaseChannel::Canary => {
-        format!("canary/{}/{}", DENO_VERSION_INFO.git_hash, binary_name)
+        format!("canary/{}/{}", ODEN_VERSION_INFO.git_hash, binary_name)
       }
       _ => {
-        format!("release/v{}/{}", DENO_VERSION_INFO.deno, binary_name)
+        format!("release/v{}/{}", ODEN_VERSION_INFO.oden, binary_name)
       }
     };
 
-    let download_directory = self.deno_dir.dl_folder_path();
+    let download_directory = self.oden_dir.dl_folder_path();
     let binary_path = download_directory.join(&binary_path_suffix);
-    log::debug!("Resolved denort: {}", binary_path.display());
+    log::debug!("Resolved odenrt: {}", binary_path.display());
 
     let read_file = |path: &Path| -> Result<Vec<u8>, AnyError> {
       std::fs::read(path).with_context(|| format!("Reading {}", path.display()))
@@ -506,9 +506,9 @@ impl<'a> DenoCompileBinaryWriter<'a> {
     let temp_dir = tempfile::TempDir::new()?;
     let base_binary_path = archive::unpack_into_dir(archive::UnpackArgs {
       exe_name: if target.contains("windows") {
-        "denort.exe"
+        "odenrt.exe"
       } else {
-        "denort"
+        "odenrt"
       },
       archive_name: &binary_name,
       archive_data: &archive_data,
@@ -523,18 +523,18 @@ impl<'a> DenoCompileBinaryWriter<'a> {
     &self,
     compile_flags: &CompileFlags,
   ) -> Result<Vec<u8>, AnyError> {
-    // For development: check DENORT_DESKTOP_BIN env var or look
-    // for libdenort next to the deno executable.
+    // For development: check ODENRT_DESKTOP_BIN env var or look
+    // for libodenrt next to the oden executable.
     if let Some(path) = get_dev_desktop_binary_path() {
       if compile_flags.engine == JavaScriptEngine::QuickJs {
         log::warn!(
-          "--engine quickjs is ignored when using the development libdenort at {}",
+          "--engine quickjs is ignored when using the development libodenrt at {}",
           path.to_string_lossy()
         );
       }
-      log::debug!("Resolved libdenort: {}", path.to_string_lossy());
+      log::debug!("Resolved libodenrt: {}", path.to_string_lossy());
       return std::fs::read(&path).with_context(|| {
-        format!("Could not find libdenort at '{}'", path.to_string_lossy())
+        format!("Could not find libodenrt at '{}'", path.to_string_lossy())
       });
     }
 
@@ -547,25 +547,25 @@ impl<'a> DenoCompileBinaryWriter<'a> {
       "so"
     };
     let lib_name = if target.contains("windows") {
-      format!("denort.{lib_ext}")
+      format!("odenrt.{lib_ext}")
     } else {
-      format!("libdenort.{lib_ext}")
+      format!("libodenrt.{lib_ext}")
     };
     let binary_name =
-      runtime_archive_name("libdenort", &compile_flags.engine, &target);
+      runtime_archive_name("libodenrt", &compile_flags.engine, &target);
 
-    let binary_path_suffix = match DENO_VERSION_INFO.release_channel {
+    let binary_path_suffix = match ODEN_VERSION_INFO.release_channel {
       ReleaseChannel::Canary => {
-        format!("canary/{}/{}", DENO_VERSION_INFO.git_hash, binary_name)
+        format!("canary/{}/{}", ODEN_VERSION_INFO.git_hash, binary_name)
       }
       _ => {
-        format!("release/v{}/{}", DENO_VERSION_INFO.deno, binary_name)
+        format!("release/v{}/{}", ODEN_VERSION_INFO.oden, binary_name)
       }
     };
 
-    let download_directory = self.deno_dir.dl_folder_path();
+    let download_directory = self.oden_dir.dl_folder_path();
     let binary_path = download_directory.join(&binary_path_suffix);
-    log::debug!("Resolved libdenort: {}", binary_path.display());
+    log::debug!("Resolved libodenrt: {}", binary_path.display());
 
     let read_file = |path: &Path| -> Result<Vec<u8>, AnyError> {
       std::fs::read(path).with_context(|| format!("Reading {}", path.display()))
@@ -629,7 +629,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
     Ok(bytes)
   }
 
-  /// This functions creates a standalone deno binary by appending a bundle
+  /// This functions creates a standalone oden binary by appending a bundle
   /// and magic trailer to the currently executing binary.
   async fn write_standalone_binary(
     &self,
@@ -793,7 +793,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
               _ => ModuleKind::Esm,
             };
             let (source, source_map) =
-              self.emitter.emit_source_for_deno_compile(
+              self.emitter.emit_source_for_oden_compile(
                 &m.specifier,
                 m.media_type,
                 module_kind,
@@ -836,7 +836,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
           vfs
             .add_file_with_data(
               &file_path,
-              deno_lib::standalone::virtual_fs::AddFileDataOptions {
+              oden_lib::standalone::virtual_fs::AddFileDataOptions {
                 data: original_source.to_vec(),
                 maybe_transpiled,
                 maybe_source_map,
@@ -1023,7 +1023,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
     };
 
     let code_cache_key = if self.cli_options.code_cache_enabled() {
-      let mut hasher = FastInsecureHasher::new_deno_versioned();
+      let mut hasher = FastInsecureHasher::new_oden_versioned();
       for module in graph.modules() {
         if let Some(source) = module.source() {
           hasher
@@ -1067,7 +1067,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
     let env_vars_from_env_file = {
       let mut aggregated_env_vars = IndexMap::new();
       for env_file_name in self.cli_options.env_file_names().rev() {
-        match deno_dotenv::find_path_and_content(
+        match oden_dotenv::find_path_and_content(
           &CliSys::default(),
           self.cli_options.initial_cwd(),
           env_file_name,
@@ -1150,7 +1150,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
               root_dir_url.specifier_key(i.base_url()).into_owned()
             } else {
               // just make a remote url local
-              "deno.json".to_string()
+              "oden.json".to_string()
             },
             json: i.to_json(),
           }
@@ -1199,7 +1199,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
       otel_config: self.cli_options.otel_config(),
       vfs_case_sensitivity: vfs.case_sensitivity,
       self_extracting: if compile_flags.self_extracting {
-        let mut hasher = FastInsecureHasher::new_deno_versioned();
+        let mut hasher = FastInsecureHasher::new_oden_versioned();
         for file in &vfs.files {
           hasher.write_u64(file.len() as u64);
           hasher.write(file);
@@ -1209,9 +1209,9 @@ impl<'a> DenoCompileBinaryWriter<'a> {
         None
       },
       // Bake in a stable app identity so origin-bound storage (default
-      // `Deno.openKv()`, `localStorage`, `caches`) persists to a per-app
+      // `Oden.openKv()`, `localStorage`, `caches`) persists to a per-app
       // directory at runtime. Prefer an explicit `--app-name`, otherwise derive
-      // it from the output file name (minus any executable extension Deno adds).
+      // it from the output file name (minus any executable extension Oden adds).
       // Resolving here keeps the identity stable even if the binary is later
       // renamed. The name is already validated in `write_bin` (via
       // `resolve_app_name`).
@@ -1223,7 +1223,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
       app_version: self
         .cli_options
         .workspace()
-        .root_deno_json()
+        .root_oden_json()
         .and_then(|c| c.json.version.clone()),
       error_reporting_url: self
         .cli_options
@@ -1273,8 +1273,8 @@ impl<'a> DenoCompileBinaryWriter<'a> {
     &self,
     specifier: &ModuleSpecifier,
   ) -> Result<
-    deno_cache_dir::file_fetcher::File,
-    deno_resolver::file_fetcher::FetchError,
+    oden_cache_dir::file_fetcher::File,
+    oden_resolver::file_fetcher::FetchError,
   > {
     self
       .file_fetcher
@@ -1288,14 +1288,14 @@ impl<'a> DenoCompileBinaryWriter<'a> {
           maybe_auth: None,
           maybe_accept: None,
           maybe_cache_setting: Some(
-            &deno_cache_dir::file_fetcher::CacheSetting::Use,
+            &oden_cache_dir::file_fetcher::CacheSetting::Use,
           ),
         },
       )
       .await
   }
 
-  /// Decide what to embed for `deno compile --bundle`. The bundle is
+  /// Decide what to embed for `oden compile --bundle`. The bundle is
   /// always shipped; this controls the npm portion. We need it when
   /// either the CJS-from-ESM wrapper pointed at on-disk paths during
   /// rewriting, or the resolved tree has a native (`.node`) addon — in
@@ -1307,7 +1307,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
   /// reached: the rewriter recorded every absolute path it pointed at,
   /// and we map each path back to its owning npm package and walk that
   /// closure. The full resolution snapshot still goes in the metadata
-  /// so denort can resolve packages by name at runtime.
+  /// so odenrt can resolve packages by name at runtime.
   fn fill_bundle_native_addon_vfs(
     &self,
     builder: &mut VfsBuilder,
@@ -1361,7 +1361,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
         let progress =
           progress_bar.update_with_prompt(ProgressMessagePrompt::Compile, "");
         progress.set_total_size(needed_ids.len() as u64);
-        // Dedup the set of `<deno-cache>/<id>/node_modules/` directories we
+        // Dedup the set of `<oden-cache>/<id>/node_modules/` directories we
         // add: a single id's node_modules dir contains the canonical package
         // folder plus sibling symlinks to its direct deps. Going one level up
         // from the canonical folder picks both up so node-module resolution at
@@ -1500,8 +1500,8 @@ impl<'a> DenoCompileBinaryWriter<'a> {
 
         let global_cache_root_path = npm_resolver.global_cache_root_path();
 
-        // Flatten all the registries folders into a single ".deno_compile_node_modules/localhost" folder
-        // that will be used by denort when loading the npm cache. This avoids us exposing
+        // Flatten all the registries folders into a single ".oden_compile_node_modules/localhost" folder
+        // that will be used by odenrt when loading the npm cache. This avoids us exposing
         // the user's private registry information and means we don't have to bother
         // serializing all the different registry config into the binary.
         //
@@ -1542,7 +1542,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
           return vfs.build();
         };
 
-        root_dir.name = DENO_COMPILE_GLOBAL_NODE_MODULES_DIR_NAME.to_string();
+        root_dir.name = ODEN_COMPILE_GLOBAL_NODE_MODULES_DIR_NAME.to_string();
         let mut new_entries = Vec::with_capacity(root_dir.entries.len());
         for entry in root_dir.entries.take_inner() {
           match &entry {
@@ -1572,7 +1572,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
         let index = parent_dir
           .entries
           .binary_search(
-            DENO_COMPILE_GLOBAL_NODE_MODULES_DIR_NAME,
+            ODEN_COMPILE_GLOBAL_NODE_MODULES_DIR_NAME,
             case_sensitivity,
           )
           .unwrap();
@@ -1581,7 +1581,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
         // go up from the ancestors removing empty directories...
         // this is not as optimized as it could be
         let mut last_name =
-          Cow::Borrowed(DENO_COMPILE_GLOBAL_NODE_MODULES_DIR_NAME);
+          Cow::Borrowed(ODEN_COMPILE_GLOBAL_NODE_MODULES_DIR_NAME);
         for ancestor in
           parent.ancestors().map(Some).chain(std::iter::once(None))
         {
@@ -1775,14 +1775,14 @@ fn serialize_npm_snapshot(
   bytes
 }
 
-fn get_denort_path(deno_exe: PathBuf) -> Option<OsString> {
-  let mut denort = deno_exe;
-  denort.set_file_name(if cfg!(windows) {
-    "denort.exe"
+fn get_odenrt_path(oden_exe: PathBuf) -> Option<OsString> {
+  let mut odenrt = oden_exe;
+  odenrt.set_file_name(if cfg!(windows) {
+    "odenrt.exe"
   } else {
-    "denort"
+    "odenrt"
   });
-  denort.exists().then(|| denort.into_os_string())
+  odenrt.exists().then(|| odenrt.into_os_string())
 }
 
 fn runtime_archive_name(
@@ -1794,13 +1794,13 @@ fn runtime_archive_name(
 }
 
 fn get_dev_binary_path() -> Option<OsString> {
-  env::var_os("DENORT_BIN").or_else(|| {
+  env::var_os("ODENRT_BIN").or_else(|| {
     env::current_exe().ok().and_then(|exec_path| {
       if exec_path
         .components()
         .any(|component| component == Component::Normal("target".as_ref()))
       {
-        get_denort_path(exec_path)
+        get_odenrt_path(exec_path)
       } else {
         None
       }
@@ -1808,32 +1808,32 @@ fn get_dev_binary_path() -> Option<OsString> {
   })
 }
 
-fn get_libdenort_path(deno_exe: PathBuf) -> Option<OsString> {
-  let mut libdenort = deno_exe;
+fn get_libodenrt_path(oden_exe: PathBuf) -> Option<OsString> {
+  let mut libodenrt = oden_exe;
   if cfg!(target_os = "macos") {
-    libdenort.set_file_name("libdenort.dylib");
+    libodenrt.set_file_name("libodenrt.dylib");
   } else if cfg!(windows) {
-    libdenort.set_file_name("denort.dll");
+    libodenrt.set_file_name("odenrt.dll");
   } else {
-    libdenort.set_file_name("libdenort.so");
+    libodenrt.set_file_name("libodenrt.so");
   }
-  libdenort.exists().then(|| libdenort.into_os_string())
+  libodenrt.exists().then(|| libodenrt.into_os_string())
 }
 
 fn get_dev_desktop_binary_path() -> Option<OsString> {
-  env::var_os("DENORT_DESKTOP_BIN").or_else(|| {
+  env::var_os("ODENRT_DESKTOP_BIN").or_else(|| {
     env::current_exe().ok().and_then(|exec_path| {
       if exec_path
         .components()
         .any(|component| component == Component::Normal("target".as_ref()))
       {
-        // Prefer release libdenort (optimized) over debug.
+        // Prefer release libodenrt (optimized) over debug.
         let target_dir = exec_path.parent().and_then(|p| p.parent());
         target_dir
           .and_then(|d| {
-            get_libdenort_path(d.join("release").join("libdenort.dylib"))
+            get_libodenrt_path(d.join("release").join("libodenrt.dylib"))
           })
-          .or_else(|| get_libdenort_path(exec_path.clone()))
+          .or_else(|| get_libodenrt_path(exec_path.clone()))
       } else {
         None
       }
@@ -1845,9 +1845,9 @@ fn get_dev_desktop_binary_path() -> Option<OsString> {
 /// in the passed environment file.
 fn get_file_env_vars(
   content: &str,
-) -> Result<IndexMap<String, String>, deno_dotenv::ParseError> {
+) -> Result<IndexMap<String, String>, oden_dotenv::ParseError> {
   let mut file_env_vars = IndexMap::new();
-  for item in deno_dotenv::from_content_sanitized_iter_with_substitution(
+  for item in oden_dotenv::from_content_sanitized_iter_with_substitution(
     &CliSys::default(),
     content,
   )? {
@@ -1908,21 +1908,21 @@ mod tests {
   fn runtime_archive_names_include_engine_suffix() {
     let target = "aarch64-apple-darwin";
     assert_eq!(
-      runtime_archive_name("denort", &JavaScriptEngine::V8, target),
-      "denort-aarch64-apple-darwin.zip"
+      runtime_archive_name("odenrt", &JavaScriptEngine::V8, target),
+      "odenrt-aarch64-apple-darwin.zip"
     );
     assert_eq!(
-      runtime_archive_name("denort", &JavaScriptEngine::QuickJs, target),
-      "denort-quickjs-aarch64-apple-darwin.zip"
+      runtime_archive_name("odenrt", &JavaScriptEngine::QuickJs, target),
+      "odenrt-quickjs-aarch64-apple-darwin.zip"
     );
     assert_eq!(
-      runtime_archive_name("libdenort", &JavaScriptEngine::QuickJs, target),
-      "libdenort-quickjs-aarch64-apple-darwin.zip"
+      runtime_archive_name("libodenrt", &JavaScriptEngine::QuickJs, target),
+      "libodenrt-quickjs-aarch64-apple-darwin.zip"
     );
   }
 
   #[test]
-  fn default_app_name_strips_only_deno_added_extensions() {
+  fn default_app_name_strips_only_oden_added_extensions() {
     assert_eq!(default_app_name("speedgraph.exe", false), "speedgraph");
     assert_eq!(default_app_name("speedgraph.so", false), "speedgraph.so");
 

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -7,14 +7,14 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use deno_ast::MediaType;
-use deno_config::deno_json;
-use deno_config::deno_json::CompilerOptionTypesDeserializeError;
-use deno_config::deno_json::NodeModulesDirMode;
-use deno_config::workspace::JsrPackageConfig;
-use deno_core::ModuleSpecifier;
-use deno_core::error::AnyError;
-use deno_core::parking_lot::Mutex;
-use deno_core::serde_json;
+use oden_config::oden_json;
+use oden_config::oden_json::CompilerOptionTypesDeserializeError;
+use oden_config::oden_json::NodeModulesDirMode;
+use oden_config::workspace::JsrPackageConfig;
+use oden_core::ModuleSpecifier;
+use oden_core::error::AnyError;
+use oden_core::parking_lot::Mutex;
+use oden_core::serde_json;
 use deno_error::JsErrorBox;
 use deno_error::JsErrorClass;
 use deno_graph::CheckJsOption;
@@ -31,24 +31,24 @@ use deno_graph::WorkspaceFastCheckOption;
 use deno_graph::packages::JsrVersionResolver;
 use deno_graph::source::Loader;
 use deno_graph::source::ResolveError;
-use deno_lib::util::result::downcast_ref_deno_resolve_error;
-use deno_npm_installer::PackageCaching;
-use deno_npm_installer::format_unmet_peer_dep_warning;
-use deno_npm_installer::graph::NpmCachingStrategy;
+use oden_lib::util::result::downcast_ref_oden_resolve_error;
+use oden_npm_installer::PackageCaching;
+use oden_npm_installer::format_unmet_peer_dep_warning;
+use oden_npm_installer::graph::NpmCachingStrategy;
 use deno_path_util::url_to_file_path;
-use deno_resolver::cache::ParsedSourceCache;
-use deno_resolver::deno_json::CompilerOptionsResolver;
-use deno_resolver::deno_json::JsxImportSourceConfigResolver;
-use deno_resolver::deno_json::ToMaybeJsxImportSourceConfigError;
-use deno_resolver::file_fetcher::GraphLoaderReporterRc;
-use deno_resolver::graph::EnhanceGraphErrorMode;
-use deno_resolver::graph::EnhancedGraphError;
-use deno_resolver::graph::NpmTypesResolutionMode;
-use deno_resolver::graph::enhance_graph_error;
-use deno_resolver::graph::enhanced_integrity_error_message;
-use deno_resolver::graph::format_deno_graph_error;
-use deno_resolver::npm::DenoInNpmPackageChecker;
-use deno_runtime::deno_permissions::PermissionsContainer;
+use oden_resolver::cache::ParsedSourceCache;
+use oden_resolver::oden_json::CompilerOptionsResolver;
+use oden_resolver::oden_json::JsxImportSourceConfigResolver;
+use oden_resolver::oden_json::ToMaybeJsxImportSourceConfigError;
+use oden_resolver::file_fetcher::GraphLoaderReporterRc;
+use oden_resolver::graph::EnhanceGraphErrorMode;
+use oden_resolver::graph::EnhancedGraphError;
+use oden_resolver::graph::NpmTypesResolutionMode;
+use oden_resolver::graph::enhance_graph_error;
+use oden_resolver::graph::enhanced_integrity_error_message;
+use oden_resolver::graph::format_deno_graph_error;
+use oden_resolver::npm::OdenInNpmPackageChecker;
+use oden_runtime::oden_permissions::PermissionsContainer;
 use deno_semver::SmallStackString;
 use deno_semver::jsr::JsrDepPackageReq;
 use deno_semver::npm::NpmPackageReqReference;
@@ -58,7 +58,7 @@ use sys_traits::FsMetadata;
 
 use crate::args::CliLockfile;
 use crate::args::CliOptions;
-use crate::args::DenoSubcommand;
+use crate::args::OdenSubcommand;
 use crate::args::config_to_deno_graph_workspace_member;
 use crate::args::graph_kind;
 use crate::args::jsr_url;
@@ -66,7 +66,7 @@ use crate::cache;
 use crate::cache::GlobalHttpCache;
 use crate::cache::ModuleInfoCache;
 use crate::colors;
-use crate::file_fetcher::CliDenoGraphLoader;
+use crate::file_fetcher::CliOdenGraphLoader;
 use crate::file_fetcher::CliFileFetcher;
 use crate::npm::CliNpmGraphResolver;
 use crate::npm::CliNpmInstaller;
@@ -388,7 +388,7 @@ pub fn resolution_error_for_tsc_diagnostic(
               })
             }
           }
-        } else if let Some(err) = downcast_ref_deno_resolve_error(error) {
+        } else if let Some(err) = downcast_ref_oden_resolve_error(error) {
           let use_module_not_found_error = match err.maybe_node_code()? {
             NodeJsErrorCode::ERR_INVALID_MODULE_SPECIFIER
             | NodeJsErrorCode::ERR_INVALID_PACKAGE_CONFIG
@@ -427,7 +427,7 @@ pub fn graph_exit_integrity_errors(graph: &ModuleGraph) {
 fn exit_for_integrity_error(err: &ModuleError) {
   if let Some(err_message) = enhanced_integrity_error_message(err) {
     log::error!("{} {}", colors::red("error:"), err_message);
-    deno_runtime::exit(10);
+    oden_runtime::exit(10);
   }
 }
 
@@ -448,7 +448,7 @@ pub struct CreatePublishGraphOptions<'a> {
   /// Whether to skip exports that can't be analyzed as modules
   /// (ex. CSS files) instead of surfacing diagnostics for them.
   /// This is used when linting because validating the exports is
-  /// the responsibility of `deno publish`.
+  /// the responsibility of `oden publish`.
   /// See https://github.com/denoland/deno/issues/26308
   pub skip_unanalyzable_exports: bool,
 }
@@ -541,7 +541,7 @@ impl ModuleGraphCreator {
     &self,
     options: CreatePublishGraphOptions<'_>,
   ) -> Result<ModuleGraph, AnyError> {
-    struct PublishLoader(CliDenoGraphLoader);
+    struct PublishLoader(CliOdenGraphLoader);
 
     impl Loader for PublishLoader {
       fn load(
@@ -604,7 +604,7 @@ impl ModuleGraphCreator {
         is_dynamic: false,
         graph_kind: deno_graph::GraphKind::All,
         roots,
-        // do not include the tsconfig imports for `deno publish`
+        // do not include the tsconfig imports for `oden publish`
         imports: Vec::new(),
         loader: Some(&publish_loader),
         npm_caching: self.options.default_npm_caching_strategy(),
@@ -766,7 +766,7 @@ pub enum BuildGraphWithNpmResolutionError {
   ToMaybeJsxImportSourceConfig(#[from] ToMaybeJsxImportSourceConfigError),
   #[class(inherit)]
   #[error(transparent)]
-  NodeModulesDirParse(#[from] deno_json::NodeModulesDirParseError),
+  NodeModulesDirParse(#[from] oden_json::NodeModulesDirParseError),
   #[class(inherit)]
   #[error(transparent)]
   Other(#[from] JsErrorBox),
@@ -796,7 +796,7 @@ pub struct ModuleGraphBuilder {
   compiler_options_resolver: Arc<CompilerOptionsResolver>,
   file_fetcher: Arc<CliFileFetcher>,
   global_http_cache: Arc<GlobalHttpCache>,
-  in_npm_pkg_checker: DenoInNpmPackageChecker,
+  in_npm_pkg_checker: OdenInNpmPackageChecker,
   jsr_version_resolver: Arc<JsrVersionResolver>,
   lockfile: Option<Arc<CliLockfile>>,
   maybe_reporter: Option<Arc<dyn deno_graph::source::Reporter>>,
@@ -821,7 +821,7 @@ impl ModuleGraphBuilder {
     compiler_options_resolver: Arc<CompilerOptionsResolver>,
     file_fetcher: Arc<CliFileFetcher>,
     global_http_cache: Arc<GlobalHttpCache>,
-    in_npm_pkg_checker: DenoInNpmPackageChecker,
+    in_npm_pkg_checker: OdenInNpmPackageChecker,
     jsr_version_resolver: Arc<JsrVersionResolver>,
     lockfile: Option<Arc<CliLockfile>>,
     maybe_reporter: Option<Arc<dyn deno_graph::source::Reporter>>,
@@ -892,7 +892,7 @@ impl ModuleGraphBuilder {
     #[allow(clippy::large_enum_variant, reason = "not important")]
     enum LoaderRef<'a> {
       Borrowed(&'a dyn Loader),
-      Owned(CliDenoGraphLoader),
+      Owned(CliOdenGraphLoader),
     }
 
     impl LoaderRef<'_> {
@@ -956,7 +956,7 @@ impl ModuleGraphBuilder {
           unstable_css_imports: self.cli_options.unstable_raw_imports(),
           unstable_config_imports: false,
           prefer_cached_jsr_versions: self.cli_options.cache_setting()
-            == deno_cache_dir::file_fetcher::CacheSetting::Only,
+            == oden_cache_dir::file_fetcher::CacheSetting::Only,
         }
       };
     }
@@ -1068,7 +1068,7 @@ impl ModuleGraphBuilder {
       // https redirects
       if has_redirects_changed {
         let graph_redirects = graph.redirects.iter().filter(|(from, _)| {
-          !matches!(from.scheme(), "npm" | "file" | "deno")
+          !matches!(from.scheme(), "npm" | "file" | "oden")
         });
         for (from, to) in graph_redirects {
           lockfile.insert_redirect(from.to_string(), to.to_string());
@@ -1137,7 +1137,7 @@ impl ModuleGraphBuilder {
             continue;
           };
           let Ok(id) =
-            managed.resolve_pkg_id_from_deno_module_req(npm_ref.req())
+            managed.resolve_pkg_id_from_oden_module_req(npm_ref.req())
           else {
             continue;
           };
@@ -1202,7 +1202,7 @@ impl ModuleGraphBuilder {
   /// Creates the default loader used for creating a graph.
   pub fn create_graph_loader_with_root_permissions(
     &self,
-  ) -> CliDenoGraphLoader {
+  ) -> CliOdenGraphLoader {
     self.create_graph_loader_with_permissions(
       self.root_permissions_container.clone(),
       None,
@@ -1213,13 +1213,13 @@ impl ModuleGraphBuilder {
     &self,
     permissions: PermissionsContainer,
     file_permission_api_name: Option<&'static str>,
-  ) -> CliDenoGraphLoader {
-    CliDenoGraphLoader::new(
+  ) -> CliOdenGraphLoader {
+    CliOdenGraphLoader::new(
       self.file_fetcher.clone(),
       self.global_http_cache.clone(),
       self.in_npm_pkg_checker.clone(),
       self.sys.clone(),
-      deno_resolver::file_fetcher::DenoGraphLoaderOptions {
+      oden_resolver::file_fetcher::OdenGraphLoaderOptions {
         file_header_overrides: self.cli_options.resolve_file_header_overrides(),
         permissions: Some(permissions),
         file_permission_api_name,
@@ -1230,8 +1230,8 @@ impl ModuleGraphBuilder {
   }
 
   fn analyze_npm_sources(&self) -> bool {
-    // only analyze npm packages with deno_graph for deno doc
-    matches!(self.cli_options.sub_command(), DenoSubcommand::Doc(_))
+    // only analyze npm packages with deno_graph for oden doc
+    matches!(self.cli_options.sub_command(), OdenSubcommand::Doc(_))
   }
 
   /// Check if `roots` and their deps are available. Returns `Ok(())` if

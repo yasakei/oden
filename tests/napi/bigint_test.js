@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { assertEquals, assertThrows, loadTestLibrary } from "./common.js";
 
 const bi = loadTestLibrary();
 
-Deno.test("cases", function () {
+Oden.test("cases", function () {
   const cases = [
     0n,
     -0n,
@@ -38,7 +38,7 @@ Deno.test("cases", function () {
   }
 });
 
-Deno.test(
+Oden.test(
   // TODO(bartlomieju): fix this test
   { ignore: true },
   function tooBigBigInt() {
@@ -50,7 +50,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   // TODO(bartlomieju): fix this test
   { ignore: true },
   function exceptionForwarding() {

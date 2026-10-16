@@ -1,0 +1,9 @@
+{
+  "name": "@test/subdir",
+  "exports": "./mod.ts",
+  "imports": {
+    "@odentest/add": "jsr:@odentest/add@^1.0.0",
+    "@odentest/esm-basic": "npm:@odentest/esm-basic@^1.0.0",
+    "@odentest/say-hello": "npm:@odentest/say-hello@^1.0.0"
+  }
+}

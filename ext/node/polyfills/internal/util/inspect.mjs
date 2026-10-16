@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -59,17 +59,17 @@ const {
   validateObject,
   validateOneOf,
   validateString,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
-const { codes } = core.loadExtScript("ext:deno_node/internal/error_codes.ts");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
+const { codes } = core.loadExtScript("ext:oden_node/internal/error_codes.ts");
 const { shouldColorize } = core.loadExtScript(
-  "ext:deno_node/internal/util/colorize.mjs",
+  "ext:oden_node/internal/util/colorize.mjs",
 );
 const {
   createStylizeWithColor,
   formatBigInt,
   formatNumber,
   formatValue,
-} = core.loadExtScript("ext:deno_web/01_console.js");
+} = core.loadExtScript("ext:oden_web/01_console.js");
 
 // Set Graphics Rendition https://en.wikipedia.org/wiki/ANSI_escape_code#graphics
 // Each color consists of an array with the color code as first entry and the
@@ -186,10 +186,10 @@ const inspectDefaultOptions = {
 
   // node only
   maxArrayLength: 100,
-  maxStringLength: 10000, // deno: strAbbreviateSize: 100
+  maxStringLength: 10000, // oden: strAbbreviateSize: 100
   customInspect: true,
 
-  // deno only
+  // oden only
   /** You can override the quotes preference in inspectString.
    * Used by util.inspect() */
   // TODO(kt3k): Consider using symbol as a key to hide this from the public

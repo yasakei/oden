@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::BTreeMap;
 
@@ -72,7 +72,7 @@ const rawTraces = {json};
     clippy::disallowed_methods,
     reason = "debug tracing writes to temp directory"
   )]
-  let temp_file_path = std::env::temp_dir().join("deno-npm-trace.html");
+  let temp_file_path = std::env::temp_dir().join("oden-npm-trace.html");
   #[allow(
     clippy::disallowed_methods,
     reason = "debug tracing writes to temp directory"

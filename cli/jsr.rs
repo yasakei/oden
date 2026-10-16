@@ -1,9 +1,9 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::sync::Arc;
 
 use dashmap::DashMap;
-use deno_core::serde_json;
+use oden_core::serde_json;
 use deno_graph::JsrPackageReqNotFoundError;
 use deno_graph::packages::JsrPackageInfo;
 use deno_graph::packages::JsrPackageVersionInfo;
@@ -116,10 +116,10 @@ impl JsrFetchResolver {
     let file = file_fetcher
       .fetch_with_options(
         &meta_url,
-        deno_resolver::file_fetcher::FetchPermissionsOptionRef::AllowAll,
-        deno_resolver::file_fetcher::FetchOptions {
+        oden_resolver::file_fetcher::FetchPermissionsOptionRef::AllowAll,
+        oden_resolver::file_fetcher::FetchOptions {
           maybe_cache_setting: Some(
-            &deno_cache_dir::file_fetcher::CacheSetting::ReloadAll,
+            &oden_cache_dir::file_fetcher::CacheSetting::ReloadAll,
           ),
           ..Default::default()
         },
@@ -132,7 +132,7 @@ impl JsrFetchResolver {
     Some(info)
   }
 
-  fn meta_url(&self, name: &str) -> Option<deno_core::url::Url> {
+  fn meta_url(&self, name: &str) -> Option<oden_core::url::Url> {
     jsr_url().join(&format!("{}/meta.json", name)).ok()
   }
 

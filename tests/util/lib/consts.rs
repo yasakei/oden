@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // port constants extracted from servers/mod.rs so they are available
 // without compiling the heavy server dependencies

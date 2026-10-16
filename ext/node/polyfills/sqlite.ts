@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core, primordials } = __bootstrap;
@@ -9,9 +9,9 @@ const {
   StatementSync,
 } = core.ops;
 const { isUint8Array } = core.loadExtScript(
-  "ext:deno_node/internal/util/types.ts",
+  "ext:oden_node/internal/util/types.ts",
 );
-const { URLPrototype } = core.loadExtScript("ext:deno_web/00_url.js");
+const { URLPrototype } = core.loadExtScript("ext:oden_web/00_url.js");
 
 const {
   Error,

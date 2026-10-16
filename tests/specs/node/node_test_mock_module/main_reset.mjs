@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // mock.reset() and mock.restoreAll() restore module mocks, matching Node's
 // MockTracker semantics, and mocks can also be restored independently.
 import assert from "node:assert/strict";

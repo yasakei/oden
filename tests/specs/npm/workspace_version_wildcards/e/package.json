@@ -1,10 +1,10 @@
 {
-  "name": "@denotest/e",
+  "name": "@odentest/e",
   "version": "1.0.0",
   "dependencies": {
-    "@denotest/a": "workspace:*",
-    "@denotest/b": "workspace:~",
-    "@denotest/c": "workspace:^",
-    "@denotest/d": "workspace:1.2.3"
+    "@odentest/a": "workspace:*",
+    "@odentest/b": "workspace:~",
+    "@odentest/c": "workspace:^",
+    "@odentest/d": "workspace:1.2.3"
   }
 }

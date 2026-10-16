@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 const error = new Error("test error");
 error.stack = "Error: test error\n    at file:///test.ts:1:1";

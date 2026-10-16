@@ -1,0 +1,8 @@
+{
+  "imports": {
+    "foo": "./src/app.ts",
+    "bar": "npm:@odentest/bin@0.5.0",
+    "baz": "jsr:@odentest/bin",
+    "./thing.ts": "./src/app.ts"
+  }
+}

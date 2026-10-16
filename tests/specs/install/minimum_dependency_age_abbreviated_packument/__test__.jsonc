@@ -1,7 +1,7 @@
 {
   "tempDir": true,
   "envs": {
-    "DENO_DIR": "$PWD/deno_dir"
+    "ODEN_DIR": "$PWD/oden_dir"
   },
   "steps": [
     {

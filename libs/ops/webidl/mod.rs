@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 mod dictionary;
 mod r#enum;
@@ -103,16 +103,16 @@ impl Parse for ConverterType {
 
 fn create_impl(ident: impl ToTokens, body: TokenStream) -> TokenStream {
   quote! {
-    impl<'a> ::deno_core::webidl::WebIdlConverter<'a> for #ident {
+    impl<'a> ::oden_core::webidl::WebIdlConverter<'a> for #ident {
       type Options = ();
 
       fn convert<'b, 'i>(
-        __scope: &mut ::deno_core::v8::PinScope<'a, 'i>,
-        __value: ::deno_core::v8::Local<'a, ::deno_core::v8::Value>,
+        __scope: &mut ::oden_core::v8::PinScope<'a, 'i>,
+        __value: ::oden_core::v8::Local<'a, ::oden_core::v8::Value>,
         __prefix: std::borrow::Cow<'static, str>,
-        __context: ::deno_core::webidl::ContextFn<'b>,
+        __context: ::oden_core::webidl::ContextFn<'b>,
         __options: &Self::Options,
-      ) -> Result<Self, ::deno_core::webidl::WebIdlError>
+      ) -> Result<Self, ::oden_core::webidl::WebIdlError>
       {
         #body
       }

@@ -1,14 +1,14 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::rc::Rc;
 
-use deno_core::AsyncRefCell;
-use deno_core::CancelHandle;
-use deno_core::Resource;
-use deno_core::ResourceId;
-use deno_core::ResourceTable;
-use deno_core::error::ResourceError;
+use oden_core::AsyncRefCell;
+use oden_core::CancelHandle;
+use oden_core::Resource;
+use oden_core::ResourceId;
+use oden_core::ResourceTable;
+use oden_core::error::ResourceError;
 use deno_error::JsErrorBox;
 
 use crate::io::TcpStreamResource;
@@ -562,7 +562,7 @@ pub enum TakeNetworkStreamError {
   ReuniteVsock,
   #[class(inherit)]
   #[error(transparent)]
-  Resource(deno_core::error::ResourceError),
+  Resource(oden_core::error::ResourceError),
 }
 
 /// In some cases it may be more efficient to extract the resource from the resource table and use it directly (for example, an HTTP server).

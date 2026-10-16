@@ -1,14 +1,14 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assertEquals, assertNotEquals, fail } from "@std/assert";
 import { assertCallbackErrorUncaught } from "../_test_utils.ts";
 import { type Dirent, readdir, readdirSync } from "node:fs";
 import { Buffer } from "node:buffer";
 import { join } from "@std/path";
 
-Deno.test({
+Oden.test({
   name: "ASYNC: reading empty directory",
   async fn() {
-    const dir = Deno.makeTempDirSync();
+    const dir = Oden.makeTempDirSync();
     await new Promise<string[]>((resolve, reject) => {
       readdir(dir, (err, files) => {
         if (err) reject(err);
@@ -16,7 +16,7 @@ Deno.test({
       });
     })
       .then((files) => assertEquals(files, []), () => fail())
-      .finally(() => Deno.removeSync(dir));
+      .finally(() => Oden.removeSync(dir));
   },
 });
 
@@ -29,13 +29,13 @@ function assertEqualsArrayAnyOrder<T>(actual: T[], expected: T[]) {
   }
 }
 
-Deno.test({
+Oden.test({
   name: "ASYNC: reading non-empty directory",
   async fn() {
-    const dir = Deno.makeTempDirSync();
-    Deno.writeTextFileSync(join(dir, "file1.txt"), "hi");
-    Deno.writeTextFileSync(join(dir, "file2.txt"), "hi");
-    Deno.mkdirSync(join(dir, "some_dir"));
+    const dir = Oden.makeTempDirSync();
+    Oden.writeTextFileSync(join(dir, "file1.txt"), "hi");
+    Oden.writeTextFileSync(join(dir, "file2.txt"), "hi");
+    Oden.mkdirSync(join(dir, "some_dir"));
     await new Promise<string[]>((resolve, reject) => {
       readdir(dir, (err, files) => {
         if (err) reject(err);
@@ -50,15 +50,15 @@ Deno.test({
           ),
         () => fail(),
       )
-      .finally(() => Deno.removeSync(dir, { recursive: true }));
+      .finally(() => Oden.removeSync(dir, { recursive: true }));
   },
 });
 
-Deno.test("ASYNC: read dirs recursively", async () => {
-  const dir = Deno.makeTempDirSync();
-  Deno.writeTextFileSync(join(dir, "file1.txt"), "hi");
-  Deno.mkdirSync(join(dir, "sub"));
-  Deno.writeTextFileSync(join(dir, "sub", "file2.txt"), "hi");
+Oden.test("ASYNC: read dirs recursively", async () => {
+  const dir = Oden.makeTempDirSync();
+  Oden.writeTextFileSync(join(dir, "file1.txt"), "hi");
+  Oden.mkdirSync(join(dir, "sub"));
+  Oden.writeTextFileSync(join(dir, "sub", "file2.txt"), "hi");
 
   try {
     const files = await new Promise<string[]>((resolve, reject) => {
@@ -73,7 +73,7 @@ Deno.test("ASYNC: read dirs recursively", async () => {
       ["file1.txt", "sub", join("sub", "file2.txt")],
     );
   } finally {
-    Deno.removeSync(dir, { recursive: true });
+    Oden.removeSync(dir, { recursive: true });
   }
 });
 
@@ -103,26 +103,26 @@ for (const variant of ["async", "sync"] as const) {
       // deno-lint-ignore no-explicit-any
       : Promise.resolve(readdirSync(path, options as any));
 
-  Deno.test(`${variant}: entries are sorted like Node (per directory)`, async () => {
-    const dir = Deno.makeTempDirSync();
+  Oden.test(`${variant}: entries are sorted like Node (per directory)`, async () => {
+    const dir = Oden.makeTempDirSync();
     for (const name of ["a", "2", "index.js", "b", "1", "c", "0"]) {
-      Deno.writeTextFileSync(join(dir, name), "hi");
+      Oden.writeTextFileSync(join(dir, name), "hi");
     }
     try {
       assertEquals(await read(dir), ["0", "1", "2", "a", "b", "c", "index.js"]);
     } finally {
-      Deno.removeSync(dir, { recursive: true });
+      Oden.removeSync(dir, { recursive: true });
     }
   });
 
-  Deno.test(`${variant}: recursive entries are sorted per directory`, async () => {
-    const dir = Deno.makeTempDirSync();
+  Oden.test(`${variant}: recursive entries are sorted per directory`, async () => {
+    const dir = Oden.makeTempDirSync();
     // Names chosen so a global sort and a per-directory sort differ: a global
     // sort would place "b/a.txt" before "b.txt".
-    Deno.mkdirSync(join(dir, "b"));
-    Deno.writeTextFileSync(join(dir, "b", "a.txt"), "hi");
-    Deno.writeTextFileSync(join(dir, "b.txt"), "hi");
-    Deno.writeTextFileSync(join(dir, "a.txt"), "hi");
+    Oden.mkdirSync(join(dir, "b"));
+    Oden.writeTextFileSync(join(dir, "b", "a.txt"), "hi");
+    Oden.writeTextFileSync(join(dir, "b.txt"), "hi");
+    Oden.writeTextFileSync(join(dir, "a.txt"), "hi");
     try {
       assertEquals(await read(dir, { recursive: true }), [
         "a.txt",
@@ -131,20 +131,20 @@ for (const variant of ["async", "sync"] as const) {
         join("b", "a.txt"),
       ]);
     } finally {
-      Deno.removeSync(dir, { recursive: true });
+      Oden.removeSync(dir, { recursive: true });
     }
   });
 
-  Deno.test(`${variant}: withFileTypes entries are sorted`, async () => {
-    const dir = Deno.makeTempDirSync();
+  Oden.test(`${variant}: withFileTypes entries are sorted`, async () => {
+    const dir = Oden.makeTempDirSync();
     for (const name of ["c", "a", "b"]) {
-      Deno.writeTextFileSync(join(dir, name), "hi");
+      Oden.writeTextFileSync(join(dir, name), "hi");
     }
     try {
       const entries = await read(dir, { withFileTypes: true }) as Dirent[];
       assertEquals(entries.map((e) => e.name), ["a", "b", "c"]);
     } finally {
-      Deno.removeSync(dir, { recursive: true });
+      Oden.removeSync(dir, { recursive: true });
     }
   });
 
@@ -156,34 +156,34 @@ for (const variant of ["async", "sync"] as const) {
   // an ASCII name would NOT distinguish the two orders, since a lead surrogate
   // is already above every ASCII code unit. macOS normalizes filenames (NFD),
   // but neither name is affected, so no skip is needed.
-  Deno.test(`${variant}: astral filenames sort by code point`, async () => {
-    const dir = Deno.makeTempDirSync();
+  Oden.test(`${variant}: astral filenames sort by code point`, async () => {
+    const dir = Oden.makeTempDirSync();
     for (const name of ["😀", "ｚ", "a"]) {
-      Deno.writeTextFileSync(join(dir, name), "hi");
+      Oden.writeTextFileSync(join(dir, name), "hi");
     }
     try {
       assertEquals(await read(dir), ["a", "ｚ", "😀"]);
     } finally {
-      Deno.removeSync(dir, { recursive: true });
+      Oden.removeSync(dir, { recursive: true });
     }
   });
 }
 
-Deno.test({
+Oden.test({
   name: "SYNC: reading empty the directory",
   fn() {
-    const dir = Deno.makeTempDirSync();
+    const dir = Oden.makeTempDirSync();
     assertEquals(readdirSync(dir), []);
   },
 });
 
-Deno.test({
+Oden.test({
   name: "SYNC: reading non-empty directory",
   fn() {
-    const dir = Deno.makeTempDirSync();
-    Deno.writeTextFileSync(join(dir, "file1.txt"), "hi");
-    Deno.writeTextFileSync(join(dir, "file2.txt"), "hi");
-    Deno.mkdirSync(join(dir, "some_dir"));
+    const dir = Oden.makeTempDirSync();
+    Oden.writeTextFileSync(join(dir, "file1.txt"), "hi");
+    Oden.writeTextFileSync(join(dir, "file2.txt"), "hi");
+    Oden.mkdirSync(join(dir, "some_dir"));
     assertEqualsArrayAnyOrder(
       readdirSync(dir),
       ["file1.txt", "some_dir", "file2.txt"],
@@ -191,11 +191,11 @@ Deno.test({
   },
 });
 
-Deno.test("SYNC: read dirs recursively", () => {
-  const dir = Deno.makeTempDirSync();
-  Deno.writeTextFileSync(join(dir, "file1.txt"), "hi");
-  Deno.mkdirSync(join(dir, "sub"));
-  Deno.writeTextFileSync(join(dir, "sub", "file2.txt"), "hi");
+Oden.test("SYNC: read dirs recursively", () => {
+  const dir = Oden.makeTempDirSync();
+  Oden.writeTextFileSync(join(dir, "file1.txt"), "hi");
+  Oden.mkdirSync(join(dir, "sub"));
+  Oden.writeTextFileSync(join(dir, "sub", "file2.txt"), "hi");
 
   try {
     const files = readdirSync(dir, { recursive: true }).map((f) =>
@@ -207,14 +207,14 @@ Deno.test("SYNC: read dirs recursively", () => {
       ["file1.txt", "sub", join("sub", "file2.txt")],
     );
   } finally {
-    Deno.removeSync(dir, { recursive: true });
+    Oden.removeSync(dir, { recursive: true });
   }
 });
 
-Deno.test("SYNC: withFileTypes + buffer encoding returns Buffer name/parentPath", () => {
-  const dir = Deno.makeTempDirSync();
+Oden.test("SYNC: withFileTypes + buffer encoding returns Buffer name/parentPath", () => {
+  const dir = Oden.makeTempDirSync();
   try {
-    Deno.writeTextFileSync(join(dir, "file1.txt"), "hi");
+    Oden.writeTextFileSync(join(dir, "file1.txt"), "hi");
     const entries = readdirSync(Buffer.from(dir) as unknown as string, {
       withFileTypes: true,
       encoding: "buffer",
@@ -232,14 +232,14 @@ Deno.test("SYNC: withFileTypes + buffer encoding returns Buffer name/parentPath"
       dir,
     );
   } finally {
-    Deno.removeSync(dir, { recursive: true });
+    Oden.removeSync(dir, { recursive: true });
   }
 });
 
-Deno.test("ASYNC: withFileTypes + buffer encoding returns Buffer name/parentPath", async () => {
-  const dir = Deno.makeTempDirSync();
+Oden.test("ASYNC: withFileTypes + buffer encoding returns Buffer name/parentPath", async () => {
+  const dir = Oden.makeTempDirSync();
   try {
-    Deno.writeTextFileSync(join(dir, "file1.txt"), "hi");
+    Oden.writeTextFileSync(join(dir, "file1.txt"), "hi");
     const entries = await new Promise<Dirent[]>((resolve, reject) => {
       readdir(
         Buffer.from(dir) as unknown as string,
@@ -266,22 +266,22 @@ Deno.test("ASYNC: withFileTypes + buffer encoding returns Buffer name/parentPath
       dir,
     );
   } finally {
-    Deno.removeSync(dir, { recursive: true });
+    Oden.removeSync(dir, { recursive: true });
   }
 });
 
-Deno.test("[std/node/fs] readdir callback isn't called twice if error is thrown", async () => {
+Oden.test("[std/node/fs] readdir callback isn't called twice if error is thrown", async () => {
   // The correct behaviour is not to catch any errors thrown,
   // but that means there'll be an uncaught error and the test will fail.
   // So the only way to test this is to spawn a subprocess, and succeed if it has a non-zero exit code.
   // (assertRejects won't work because there's no way to catch the error.)
-  const tempDir = await Deno.makeTempDir();
+  const tempDir = await Oden.makeTempDir();
   const importUrl = new URL("node:fs", import.meta.url);
   await assertCallbackErrorUncaught({
     prelude: `import { readdir } from ${JSON.stringify(importUrl)}`,
     invocation: `readdir(${JSON.stringify(tempDir)}, `,
     async cleanup() {
-      await Deno.remove(tempDir);
+      await Oden.remove(tempDir);
     },
   });
 });

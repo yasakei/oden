@@ -1,14 +1,14 @@
 import { assertEquals } from "@std/assert";
 import { join } from "@std/path";
 
-const tmpDir = Deno.makeTempDirSync();
+const tmpDir = Oden.makeTempDirSync();
 
 const file1 = join(tmpDir, "1");
-const command1 = new Deno.Command(Deno.execPath(), {
+const command1 = new Oden.Command(Oden.execPath(), {
   env: {
-    "OTEL_DENO_METRICS": "false",
+    "OTEL_ODEN_METRICS": "false",
     "OTEL_SERVICE_NAME": "server_1",
-    "DENO_UNSTABLE_OTEL_DETERMINISTIC": "1",
+    "ODEN_UNSTABLE_OTEL_DETERMINISTIC": "1",
   },
   args: ["run", "-A", "-q", "http_propagators_1.ts", file1],
   stdout: "inherit",
@@ -18,11 +18,11 @@ const command1 = new Deno.Command(Deno.execPath(), {
 const p1 = command1.output();
 
 const file2 = join(tmpDir, "2");
-const command2 = new Deno.Command(Deno.execPath(), {
+const command2 = new Oden.Command(Oden.execPath(), {
   env: {
-    "OTEL_DENO_METRICS": "false",
+    "OTEL_ODEN_METRICS": "false",
     "OTEL_SERVICE_NAME": "server_2",
-    "DENO_UNSTABLE_OTEL_DETERMINISTIC": "2",
+    "ODEN_UNSTABLE_OTEL_DETERMINISTIC": "2",
   },
   args: ["run", "-A", "-q", "http_propagators_2.ts", file2],
   stdout: "inherit",
@@ -34,9 +34,9 @@ const p2 = command2.output();
 // Wait until both file1 and file2 are created, but at most 10 seconds
 const start = Date.now();
 while (true) {
-  const file1Exists = await Deno.stat(file1).then(() => true)
+  const file1Exists = await Oden.stat(file1).then(() => true)
     .catch(() => false);
-  const file2Exists = await Deno.stat(file2).then(() => true)
+  const file2Exists = await Oden.stat(file2).then(() => true)
     .catch(() => false);
   console.log({ file1Exists, file2Exists });
   if (file1Exists && file2Exists) break;

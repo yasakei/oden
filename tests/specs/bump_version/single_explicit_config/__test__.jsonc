@@ -12,6 +12,6 @@
     "output": "after_pkg.out"
   }, {
     "args": "bump-version",
-    "output": "after_deno.out"
+    "output": "after_oden.out"
   }]
 }

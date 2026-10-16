@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -65,9 +65,9 @@ const {
   ERR_INVALID_FILE_URL_PATH,
   ERR_INVALID_URL,
   ERR_INVALID_URL_SCHEME,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
 const { validateString } = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
 const {
   CHAR_0,
@@ -105,25 +105,25 @@ const {
   CHAR_UPPERCASE_Z,
   CHAR_VERTICAL_LINE,
   CHAR_ZERO_WIDTH_NOBREAK_SPACE,
-} = core.loadExtScript("ext:deno_node/path/_constants.ts");
+} = core.loadExtScript("ext:oden_node/path/_constants.ts");
 const lazyPath = core.createLazyLoader("node:path");
 const {
   domainToASCII: idnaToASCII,
   domainToUnicode: idnaToUnicode,
-} = core.loadExtScript("ext:deno_node/internal/idna.ts");
-const { isWindows, osType } = core.loadExtScript("ext:deno_node/_util/os.ts");
+} = core.loadExtScript("ext:oden_node/internal/idna.ts");
+const { isWindows, osType } = core.loadExtScript("ext:oden_node/_util/os.ts");
 let _Buffer;
 function lazyBuffer() {
   return _Buffer ??=
-    core.loadExtScript("ext:deno_node/internal/buffer.mjs").Buffer;
+    core.loadExtScript("ext:oden_node/internal/buffer.mjs").Buffer;
 }
 const { encodeStr, hexTable } = core.loadExtScript(
-  "ext:deno_node/internal/querystring.ts",
+  "ext:oden_node/internal/querystring.ts",
 );
-const querystring = core.loadExtScript("ext:deno_node/querystring.js").default;
-const { URL, URLSearchParams } = core.loadExtScript("ext:deno_web/00_url.js");
+const querystring = core.loadExtScript("ext:oden_node/querystring.js").default;
+const { URL, URLSearchParams } = core.loadExtScript("ext:oden_web/00_url.js");
 const { urlToHttpOptions } = core.loadExtScript(
-  "ext:deno_node/internal/url.ts",
+  "ext:oden_node/internal/url.ts",
 );
 
 const forwardSlashRegEx = new SafeRegExp(/\//g);
@@ -178,7 +178,7 @@ const hostnameMaxLen = 255;
 // digits
 // alpha (uppercase)
 // alpha (lowercase)
-// deno-fmt-ignore
+// oden-fmt-ignore
 const noEscapeAuth = new Int8Array([
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x00 - 0x0F
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x10 - 0x1F
@@ -666,7 +666,7 @@ class Url {
   public urlParse(
     url: string,
     parseQueryString: boolean,
-    slashesDenoteHost: boolean,
+    slashesOdenteHost: boolean,
   ) {
     validateString(url, "url");
 
@@ -744,7 +744,7 @@ class Url {
       }
     }
 
-    if (!slashesDenoteHost && !hasHash) {
+    if (!slashesOdenteHost && !hasHash) {
       // Try fast path regexp
       const simplePath = RegExpPrototypeExec(simplePathPattern, rest);
       if (simplePath) {
@@ -786,7 +786,7 @@ class Url {
     // how the browser resolves relative URLs.
     let slashes;
     if (
-      slashesDenoteHost || proto || RegExpPrototypeTest(hostPattern, rest)
+      slashesOdenteHost || proto || RegExpPrototypeTest(hostPattern, rest)
     ) {
       slashes = StringPrototypeCharCodeAt(rest, 0) === CHAR_FORWARD_SLASH &&
         StringPrototypeCharCodeAt(rest, 1) === CHAR_FORWARD_SLASH;
@@ -1148,7 +1148,7 @@ function getHostname(self: Url, rest: string, hostname: string) {
 
 // Escaped characters. Use empty strings to fill up unused entries.
 // Using Array is faster than Object/Map
-// deno-fmt-ignore
+// oden-fmt-ignore
 const escapedCodes = [
   /* 0 - 9 */ "",
   "",
@@ -1316,17 +1316,17 @@ function autoEscapeStr(rest: string) {
  * @param url The URL string to parse.
  * @param parseQueryString If `true`, the query property will always be set to an object returned by the querystring module's parse() method. If false,
  * the query property on the returned URL object will be an unparsed, undecoded string. Default: false.
- * @param slashesDenoteHost If `true`, the first token after the literal string // and preceding the next / will be interpreted as the host
+ * @param slashesOdenteHost If `true`, the first token after the literal string // and preceding the next / will be interpreted as the host
  */
 function parse(
   url: string | Url,
   parseQueryString: boolean,
-  slashesDenoteHost: boolean,
+  slashesOdenteHost: boolean,
 ) {
   if (ObjectPrototypeIsPrototypeOf(Url.prototype, url)) return url;
 
   const urlObject = new Url();
-  urlObject.urlParse(url, parseQueryString, slashesDenoteHost);
+  urlObject.urlParse(url, parseQueryString, slashesOdenteHost);
   return urlObject;
 }
 
@@ -1475,7 +1475,7 @@ function getPathBufferFromURLWin(url: URL) {
     const prefix = Buffer.from("\\\\", "ascii");
     const domain = Buffer.from(domainToUnicode(hostname), "utf8");
     // `concat` is a `node:buffer` static method on `Buffer`
-    // deno-lint-ignore deno-internal/prefer-primordials
+    // deno-lint-ignore oden-internal/prefer-primordials
     return Buffer.concat([prefix, domain, decodedPathname]);
   }
   const letter = decodedPathname[1] | 0x20;

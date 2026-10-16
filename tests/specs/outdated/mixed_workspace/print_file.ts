@@ -1,2 +1,2 @@
-const file = Deno.args[0];
-console.log(Deno.readTextFileSync(file).trim());
+const file = Oden.args[0];
+console.log(Oden.readTextFileSync(file).trim());

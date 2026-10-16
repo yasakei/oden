@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 "use strict";
 
 ((window) => {
@@ -13,7 +13,7 @@
     op_timer_untrack,
     op_timer_now,
     op_leak_tracing_submit,
-  } = window.Deno.core.ops;
+  } = window.Oden.core.ops;
   const {
     ErrorCaptureStackTrace,
     StringPrototypeSlice,

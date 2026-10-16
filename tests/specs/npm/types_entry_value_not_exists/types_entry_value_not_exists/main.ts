@@ -1,4 +1,4 @@
-import { getValue } from "npm:@denotest/types-entry-value-not-exists";
+import { getValue } from "npm:@odentest/types-entry-value-not-exists";
 
 // should error here
 const result: string = getValue();

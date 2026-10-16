@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,13 +20,13 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-// deno-lint-ignore-file no-explicit-any deno-internal/prefer-primordials
+// deno-lint-ignore-file no-explicit-any oden-internal/prefer-primordials
 
 (function () {
 const { core } = __bootstrap;
 const { HTTPParser: NativeHTTPParser } = core.ops;
-const { Buffer } = core.loadExtScript("ext:deno_node/internal/buffer.mjs");
-const { AsyncResource } = core.loadExtScript("ext:deno_node/async_hooks.ts");
+const { Buffer } = core.loadExtScript("ext:oden_node/internal/buffer.mjs");
+const { AsyncResource } = core.loadExtScript("ext:oden_node/async_hooks.ts");
 
 // Method names indexed by llhttp method enum values.
 // Order must match llhttp_method_t in llhttp.h.

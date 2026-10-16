@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #[macro_export]
 macro_rules! v8_static_strings {
@@ -14,14 +14,14 @@ pub use v8_static_strings;
 v8_static_strings!(
   BUILD_CUSTOM_ERROR = "buildCustomError",
   CALL_CONSOLE = "callConsole",
-  CALL_SITE_EVALS = "deno_core::call_site_evals",
+  CALL_SITE_EVALS = "oden_core::call_site_evals",
   CAUSE = "cause",
   CODE = "code",
   CONSOLE = "console",
   CONSTRUCTOR = "constructor",
   ERROR_CONSTRUCTORS = "errorConstructors",
   CORE = "core",
-  DENO = "Deno",
+  ODEN = "Oden",
   DEFAULT = "default",
   DIRNAME = "dirname",
   ERR_MODULE_NOT_FOUND = "ERR_MODULE_NOT_FOUND",
@@ -50,5 +50,5 @@ v8_static_strings!(
   WEAK_MAP = "WeakMap",
   WEBASSEMBLY = "WebAssembly",
   ESMODULE = "__esModule",
-  HOST_OBJECT = "Deno.core.hostObject",
+  HOST_OBJECT = "Oden.core.hostObject",
 );

@@ -1,13 +1,13 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use deno_core::anyhow::anyhow;
-use deno_core::anyhow::bail;
-use deno_core::error::AnyError;
-use deno_core::serde_json::json;
-use deno_core::unsync::spawn;
+use oden_core::anyhow::anyhow;
+use oden_core::anyhow::bail;
+use oden_core::error::AnyError;
+use oden_core::serde_json::json;
+use oden_core::unsync::spawn;
 use lsp_types::Uri;
 use tower_lsp::lsp_types as lsp;
 use tower_lsp::lsp_types::ConfigurationItem;
@@ -89,28 +89,28 @@ impl Client {
     });
   }
 
-  pub fn send_did_refresh_deno_configuration_tree_notification(
+  pub fn send_did_refresh_oden_configuration_tree_notification(
     &self,
-    params: lsp_custom::DidRefreshDenoConfigurationTreeNotificationParams,
+    params: lsp_custom::DidRefreshOdenConfigurationTreeNotificationParams,
   ) {
     // do on a task in case the caller currently is in the lsp lock
     let client = self.0.clone();
     spawn(async move {
       client
-        .send_did_refresh_deno_configuration_tree_notification(params)
+        .send_did_refresh_oden_configuration_tree_notification(params)
         .await;
     });
   }
 
-  pub fn send_did_change_deno_configuration_notification(
+  pub fn send_did_change_oden_configuration_notification(
     &self,
-    params: lsp_custom::DidChangeDenoConfigurationNotificationParams,
+    params: lsp_custom::DidChangeOdenConfigurationNotificationParams,
   ) {
     // do on a task in case the caller currently is in the lsp lock
     let client = self.0.clone();
     spawn(async move {
       client
-        .send_did_change_deno_configuration_notification(params)
+        .send_did_change_oden_configuration_notification(params)
         .await;
     });
   }
@@ -187,13 +187,13 @@ trait ClientTrait: Send + Sync {
   async fn send_diagnostic_batch_start_notification(&self);
   async fn send_diagnostic_batch_end_notification(&self);
   async fn send_test_notification(&self, params: TestingNotification);
-  async fn send_did_refresh_deno_configuration_tree_notification(
+  async fn send_did_refresh_oden_configuration_tree_notification(
     &self,
-    params: lsp_custom::DidRefreshDenoConfigurationTreeNotificationParams,
+    params: lsp_custom::DidRefreshOdenConfigurationTreeNotificationParams,
   );
-  async fn send_did_change_deno_configuration_notification(
+  async fn send_did_change_oden_configuration_notification(
     &self,
-    params: lsp_custom::DidChangeDenoConfigurationNotificationParams,
+    params: lsp_custom::DidChangeOdenConfigurationNotificationParams,
   );
   async fn send_did_upgrade_check_notification(
     &self,
@@ -276,25 +276,25 @@ impl ClientTrait for TowerClient {
     }
   }
 
-  async fn send_did_refresh_deno_configuration_tree_notification(
+  async fn send_did_refresh_oden_configuration_tree_notification(
     &self,
-    params: lsp_custom::DidRefreshDenoConfigurationTreeNotificationParams,
+    params: lsp_custom::DidRefreshOdenConfigurationTreeNotificationParams,
   ) {
     self
       .0
-      .send_notification::<lsp_custom::DidRefreshDenoConfigurationTreeNotification>(
+      .send_notification::<lsp_custom::DidRefreshOdenConfigurationTreeNotification>(
         params,
       )
       .await
   }
 
-  async fn send_did_change_deno_configuration_notification(
+  async fn send_did_change_oden_configuration_notification(
     &self,
-    params: lsp_custom::DidChangeDenoConfigurationNotificationParams,
+    params: lsp_custom::DidChangeOdenConfigurationNotificationParams,
   ) {
     self
       .0
-      .send_notification::<lsp_custom::DidChangeDenoConfigurationNotification>(
+      .send_notification::<lsp_custom::DidChangeOdenConfigurationNotification>(
         params,
       )
       .await
@@ -351,11 +351,11 @@ impl ClientTrait for TowerClient {
         let mut configs = configs.into_iter();
         let mut result = Vec::with_capacity(scopes.len());
         for _ in 0..scopes.len() {
-          let deno = json!(configs.next());
+          let oden = json!(configs.next());
           let javascript = json!(configs.next());
           let typescript = json!(configs.next());
           result.push(WorkspaceSettings::from_raw_settings(
-            deno, javascript, typescript,
+            oden, javascript, typescript,
           ));
         }
         Ok(result)

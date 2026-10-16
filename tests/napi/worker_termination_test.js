@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { assertEquals } from "./common.js";
 
-Deno.test("napi addon survives worker termination", async () => {
+Oden.test("napi addon survives worker termination", async () => {
   // Spawn a worker that loads the NAPI addon and does work.
   // Terminate it and verify no crash occurs.
   const worker = new Worker(
@@ -24,7 +24,7 @@ Deno.test("napi addon survives worker termination", async () => {
   await new Promise((r) => setTimeout(r, 100));
 });
 
-Deno.test("napi external buffer finalizer runs after worker termination", async () => {
+Oden.test("napi external buffer finalizer runs after worker termination", async () => {
   const worker = new Worker(
     new URL("./worker_termination_worker.js", import.meta.url),
     { type: "module" },

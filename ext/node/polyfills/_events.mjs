@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -68,17 +68,17 @@ const kWatermarkData = SymbolFor("nodejs.watermarkData");
 const kEvents = Symbol("kEvents");
 
 const { inspect } = core.loadExtScript(
-  "ext:deno_node/internal/util/inspect.mjs",
+  "ext:oden_node/internal/util/inspect.mjs",
 );
 const { kEmptyObject } = core.loadExtScript(
-  "ext:deno_node/internal/util.mjs",
+  "ext:oden_node/internal/util.mjs",
 );
 const {
   AbortError,
   ERR_INVALID_ARG_TYPE,
   ERR_INVALID_THIS,
   ERR_UNHANDLED_ERROR,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
 
 const lazyAsyncHooks = core.createLazyLoader("node:async_hooks");
 const {
@@ -89,16 +89,16 @@ const {
   validateNumber,
   validateObject,
   validateString,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
-const { spliceOne } = core.loadExtScript("ext:deno_node/_utils.ts");
-const { nextTick } = core.loadExtScript("ext:deno_node/_process/process.ts");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
+const { spliceOne } = core.loadExtScript("ext:oden_node/_utils.ts");
+const { nextTick } = core.loadExtScript("ext:oden_node/_process/process.ts");
 const {
   eventTargetData,
   kResistStopImmediatePropagation,
-} = core.loadExtScript("ext:deno_web/02_event.js");
+} = core.loadExtScript("ext:oden_web/02_event.js");
 
 const { addAbortListener } = core.loadExtScript(
-  "ext:deno_node/internal/events/abort_listener.mjs",
+  "ext:oden_node/internal/events/abort_listener.mjs",
 );
 const kFirstEventParam = Symbol("kFirstEventParam");
 const kCapture = Symbol("kCapture");

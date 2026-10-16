@@ -1,6 +1,6 @@
 // Regression test: the node-compat PipeWrap handle (the native backing for
 // node:net unix sockets, reachable via process.binding("pipe_wrap")) must
-// honor Deno's filesystem permission model. Binding a unix-domain socket
+// honor Oden's filesystem permission model. Binding a unix-domain socket
 // creates a socket inode on disk, so it requires read+write permission for
 // the path. Without it, bind() must throw NotCapable, which in turn means the
 // path is never recorded and the fchmod/unlink-on-close paths that operate on
@@ -29,7 +29,7 @@ function tryBind(path: string): string {
 // so permission-less code cannot create a socket inode on disk.
 console.log(
   "create:",
-  tryBind("/tmp/deno-pwn.sock") === "denied" ? "PASS" : "FAIL",
+  tryBind("/tmp/oden-pwn.sock") === "denied" ? "PASS" : "FAIL",
 );
 
 // (b)/(c): a denied bind must NOT record the path, so a subsequent fchmod or

@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { assert, assertEquals } from "./test_util.ts";
 
-Deno.test(function basicAbortController() {
+Oden.test(function basicAbortController() {
   const controller = new AbortController();
   assert(controller);
   const { signal } = controller;
@@ -12,7 +12,7 @@ Deno.test(function basicAbortController() {
   assertEquals(signal.aborted, true);
 });
 
-Deno.test(function signalCallsOnabort() {
+Oden.test(function signalCallsOnabort() {
   const controller = new AbortController();
   const { signal } = controller;
   let called = false;
@@ -25,7 +25,7 @@ Deno.test(function signalCallsOnabort() {
   assert(called);
 });
 
-Deno.test(function signalEventListener() {
+Oden.test(function signalEventListener() {
   const controller = new AbortController();
   const { signal } = controller;
   let called = false;
@@ -38,7 +38,7 @@ Deno.test(function signalEventListener() {
   assert(called);
 });
 
-Deno.test(function onlyAbortsOnce() {
+Oden.test(function onlyAbortsOnce() {
   const controller = new AbortController();
   const { signal } = controller;
   let called = 0;
@@ -52,12 +52,12 @@ Deno.test(function onlyAbortsOnce() {
   assertEquals(called, 2);
 });
 
-Deno.test(function controllerHasProperToString() {
+Oden.test(function controllerHasProperToString() {
   const actual = Object.prototype.toString.call(new AbortController());
   assertEquals(actual, "[object AbortController]");
 });
 
-Deno.test(function abortReason() {
+Oden.test(function abortReason() {
   const signal = AbortSignal.abort("hey!");
   assertEquals(signal.aborted, true);
   assertEquals(signal.reason, "hey!");

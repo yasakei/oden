@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![allow(clippy::print_stderr, reason = "example binary")]
 #![allow(clippy::disallowed_methods, reason = "example binary")]
@@ -9,13 +9,13 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use deno_npm::registry::NpmPackageInfo;
-use deno_npm::registry::NpmPackageVersionInfo;
-use deno_npm::registry::NpmRegistryApi;
-use deno_npm::registry::NpmRegistryPackageInfoLoadError;
-use deno_npm::resolution::AddPkgReqsOptions;
-use deno_npm::resolution::NpmResolutionSnapshot;
-use deno_npm::resolution::NpmVersionResolver;
+use oden_npm::registry::NpmPackageInfo;
+use oden_npm::registry::NpmPackageVersionInfo;
+use oden_npm::registry::NpmRegistryApi;
+use oden_npm::registry::NpmRegistryPackageInfoLoadError;
+use oden_npm::resolution::AddPkgReqsOptions;
+use oden_npm::resolution::NpmResolutionSnapshot;
+use oden_npm::resolution::NpmVersionResolver;
 use deno_semver::package::PackageNv;
 use deno_semver::package::PackageReq;
 use reqwest::StatusCode;
@@ -35,10 +35,10 @@ use reqwest::StatusCode;
 /// running a custom npm registry locally via:
 ///
 /// ```sh
-/// deno run --allow-net --allow-read=. --allow-write=. jsr:@david/bench-registry@0.3.2/cli --cached-only
+/// oden run --allow-net --allow-read=. --allow-write=. jsr:@david/bench-registry@0.3.2/cli --cached-only
 /// ```
 ///
-/// Then do `deno clean ; pnpm cache delete`, create an `.npmrc` with:
+/// Then do `oden clean ; pnpm cache delete`, create an `.npmrc` with:
 ///
 /// ```ini
 /// registry=http://localhost:8000/npm/
@@ -322,7 +322,7 @@ struct SubsetRegistryApi {
 
 impl Default for SubsetRegistryApi {
   fn default() -> Self {
-    std::fs::create_dir_all("target/.deno_npm").unwrap();
+    std::fs::create_dir_all("target/.oden_npm").unwrap();
     Self {
       data: Default::default(),
     }
@@ -406,7 +406,7 @@ impl NpmRegistryApi for SubsetRegistryApi {
 }
 
 fn packument_cache_filepath(name: &str) -> String {
-  format!("target/.deno_npm/{}", encode_package_name(name))
+  format!("target/.oden_npm/{}", encode_package_name(name))
 }
 
 fn packument_url(name: &str) -> String {

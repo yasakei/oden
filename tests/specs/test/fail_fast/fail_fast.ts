@@ -1,30 +1,30 @@
-Deno.test("test 1", () => {
+Oden.test("test 1", () => {
   throw new Error();
 });
-Deno.test("test 2", () => {
+Oden.test("test 2", () => {
   throw new Error();
 });
-Deno.test("test 3", () => {
+Oden.test("test 3", () => {
   throw new Error();
 });
-Deno.test("test 4", () => {
+Oden.test("test 4", () => {
   throw new Error();
 });
-Deno.test("test 5", () => {
+Oden.test("test 5", () => {
   throw new Error();
 });
-Deno.test("test 6", () => {
+Oden.test("test 6", () => {
   throw new Error();
 });
-Deno.test("test 7", () => {
+Oden.test("test 7", () => {
   throw new Error();
 });
-Deno.test("test 8", () => {
+Oden.test("test 8", () => {
   throw new Error();
 });
-Deno.test("test 9", () => {
+Oden.test("test 9", () => {
   throw new Error();
 });
-Deno.test("test 0", () => {
+Oden.test("test 0", () => {
   throw new Error();
 });

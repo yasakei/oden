@@ -1,0 +1,19 @@
+{
+  "imports": {
+    "@odentest/add": "jsr:@odentest/add@^1.0.0",
+    "@odentest/add/": "jsr:/@odentest/add@^1.0.0/",
+    "@odentest/subtract": "jsr:@odentest/subtract@^0.2.0",
+    "@odentest/with-subpath": "jsr:@odentest/multiple-exports@0.5.0/data-json",
+    "@odentest/breaking-change-between-versions": "npm:@odentest/breaking-change-between-versions@1.0.0",
+    "@odentest/bin": "npm:@odentest/bin@1.0.0",
+    "@odentest/has-patch-versions": "npm:@odentest/has-patch-versions@^0.1.0"
+  },
+  "scopes": {
+    "/foo/": {
+      "@odentest/add": "jsr:@odentest/add@^1.0.0",
+      "@odentest/add/": "jsr:/@odentest/add@^1.0.0/",
+      "@odentest/subtract": "jsr:@odentest/subtract@^0.2.0",
+      "@odentest/with-subpath": "jsr:@odentest/multiple-exports@0.5.0/data-json"
+    }
+  }
+}

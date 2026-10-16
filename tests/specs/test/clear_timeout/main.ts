@@ -1,5 +1,5 @@
 clearTimeout(setTimeout(() => {}, 1000));
 
-Deno.test("test 1", () => {});
-Deno.test("test 2", () => {});
-Deno.test("test 3", () => {});
+Oden.test("test 1", () => {});
+Oden.test("test 2", () => {});
+Oden.test("test 3", () => {});

@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_core::GarbageCollected;
-use deno_core::WebIDL;
-use deno_core::cppgc::make_cppgc_object;
-use deno_core::op2;
-use deno_core::v8;
-use deno_core::webidl::WebIdlInterfaceConverter;
+use oden_core::GarbageCollected;
+use oden_core::WebIDL;
+use oden_core::cppgc::make_cppgc_object;
+use oden_core::op2;
+use oden_core::v8;
+use oden_core::webidl::WebIdlInterfaceConverter;
 use wgpu_core::pipeline;
 
 use crate::Instance;
@@ -30,7 +30,7 @@ impl WebIdlInterfaceConverter for GPUShaderModule {
 
 // SAFETY: we're sure this can be GCed
 unsafe impl GarbageCollected for GPUShaderModule {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"GPUShaderModule"
@@ -87,7 +87,7 @@ pub struct GPUCompilationMessage {
 
 // SAFETY: we're sure this can be GCed
 unsafe impl GarbageCollected for GPUCompilationMessage {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"GPUCompilationMessage"
@@ -184,7 +184,7 @@ pub struct GPUCompilationInfo {
 
 // SAFETY: we're sure this can be GCed
 unsafe impl GarbageCollected for GPUCompilationInfo {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"GPUCompilationInfo"

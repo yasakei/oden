@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use test_util::TestContext;
 use test_util::TestContextBuilder;
@@ -12,7 +12,7 @@ use test_util::with_pty;
 fn junit_path() {
   let context = TestContextBuilder::new().use_temp_cwd().build();
   let temp_dir = context.temp_dir();
-  temp_dir.write("test.js", "Deno.test('does test', () => {});");
+  temp_dir.write("test.js", "Oden.test('does test', () => {});");
   let output = context
     .new_command()
     .args("test --junit-path=sub_dir/output.xml test.js")
@@ -54,7 +54,7 @@ fn test_with_glob_config() {
 
   let cmd_output = context
     .new_command()
-    .args("test --config deno.glob.json")
+    .args("test --config oden.glob.json")
     .run();
 
   cmd_output.assert_exit_code(0);
@@ -77,7 +77,7 @@ fn test_with_glob_config_and_flags() {
 
   let cmd_output = context
     .new_command()
-    .args("test --config deno.glob.json --ignore=glob/nested/**/bar.ts")
+    .args("test --config oden.glob.json --ignore=glob/nested/**/bar.ts")
     .run();
 
   cmd_output.assert_exit_code(0);
@@ -95,7 +95,7 @@ fn test_with_glob_config_and_flags() {
 
   let cmd_output = context
     .new_command()
-    .args("test --config deno.glob.json glob/data/test1.?s")
+    .args("test --config oden.glob.json glob/data/test1.?s")
     .run();
 
   cmd_output.assert_exit_code(0);
@@ -124,9 +124,9 @@ fn conditionally_loads_type_graph() {
 fn workspace_dot_runs_test_module_once() {
   let context = TestContextBuilder::new().use_temp_cwd().build();
   let temp_dir = context.temp_dir();
-  temp_dir.write("deno.jsonc", r#"{ "workspace": ["./member"] }"#);
-  temp_dir.write("member/deno.json", "{}");
-  temp_dir.write("main_test.ts", "Deno.test('test', () => {});");
+  temp_dir.write("oden.jsonc", r#"{ "workspace": ["./member"] }"#);
+  temp_dir.write("member/oden.json", "{}");
+  temp_dir.write("main_test.ts", "Oden.test('test', () => {});");
 
   let output = context.new_command().args("test .").run();
   output.assert_exit_code(0);
@@ -140,14 +140,14 @@ fn workspace_dot_runs_test_module_once() {
 }
 
 #[test]
-fn nested_deno_test_registration_errors() {
+fn nested_oden_test_registration_errors() {
   let context = TestContextBuilder::new().use_temp_cwd().build();
   let temp_dir = context.temp_dir();
   temp_dir.write(
     "nested_test.ts",
     r#"
-Deno.test("outer", () => {
-  Deno.test("inner", () => {});
+Oden.test("outer", () => {
+  Oden.test("inner", () => {});
 });
 "#,
   );
@@ -155,6 +155,6 @@ Deno.test("outer", () => {
   let output = context.new_command().args("test nested_test.ts").run();
   output.assert_exit_code(1);
   let combined = output.combined_output();
-  assert_contains!(combined, "Nested Deno.test() calls are not supported",);
+  assert_contains!(combined, "Nested Oden.test() calls are not supported",);
   assert_contains!(combined, "Use t.step()");
 }

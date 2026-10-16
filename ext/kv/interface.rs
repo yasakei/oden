@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::RefCell;
 use std::rc::Rc;
 
 use async_trait::async_trait;
-use deno_core::OpState;
+use oden_core::OpState;
 use deno_error::JsErrorBox;
 use denokv_proto::Database;
 

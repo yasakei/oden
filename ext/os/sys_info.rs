@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 #[cfg(target_family = "windows")]
 use std::sync::Once;
 
-use deno_core::ToV8;
+use oden_core::ToV8;
 
 type LoadAvg = (f64, f64, f64);
 const DEFAULT_LOADAVG: LoadAvg = (0.0, 0.0, 0.0);

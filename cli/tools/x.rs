@@ -1,19 +1,19 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::BTreeMap;
 use std::path::Path;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use deno_cache_dir::file_fetcher::CacheSetting;
-use deno_config::deno_json::MinimumDependencyAgeConfig;
-use deno_config::deno_json::NewestDependencyDate;
-use deno_core::anyhow;
-use deno_core::anyhow::Context;
-use deno_core::error::AnyError;
-use deno_core::serde_json;
-use deno_npm_installer::PackagesAllowedScripts;
-use deno_runtime::deno_permissions::PathQueryDescriptor;
+use oden_cache_dir::file_fetcher::CacheSetting;
+use oden_config::oden_json::MinimumDependencyAgeConfig;
+use oden_config::oden_json::NewestDependencyDate;
+use oden_core::anyhow;
+use oden_core::anyhow::Context;
+use oden_core::error::AnyError;
+use oden_core::serde_json;
+use oden_npm_installer::PackagesAllowedScripts;
+use oden_runtime::oden_permissions::PathQueryDescriptor;
 use deno_semver::jsr::JsrPackageReqReference;
 use deno_semver::npm::NpmPackageReqReference;
 use deno_semver::package::PackageReq;
@@ -21,7 +21,7 @@ use node_resolver::BinValue;
 
 use crate::args::CliOptions;
 use crate::args::ConfigFlag;
-use crate::args::DenoXShimName;
+use crate::args::OdenXShimName;
 use crate::args::Flags;
 use crate::args::FlagsExt;
 use crate::args::XFlags;
@@ -36,18 +36,18 @@ use crate::util::console::confirm;
 use crate::util::draw_thread::DrawThread;
 use crate::util::fs::canonicalize_path;
 
-/// Renders the `--minimum-dependency-age` argument for the re-run `deno run`
+/// Renders the `--minimum-dependency-age` argument for the re-run `oden run`
 /// subprocess, but only when the user passed the flag EXPLICITLY on the CLI.
 ///
-/// `deno x` executes the target as a `deno run <target>` subprocess in the
-/// user's cwd, so it re-discovers the cwd `deno.json` `minimumDependencyAge`
+/// `oden x` executes the target as a `oden run <target>` subprocess in the
+/// user's cwd, so it re-discovers the cwd `oden.json` `minimumDependencyAge`
 /// (including its `exclude`) and `.npmrc` policy exactly as a plain
-/// `deno run <target>` would. The only thing that subprocess can't observe is
+/// `oden run <target>` would. The only thing that subprocess can't observe is
 /// an explicit CLI flag, so we forward just that — rendering the EXPLICIT value
 /// (never a computed effective policy). Forwarding a config-derived scalar
 /// would override the natively-discovered policy and drop its `exclude`,
-/// diverging from `deno run` (issue #35991). An explicit flag carries
-/// empty-`exclude` semantics, same as `deno run --minimum-dependency-age=...`.
+/// diverging from `oden run` (issue #35991). An explicit flag carries
+/// empty-`exclude` semantics, same as `oden run --minimum-dependency-age=...`.
 fn minimum_dependency_age_flag_arg(flags: &Flags) -> Option<String> {
   let value = match flags.minimum_dependency_age? {
     NewestDependencyDate::Disabled => "0".to_string(),
@@ -57,13 +57,13 @@ fn minimum_dependency_age_flag_arg(flags: &Flags) -> Option<String> {
 }
 
 /// Renders the user's explicit `--config`/`--no-config` selection for the re-run
-/// `deno run <target>` subprocess argv.
+/// `oden run <target>` subprocess argv.
 ///
 /// The subprocess re-resolves the target from the user's cwd, so it only
-/// auto-discovers a cwd `deno.json`. When the user selected a config that is NOT
+/// auto-discovers a cwd `oden.json`. When the user selected a config that is NOT
 /// auto-discoverable (an explicit `--config=<path>` outside cwd), that policy —
 /// including any `minimumDependencyAge` — would be dropped by the subprocess,
-/// diverging from `deno run --config=<path> <target>` (issue #35991). Forward it:
+/// diverging from `oden run --config=<path> <target>` (issue #35991). Forward it:
 /// - `Path(p)` -> `--config=<abs>` (made absolute, but WITHOUT resolving
 ///   symlinks, so it is robust regardless of the child's cwd).
 /// - `Disabled` -> `--no-config`.
@@ -83,7 +83,7 @@ fn config_flag_arg(flags: &Flags, initial_cwd: &Path) -> Option<String> {
       // only). Canonicalizing would resolve a symlinked config to its target, so
       // relative config members (permission set paths, `imports`, lock path,
       // ...) would then resolve relative to the target's directory instead of
-      // the path the user supplied — diverging from `deno run --config=<path>`.
+      // the path the user supplied — diverging from `oden run --config=<path>`.
       let abs = deno_path_util::normalize_path(abs);
       Some(format!("--config={}", abs.display()))
     }
@@ -91,15 +91,15 @@ fn config_flag_arg(flags: &Flags, initial_cwd: &Path) -> Option<String> {
 }
 
 /// Like [`config_flag_arg`], but for re-run sites whose child does NOT
-/// auto-discover the user's cwd `deno.json`, so an original `ConfigFlag::Discover`
+/// auto-discover the user's cwd `oden.json`, so an original `ConfigFlag::Discover`
 /// must be resolved to the discovered config path and forwarded explicitly. Two
 /// such sites (issue #35991):
 /// - the npm auto-install re-run, which executes the *installed bin file* (under
-///   `deno_dir/deno_x_cache/...`): its config auto-discovery anchors on the
+///   `oden_dir/oden_x_cache/...`): its config auto-discovery anchors on the
 ///   installed file's directory, NEVER the user's cwd (it finds the internal
-///   temp `deno.json` instead).
+///   temp `oden.json` instead).
 /// - the jsr/URL re-run, which executes a `jsr:`/`data:`/`http(s):` main module:
-///   `deno run` disables config discovery entirely for a non-`file:`/non-`npm:`
+///   `oden run` disables config discovery entirely for a non-`file:`/non-`npm:`
 ///   entrypoint, so the child would drop the cwd policy (`minimumDependencyAge`,
 ///   permission sets, ...) that the isolated install already honored.
 ///
@@ -113,7 +113,7 @@ fn config_flag_arg_carrying_discovered(
   if matches!(flags.config_flag, ConfigFlag::Discover) {
     return cli_options
       .start_dir
-      .member_or_root_deno_json()
+      .member_or_root_oden_json()
       .and_then(|config| {
         deno_path_util::url_to_file_path(&config.specifier).ok()
       })
@@ -123,13 +123,13 @@ fn config_flag_arg_carrying_discovered(
 }
 
 /// Renders the user's explicit `-P`/`--permission-set=<name>` selection for the
-/// re-run `deno run <target>` subprocess argv.
+/// re-run `oden run <target>` subprocess argv.
 ///
 /// A permission set is resolved from the (discovered or explicit) config file at
 /// runtime and is NOT baked into `flags.permissions`, so `to_permission_args()`
 /// does not forward it. Without forwarding the selection, the subprocess would
 /// run with no permission set and fail with `NotCapable`, diverging from
-/// `deno run --permission-set=<name> <target>` (issue #35991). A bare `-P`
+/// `oden run --permission-set=<name> <target>` (issue #35991). A bare `-P`
 /// resolves to `Some("")` (the default set), which round-trips as
 /// `--permission-set=`.
 fn permission_set_flag_arg(flags: &Flags) -> Option<String> {
@@ -139,7 +139,7 @@ fn permission_set_flag_arg(flags: &Flags) -> Option<String> {
     .map(|name| format!("--permission-set={}", name))
 }
 
-/// Computes the extra `deno run` arguments that carry the user's ORIGINAL CLI
+/// Computes the extra `oden run` arguments that carry the user's ORIGINAL CLI
 /// selections into a re-run subprocess argv: the explicit
 /// `--minimum-dependency-age` flag, the `--config`/`--no-config` selection
 /// (passed in as `config_arg`, rendered by `config_flag_arg_carrying_discovered`),
@@ -147,7 +147,7 @@ fn permission_set_flag_arg(flags: &Flags) -> Option<String> {
 ///
 /// These MUST be computed from the user's original `flags`/`cli_options`, never
 /// from the internal runner flags used for npm auto-install: those overwrite
-/// `config_flag` with a generated temp `deno.json` path (see
+/// `config_flag` with a generated temp `oden.json` path (see
 /// `autoinstall_package::make_new_flags`), which would forward the internal
 /// config instead of the user's explicit `--config` — or forward a config at all
 /// when the user relied on auto-discovery (issue #35991).
@@ -170,7 +170,7 @@ fn forwarded_run_args(
 
 /// Serializes the effective minimum dependency age policy (age + exclude) into
 /// the object form understood by `to_minimum_dependency_age_config`, so the
-/// full policy can be written into the generated temp `deno.json` used for
+/// full policy can be written into the generated temp `oden.json` used for
 /// installing. The temp workspace uses a config override and therefore can't
 /// see the user's cwd config, so the policy must travel with it.
 fn minimum_dependency_age_config_json(
@@ -192,12 +192,12 @@ async fn resolve_local_bins(
   factory: &CliFactory,
 ) -> Result<BTreeMap<String, BinValue>, AnyError> {
   match &npm_resolver {
-    deno_resolver::npm::NpmResolver::Byonm(npm_resolver) => {
+    oden_resolver::npm::NpmResolver::Byonm(npm_resolver) => {
       let node_modules_dir = npm_resolver.root_node_modules_path().unwrap();
       let bin_dir = node_modules_dir.join(".bin");
       Ok(node_resolver.resolve_npm_commands_from_bin_dir(&bin_dir))
     }
-    deno_resolver::npm::NpmResolver::Managed(npm_resolver) => {
+    oden_resolver::npm::NpmResolver::Managed(npm_resolver) => {
       let mut all_bins = BTreeMap::new();
       for id in npm_resolver.resolution().top_level_packages() {
         let package_folder =
@@ -230,32 +230,32 @@ async fn resolve_local_bins(
 }
 
 fn run_js_file(
-  main_module: &deno_core::url::Url,
-  deno_args: &[String],
+  main_module: &oden_core::url::Url,
+  oden_args: &[String],
   argv: &[String],
   npm_process_state: Option<String>,
   npm: bool,
 ) -> Result<i32, AnyError> {
-  use deno_runtime::deno_io::FromRawIoHandle;
+  use oden_runtime::oden_io::FromRawIoHandle;
 
-  let deno_exe = std::env::current_exe()
+  let oden_exe = std::env::current_exe()
     .and_then(|p| canonicalize_path(&p))
     .context("Failed to get current executable path")?;
 
   let mut args: Vec<std::ffi::OsString> = vec!["run".into()];
-  args.extend(deno_args.iter().map(|s| s.into()));
+  args.extend(oden_args.iter().map(|s| s.into()));
   args.push(main_module.as_str().into());
   args.extend(argv.iter().map(|s| s.into()));
 
-  let mut command = std::process::Command::new(deno_exe);
+  let mut command = std::process::Command::new(oden_exe);
   command.args(&args);
 
   let _temp_file = if let Some(state) = &npm_process_state {
     let fd =
-      deno_runtime::deno_process::npm_process_state_tempfile(state.as_bytes())
+      oden_runtime::oden_process::npm_process_state_tempfile(state.as_bytes())
         .context("Failed to create npm process state tempfile")?;
     command.env(
-      deno_runtime::deno_process::NPM_RESOLUTION_STATE_FD_ENV_VAR_NAME,
+      oden_runtime::oden_process::NPM_RESOLUTION_STATE_FD_ENV_VAR_NAME,
       (fd as usize).to_string(),
     );
     // Keep the file alive until the subprocess completes
@@ -277,8 +277,8 @@ fn run_js_file(
   #[cfg(not(unix))]
   {
     let mut child =
-      command.spawn().context("Failed to spawn deno subprocess")?;
-    let status = child.wait().context("Failed to wait for deno subprocess")?;
+      command.spawn().context("Failed to spawn oden subprocess")?;
+    let status = child.wait().context("Failed to wait for oden subprocess")?;
     Ok(status.code().unwrap_or(1))
   }
 }
@@ -287,17 +287,17 @@ pub(crate) fn get_npm_process_state(
   npm_resolver: &CliNpmResolver,
 ) -> Option<String> {
   match npm_resolver {
-    deno_resolver::npm::NpmResolver::Managed(managed) => {
+    oden_resolver::npm::NpmResolver::Managed(managed) => {
       let linker_mode = match managed.linker_mode() {
-        deno_config::deno_json::NodeModulesLinkerMode::Hoisted => {
-          deno_npm_installer::process_state::NpmProcessStateLinkerMode::Hoisted
+        oden_config::oden_json::NodeModulesLinkerMode::Hoisted => {
+          oden_npm_installer::process_state::NpmProcessStateLinkerMode::Hoisted
         }
-        deno_config::deno_json::NodeModulesLinkerMode::Isolated => {
-          deno_npm_installer::process_state::NpmProcessStateLinkerMode::Isolated
+        oden_config::oden_json::NodeModulesLinkerMode::Isolated => {
+          oden_npm_installer::process_state::NpmProcessStateLinkerMode::Isolated
         }
       };
       Some(
-        deno_npm_installer::process_state::NpmProcessState::new_managed(
+        oden_npm_installer::process_state::NpmProcessState::new_managed(
           managed.resolution().serialized_valid_snapshot(),
           managed.root_node_modules_path(),
           linker_mode,
@@ -305,7 +305,7 @@ pub(crate) fn get_npm_process_state(
         .as_serialized(),
       )
     }
-    deno_resolver::npm::NpmResolver::Byonm(_) => None,
+    oden_resolver::npm::NpmResolver::Byonm(_) => None,
   }
 }
 
@@ -315,21 +315,21 @@ pub(crate) fn run_bin_value(
   bin_value: BinValue,
   npm_process_state: Option<String>,
   unstable_args: &[String],
-  // Extra `deno run` args carrying the user's ORIGINAL CLI selections (config,
+  // Extra `oden run` args carrying the user's ORIGINAL CLI selections (config,
   // minimum-dependency-age, permission-set). Computed by the caller from the
   // original flags/cwd via `forwarded_run_args`, NOT from `flags` here: in the
   // npm auto-install path `flags` is the internal runner flags whose
-  // `config_flag` points at a generated temp `deno.json` (issue #35991).
+  // `config_flag` points at a generated temp `oden.json` (issue #35991).
   forwarded_args: &[String],
 ) -> Result<i32, AnyError> {
   match bin_value {
     BinValue::JsFile(path_buf) => {
       let path = deno_path_util::url_from_file_path(path_buf.as_ref())?;
-      let mut deno_args = flags.to_permission_args();
-      deno_args.extend(unstable_args.iter().cloned());
-      deno_args.extend(forwarded_args.iter().cloned());
+      let mut oden_args = flags.to_permission_args();
+      oden_args.extend(unstable_args.iter().cloned());
+      oden_args.extend(forwarded_args.iter().cloned());
 
-      run_js_file(&path, &deno_args, &flags.argv, npm_process_state, true)
+      run_js_file(&path, &oden_args, &flags.argv, npm_process_state, true)
     }
     BinValue::Executable(mut path_buf) => {
       if cfg!(windows) && path_buf.extension().is_none() {
@@ -342,7 +342,7 @@ pub(crate) fn run_bin_value(
       }
       let permissions = factory.root_permissions_container()?;
       permissions.check_run(
-        &deno_runtime::deno_permissions::RunQueryDescriptor::Path(
+        &oden_runtime::oden_permissions::RunQueryDescriptor::Path(
           PathQueryDescriptor::new(
             &factory.sys(),
             std::borrow::Cow::Borrowed(path_buf.as_ref()),
@@ -445,7 +445,7 @@ fn create_package_temp_dir(
   prefix: Option<&str>,
   package_req: &PackageReq,
   reload: bool,
-  deno_dir: &Path,
+  oden_dir: &Path,
   min_dep_age_config: &MinimumDependencyAgeConfig,
 ) -> Result<XTempDir, AnyError> {
   let mut package_req_folder = String::from(prefix.unwrap_or(""));
@@ -456,9 +456,9 @@ fn create_package_temp_dir(
       .replace(">", "gt")
       .replace("<", "lt"),
   );
-  let temp_dir = deno_dir.join("deno_x_cache").join(package_req_folder);
+  let temp_dir = oden_dir.join("oden_x_cache").join(package_req_folder);
   if temp_dir.exists() {
-    if reload || !temp_dir.join("deno.lock").exists() {
+    if reload || !temp_dir.join("oden.lock").exists() {
       std::fs::remove_dir_all(&temp_dir)?;
     } else {
       let temp_dir = canonicalize_path(&temp_dir).unwrap_or(temp_dir);
@@ -468,17 +468,17 @@ fn create_package_temp_dir(
   std::fs::create_dir_all(&temp_dir)?;
   let package_json_path = temp_dir.join("package.json");
   std::fs::write(&package_json_path, "{}")?;
-  let deno_json_path = temp_dir.join("deno.json");
-  let mut deno_json_value = serde_json::json!({"nodeModulesDir": "auto"});
+  let oden_json_path = temp_dir.join("oden.json");
+  let mut oden_json_value = serde_json::json!({"nodeModulesDir": "auto"});
   if let Some(min_dep_age) =
     minimum_dependency_age_config_json(min_dep_age_config)
   {
-    deno_json_value
+    oden_json_value
       .as_object_mut()
       .unwrap()
       .insert("minimumDependencyAge".to_string(), min_dep_age);
   }
-  std::fs::write(&deno_json_path, serde_json::to_string(&deno_json_value)?)?;
+  std::fs::write(&oden_json_path, serde_json::to_string(&oden_json_value)?)?;
 
   let temp_dir = canonicalize_path(&temp_dir).unwrap_or(temp_dir);
   Ok(XTempDir::New(temp_dir))
@@ -486,18 +486,18 @@ fn create_package_temp_dir(
 
 fn write_shim(
   out_dir: &Path,
-  shim_name: DenoXShimName,
+  shim_name: OdenXShimName,
 ) -> Result<(), AnyError> {
   #[cfg(unix)]
   {
     use std::os::unix::fs::PermissionsExt;
     let out_path = out_dir.join(shim_name.name());
-    if let DenoXShimName::Other(_) = shim_name {
+    if let OdenXShimName::Other(_) = shim_name {
       std::fs::write(
         &out_path,
         r##"#!/bin/sh
 SCRIPT_DIR="$(dirname -- "$(readlink -f -- "$0")")"
-exec "$SCRIPT_DIR/deno" x "$@"
+exec "$SCRIPT_DIR/oden" x "$@"
 "##
           .as_bytes(),
       )?;
@@ -505,12 +505,12 @@ exec "$SCRIPT_DIR/deno" x "$@"
       permissions.set_mode(0o755);
       std::fs::set_permissions(&out_path, permissions)?;
     } else {
-      match std::os::unix::fs::symlink("./deno", &out_path) {
+      match std::os::unix::fs::symlink("./oden", &out_path) {
         Ok(_) => {}
         Err(e) => match e.kind() {
           std::io::ErrorKind::AlreadyExists => {
             std::fs::remove_file(&out_path)?;
-            std::os::unix::fs::symlink("./deno", &out_path)?;
+            std::os::unix::fs::symlink("./oden", &out_path)?;
           }
           _ => return Err(e.into()),
         },
@@ -524,7 +524,7 @@ exec "$SCRIPT_DIR/deno" x "$@"
     std::fs::write(
       out_path,
       r##"@echo off
-"%~dp0deno.exe" x %*
+"%~dp0oden.exe" x %*
 exit /b %ERRORLEVEL%
 "##,
     )?;
@@ -564,11 +564,11 @@ pub async fn run(flags: Arc<Flags>, x_flags: XFlags) -> Result<i32, AnyError> {
   let unstable_args = cli_options.unstable_args();
   let npm_resolver = factory.npm_resolver().await?;
   let node_resolver = factory.node_resolver().await?;
-  // Extra `deno run` args forwarded to every re-run subprocess, computed ONCE
+  // Extra `oden run` args forwarded to every re-run subprocess, computed ONCE
   // from the user's ORIGINAL flags/cwd (never the internal npm-install runner
-  // flags, whose `config_flag` points at a generated temp deno.json). See
-  // `forwarded_run_args` (issue #35991). Every `deno x` re-run site executes a
-  // target whose child does NOT auto-discover the user's cwd `deno.json` — the
+  // flags, whose `config_flag` points at a generated temp oden.json). See
+  // `forwarded_run_args` (issue #35991). Every `oden x` re-run site executes a
+  // target whose child does NOT auto-discover the user's cwd `oden.json` — the
   // installed bin FILE anchors discovery on the install dir, and a jsr:/url main
   // module has config discovery disabled entirely — so an original `Discover` is
   // resolved to the discovered config path and forwarded explicitly, keeping the
@@ -609,11 +609,11 @@ pub async fn run(flags: Arc<Flags>, x_flags: XFlags) -> Result<i32, AnyError> {
     || Path::new(&effective_command).extension().is_some();
   if is_file_like && Path::new(&effective_command).is_file() {
     return Err(anyhow::anyhow!(
-      "Use 'deno run' to run a local file directly, 'deno x' is intended for running commands from packages."
+      "Use 'oden run' to run a local file directly, 'oden x' is intended for running commands from packages."
     ));
   }
 
-  let thing_to_run = match deno_core::url::Url::parse(&effective_command) {
+  let thing_to_run = match oden_core::url::Url::parse(&effective_command) {
     Ok(url) => {
       if url.scheme() == "npm" {
         let req_ref = NpmPackageReqReference::from_specifier(&url)?;
@@ -625,7 +625,7 @@ pub async fn run(flags: Arc<Flags>, x_flags: XFlags) -> Result<i32, AnyError> {
         ReqRefOrUrl::Url(url)
       }
     }
-    Err(deno_core::url::ParseError::RelativeUrlWithoutBase) => {
+    Err(oden_core::url::ParseError::RelativeUrlWithoutBase) => {
       let new_command = format!("npm:{}", effective_command);
       let req_ref = NpmPackageReqReference::from_str(&new_command)?;
       ReqRefOrUrl::Npm(req_ref)
@@ -637,10 +637,10 @@ pub async fn run(flags: Arc<Flags>, x_flags: XFlags) -> Result<i32, AnyError> {
 
   let cache_setting = cli_options.cache_setting();
   let reload = matches!(cache_setting, CacheSetting::ReloadAll);
-  // Effective minimum dependency age policy (CLI flag > cwd deno.json > .npmrc
+  // Effective minimum dependency age policy (CLI flag > cwd oden.json > .npmrc
   // > default) resolved from the ORIGINAL factory, i.e. the user's cwd config.
   // This full config (age + exclude) is written into the generated temp
-  // deno.json used for installing, since that temp workspace can't see the
+  // oden.json used for installing, since that temp workspace can't see the
   // user's cwd config on its own.
   let min_dep_age_config = factory
     .resolver_factory()?
@@ -650,7 +650,7 @@ pub async fn run(flags: Arc<Flags>, x_flags: XFlags) -> Result<i32, AnyError> {
     ReqRefOrUrl::Npm(npm_package_req_reference) => {
       // First try to resolve from the local project
       if let Ok(package_folder) = npm_resolver
-        .resolve_pkg_folder_from_deno_module_req(
+        .resolve_pkg_folder_from_oden_module_req(
           npm_package_req_reference.req(),
           &deno_path_util::url_from_directory_path(cli_options.initial_cwd())
             .unwrap(),
@@ -685,14 +685,14 @@ pub async fn run(flags: Arc<Flags>, x_flags: XFlags) -> Result<i32, AnyError> {
         reload,
         command_flags.yes,
         &command_flags.ignore_scripts,
-        &factory.deno_dir()?.root,
+        &factory.oden_dir()?.root,
         &min_dep_age_config,
         resolve_import_deny_rules(cli_options)?,
       )
       .await?;
       let mut runner_flags = (*managed_flags).clone();
       runner_flags.node_modules_dir =
-        Some(deno_config::deno_json::NodeModulesDirMode::Manual);
+        Some(oden_config::oden_json::NodeModulesDirMode::Manual);
       let runner_flags = Arc::new(runner_flags);
       let runner_factory = CliFactory::from_flags(runner_flags.clone());
       let runner_node_resolver = runner_factory.node_resolver().await?;
@@ -764,7 +764,7 @@ pub async fn run(flags: Arc<Flags>, x_flags: XFlags) -> Result<i32, AnyError> {
         reload,
         command_flags.yes,
         &command_flags.ignore_scripts,
-        &factory.deno_dir()?.root,
+        &factory.oden_dir()?.root,
         &min_dep_age_config,
         resolve_import_deny_rules(cli_options)?,
       )
@@ -773,18 +773,18 @@ pub async fn run(flags: Arc<Flags>, x_flags: XFlags) -> Result<i32, AnyError> {
       let npm_resolver = new_factory.npm_resolver().await?;
       let npm_process_state = get_npm_process_state(npm_resolver);
 
-      let mut deno_args = flags.to_permission_args();
-      deno_args.extend(unstable_args.iter().cloned());
-      deno_args.extend(forwarded.iter().cloned());
+      let mut oden_args = flags.to_permission_args();
+      oden_args.extend(unstable_args.iter().cloned());
+      oden_args.extend(forwarded.iter().cloned());
       let url =
-        deno_core::url::Url::parse(&jsr_package_req_reference.to_string())?;
-      run_js_file(&url, &deno_args, &flags.argv, npm_process_state, false)
+        oden_core::url::Url::parse(&jsr_package_req_reference.to_string())?;
+      run_js_file(&url, &oden_args, &flags.argv, npm_process_state, false)
     }
     ReqRefOrUrl::Url(url) => {
-      let mut deno_args = flags.to_permission_args();
-      deno_args.extend(unstable_args.iter().cloned());
-      deno_args.extend(forwarded.iter().cloned());
-      run_js_file(&url, &deno_args, &flags.argv, None, false)
+      let mut oden_args = flags.to_permission_args();
+      oden_args.extend(unstable_args.iter().cloned());
+      oden_args.extend(forwarded.iter().cloned());
+      run_js_file(&url, &oden_args, &flags.argv, None, false)
     }
   }
 }
@@ -795,7 +795,7 @@ fn bin_commands_for_package(
   package_req: &PackageReq,
 ) -> Result<BTreeMap<String, BinValue>, AnyError> {
   let pkg_id =
-    managed_npm_resolver.resolve_pkg_id_from_deno_module_req(package_req)?;
+    managed_npm_resolver.resolve_pkg_id_from_oden_module_req(package_req)?;
   let package_folder =
     managed_npm_resolver.resolve_pkg_folder_from_pkg_id(&pkg_id)?;
   node_resolver
@@ -806,7 +806,7 @@ fn bin_commands_for_package(
 /// The user's `--deny-import` rules, resolved against the config the user
 /// actually selected.
 ///
-/// The auto-install below runs against a generated temp `deno.json`, which
+/// The auto-install below runs against a generated temp `oden.json`, which
 /// cannot see a `-P` set defined in the user's config. Resolving the rules
 /// against the user's own options and baking them into the internal flags
 /// keeps the deny list — which decides what code may be downloaded at all —
@@ -826,7 +826,7 @@ async fn autoinstall_package(
   reload: bool,
   yes: bool,
   ignore_scripts: &PackagesAllowedScripts,
-  deno_dir: &Path,
+  oden_dir: &Path,
   min_dep_age_config: &MinimumDependencyAgeConfig,
   import_deny_rules: Option<Vec<String>>,
 ) -> Result<(Arc<Flags>, CliFactory), AnyError> {
@@ -842,11 +842,11 @@ async fn autoinstall_package(
     new_flags.permissions.deny_import = import_deny_rules;
     new_flags.permission_set = None;
     new_flags.node_modules_dir =
-      Some(deno_config::deno_json::NodeModulesDirMode::Auto);
+      Some(oden_config::oden_json::NodeModulesDirMode::Auto);
     let temp_node_modules = temp_dir.join("node_modules");
     new_flags.internal.root_node_modules_dir_override = Some(temp_node_modules);
     new_flags.config_flag = crate::args::ConfigFlag::Path(
-      temp_dir.join("deno.json").to_string_lossy().into_owned(),
+      temp_dir.join("oden.json").to_string_lossy().into_owned(),
     );
     match ignore_scripts {
       PackagesAllowedScripts::All => {
@@ -874,7 +874,7 @@ async fn autoinstall_package(
     Some(req_ref.prefix()),
     req_ref.req(),
     reload,
-    deno_dir,
+    oden_dir,
     min_dep_age_config,
   )?;
 
@@ -922,25 +922,25 @@ async fn autoinstall_package(
           )?;
         }
         ReqRef::Jsr(req_ref) => {
-          let deno_json = temp_dir.join("deno.json");
+          let oden_json = temp_dir.join("oden.json");
           let mut imports = serde_json::Map::new();
           imports.insert(
             req_ref.req().name.to_string(),
             serde_json::Value::String(format!("jsr:{}", req_ref.req())),
           );
-          let mut deno_json_value = serde_json::json!({
+          let mut oden_json_value = serde_json::json!({
             "nodeModulesDir": "manual",
             "imports": imports,
           });
           if let Some(min_dep_age) =
             minimum_dependency_age_config_json(min_dep_age_config)
           {
-            deno_json_value
+            oden_json_value
               .as_object_mut()
               .unwrap()
               .insert("minimumDependencyAge".to_string(), min_dep_age);
           }
-          std::fs::write(&deno_json, serde_json::to_string(&deno_json_value)?)?;
+          std::fs::write(&oden_json, serde_json::to_string(&oden_json_value)?)?;
         }
       }
 
@@ -994,5 +994,5 @@ impl<'a> ReqRef<'a> {
 enum ReqRefOrUrl {
   Npm(NpmPackageReqReference),
   Jsr(JsrPackageReqReference),
-  Url(deno_core::url::Url),
+  Url(oden_core::url::Url),
 }

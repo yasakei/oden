@@ -1,3 +1,3 @@
-import { hello } from "@denotest/mjs-reexport-cjs";
+import { hello } from "@odentest/mjs-reexport-cjs";
 
 console.log(hello);

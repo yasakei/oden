@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![allow(clippy::print_stdout, reason = "FFI test output")]
 #![allow(clippy::print_stderr, reason = "FFI test output")]

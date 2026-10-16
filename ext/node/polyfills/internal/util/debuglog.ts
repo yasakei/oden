@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 
 // `debugImpls` and `testEnabled` are initialized with safe defaults so that
@@ -84,7 +84,7 @@ function debuglogImpl(
         console.error(
           "%s %s: " + msg,
           set,
-          String(Deno.pid),
+          String(Oden.pid),
           ...new SafeArrayIterator(args),
         );
       };

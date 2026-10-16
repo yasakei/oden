@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cell::RefCell;
@@ -8,15 +8,15 @@ use std::rc::Rc;
 use std::sync::Arc;
 
 use bytes::Bytes;
-use deno_core::AsyncRefCell;
-use deno_core::AsyncResult;
-use deno_core::FromV8;
-use deno_core::OpState;
-use deno_core::Resource;
-use deno_core::ResourceId;
-use deno_core::ToV8;
-use deno_core::convert::ByteString;
-use deno_core::op2;
+use oden_core::AsyncRefCell;
+use oden_core::AsyncResult;
+use oden_core::FromV8;
+use oden_core::OpState;
+use oden_core::Resource;
+use oden_core::ResourceId;
+use oden_core::ToV8;
+use oden_core::convert::ByteString;
+use oden_core::op2;
 use deno_error::JsErrorBox;
 use futures::Stream;
 use tokio::io::AsyncRead;
@@ -62,7 +62,7 @@ pub enum CacheError {
   JoinError(#[from] tokio::task::JoinError),
   #[class(inherit)]
   #[error(transparent)]
-  Resource(#[from] deno_core::error::ResourceError),
+  Resource(#[from] oden_core::error::ResourceError),
   #[class(inherit)]
   #[error(transparent)]
   Other(JsErrorBox),
@@ -99,8 +99,8 @@ pub enum CacheError {
 #[derive(Clone)]
 pub struct CreateCache(pub Arc<dyn Fn() -> Result<CacheImpl, CacheError>>);
 
-deno_core::extension!(deno_cache,
-  deps = [ deno_webidl, deno_web, deno_fetch ],
+oden_core::extension!(oden_cache,
+  deps = [ oden_webidl, oden_web, oden_fetch ],
   ops = [
     op_cache_storage_open,
     op_cache_storage_has,
@@ -284,7 +284,7 @@ impl CacheResponseResource {
   ) -> Result<usize, std::io::Error> {
     let nread = match &*self {
       CacheResponseResource::Sqlite(_) => {
-        let resource = deno_core::RcRef::map(&self, |r| match r {
+        let resource = oden_core::RcRef::map(&self, |r| match r {
           Self::Sqlite(r) => r,
           _ => unreachable!(),
         });
@@ -292,7 +292,7 @@ impl CacheResponseResource {
         file.read(data).await?
       }
       CacheResponseResource::Lsc(_) => {
-        let resource = deno_core::RcRef::map(&self, |r| match r {
+        let resource = oden_core::RcRef::map(&self, |r| match r {
           Self::Lsc(r) => r,
           _ => unreachable!(),
         });
@@ -306,7 +306,7 @@ impl CacheResponseResource {
 }
 
 impl Resource for CacheResponseResource {
-  deno_core::impl_readable_byob!();
+  oden_core::impl_readable_byob!();
 
   fn name(&self) -> Cow<'_, str> {
     "CacheResponseResource".into()

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 use std::collections::HashSet;
@@ -6,11 +6,11 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use deno_error::JsErrorBox;
-use deno_npm::registry::NpmPackageInfo;
-use deno_npm::registry::NpmPackageInfoCacheMetadata;
-use deno_npm::registry::NpmRegistryApi;
-use deno_npm::registry::NpmRegistryPackageInfoLoadError;
-use deno_npmrc::ResolvedNpmRc;
+use oden_npm::registry::NpmPackageInfo;
+use oden_npm::registry::NpmPackageInfoCacheMetadata;
+use oden_npm::registry::NpmRegistryApi;
+use oden_npm::registry::NpmRegistryPackageInfoLoadError;
+use oden_npmrc::ResolvedNpmRc;
 use deno_unsync::sync::AtomicFlag;
 use futures::FutureExt;
 use futures::future::LocalBoxFuture;
@@ -42,7 +42,7 @@ pub struct SerializedCachedPackageInfo {
   #[serde(
     default,
     skip_serializing_if = "Option::is_none",
-    rename = "_deno.etag"
+    rename = "_oden.etag"
   )]
   pub etag: Option<String>,
   /// The abbreviated install manifest's last modified date, which is used
@@ -57,7 +57,7 @@ pub struct SerializedCachedPackageInfo {
   #[serde(
     default,
     skip_serializing_if = "std::ops::Not::not",
-    rename = "_deno.packumentFormat",
+    rename = "_oden.packumentFormat",
     with = "full_packument_marker"
   )]
   pub full_packument: bool,
@@ -215,7 +215,7 @@ impl<THttpClient: NpmCacheHttpClient, TSys: NpmCacheSys>
           // provider, so capturing a strong `Arc<Self>` would form a reference
           // cycle (`self` -> `memory_cache` -> value creator -> `self`) that
           // keeps the whole provider — and every package's cached registry
-          // metadata — alive for the life of the process. Under `deno run
+          // metadata — alive for the life of the process. Under `oden run
           // --watch` that leaks one full registry cache per reload (see
           // denoland/deno#35664). `create_load_future` re-clones a strong
           // reference for the duration of an in-flight load, which is fine.
@@ -652,14 +652,14 @@ mod test {
     let abbreviated_new = cached_info(
       r#"{"name":"pkg","versions":{"1.0.0":{"version":"1.0.0"}},"modified":"2024-01-02T00:00:00.000Z"}"#,
     );
-    // written by an old version of deno
+    // written by an old version of oden
     let abbreviated_unknown =
       cached_info(r#"{"name":"pkg","versions":{"1.0.0":{"version":"1.0.0"}}}"#);
     let full = cached_info(
       r#"{"name":"pkg","versions":{"1.0.0":{"version":"1.0.0"}},"time":{"1.0.0":"2024-01-03T00:00:00.000Z"}}"#,
     );
     let full_no_dates = cached_info(
-      r#"{"name":"pkg","versions":{"1.0.0":{"version":"1.0.0"}},"_deno.packumentFormat":"full"}"#,
+      r#"{"name":"pkg","versions":{"1.0.0":{"version":"1.0.0"}},"_oden.packumentFormat":"full"}"#,
     );
     let no_versions = cached_info(r#"{"name":"pkg","versions":{}}"#);
 

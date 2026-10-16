@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 mod blob;
 
@@ -23,12 +23,12 @@ use std::sync::Arc;
 pub use blob::BlobError;
 pub use compression::CompressionError;
 pub use css_stylesheet::create_css_style_sheet;
-use deno_core::U16String;
-use deno_core::convert::ByteString;
-use deno_core::convert::Uint8Array;
-use deno_core::op2;
-use deno_core::url::Url;
-use deno_core::v8;
+use oden_core::U16String;
+use oden_core::convert::ByteString;
+use oden_core::convert::Uint8Array;
+use oden_core::op2;
+use oden_core::url::Url;
+use oden_core::v8;
 use encoding_rs::CoderResult;
 use encoding_rs::Decoder;
 use encoding_rs::DecoderResult;
@@ -68,8 +68,8 @@ use crate::timers::op_now;
 use crate::timers::op_time_origin;
 pub mod locks;
 
-deno_core::extension!(deno_web,
-  deps = [ deno_webidl ],
+oden_core::extension!(oden_web,
+  deps = [ oden_webidl ],
   ops = [
     op_base64_decode,
     op_base64_decode_into,
@@ -818,8 +818,8 @@ struct TextDecoderResource {
 }
 
 // SAFETY: we're sure `TextDecoderResource` can be GCed
-unsafe impl deno_core::GarbageCollected for TextDecoderResource {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+unsafe impl oden_core::GarbageCollected for TextDecoderResource {
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"TextDecoderResource"

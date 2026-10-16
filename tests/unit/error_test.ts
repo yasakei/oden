@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   assertEquals,
   assertInstanceOf,
@@ -7,46 +7,46 @@ import {
 } from "@std/assert";
 
 const errorConstructors = [
-  Deno.errors.NotFound,
-  Deno.errors.PermissionDenied,
-  Deno.errors.ConnectionRefused,
-  Deno.errors.ConnectionReset,
-  Deno.errors.ConnectionAborted,
-  Deno.errors.NotConnected,
-  Deno.errors.AddrInUse,
-  Deno.errors.AddrNotAvailable,
-  Deno.errors.BrokenPipe,
-  Deno.errors.AlreadyExists,
-  Deno.errors.InvalidData,
-  Deno.errors.TimedOut,
-  Deno.errors.Interrupted,
-  Deno.errors.WriteZero,
-  Deno.errors.WouldBlock,
-  Deno.errors.UnexpectedEof,
-  Deno.errors.BadResource,
-  Deno.errors.Http,
-  Deno.errors.Busy,
-  Deno.errors.NotSupported,
-  Deno.errors.FilesystemLoop,
-  Deno.errors.IsADirectory,
-  Deno.errors.NetworkUnreachable,
-  Deno.errors.NotADirectory,
-  Deno.errors.NotCapable,
+  Oden.errors.NotFound,
+  Oden.errors.PermissionDenied,
+  Oden.errors.ConnectionRefused,
+  Oden.errors.ConnectionReset,
+  Oden.errors.ConnectionAborted,
+  Oden.errors.NotConnected,
+  Oden.errors.AddrInUse,
+  Oden.errors.AddrNotAvailable,
+  Oden.errors.BrokenPipe,
+  Oden.errors.AlreadyExists,
+  Oden.errors.InvalidData,
+  Oden.errors.TimedOut,
+  Oden.errors.Interrupted,
+  Oden.errors.WriteZero,
+  Oden.errors.WouldBlock,
+  Oden.errors.UnexpectedEof,
+  Oden.errors.BadResource,
+  Oden.errors.Http,
+  Oden.errors.Busy,
+  Oden.errors.NotSupported,
+  Oden.errors.FilesystemLoop,
+  Oden.errors.IsADirectory,
+  Oden.errors.NetworkUnreachable,
+  Oden.errors.NotADirectory,
+  Oden.errors.NotCapable,
 ];
 
-function assertError(ErrorConstructor: typeof Deno.errors.NotFound) {
+function assertError(ErrorConstructor: typeof Oden.errors.NotFound) {
   const error = new ErrorConstructor("msg", { cause: "cause" });
   assertInstanceOf(error, Error);
   assertEquals(error.cause, "cause");
 }
 
-Deno.test("Errors work", () => {
+Oden.test("Errors work", () => {
   for (const errorConstructor of errorConstructors) {
     assertError(errorConstructor);
   }
 });
 
-Deno.test("Errors have some tamper resistance", () => {
+Oden.test("Errors have some tamper resistance", () => {
   // deno-lint-ignore no-explicit-any
   (Object.prototype as any).get = () => {};
   assertThrows(() => fail("test error"), Error, "test error");

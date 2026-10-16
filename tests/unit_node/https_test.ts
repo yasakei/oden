@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import http from "node:http";
 import https from "node:https";
 import { assert, assertEquals } from "../unit/test_util.ts";
 import type { AddressInfo } from "node:net";
 
-Deno.test("[node/https] Server.address() includes family property", async () => {
+Oden.test("[node/https] Server.address() includes family property", async () => {
   const certFile = "tests/testdata/tls/localhost.crt";
   const keyFile = "tests/testdata/tls/localhost.key";
 
@@ -13,8 +13,8 @@ Deno.test("[node/https] Server.address() includes family property", async () => 
   {
     const { promise, resolve } = Promise.withResolvers<void>();
     const server = https.createServer({
-      cert: Deno.readTextFileSync(certFile),
-      key: Deno.readTextFileSync(keyFile),
+      cert: Oden.readTextFileSync(certFile),
+      key: Oden.readTextFileSync(keyFile),
     }, (_req, res) => {
       res.end("ok");
     });
@@ -34,8 +34,8 @@ Deno.test("[node/https] Server.address() includes family property", async () => 
   {
     const { promise, resolve } = Promise.withResolvers<void>();
     const server = https.createServer({
-      cert: Deno.readTextFileSync(certFile),
-      key: Deno.readTextFileSync(keyFile),
+      cert: Oden.readTextFileSync(certFile),
+      key: Oden.readTextFileSync(keyFile),
     }, (_req, res) => {
       res.end("ok");
     });
@@ -53,10 +53,10 @@ Deno.test("[node/https] Server.address() includes family property", async () => 
 });
 
 // https://github.com/denoland/deno/issues/31758
-Deno.test("[node/https] address() returns assigned port immediately after listen()", async () => {
+Oden.test("[node/https] address() returns assigned port immediately after listen()", async () => {
   const server = https.createServer({
-    cert: Deno.readTextFileSync("tests/testdata/tls/localhost.crt"),
-    key: Deno.readTextFileSync("tests/testdata/tls/localhost.key"),
+    cert: Oden.readTextFileSync("tests/testdata/tls/localhost.crt"),
+    key: Oden.readTextFileSync("tests/testdata/tls/localhost.key"),
   });
   server.listen(0);
 
@@ -70,16 +70,16 @@ Deno.test("[node/https] address() returns assigned port immediately after listen
   await promise;
 });
 
-Deno.test({
+Oden.test({
   name:
     "request.socket.authorized is true when successfully requested to https server",
   async fn() {
     const { promise, resolve } = Promise.withResolvers<void>();
     let serverPort: number;
-    const server = Deno.serve({
+    const server = Oden.serve({
       port: 0,
-      cert: Deno.readTextFileSync("tests/testdata/tls/localhost.crt"),
-      key: Deno.readTextFileSync("tests/testdata/tls/localhost.key"),
+      cert: Oden.readTextFileSync("tests/testdata/tls/localhost.crt"),
+      key: Oden.readTextFileSync("tests/testdata/tls/localhost.key"),
       onListen({ port }) {
         serverPort = port;
         resolve();
@@ -107,7 +107,7 @@ Deno.test({
 // `protocol: "http:"`, and `http.ClientRequest` then throws
 // ERR_INVALID_PROTOCOL against an https URL — breaking `npm install` and
 // anything else that relies on agent-base.
-Deno.test("[node/https] request stack frame surfaces 'node:https:' for agent-base", () => {
+Oden.test("[node/https] request stack frame surfaces 'node:https:' for agent-base", () => {
   // Mirrors agent-base@7's `protocol` getter: if the protocol wasn't set
   // explicitly via the setter, scan the current stack for `node:https:` to
   // decide whether we're inside an https request. The slot is keyed off a

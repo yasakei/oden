@@ -1,3 +1,3 @@
-Deno.hostname();
-await Deno.makeTempDir();
-Deno.env.get("FOO");
+Oden.hostname();
+await Oden.makeTempDir();
+Oden.env.get("FOO");

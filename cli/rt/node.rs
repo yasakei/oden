@@ -1,64 +1,64 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::sync::Arc;
 
-use deno_core::url::Url;
+use oden_core::url::Url;
 use deno_error::JsErrorBox;
-use deno_lib::standalone::binary::CjsExportAnalysisEntry;
+use oden_lib::standalone::binary::CjsExportAnalysisEntry;
 use deno_media_type::MediaType;
-use deno_resolver::loader::NpmModuleLoader;
-use deno_resolver::npm::DenoInNpmPackageChecker;
-use deno_resolver::npm::NpmReqResolver;
-use node_resolver::DenoIsBuiltInNodeModuleChecker;
+use oden_resolver::loader::NpmModuleLoader;
+use oden_resolver::npm::OdenInNpmPackageChecker;
+use oden_resolver::npm::NpmReqResolver;
+use node_resolver::OdenIsBuiltInNodeModuleChecker;
 use node_resolver::analyze::CjsAnalysis;
 use node_resolver::analyze::CjsAnalysisExports;
 use node_resolver::analyze::EsmAnalysisMode;
 use node_resolver::analyze::NodeCodeTranslator;
 
 use crate::binary::StandaloneModules;
-use crate::file_system::DenoRtSys;
+use crate::file_system::OdenRtSys;
 
-pub type DenoRtCjsTracker =
-  deno_resolver::cjs::CjsTracker<DenoInNpmPackageChecker, DenoRtSys>;
-pub type DenoRtNpmResolver = deno_resolver::npm::NpmResolver<DenoRtSys>;
-pub type DenoRtNpmModuleLoader = NpmModuleLoader<
+pub type OdenRtCjsTracker =
+  oden_resolver::cjs::CjsTracker<OdenInNpmPackageChecker, OdenRtSys>;
+pub type OdenRtNpmResolver = oden_resolver::npm::NpmResolver<OdenRtSys>;
+pub type OdenRtNpmModuleLoader = NpmModuleLoader<
   CjsCodeAnalyzer,
-  DenoInNpmPackageChecker,
-  DenoIsBuiltInNodeModuleChecker,
-  DenoRtNpmResolver,
-  DenoRtSys,
+  OdenInNpmPackageChecker,
+  OdenIsBuiltInNodeModuleChecker,
+  OdenRtNpmResolver,
+  OdenRtSys,
 >;
-pub type DenoRtNodeCodeTranslator = NodeCodeTranslator<
+pub type OdenRtNodeCodeTranslator = NodeCodeTranslator<
   CjsCodeAnalyzer,
-  DenoInNpmPackageChecker,
-  DenoIsBuiltInNodeModuleChecker,
-  DenoRtNpmResolver,
-  DenoRtSys,
+  OdenInNpmPackageChecker,
+  OdenIsBuiltInNodeModuleChecker,
+  OdenRtNpmResolver,
+  OdenRtSys,
 >;
-pub type DenoRtNodeResolver = deno_runtime::deno_node::NodeResolver<
-  DenoInNpmPackageChecker,
-  DenoRtNpmResolver,
-  DenoRtSys,
+pub type OdenRtNodeResolver = oden_runtime::oden_node::NodeResolver<
+  OdenInNpmPackageChecker,
+  OdenRtNpmResolver,
+  OdenRtSys,
 >;
-pub type DenoRtNpmReqResolver = NpmReqResolver<
-  DenoInNpmPackageChecker,
-  DenoIsBuiltInNodeModuleChecker,
-  DenoRtNpmResolver,
-  DenoRtSys,
+pub type OdenRtNpmReqResolver = NpmReqResolver<
+  OdenInNpmPackageChecker,
+  OdenIsBuiltInNodeModuleChecker,
+  OdenRtNpmResolver,
+  OdenRtSys,
 >;
 
 pub struct CjsCodeAnalyzer {
-  cjs_tracker: Arc<DenoRtCjsTracker>,
+  cjs_tracker: Arc<OdenRtCjsTracker>,
   modules: Arc<StandaloneModules>,
-  sys: DenoRtSys,
+  sys: OdenRtSys,
 }
 
 impl CjsCodeAnalyzer {
   pub fn new(
-    cjs_tracker: Arc<DenoRtCjsTracker>,
+    cjs_tracker: Arc<OdenRtCjsTracker>,
     modules: Arc<StandaloneModules>,
-    sys: DenoRtSys,
+    sys: OdenRtSys,
   ) -> Self {
     Self {
       cjs_tracker,
@@ -119,7 +119,7 @@ impl CjsCodeAnalyzer {
             // the compile step skipped analysis for this file — bug.
             if log::log_enabled!(log::Level::Debug) {
               log::debug!(
-                "No CJS export analysis was stored for '{}'. Assuming ESM. This might indicate a bug in Deno.",
+                "No CJS export analysis was stored for '{}'. Assuming ESM. This might indicate a bug in Oden.",
                 specifier
               );
             }
@@ -150,13 +150,13 @@ impl CjsCodeAnalyzer {
 /// files read from the host filesystem (HMR / dev mode) which have no
 /// pre-computed analysis embedded in the VFS.
 ///
-/// Mirrors what `DenoCjsCodeAnalyzer` does at compile time, minus the
+/// Mirrors what `OdenCjsCodeAnalyzer` does at compile time, minus the
 /// re-export resolution (the loader walks reexports separately). The
 /// `compute_is_script` + `is_cjs_with_known_is_script` two-step is the
 /// same one the compile-time analyzer uses; without it, ESM files that
 /// happen to look CJS-ish would be mis-classified.
 fn analyze_cjs_live<'a>(
-  cjs_tracker: &DenoRtCjsTracker,
+  cjs_tracker: &OdenRtCjsTracker,
   specifier: &Url,
   media_type: MediaType,
   source: Cow<'a, str>,

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -63,17 +63,17 @@ const {
   op_node_getnameinfo,
 } = core.ops;
 const { isIPv4, isIPv6 } = core.loadExtScript(
-  "ext:deno_node/internal/net.ts",
+  "ext:oden_node/internal/net.ts",
 );
 const { codeMap } = core.loadExtScript(
-  "ext:deno_node/internal_binding/uv.ts",
+  "ext:oden_node/internal_binding/uv.ts",
 );
 const {
   AsyncWrap,
   providerType,
-} = core.loadExtScript("ext:deno_node/internal_binding/async_wrap.ts");
+} = core.loadExtScript("ext:oden_node/internal_binding/async_wrap.ts");
 const { ares_strerror } = core.loadExtScript(
-  "ext:deno_node/internal_binding/ares.ts",
+  "ext:oden_node/internal_binding/ares.ts",
 );
 
 interface LookupAddress {
@@ -154,7 +154,7 @@ function getaddrinfo(
         error = codeMap.get("EAI_NODATA")!;
       }
     } catch (e) {
-      if (ObjectPrototypeIsPrototypeOf(Deno.errors.NotCapable.prototype, e)) {
+      if (ObjectPrototypeIsPrototypeOf(Oden.errors.NotCapable.prototype, e)) {
         error = codeMap.get("EPERM")!;
       } else if (
         typeof (e as { uv_errcode?: number })?.uv_errcode === "number" &&
@@ -320,12 +320,12 @@ class ChannelWrap extends AsyncWrap implements ChannelWrapQuery {
 
   async #query(
     query: string,
-    recordType: Deno.RecordType,
+    recordType: Oden.RecordType,
     ttl?: boolean,
   ) {
     // deno-lint-ignore no-explicit-any
     let code: any;
-    let ret: Awaited<ReturnType<typeof Deno.resolveDns>>;
+    let ret: Awaited<ReturnType<typeof Oden.resolveDns>>;
 
     if (this.#servers !== null && this.#servers.length) {
       for (const server of new SafeArrayIterator(this.#servers)) {
@@ -362,8 +362,8 @@ class ChannelWrap extends AsyncWrap implements ChannelWrapQuery {
 
   async #resolve(
     query: string,
-    recordType: Deno.RecordType,
-    resolveOptions?: Deno.ResolveDnsOptions,
+    recordType: Oden.RecordType,
+    resolveOptions?: Oden.ResolveDnsOptions,
     ttl?: boolean,
   ): Promise<{
     // deno-lint-ignore no-explicit-any
@@ -417,7 +417,7 @@ class ChannelWrap extends AsyncWrap implements ChannelWrapQuery {
         return { code, ret };
       } catch (e) {
         if (
-          ObjectPrototypeIsPrototypeOf(Deno.errors.Interrupted.prototype, e)
+          ObjectPrototypeIsPrototypeOf(Oden.errors.Interrupted.prototype, e)
         ) {
           if (timedOut) {
             // Our own timeout timer aborted the op - this is a timeout, so
@@ -428,7 +428,7 @@ class ChannelWrap extends AsyncWrap implements ChannelWrapQuery {
           // in both cases stop and report a timeout.
           code = "ETIMEOUT";
         } else if (
-          ObjectPrototypeIsPrototypeOf(Deno.errors.TimedOut.prototype, e)
+          ObjectPrototypeIsPrototypeOf(Oden.errors.TimedOut.prototype, e)
         ) {
           // TimedOut from hickory - retry if attempts remain
           if (attempt < tries - 1) continue;
@@ -443,7 +443,7 @@ class ChannelWrap extends AsyncWrap implements ChannelWrapQuery {
           // `code` (and `errno: undefined`) as Node.js.
           code = (e as { ares_code: string }).ares_code;
         } else if (
-          ObjectPrototypeIsPrototypeOf(Deno.errors.NotFound.prototype, e)
+          ObjectPrototypeIsPrototypeOf(Oden.errors.NotFound.prototype, e)
         ) {
           // A "not found" error without a more specific c-ares code, e.g. an
           // empty answer. Report `ENOTFOUND`, matching Node.js.
@@ -580,7 +580,7 @@ class ChannelWrap extends AsyncWrap implements ChannelWrapQuery {
       let recordsWithTtl;
       if (req.ttl) {
         recordsWithTtl = ArrayPrototypeMap(
-          ret as Deno.RecordWithTtl[],
+          ret as Oden.RecordWithTtl[],
           (val) => ({
             address: val?.data,
             ttl: val?.ttl,
@@ -606,7 +606,7 @@ class ChannelWrap extends AsyncWrap implements ChannelWrapQuery {
         let recordsWithTtl;
         if (req.ttl) {
           recordsWithTtl = ArrayPrototypeMap(
-            ret as Deno.RecordWithTtl[],
+            ret as Oden.RecordWithTtl[],
             (val) => ({
               address: val?.data as string,
               ttl: val?.ttl,
@@ -629,7 +629,7 @@ class ChannelWrap extends AsyncWrap implements ChannelWrapQuery {
       SetPrototypeDelete(this.#pendingQueries, req);
 
       const records = ArrayPrototypeMap(
-        ret as Deno.CaaRecord[],
+        ret as Oden.CaaRecord[],
         ({ critical, tag, value }) => ({
           [tag]: value,
           critical: +critical && 128,
@@ -663,7 +663,7 @@ class ChannelWrap extends AsyncWrap implements ChannelWrapQuery {
       SetPrototypeDelete(this.#pendingQueries, req);
 
       const records = ArrayPrototypeMap(
-        ret as Deno.MxRecord[],
+        ret as Oden.MxRecord[],
         ({ preference, exchange }) => ({
           priority: preference,
           exchange: fqdnToHostname(exchange),
@@ -684,7 +684,7 @@ class ChannelWrap extends AsyncWrap implements ChannelWrapQuery {
       SetPrototypeDelete(this.#pendingQueries, req);
 
       const records = ArrayPrototypeMap(
-        ret as Deno.NaptrRecord[],
+        ret as Oden.NaptrRecord[],
         ({ order, preference, flags, services, regexp, replacement }) => ({
           flags,
           service: services,
@@ -748,7 +748,7 @@ class ChannelWrap extends AsyncWrap implements ChannelWrapQuery {
 
       if (ret.length) {
         const { mname, rname, serial, refresh, retry, expire, minimum } =
-          ret[0] as Deno.SoaRecord;
+          ret[0] as Oden.SoaRecord;
 
         record = {
           nsname: fqdnToHostname(mname),
@@ -775,7 +775,7 @@ class ChannelWrap extends AsyncWrap implements ChannelWrapQuery {
       SetPrototypeDelete(this.#pendingQueries, req);
 
       const records = ArrayPrototypeMap(
-        ret as Deno.SrvRecord[],
+        ret as Oden.SrvRecord[],
         ({ priority, weight, port, target }) => ({
           priority,
           weight,

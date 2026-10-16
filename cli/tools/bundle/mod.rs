@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 mod esbuild;
 mod externals;
@@ -21,18 +21,18 @@ use deno_ast::EmitOptions;
 use deno_ast::MediaType;
 use deno_ast::ModuleKind;
 use deno_ast::ModuleSpecifier;
-use deno_bundle_runtime::BundleFormat;
-use deno_bundle_runtime::BundlePlatform;
-use deno_bundle_runtime::PackageHandling;
-use deno_bundle_runtime::SourceMapType;
-use deno_config::workspace::TsTypeLib;
-use deno_core::anyhow::Context as _;
-use deno_core::error::AnyError;
-use deno_core::futures::FutureExt as _;
-use deno_core::parking_lot::Mutex;
-use deno_core::parking_lot::RwLock;
-use deno_core::serde_json;
-use deno_core::url::Url;
+use oden_bundle_runtime::BundleFormat;
+use oden_bundle_runtime::BundlePlatform;
+use oden_bundle_runtime::PackageHandling;
+use oden_bundle_runtime::SourceMapType;
+use oden_config::workspace::TsTypeLib;
+use oden_core::anyhow::Context as _;
+use oden_core::error::AnyError;
+use oden_core::futures::FutureExt as _;
+use oden_core::parking_lot::Mutex;
+use oden_core::parking_lot::RwLock;
+use oden_core::serde_json;
+use oden_core::url::Url;
 use deno_error::JsError;
 use deno_error::JsErrorClass;
 use deno_graph::GraphKind;
@@ -40,21 +40,21 @@ use deno_graph::ModuleErrorKind;
 use deno_graph::ModuleGraph;
 use deno_graph::Position;
 use deno_path_util::resolve_url_or_path;
-use deno_resolver::cache::ParsedSourceCache;
-use deno_resolver::graph::ResolveWithGraphError;
-use deno_resolver::graph::ResolveWithGraphOptions;
-use deno_resolver::loader::LoadCodeSourceError;
-use deno_resolver::loader::LoadCodeSourceErrorKind;
-use deno_resolver::loader::LoadPreparedModuleErrorKind;
-use deno_resolver::loader::LoadedModuleOrAsset;
-use deno_resolver::loader::LoadedModuleSource;
-use deno_resolver::loader::RequestedModuleType;
-use deno_resolver::npm::managed::ResolvePkgFolderFromDenoModuleError;
-use deno_resolver::npmrc::discover_npmrc_from_home;
-use deno_resolver::workspace::WorkspaceNpmLinkPackagesRc;
-use deno_runtime::deno_permissions::CheckSpecifierKind;
-use deno_runtime::deno_permissions::OpenAccessKind;
-use deno_runtime::deno_permissions::PermissionsContainer;
+use oden_resolver::cache::ParsedSourceCache;
+use oden_resolver::graph::ResolveWithGraphError;
+use oden_resolver::graph::ResolveWithGraphOptions;
+use oden_resolver::loader::LoadCodeSourceError;
+use oden_resolver::loader::LoadCodeSourceErrorKind;
+use oden_resolver::loader::LoadPreparedModuleErrorKind;
+use oden_resolver::loader::LoadedModuleOrAsset;
+use oden_resolver::loader::LoadedModuleSource;
+use oden_resolver::loader::RequestedModuleType;
+use oden_resolver::npm::managed::ResolvePkgFolderFromOdenModuleError;
+use oden_resolver::npmrc::discover_npmrc_from_home;
+use oden_resolver::workspace::WorkspaceNpmLinkPackagesRc;
+use oden_runtime::oden_permissions::CheckSpecifierKind;
+use oden_runtime::oden_permissions::OpenAccessKind;
+use oden_runtime::oden_permissions::PermissionsContainer;
 use deno_semver::npm::NpmPackageReqReference;
 use esbuild_client::EsbuildFlagsBuilder;
 use esbuild_client::EsbuildService;
@@ -79,7 +79,7 @@ use crate::graph_container::CollectSpecifiersOptions;
 use crate::graph_container::MainModuleGraphContainer;
 use crate::graph_container::ModuleGraphContainer;
 use crate::graph_container::ModuleGraphUpdatePermit;
-use crate::module_loader::CliDenoResolverModuleLoader;
+use crate::module_loader::CliOdenResolverModuleLoader;
 use crate::module_loader::CliEmitter;
 use crate::module_loader::ModuleLoadPreparer;
 use crate::module_loader::PrepareModuleLoadOptions;
@@ -92,7 +92,7 @@ use crate::util::file_watcher::WatcherRestartMode;
 use crate::util::fs::canonicalize_path;
 
 static DISABLE_HACK: LazyLock<bool> =
-  LazyLock::new(|| std::env::var("NO_DENO_BUNDLE_HACK").is_err());
+  LazyLock::new(|| std::env::var("NO_ODEN_BUNDLE_HACK").is_err());
 
 pub async fn prepare_inputs(
   resolver: &CliResolver,
@@ -100,7 +100,7 @@ pub async fn prepare_inputs(
   node_resolver: &CliNodeResolver,
   init_cwd: &Path,
   bundle_flags: &BundleFlags,
-  plugin_handler: &mut DenoPluginHandler,
+  plugin_handler: &mut OdenPluginHandler,
 ) -> Result<BundlerInput, AnyError> {
   let resolved_entrypoints = resolve_entrypoints(
     resolver,
@@ -145,12 +145,12 @@ pub async fn prepare_inputs(
   } else {
     // require an outdir when any HTML is present
     if bundle_flags.output_dir.is_none() {
-      return Err(deno_core::anyhow::anyhow!(
+      return Err(oden_core::anyhow::anyhow!(
         "--outdir is required when bundling HTML entrypoints",
       ));
     }
     if bundle_flags.output_path.is_some() {
-      return Err(deno_core::anyhow::anyhow!(
+      return Err(oden_core::anyhow::anyhow!(
         "--output is not supported with HTML entrypoints; use --outdir",
       ));
     }
@@ -236,8 +236,8 @@ pub async fn bundle_init(
   let resolver = factory.resolver().await?.clone();
   let module_load_preparer = factory.module_load_preparer().await?.clone();
   // Module loads (including remote imports) are checked against the caller's
-  // permissions when invoked via `Deno.bundle()`, and against the CLI's own
-  // permissions when invoked via `deno bundle`.
+  // permissions when invoked via `Oden.bundle()`, and against the CLI's own
+  // permissions when invoked via `oden bundle`.
   let (permissions, is_runtime_api) = match caller_permissions {
     Some(permissions) => (permissions, true),
     None => (factory.root_permissions_container()?.clone(), false),
@@ -255,7 +255,7 @@ pub async fn bundle_init(
     clippy::arc_with_non_send_sync,
     reason = "fine because only used in output positions"
   )]
-  let mut plugin_handler = Arc::new(DenoPluginHandler {
+  let mut plugin_handler = Arc::new(OdenPluginHandler {
     file_fetcher: factory.file_fetcher()?.clone(),
     resolver: resolver.clone(),
     module_load_preparer,
@@ -371,7 +371,7 @@ pub async fn bundle(
         &bundler.plugin_handler.take_deferred_resolve_errors(),
       );
       if !response.errors.is_empty() {
-        deno_core::anyhow::bail!("bundling failed");
+        oden_core::anyhow::bail!("bundling failed");
       }
     }
     return bundle_watch(
@@ -412,7 +412,7 @@ pub async fn bundle(
   }
 
   if !response.errors.is_empty() {
-    deno_core::anyhow::bail!("bundling failed");
+    oden_core::anyhow::bail!("bundling failed");
   }
 
   Ok(())
@@ -466,7 +466,7 @@ async fn emit_bundle_declarations(
   )?;
 
   if result.diagnostics.has_diagnostic() {
-    deno_core::anyhow::bail!(
+    oden_core::anyhow::bail!(
       "Type checking failed when generating declarations:\n{}",
       result.diagnostics
     );
@@ -489,7 +489,7 @@ async fn emit_bundle_declarations(
   // For each entry point, produce a single rolled-up .d.ts
   for entry_specifier in &entrypoint_specifiers {
     let entry_path = entry_specifier.to_file_path().map_err(|_| {
-      deno_core::anyhow::anyhow!(
+      oden_core::anyhow::anyhow!(
         "Entry point must be a file: {}",
         entry_specifier
       )
@@ -500,7 +500,7 @@ async fn emit_bundle_declarations(
     let entry_dts = dts_by_source
       .get(&dts_path.to_string_lossy().to_string())
       .ok_or_else(|| {
-        deno_core::anyhow::anyhow!(
+        oden_core::anyhow::anyhow!(
           "No declaration file emitted for entry point: {}",
           entry_specifier
         )
@@ -850,13 +850,13 @@ fn inline_declarations(
   }
 }
 
-/// Bundle a single entrypoint for `deno compile --bundle` and return the
-/// resulting JavaScript bytes in memory. The Deno-specific `createRequire`
+/// Bundle a single entrypoint for `oden compile --bundle` and return the
+/// resulting JavaScript bytes in memory. The Oden-specific `createRequire`
 /// shim is applied to the output so CJS `require()` calls keep working in
 /// the compiled binary.
 ///
 /// `external` is the set of import patterns (typically npm package names) to
-/// leave unbundled. For `deno compile --bundle` this is populated with the
+/// leave unbundled. For `oden compile --bundle` this is populated with the
 /// names of packages that ship native `.node` addons so their internal
 /// `require('./X.node')` calls keep their original `__dirname` context at
 /// runtime.
@@ -879,7 +879,7 @@ pub async fn bundle_for_compile(
     inline_imports: true,
     packages: PackageHandling::Bundle,
     sourcemap: None,
-    platform: BundlePlatform::Deno,
+    platform: BundlePlatform::Oden,
     watch: false,
   };
 
@@ -887,7 +887,7 @@ pub async fn bundle_for_compile(
   // Without this, module-graph creation skips deep CJS files inside
   // `node_modules` (jiti.cjs is the canonical case) and the parent
   // `.mjs` trips an esbuild parse error when its import target can't
-  // be loaded. This flips the same three resolver knobs `deno bundle`
+  // be loaded. This flips the same three resolver knobs `oden bundle`
   // sets (`bundle_mode`, `node_code_translator_mode` = Disabled,
   // `allow_json_imports` = Always) without otherwise swapping the
   // subcommand, so the rest of compilation keeps Compile semantics.
@@ -909,7 +909,7 @@ pub async fn bundle_for_compile(
     &bundler.plugin_handler.take_deferred_resolve_errors(),
   );
   if !response.errors.is_empty() {
-    deno_core::anyhow::bail!("bundling failed");
+    oden_core::anyhow::bail!("bundling failed");
   }
 
   let output_files = collect_output_files(
@@ -935,7 +935,7 @@ pub async fn bundle_for_compile(
     );
   }
 
-  deno_core::anyhow::bail!("esbuild produced no JavaScript output")
+  oden_core::anyhow::bail!("esbuild produced no JavaScript output")
 }
 
 fn metafile_from_response(
@@ -943,7 +943,7 @@ fn metafile_from_response(
 ) -> Result<esbuild_client::Metafile, AnyError> {
   Ok(serde_json::from_str::<esbuild_client::Metafile>(
     response.metafile.as_deref().ok_or_else(|| {
-      deno_core::anyhow::anyhow!("expected a metafile to be present")
+      oden_core::anyhow::anyhow!("expected a metafile to be present")
     })?,
   )?)
 }
@@ -1037,7 +1037,7 @@ async fn bundle_watch(
             watcher_communicator.watch_paths(current_roots.borrow().clone());
         }
 
-        // `deno bundle --watch` has no per-run exit code (and disables the
+        // `oden bundle --watch` has no per-run exit code (and disables the
         // "finished" message above), so report 0 to the watcher.
         Ok(0)
       })
@@ -1050,7 +1050,7 @@ async fn bundle_watch(
 }
 
 pub fn should_replace_require_shim(platform: BundlePlatform) -> bool {
-  *DISABLE_HACK && matches!(platform, BundlePlatform::Deno)
+  *DISABLE_HACK && matches!(platform, BundlePlatform::Oden)
 }
 
 fn get_input_paths_for_watch(response: &BuildResponse) -> Vec<PathBuf> {
@@ -1089,7 +1089,7 @@ pub type EsbuildFlags = Vec<String>;
 
 pub struct EsbuildBundler {
   client: esbuild_client::ProtocolClient,
-  plugin_handler: Arc<DenoPluginHandler>,
+  plugin_handler: Arc<OdenPluginHandler>,
   on_end_rx: tokio::sync::mpsc::Receiver<esbuild_client::OnEndArgs>,
   mode: BundlingMode,
   cwd: PathBuf,
@@ -1100,7 +1100,7 @@ pub struct EsbuildBundler {
 impl EsbuildBundler {
   pub fn new(
     client: esbuild_client::ProtocolClient,
-    plugin_handler: Arc<DenoPluginHandler>,
+    plugin_handler: Arc<OdenPluginHandler>,
     mode: BundlingMode,
     on_end_rx: tokio::sync::mpsc::Receiver<esbuild_client::OnEndArgs>,
     cwd: PathBuf,
@@ -1140,7 +1140,7 @@ impl EsbuildBundler {
       mangle_cache: None,
       node_paths: vec![],
       plugins: Some(vec![protocol::BuildPlugin {
-        name: "deno".into(),
+        name: "oden".into(),
         on_start: false,
         on_end: matches!(self.mode, BundlingMode::Watch),
         on_resolve: (vec![protocol::OnResolveSetupOptions {
@@ -1182,7 +1182,7 @@ impl EsbuildBundler {
           .context("failed to send rebuild request to esbuild")?
           .map_err(|e| message_to_error(&e, &self.cwd))?;
         let response = self.on_end_rx.recv().await.ok_or_else(|| {
-          deno_core::anyhow::anyhow!(
+          oden_core::anyhow::anyhow!(
             "esbuild exited before the rebuild completed"
           )
         })?;
@@ -1250,7 +1250,7 @@ fn message_to_error(
   message: &esbuild_client::protocol::Message,
   current_dir: &Path,
 ) -> AnyError {
-  deno_core::anyhow::anyhow!("{}", format_message(message, current_dir))
+  oden_core::anyhow::anyhow!("{}", format_message(message, current_dir))
 }
 
 // TODO(nathanwhit): MASSIVE HACK
@@ -1263,7 +1263,7 @@ fn replace_require_shim(contents: &str, minified: bool) -> String {
     );
     re.replace(contents, |c: &regex::Captures<'_>| {
       let var_name = c.get(1).unwrap().as_str();
-      format!("import{{createRequire as __deno_internal_createRequire}} from \"node:module\";var {var_name}=__deno_internal_createRequire(import.meta.url);")
+      format!("import{{createRequire as __oden_internal_createRequire}} from \"node:module\";var {var_name}=__oden_internal_createRequire(import.meta.url);")
     }).into_owned()
   } else {
     let re = lazy_regex::regex!(
@@ -1271,8 +1271,8 @@ fn replace_require_shim(contents: &str, minified: bool) -> String {
     );
     re.replace_all(
       contents,
-      r#"import { createRequire as __deno_internal_createRequire } from "node:module";
-var __require = __deno_internal_createRequire(import.meta.url);
+      r#"import { createRequire as __oden_internal_createRequire } from "node:module";
+var __require = __oden_internal_createRequire(import.meta.url);
 "#,
     )
     .into_owned()
@@ -1285,7 +1285,7 @@ var __require = __deno_internal_createRequire(import.meta.url);
 // esbuild emits a node-mode interop call (`__toESM(require_x(), 1)`) only when
 // it can tell the importing module is *explicitly* ESM (a `.mjs`/`.mts` file or
 // a file under a `"type": "module"` package.json). It learns this while walking
-// package.json during its own resolve step. In `deno bundle` resolution and
+// package.json during its own resolve step. In `oden bundle` resolution and
 // loading are handled by our plugin, and esbuild's plugin protocol has no way
 // to communicate a module's type, so esbuild falls back to browser-mode interop
 // which respects the `__esModule` marker and does not synthesize `.default`.
@@ -1390,11 +1390,11 @@ struct BundleError(Box<BundleErrorKind>);
 #[class(generic)]
 enum BundleErrorKind {
   #[error(transparent)]
-  Resolver(#[from] deno_resolver::graph::ResolveWithGraphError),
+  Resolver(#[from] oden_resolver::graph::ResolveWithGraphError),
   #[error(transparent)]
-  Url(#[from] deno_core::url::ParseError),
+  Url(#[from] oden_core::url::ParseError),
   #[error(transparent)]
-  ResolveNpmPkg(#[from] ResolvePkgFolderFromDenoModuleError),
+  ResolveNpmPkg(#[from] ResolvePkgFolderFromOdenModuleError),
   #[error(transparent)]
   SubpathResolve(#[from] PackageSubpathResolveError),
   #[error(transparent)]
@@ -1408,7 +1408,7 @@ enum BundleErrorKind {
   #[error(transparent)]
   PrepareModuleLoad(#[from] crate::module_loader::PrepareModuleLoadError),
   #[error(transparent)]
-  ResolveReqWithSubPath(#[from] deno_resolver::npm::ResolveReqWithSubPathError),
+  ResolveReqWithSubPath(#[from] oden_resolver::npm::ResolveReqWithSubPathError),
   #[error(transparent)]
   PackageReqReferenceParse(
     #[from] deno_semver::package::PackageReqReferenceParseError,
@@ -1474,9 +1474,9 @@ pub struct DeferredResolveError {
 
 /// Path prefix used to mark modules disabled via a `browser` map (`"foo": false`).
 /// `\0` keeps it from colliding with any real filesystem path.
-const BROWSER_DISABLED_PREFIX: &str = "\0deno-browser-disabled:";
+const BROWSER_DISABLED_PREFIX: &str = "\0oden-browser-disabled:";
 
-pub struct DenoPluginHandler {
+pub struct OdenPluginHandler {
   file_fetcher: Arc<CliFileFetcher>,
   resolver: Arc<CliResolver>,
   module_load_preparer: Arc<ModuleLoadPreparer>,
@@ -1484,9 +1484,9 @@ pub struct DenoPluginHandler {
   module_graph_container: Arc<MainModuleGraphContainer>,
   permissions: PermissionsContainer,
   /// Whether reads and writes must respect the calling program's permissions.
-  /// The directly invoked `deno bundle` command is a trusted CLI path.
+  /// The directly invoked `oden bundle` command is a trusted CLI path.
   is_runtime_api: bool,
-  module_loader: Arc<CliDenoResolverModuleLoader>,
+  module_loader: Arc<CliOdenResolverModuleLoader>,
   externals_matcher: Option<ExternalsMatcher>,
   on_end_tx: tokio::sync::mpsc::Sender<esbuild_client::OnEndArgs>,
   deferred_resolve_errors: Arc<Mutex<Vec<DeferredResolveError>>>,
@@ -1498,7 +1498,7 @@ pub struct DenoPluginHandler {
   initial_cwd: Url,
 }
 
-impl DenoPluginHandler {
+impl OdenPluginHandler {
   fn take_deferred_resolve_errors(&self) -> Vec<DeferredResolveError> {
     std::mem::take(&mut *self.deferred_resolve_errors.lock())
   }
@@ -1537,9 +1537,9 @@ impl DenoPluginHandler {
       .ok()
       .flatten()?;
     match pkg_json.side_effects.as_ref()? {
-      deno_package_json::PackageJsonSideEffects::Bool(true) => None,
-      deno_package_json::PackageJsonSideEffects::Bool(false) => Some(false),
-      deno_package_json::PackageJsonSideEffects::Patterns(patterns) => {
+      oden_package_json::PackageJsonSideEffects::Bool(true) => None,
+      oden_package_json::PackageJsonSideEffects::Bool(false) => Some(false),
+      oden_package_json::PackageJsonSideEffects::Patterns(patterns) => {
         let rel = file_path.strip_prefix(pkg_json.dir_path()).ok()?;
         let rel_str = rel.to_string_lossy().replace('\\', "/");
         for pattern in patterns {
@@ -1580,7 +1580,7 @@ fn side_effects_pattern_matches(pattern: &str, rel_path: &str) -> bool {
 }
 
 #[async_trait::async_trait(?Send)]
-impl esbuild_client::PluginHandler for DenoPluginHandler {
+impl esbuild_client::PluginHandler for OdenPluginHandler {
   async fn on_resolve(
     &self,
     args: esbuild_client::OnResolveArgs,
@@ -1592,8 +1592,8 @@ impl esbuild_client::PluginHandler for DenoPluginHandler {
     {
       return Ok(Some(esbuild_client::OnResolveResult {
         path: Some(args.path),
-        plugin_name: Some("deno".to_string()),
-        namespace: Some("deno".to_string()),
+        plugin_name: Some("oden".to_string()),
+        namespace: Some("oden".to_string()),
         ..Default::default()
       }));
     }
@@ -1604,7 +1604,7 @@ impl esbuild_client::PluginHandler for DenoPluginHandler {
       return Ok(Some(esbuild_client::OnResolveResult {
         external: Some(true),
         path: Some(args.path),
-        plugin_name: Some("deno".to_string()),
+        plugin_name: Some("oden".to_string()),
         plugin_data: None,
         ..Default::default()
       }));
@@ -1624,7 +1624,7 @@ impl esbuild_client::PluginHandler for DenoPluginHandler {
       return Ok(Some(esbuild_client::OnResolveResult {
         external: Some(true),
         path: Some(args.path),
-        plugin_name: Some("deno".to_string()),
+        plugin_name: Some("oden".to_string()),
         plugin_data: None,
         ..Default::default()
       }));
@@ -1647,15 +1647,15 @@ impl esbuild_client::PluginHandler for DenoPluginHandler {
         if let Some(orig) = browser_map_disabled_specifier(&e) {
           return Ok(Some(esbuild_client::OnResolveResult {
             path: Some(format!("{BROWSER_DISABLED_PREFIX}{orig}")),
-            namespace: Some("deno".into()),
-            plugin_name: Some("deno".to_string()),
+            namespace: Some("oden".into()),
+            plugin_name: Some("oden".to_string()),
             ..Default::default()
           }));
         }
         return Ok(Some(esbuild_client::OnResolveResult {
           errors: Some(vec![esbuild_client::protocol::PartialMessage {
             id: "deno_error".into(),
-            plugin_name: "deno".into(),
+            plugin_name: "oden".into(),
             text: e.to_string(),
             ..Default::default()
           }]),
@@ -1694,13 +1694,13 @@ impl esbuild_client::PluginHandler for DenoPluginHandler {
           || r.starts_with("http:")
           || r.starts_with("data:")
         {
-          Some("deno".into())
+          Some("oden".into())
         } else {
           None
         },
         external: Some(is_external),
         path: Some(r),
-        plugin_name: Some("deno".to_string()),
+        plugin_name: Some("oden".to_string()),
         plugin_data: None,
         side_effects,
         ..Default::default()
@@ -1742,11 +1742,11 @@ impl esbuild_client::PluginHandler for DenoPluginHandler {
         }
         return Ok(Some(esbuild_client::OnLoadResult {
           errors: Some(vec![esbuild_client::protocol::PartialMessage {
-            plugin_name: "deno".into(),
+            plugin_name: "oden".into(),
             text: e.to_string(),
             ..Default::default()
           }]),
-          plugin_name: Some("deno".to_string()),
+          plugin_name: Some("oden".to_string()),
           ..Default::default()
         }));
       }
@@ -1809,7 +1809,7 @@ pub struct BundleLoadError(pub Box<BundleLoadErrorKind>);
 pub enum BundleLoadErrorKind {
   #[class(inherit)]
   #[error(transparent)]
-  Fetch(#[from] deno_resolver::file_fetcher::FetchError),
+  Fetch(#[from] oden_resolver::file_fetcher::FetchError),
   #[class(inherit)]
   #[error(transparent)]
   LoadCodeSource(#[from] LoadCodeSourceError),
@@ -1818,7 +1818,7 @@ pub enum BundleLoadErrorKind {
   ResolveUrlOrPath(#[from] deno_path_util::ResolveUrlOrPathError),
   #[class(inherit)]
   #[error(transparent)]
-  Permission(#[from] deno_runtime::deno_permissions::PermissionCheckError),
+  Permission(#[from] oden_runtime::oden_permissions::PermissionCheckError),
   #[class(inherit)]
   #[error(transparent)]
   ResolveWithGraph(#[from] ResolveWithGraphError),
@@ -1848,7 +1848,7 @@ pub enum BundleLoadErrorKind {
   #[class(generic)]
   #[error("Emit parsed source helper error")]
   EmitParsedSourceHelperError(
-    #[from] deno_resolver::emit::EmitParsedSourceHelperError,
+    #[from] oden_resolver::emit::EmitParsedSourceHelperError,
   ),
 }
 
@@ -1877,12 +1877,12 @@ fn browser_map_disabled_specifier(error: &BundleError) -> Option<String> {
   let BundleErrorKind::Resolver(resolve_err) = error.as_kind() else {
     return None;
   };
-  let deno_resolver::graph::ResolveWithGraphErrorKind::Resolve(e) =
+  let oden_resolver::graph::ResolveWithGraphErrorKind::Resolve(e) =
     resolve_err.as_kind()
   else {
     return None;
   };
-  let deno_resolver::DenoResolveErrorKind::Node(node_err) = e.as_kind() else {
+  let oden_resolver::OdenResolveErrorKind::Node(node_err) = e.as_kind() else {
     return None;
   };
   let node_resolver::errors::NodeResolveErrorKind::BrowserMapDisabled(disabled) =
@@ -1910,9 +1910,9 @@ fn looks_like_bare_specifier(specifier: &str) -> bool {
 fn maybe_ignorable_resolution_error(
   error: &ResolveWithGraphError,
 ) -> Option<String> {
-  if let deno_resolver::graph::ResolveWithGraphErrorKind::Resolve(e) =
+  if let oden_resolver::graph::ResolveWithGraphErrorKind::Resolve(e) =
     error.as_kind()
-    && let deno_resolver::DenoResolveErrorKind::Node(node_err) = e.as_kind()
+    && let oden_resolver::OdenResolveErrorKind::Node(node_err) = e.as_kind()
     && let node_resolver::errors::NodeResolveErrorKind::PackageResolve(pkg_err) =
       node_err.as_kind()
     && let node_resolver::errors::PackageResolveErrorKind::PackageFolderResolve(
@@ -1923,7 +1923,7 @@ fn maybe_ignorable_resolution_error(
     ) = pkg_folder_err.as_kind()
   {
     Some(package_name.to_string())
-  } else if let deno_resolver::graph::ResolveWithGraphErrorKind::Resolution(
+  } else if let oden_resolver::graph::ResolveWithGraphErrorKind::Resolution(
     deno_graph::ResolutionError::ResolverError {
       error: resolve_error,
       specifier,
@@ -1944,7 +1944,7 @@ fn maybe_ignorable_resolution_error(
   }
 }
 
-impl DenoPluginHandler {
+impl OdenPluginHandler {
   async fn reload_specifiers(
     &self,
     specifiers: &[PathBuf],
@@ -2113,7 +2113,7 @@ impl DenoPluginHandler {
           permissions: self.permissions.clone(),
           file_permission_api_name: self
             .is_runtime_api
-            .then_some("Deno.bundle()"),
+            .then_some("Oden.bundle()"),
           ext_overwrite: None,
           allow_unknown_media_types: true,
           allow_sloppy_imports_hints_for_unreferenced_roots: true,
@@ -2127,9 +2127,9 @@ impl DenoPluginHandler {
     Ok(())
   }
 
-  /// When bundling via `Deno.bundle()`, reading a module returns its
+  /// When bundling via `Oden.bundle()`, reading a module returns its
   /// (transpiled) source to the calling program, so it must be gated on the
-  /// caller's permissions. `deno bundle` reads its inputs unchecked like the
+  /// caller's permissions. `oden bundle` reads its inputs unchecked like the
   /// other CLI subcommands, in which case this is a no-op.
   ///
   /// Graph preparation already performs the check before reading source. This
@@ -2141,20 +2141,20 @@ impl DenoPluginHandler {
     if self.is_runtime_api {
       if specifier.scheme() == "file" {
         let path = deno_path_util::url_to_file_path(specifier).map_err(|_| {
-          deno_runtime::deno_permissions::PermissionCheckError::InvalidFilePath(
+          oden_runtime::oden_permissions::PermissionCheckError::InvalidFilePath(
             specifier.clone(),
           )
         })?;
         let checked_path = self.permissions.check_open(
           Cow::Owned(path),
           OpenAccessKind::Read,
-          Some("Deno.bundle()"),
+          Some("Oden.bundle()"),
         )?;
         let checked_specifier = deno_path_util::url_from_file_path(
           &checked_path,
         )
         .map_err(|_| {
-          deno_runtime::deno_permissions::PermissionCheckError::InvalidFilePath(
+          oden_runtime::oden_permissions::PermissionCheckError::InvalidFilePath(
             specifier.clone(),
           )
         })?;
@@ -2643,7 +2643,7 @@ fn resolve_roots(
       Ok(v) => {
         let referrer = ModuleSpecifier::from_directory_path(cwd).unwrap();
         let package_folder = npm_resolver
-          .resolve_pkg_folder_from_deno_module_req(v.req(), &referrer)
+          .resolve_pkg_folder_from_oden_module_req(v.req(), &referrer)
           .unwrap();
         let Ok(node_resolver::BinValue::JsFile(main_module)) =
           node_resolver.resolve_binary_export(&package_folder, v.sub_path())
@@ -2666,7 +2666,7 @@ fn resolve_roots(
 async fn ensure_esbuild_downloaded(
   factory: &CliFactory,
 ) -> Result<PathBuf, AnyError> {
-  let deno_dir = factory.deno_dir()?;
+  let oden_dir = factory.oden_dir()?;
   let sys = factory.sys();
 
   // Esbuild is an implementation detail of the bundler, so resolve its
@@ -2679,7 +2679,7 @@ async fn ensure_esbuild_downloaded(
   let link_packages = WorkspaceNpmLinkPackagesRc::default();
 
   let esbuild_path = esbuild::ensure_esbuild(
-    deno_dir,
+    oden_dir,
     &npmrc,
     npm_cache_services.registry_info_provider(),
     &link_packages,
@@ -2740,10 +2740,10 @@ fn configure_esbuild_flags(
     builder.metafile(true);
   }
   match bundle_flags.platform {
-    deno_bundle_runtime::BundlePlatform::Browser => {
+    oden_bundle_runtime::BundlePlatform::Browser => {
       builder.platform(esbuild_client::Platform::Browser);
     }
-    deno_bundle_runtime::BundlePlatform::Deno => {}
+    oden_bundle_runtime::BundlePlatform::Oden => {}
   }
 
   builder.build()
@@ -2833,8 +2833,8 @@ pub fn maybe_process_contents(
   let is_js = is_js(path) || path.ends_with("<stdout>");
   if is_js {
     let string = str::from_utf8(&file.contents)?;
-    // The `createRequire` shim is Deno-specific (it injects an import from
-    // `node:module`), so it is only applied for the Deno platform. The CJS
+    // The `createRequire` shim is Oden-specific (it injects an import from
+    // `node:module`), so it is only applied for the Oden platform. The CJS
     // interop fix-up below is platform-independent and always runs.
     let string = if should_replace_require_shim {
       replace_require_shim(string, minified)
@@ -2924,7 +2924,7 @@ pub fn collect_output_files<'a>(
   } = input
   {
     let outdir = outdir.ok_or_else(|| {
-      deno_core::anyhow::anyhow!(
+      oden_core::anyhow::anyhow!(
         "--outdir is required when bundling HTML entrypoints",
       )
     })?;
@@ -2963,7 +2963,7 @@ pub fn process_result(
       .unwrap_or_else(|| Cow::Borrowed(file.contents.as_ref()));
 
     if file.path.ends_with("<stdout>") {
-      deno_print::drop_write_stdout(bytes.as_ref());
+      oden_print::drop_write_stdout(bytes.as_ref());
       continue;
     }
 
@@ -2972,7 +2972,7 @@ pub fn process_result(
         permissions.check_open(
           Cow::Owned(path.to_path_buf()),
           OpenAccessKind::Write,
-          Some("Deno.bundle()"),
+          Some("Oden.bundle()"),
         )
       })
       .transpose()?;
@@ -2987,7 +2987,7 @@ pub fn process_result(
             permissions.check_open(
               Cow::Owned(parent.to_path_buf()),
               OpenAccessKind::WriteNoFollow,
-              Some("Deno.bundle()"),
+              Some("Oden.bundle()"),
             )
           })
           .transpose()?;
@@ -3053,7 +3053,7 @@ fn print_finished_message(
 
 #[cfg(test)]
 mod entrypoint_tests {
-  use deno_core::url::Url;
+  use oden_core::url::Url;
 
   use super::is_html_entrypoint;
 

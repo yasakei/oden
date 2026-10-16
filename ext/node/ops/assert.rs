@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use deno_ast::MediaType;
 use deno_ast::TokenOrComment;
 use deno_ast::swc::parser::token::Token;
 use deno_ast::swc::parser::token::Word;
-use deno_core::op2;
-use deno_core::v8;
+use oden_core::op2;
+use oden_core::v8;
 use deno_error::JsErrorBox;
 
 #[op2]

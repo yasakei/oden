@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 
-use deno_cache_dir::npm::mixed_case_package_name_decode;
-use deno_cache_dir::npm::mixed_case_package_name_encode;
-use deno_npm::NpmPackageCacheFolderId;
+use oden_cache_dir::npm::mixed_case_package_name_decode;
+use oden_cache_dir::npm::mixed_case_package_name_encode;
+use oden_npm::NpmPackageCacheFolderId;
 use deno_semver::StackString;
 use deno_semver::package::PackageNv;
 
@@ -27,7 +27,7 @@ pub fn get_package_folder_id_folder_name_from_parts(
   } else {
     Cow::Owned(format!("_{}", copy_index))
   };
-  let name = normalize_pkg_name_for_node_modules_deno_folder(&nv.name);
+  let name = normalize_pkg_name_for_node_modules_oden_folder(&nv.name);
   format!("{}@{}{}", name, nv.version, copy_str)
 }
 
@@ -55,8 +55,8 @@ pub fn get_package_folder_id_from_folder_name(
   })
 }
 
-/// Normalizes a package name for use at `node_modules/.deno/<pkg-name>@<version>[_<copy_index>]`
-pub fn normalize_pkg_name_for_node_modules_deno_folder(
+/// Normalizes a package name for use at `node_modules/.oden/<pkg-name>@<version>[_<copy_index>]`
+pub fn normalize_pkg_name_for_node_modules_oden_folder(
   name: &str,
 ) -> Cow<'_, str> {
   let name = if name.to_lowercase() == name {
@@ -73,7 +73,7 @@ pub fn normalize_pkg_name_for_node_modules_deno_folder(
 
 #[cfg(test)]
 mod test {
-  use deno_npm::NpmPackageCacheFolderId;
+  use oden_npm::NpmPackageCacheFolderId;
   use deno_semver::package::PackageNv;
 
   use super::*;

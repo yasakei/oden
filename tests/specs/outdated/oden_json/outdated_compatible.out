@@ -1,0 +1,10 @@
+┌──────────────────────────────────┬─────────┬────────┬────────┐
+│ Package                          │ Current │ Update │ Latest │
+├──────────────────────────────────┼─────────┼────────┼────────┤
+│ jsr:@odentest/add                │ 0.2.0   │ 0.2.1  │ 1.0.0  │
+├──────────────────────────────────┼─────────┼────────┼────────┤
+│ npm:@odentest/has-patch-versions │ 0.1.0   │ 0.1.1  │ 0.2.0  │
+└──────────────────────────────────┴─────────┴────────┴────────┘
+
+Run oden update to update to the latest compatible versions,
+or oden outdated --help for more information.

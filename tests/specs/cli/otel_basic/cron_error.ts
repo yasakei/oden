@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-Deno.env.set("DENO_CRON_TEST_SCHEDULE_OFFSET", "100");
+Oden.env.set("ODEN_CRON_TEST_SCHEDULE_OFFSET", "100");
 
 let count = 0;
 const { promise, resolve } = Promise.withResolvers<void>();
 const ac = new AbortController();
 
-const c = Deno.cron(
+const c = Oden.cron(
   "test-cron-error",
   "*/20 * * * *",
   { signal: ac.signal },

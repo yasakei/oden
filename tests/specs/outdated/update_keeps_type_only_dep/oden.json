@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "@odentest/type-only-jsr-dep": "jsr:@odentest/type-only-jsr-dep@^1.0.0"
+  }
+}

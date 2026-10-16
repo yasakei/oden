@@ -1,0 +1,8 @@
+{
+  "name": "@odentest/multiple-arch-deps",
+  "version": "1.0.0",
+  "optionalDependencies": {
+    "@odentest/multiple-arches-win32-x64": "1.0.0",
+    "@odentest/multiple-arches-win32-arm64": "1.0.0"
+  }
+}

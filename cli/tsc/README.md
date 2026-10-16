@@ -13,8 +13,8 @@ It works like this currently:
 1. Add Microsoft/TypeScript as a remote and fetch its latest tags
 1. Checkout a new branch based on this tag.
 1. Cherry pick the custom commit we made in a previous release to the new one.
-1. This commit has a "deno.ts" file in it. Read the instructions in it.
-1. Copy typescript.js into Deno repo.
+1. This commit has a "oden.ts" file in it. Read the instructions in it.
+1. Copy typescript.js into Oden repo.
 1. Copy d.ts files into dts directory.
 1. Review the copied files, removing and reverting what's necessary
 
@@ -30,6 +30,6 @@ git checkout -b branch_v3.9.7
 git cherry pick <previous-release-branch-commit-we-did>
 npm install
 npx hereby
-rsync built/local/typescript.js ~/src/deno/cli/tsc/00_typescript.js
-rsync --exclude=protocol.d.ts --exclude=tsserverlibrary.d.ts --exclude=typescriptServices.d.ts built/local/*.d.ts ~/src/deno/cli/tsc/dts/
+rsync built/local/typescript.js ~/src/oden/cli/tsc/00_typescript.js
+rsync --exclude=protocol.d.ts --exclude=tsserverlibrary.d.ts --exclude=typescriptServices.d.ts built/local/*.d.ts ~/src/oden/cli/tsc/dts/
 ```

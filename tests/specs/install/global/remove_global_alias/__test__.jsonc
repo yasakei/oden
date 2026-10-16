@@ -2,11 +2,11 @@
   "tempDir": true,
   "steps": [
     {
-      "args": "install --global --root ./bins --name deno-test-bin ./main.js",
+      "args": "install --global --root ./bins --name oden-test-bin ./main.js",
       "output": "install.out"
     },
     {
-      "args": "remove --global --root ./bins deno-test-bin",
+      "args": "remove --global --root ./bins oden-test-bin",
       "output": "remove.out"
     },
     {

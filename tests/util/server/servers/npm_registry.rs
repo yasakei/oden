@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::convert::Infallible;
 use std::future::Future;
@@ -54,11 +54,11 @@ pub fn public_npm_jsr_registry(port: u16) -> Vec<LocalBoxFuture<'static, ()>> {
 const PRIVATE_NPM_REGISTRY_AUTH_TOKEN: &str = "private-reg-token";
 const PRIVATE_NPM_REGISTRY_2_AUTH_TOKEN: &str = "private-reg-token2";
 
-// `deno:land` encoded using base64
+// `oden:land` encoded using base64
 const PRIVATE_NPM_REGISTRY_AUTH_BASE64: &str = "ZGVubzpsYW5k";
-// `deno@test.com:land` encoded using base64
+// `oden@test.com:land` encoded using base64
 const PRIVATE_NPM_REGISTRY_AUTH_EMAIL_BASE64: &str = "ZGVub0B0ZXN0LmNvbTpsYW5k";
-// `deno:land2` encoded using base64
+// `oden:land2` encoded using base64
 const PRIVATE_NPM_REGISTRY_2_AUTH_BASE64: &str = "ZGVubzpsYW5kMg==";
 
 pub fn private_npm_registry1(port: u16) -> Vec<LocalBoxFuture<'static, ()>> {
@@ -214,7 +214,7 @@ async fn private_npm_registry3_handler(
   // npm client (via the `Accept: application/vnd.npm.install-v1+json` header)
   // and otherwise redirects to the public npm registry, which doesn't have the
   // private package and 404s. This reproduces the behaviour from
-  // https://github.com/denoland/deno/issues/31924 where `deno outdated` dropped
+  // https://github.com/denoland/deno/issues/31924 where `oden outdated` dropped
   // the package because it fetched metadata with `Accept: */*`.
   let uri_path = req.uri().path();
   let is_metadata = !uri_path.ends_with(".tgz");
@@ -416,7 +416,7 @@ fn handle_custom_npm_registry_path(
 fn should_download_npm_packages() -> bool {
   // when this env var is set, it will download and save npm packages
   // to the tests/registry/npm directory
-  std::env::var("DENO_TEST_UTIL_UPDATE_NPM") == Ok("1".to_string())
+  std::env::var("ODEN_TEST_UTIL_UPDATE_NPM") == Ok("1".to_string())
 }
 
 async fn try_serve_npm_registry(
@@ -428,7 +428,7 @@ async fn try_serve_npm_registry(
   if let Some((scope_name, package_name_with_path)) = test_npm_registry
     .get_test_scope_and_package_name_with_path_from_uri_path(uri_path)
   {
-    // serve all requests to the `DENOTEST_SCOPE_NAME` or `DENOTEST2_SCOPE_NAME`
+    // serve all requests to the `ODENTEST_SCOPE_NAME` or `ODENTEST2_SCOPE_NAME`
     // using the file system at that path
     match handle_custom_npm_registry_path(
       scope_name,
@@ -663,21 +663,21 @@ fn process_npm_security_advisories_bulk_body(
 
   let mut response = serde_json::Map::new();
 
-  if package_names.contains(&"@denotest/with-vuln1".to_string()) {
+  if package_names.contains(&"@odentest/with-vuln1".to_string()) {
     response.insert(
-      "@denotest/with-vuln1".to_string(),
+      "@odentest/with-vuln1".to_string(),
       json!([get_advisory_for_with_vuln1()]),
     );
   }
-  if package_names.contains(&"@denotest/with-vuln2".to_string()) {
+  if package_names.contains(&"@odentest/with-vuln2".to_string()) {
     response.insert(
-      "@denotest/with-vuln2".to_string(),
+      "@odentest/with-vuln2".to_string(),
       json!([get_advisory_for_with_vuln2()]),
     );
   }
-  if package_names.contains(&"@denotest/with-vuln3".to_string()) {
+  if package_names.contains(&"@odentest/with-vuln3".to_string()) {
     response.insert(
-      "@denotest/with-vuln3".to_string(),
+      "@odentest/with-vuln3".to_string(),
       json!([get_advisory_for_with_vuln3()]),
     );
   }
@@ -688,7 +688,7 @@ fn process_npm_security_advisories_bulk_body(
 fn get_advisory_for_with_vuln1() -> serde_json::Value {
   json!({
     "url": "https://example.com/vuln/101010",
-    "title": "@denotest/with-vuln1 is susceptible to prototype pollution",
+    "title": "@odentest/with-vuln1 is susceptible to prototype pollution",
     "severity": "high",
     "vulnerable_versions": "<1.1.0",
     "patched_versions": ">=1.1.0",
@@ -700,7 +700,7 @@ fn get_advisory_for_with_vuln1() -> serde_json::Value {
 fn get_advisory_for_with_vuln2() -> serde_json::Value {
   json!({
     "url": "https://example.com/vuln/202020",
-    "title": "@denotest/with-vuln2 can steal crypto keys",
+    "title": "@odentest/with-vuln2 can steal crypto keys",
     "severity": "critical",
     "vulnerable_versions": "<2.0.0",
     "patched_versions": ">=2.0.0",
@@ -712,7 +712,7 @@ fn get_advisory_for_with_vuln2() -> serde_json::Value {
 fn get_advisory_for_with_vuln3() -> serde_json::Value {
   json!({
     "url": "https://example.com/vuln/303030",
-    "title": "@denotest/with-vuln3 has security vulnerability",
+    "title": "@odentest/with-vuln3 has security vulnerability",
     "severity": "high",
     "vulnerable_versions": "<1.1.0",
     "patched_versions": ">=1.1.0",

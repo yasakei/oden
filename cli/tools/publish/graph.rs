@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashSet;
 use std::sync::Arc;
@@ -7,13 +7,13 @@ use deno_ast::ParsedSource;
 use deno_ast::SourceRangedForSpanned;
 use deno_ast::SourceTextInfo;
 use deno_ast::swc::common::comments::CommentKind;
-use deno_core::error::AnyError;
-use deno_core::url::Url;
+use oden_core::error::AnyError;
+use oden_core::url::Url;
 use deno_graph::ModuleEntryRef;
 use deno_graph::ModuleGraph;
 use deno_graph::ResolutionResolved;
 use deno_graph::WalkOptions;
-use deno_resolver::cache::ParsedSourceCache;
+use oden_resolver::cache::ParsedSourceCache;
 use deno_semver::jsr::JsrPackageReqReference;
 use deno_semver::npm::NpmPackageReqReference;
 
@@ -88,7 +88,7 @@ impl GraphDiagnosticsCollector {
                 let maybe_version =
                   self.npm_resolver.as_managed().and_then(|managed| {
                     managed
-                      .resolve_pkg_id_from_deno_module_req(npm_req_ref.req())
+                      .resolve_pkg_id_from_oden_module_req(npm_req_ref.req())
                       .ok()
                       .map(|id| id.nv.version.clone())
                   });

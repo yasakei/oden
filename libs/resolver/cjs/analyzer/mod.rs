@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::collections::BTreeMap;
 
 use deno_error::JsErrorBox;
-use deno_maybe_sync::MaybeDashMap;
-use deno_maybe_sync::MaybeSend;
-use deno_maybe_sync::MaybeSync;
+use oden_maybe_sync::MaybeDashMap;
+use oden_maybe_sync::MaybeSend;
+use oden_maybe_sync::MaybeSync;
 use deno_media_type::MediaType;
 use node_resolver::analyze::CjsAnalysis as ExtNodeCjsAnalysis;
 use node_resolver::analyze::CjsAnalysisExports;
@@ -18,13 +18,13 @@ use serde::Serialize;
 use url::Url;
 
 use super::CjsTrackerRc;
-use crate::npm::DenoInNpmPackageChecker;
+use crate::npm::OdenInNpmPackageChecker;
 
 #[cfg(feature = "deno_ast")]
-mod deno_ast;
+mod oden_ast;
 
 #[cfg(feature = "deno_ast")]
-pub use deno_ast::DenoAstModuleExportAnalyzer;
+pub use oden_ast::OdenAstModuleExportAnalyzer;
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct ModuleExportsAndReExports {
@@ -46,7 +46,7 @@ pub struct MemberReExport {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub enum DenoCjsAnalysis {
+pub enum OdenCjsAnalysis {
   /// The module was found to be an ES module.
   Esm,
   /// The module was found to be an ES module and
@@ -60,7 +60,7 @@ pub enum DenoCjsAnalysis {
 pub struct NodeAnalysisCacheSourceHash(pub u64);
 
 #[allow(clippy::disallowed_types, reason = "definition")]
-pub type NodeAnalysisCacheRc = deno_maybe_sync::MaybeArc<dyn NodeAnalysisCache>;
+pub type NodeAnalysisCacheRc = oden_maybe_sync::MaybeArc<dyn NodeAnalysisCache>;
 
 pub trait NodeAnalysisCache: MaybeSend + MaybeSync {
   fn compute_source_hash(&self, source: &str) -> NodeAnalysisCacheSourceHash;
@@ -68,12 +68,12 @@ pub trait NodeAnalysisCache: MaybeSend + MaybeSync {
     &self,
     specifier: &Url,
     source_hash: NodeAnalysisCacheSourceHash,
-  ) -> Option<DenoCjsAnalysis>;
+  ) -> Option<OdenCjsAnalysis>;
   fn set_cjs_analysis(
     &self,
     specifier: &Url,
     source_hash: NodeAnalysisCacheSourceHash,
-    analysis: &DenoCjsAnalysis,
+    analysis: &OdenCjsAnalysis,
   );
 }
 
@@ -88,7 +88,7 @@ impl NodeAnalysisCache for NullNodeAnalysisCache {
     &self,
     _specifier: &Url,
     _source_hash: NodeAnalysisCacheSourceHash,
-  ) -> Option<DenoCjsAnalysis> {
+  ) -> Option<OdenCjsAnalysis> {
     None
   }
 
@@ -96,13 +96,13 @@ impl NodeAnalysisCache for NullNodeAnalysisCache {
     &self,
     _specifier: &Url,
     _source_hash: NodeAnalysisCacheSourceHash,
-    _analysis: &DenoCjsAnalysis,
+    _analysis: &OdenCjsAnalysis,
   ) {
   }
 }
 
 #[sys_traits::auto_impl]
-pub trait DenoCjsCodeAnalyzerSys:
+pub trait OdenCjsCodeAnalyzerSys:
   sys_traits::FsRead + sys_traits::FsMetadata + MaybeSend + MaybeSync + 'static
 {
 }
@@ -123,7 +123,7 @@ pub trait ModuleForExportAnalysis {
 
 #[allow(clippy::disallowed_types, reason = "definition")]
 pub type ModuleExportAnalyzerRc =
-  deno_maybe_sync::MaybeArc<dyn ModuleExportAnalyzer>;
+  oden_maybe_sync::MaybeArc<dyn ModuleExportAnalyzer>;
 
 #[allow(
   clippy::disallowed_types,
@@ -155,14 +155,14 @@ impl ModuleExportAnalyzer for NotImplementedModuleExportAnalyzer {
 }
 
 #[allow(clippy::disallowed_types, reason = "definition")]
-pub type DenoCjsCodeAnalyzerRc<TSys> =
-  deno_maybe_sync::MaybeArc<DenoCjsCodeAnalyzer<TSys>>;
+pub type OdenCjsCodeAnalyzerRc<TSys> =
+  oden_maybe_sync::MaybeArc<OdenCjsCodeAnalyzer<TSys>>;
 
 type MemberPropsMap = BTreeMap<String, Vec<String>>;
 
 #[allow(clippy::disallowed_types, reason = "definition")]
-type MemberPropsCache = deno_maybe_sync::MaybeArc<
-  MaybeDashMap<(Url, u64), deno_maybe_sync::MaybeArc<MemberPropsMap>>,
+type MemberPropsCache = oden_maybe_sync::MaybeArc<
+  MaybeDashMap<(Url, u64), oden_maybe_sync::MaybeArc<MemberPropsMap>>,
 >;
 
 /// Whether a source should skip CJS export analysis (treated as ESM) instead of
@@ -198,9 +198,9 @@ fn should_skip_cjs_analysis(media_type: MediaType, source: &str) -> bool {
   is_definitely_non_script || (media_type == MediaType::Unknown && looks_binary)
 }
 
-pub struct DenoCjsCodeAnalyzer<TSys: DenoCjsCodeAnalyzerSys> {
+pub struct OdenCjsCodeAnalyzer<TSys: OdenCjsCodeAnalyzerSys> {
   cache: NodeAnalysisCacheRc,
-  cjs_tracker: CjsTrackerRc<DenoInNpmPackageChecker, TSys>,
+  cjs_tracker: CjsTrackerRc<OdenInNpmPackageChecker, TSys>,
   module_export_analyzer: ModuleExportAnalyzerRc,
   /// Memoizes the per-member property map keyed by `(specifier,
   /// source_hash)`. Built once per inner module so that repeated
@@ -210,10 +210,10 @@ pub struct DenoCjsCodeAnalyzer<TSys: DenoCjsCodeAnalyzerSys> {
   member_props_cache: MemberPropsCache,
 }
 
-impl<TSys: DenoCjsCodeAnalyzerSys> DenoCjsCodeAnalyzer<TSys> {
+impl<TSys: OdenCjsCodeAnalyzerSys> OdenCjsCodeAnalyzer<TSys> {
   pub fn new(
     cache: NodeAnalysisCacheRc,
-    cjs_tracker: CjsTrackerRc<DenoInNpmPackageChecker, TSys>,
+    cjs_tracker: CjsTrackerRc<OdenInNpmPackageChecker, TSys>,
     module_export_analyzer: ModuleExportAnalyzerRc,
   ) -> Self {
     Self {
@@ -229,7 +229,7 @@ impl<TSys: DenoCjsCodeAnalyzerSys> DenoCjsCodeAnalyzer<TSys> {
     specifier: &Url,
     source: &str,
     esm_analysis_mode: EsmAnalysisMode,
-  ) -> Result<DenoCjsAnalysis, JsErrorBox> {
+  ) -> Result<OdenCjsAnalysis, JsErrorBox> {
     let source = source.strip_prefix('\u{FEFF}').unwrap_or(source); // strip BOM
     let source_hash = self.cache.compute_source_hash(source);
     if let Some(analysis) = self.cache.get_cjs_analysis(specifier, source_hash)
@@ -239,11 +239,11 @@ impl<TSys: DenoCjsCodeAnalyzerSys> DenoCjsCodeAnalyzer<TSys> {
 
     let media_type = MediaType::from_specifier(specifier);
     if media_type == MediaType::Json {
-      return Ok(DenoCjsAnalysis::Cjs(Default::default()));
+      return Ok(OdenCjsAnalysis::Cjs(Default::default()));
     }
 
     if should_skip_cjs_analysis(media_type, source) {
-      return Ok(DenoCjsAnalysis::Esm);
+      return Ok(OdenCjsAnalysis::Esm);
     }
 
     let cjs_tracker = self.cjs_tracker.clone();
@@ -272,12 +272,12 @@ impl<TSys: DenoCjsCodeAnalyzerSys> DenoCjsCodeAnalyzer<TSys> {
               .map_err(JsErrorBox::from_err)?;
           if is_cjs {
             let analysis = parsed_source.analyze_cjs();
-            Ok(DenoCjsAnalysis::Cjs(analysis))
+            Ok(OdenCjsAnalysis::Cjs(analysis))
           } else {
             match esm_analysis_mode {
-              EsmAnalysisMode::SourceOnly => Ok(DenoCjsAnalysis::Esm),
+              EsmAnalysisMode::SourceOnly => Ok(OdenCjsAnalysis::Esm),
               EsmAnalysisMode::SourceImportsAndExports => {
-                Ok(DenoCjsAnalysis::EsmAnalysis(
+                Ok(OdenCjsAnalysis::EsmAnalysis(
                   parsed_source.analyze_es_runtime_exports(),
                 ))
               }
@@ -293,7 +293,7 @@ impl<TSys: DenoCjsCodeAnalyzerSys> DenoCjsCodeAnalyzer<TSys> {
       #[cfg(not(feature = "sync"))]
       analyze()?
     } else {
-      DenoCjsAnalysis::Esm
+      OdenCjsAnalysis::Esm
     };
 
     self
@@ -305,8 +305,8 @@ impl<TSys: DenoCjsCodeAnalyzerSys> DenoCjsCodeAnalyzer<TSys> {
 }
 
 #[async_trait::async_trait(?Send)]
-impl<TSys: DenoCjsCodeAnalyzerSys> CjsCodeAnalyzer
-  for DenoCjsCodeAnalyzer<TSys>
+impl<TSys: OdenCjsCodeAnalyzerSys> CjsCodeAnalyzer
+  for OdenCjsCodeAnalyzer<TSys>
 {
   async fn analyze_cjs<'a>(
     &self,
@@ -327,12 +327,12 @@ impl<TSys: DenoCjsCodeAnalyzerSys> CjsCodeAnalyzer
       .inner_cjs_analysis(specifier, &source, esm_analysis_mode)
       .await?;
     match analysis {
-      DenoCjsAnalysis::Esm => Ok(ExtNodeCjsAnalysis::Esm(source, None)),
-      DenoCjsAnalysis::EsmAnalysis(analysis) => Ok(ExtNodeCjsAnalysis::Esm(
+      OdenCjsAnalysis::Esm => Ok(ExtNodeCjsAnalysis::Esm(source, None)),
+      OdenCjsAnalysis::EsmAnalysis(analysis) => Ok(ExtNodeCjsAnalysis::Esm(
         source,
         Some(to_ext_cjs_analysis_exports(analysis)),
       )),
-      DenoCjsAnalysis::Cjs(analysis) => Ok(ExtNodeCjsAnalysis::Cjs(
+      OdenCjsAnalysis::Cjs(analysis) => Ok(ExtNodeCjsAnalysis::Cjs(
         to_ext_cjs_analysis_exports(analysis),
       )),
     }
@@ -382,7 +382,7 @@ impl<TSys: DenoCjsCodeAnalyzerSys> CjsCodeAnalyzer
     let map = analyze()?;
 
     #[allow(clippy::disallowed_types, reason = "definition")]
-    let map = deno_maybe_sync::MaybeArc::new(map);
+    let map = oden_maybe_sync::MaybeArc::new(map);
     let result = map.get(member).cloned();
     self.member_props_cache.insert(cache_key, map);
     Ok(result)

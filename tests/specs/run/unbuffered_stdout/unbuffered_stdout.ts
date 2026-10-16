@@ -1,1 +1,1 @@
-Deno.stdout.write(new TextEncoder().encode("a"));
+Oden.stdout.write(new TextEncoder().encode("a"));

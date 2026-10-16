@@ -1,1 +1,1 @@
-console.log(Deno.readTextFileSync(import.meta.dirname + "/file.txt"));
+console.log(Oden.readTextFileSync(import.meta.dirname + "/file.txt"));

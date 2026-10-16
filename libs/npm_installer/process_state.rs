@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::ffi::OsStr;
 use std::ffi::OsString;
@@ -8,14 +8,14 @@ use std::io::Seek;
 use std::path::Path;
 use std::path::PathBuf;
 
-use deno_npm::resolution::ValidSerializedNpmResolutionSnapshot;
+use oden_npm::resolution::ValidSerializedNpmResolutionSnapshot;
 use serde::Deserialize;
 use serde::Serialize;
 use sys_traits::BoxableFsFile;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum NpmProcessStateKind {
-  Snapshot(deno_npm::resolution::SerializedNpmResolutionSnapshot),
+  Snapshot(oden_npm::resolution::SerializedNpmResolutionSnapshot),
   Byonm,
 }
 
@@ -26,8 +26,8 @@ pub trait NpmProcessStateFromEnvVarSys:
 }
 
 /// The serialized npm process state which can be written to a file and then
-/// the FD or path can be passed to a spawned deno process via the
-/// `DENO_DONT_USE_INTERNAL_NODE_COMPAT_STATE_FD` env var.
+/// the FD or path can be passed to a spawned oden process via the
+/// `ODEN_DONT_USE_INTERNAL_NODE_COMPAT_STATE_FD` env var.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct NpmProcessState {
   pub kind: NpmProcessStateKind,

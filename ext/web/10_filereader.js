@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // @ts-check
 /// <reference no-default-lib="true" />
-/// <reference path="../../core/lib.deno_core.d.ts" />
+/// <reference path="../../core/lib.oden_core.d.ts" />
 /// <reference path="../../core/internal.d.ts" />
 /// <reference path="../webidl/internal.d.ts" />
 /// <reference path="../web/internal.d.ts" />
-/// <reference path="../../cli/tsc/dts/lib.deno_web.d.ts" />
+/// <reference path="../../cli/tsc/dts/lib.oden_web.d.ts" />
 /// <reference path="./internal.d.ts" />
 /// <reference lib="esnext" />
 
@@ -33,22 +33,22 @@ const {
   Uint8Array,
 } = primordials;
 
-const webidl = core.loadExtScript("ext:deno_webidl/00_webidl.js");
+const webidl = core.loadExtScript("ext:oden_webidl/00_webidl.js");
 const { createFilteredInspectProxy } = core.loadExtScript(
-  "ext:deno_web/01_console.js",
+  "ext:oden_web/01_console.js",
 );
 const { forgivingBase64Encode } = core.loadExtScript(
-  "ext:deno_web/00_infra.js",
+  "ext:oden_web/00_infra.js",
 );
 const { EventTarget, ProgressEvent } = core.loadExtScript(
-  "ext:deno_web/02_event.js",
+  "ext:oden_web/02_event.js",
 );
 const { decode, TextDecoder } = core.loadExtScript(
-  "ext:deno_web/08_text_encoding.js",
+  "ext:oden_web/08_text_encoding.js",
 );
-const { parseMimeType } = core.loadExtScript("ext:deno_web/01_mimesniff.js");
-const { DOMException } = core.loadExtScript("ext:deno_web/01_dom_exception.js");
-const { setTimeout } = core.loadExtScript("ext:deno_web/02_timers.js");
+const { parseMimeType } = core.loadExtScript("ext:oden_web/01_mimesniff.js");
+const { DOMException } = core.loadExtScript("ext:oden_web/01_dom_exception.js");
+const { setTimeout } = core.loadExtScript("ext:oden_web/02_timers.js");
 
 const state = Symbol("[[state]]");
 const result = Symbol("[[result]]");
@@ -458,7 +458,7 @@ class FileReader extends EventTarget {
     this.#setEventHandlerFor("abort", value);
   }
 
-  [SymbolFor("Deno.privateCustomInspect")](inspect, inspectOptions) {
+  [SymbolFor("Oden.privateCustomInspect")](inspect, inspectOptions) {
     return inspect(
       createFilteredInspectProxy({
         object: this,

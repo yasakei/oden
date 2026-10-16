@@ -1,0 +1,6 @@
+{
+  "tasks": {
+    "output": "oden eval 'console.log(1)'",
+    "other": "oden eval 'console.log(2)'"
+  }
+}

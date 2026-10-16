@@ -12,7 +12,7 @@
     "bare_specifier": {
       "steps": [
         {
-          "args": "info --quiet @denotest/esm-basic",
+          "args": "info --quiet @odentest/esm-basic",
           "output": "info_bare.out"
         }
       ]

@@ -1,0 +1,8 @@
+{
+  "tests": {
+    "oden_style_exec_argv": {
+      "args": "run -A --unstable-detect-cjs main.js",
+      "output": "main.out"
+    }
+  }
+}

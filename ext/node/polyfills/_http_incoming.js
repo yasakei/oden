@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -36,7 +36,7 @@ const {
 } = primordials;
 
 import { finished, Readable } from "node:stream";
-const { nextTick } = core.loadExtScript("ext:deno_node/_next_tick.ts");
+const { nextTick } = core.loadExtScript("ext:oden_node/_next_tick.ts");
 
 const kHeaders = Symbol("kHeaders");
 const kHeadersDistinct = Symbol("kHeadersDistinct");

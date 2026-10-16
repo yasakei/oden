@@ -1,0 +1,7 @@
+{
+  "nodeModulesDir": "manual",
+  "imports": {
+    "add": "jsr:@odentest/add@^1.0.0",
+    "esm-basic": "npm:@odentest/esm-basic@^1.0.0"
+  }
+}

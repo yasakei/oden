@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Regression test for https://github.com/denoland/deno/issues/20464
 // Opening a KV, attaching listenQueue() without await, and then hitting an
@@ -7,7 +7,7 @@
 // against the dropped SQLite connection. The error path must now unwind
 // cleanly: surface the JS error, exit non-zero, no panic.
 
-const kv = await Deno.openKv(":memory:");
+const kv = await Oden.openKv(":memory:");
 kv.listenQueue(() => {});
 console.log("Listening for messages...");
 

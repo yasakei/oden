@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 use std::rc::Rc;
 use std::sync::Arc;
 
-use deno_package_json::parse_jsr_dep_value;
+use oden_package_json::parse_jsr_dep_value;
 use deno_semver::StackString;
 use deno_semver::Version;
 use deno_semver::VersionReq;

@@ -1,6 +1,6 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_core::v8;
+use oden_core::v8;
 
 pub(crate) fn v8_string_to_utf8_bytes<'s>(
   scope: &mut v8::PinScope<'s, '_>,

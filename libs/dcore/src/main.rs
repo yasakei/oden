@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![allow(clippy::print_stdout, reason = "example code")]
 #![allow(clippy::print_stderr, reason = "example code")]
@@ -9,9 +9,9 @@ use std::sync::Arc;
 
 use anyhow::Context;
 use anyhow::bail;
-use deno_core::RuntimeOptions;
-use deno_core::anyhow::Error;
-use deno_core_testing::create_runtime_from_snapshot;
+use oden_core::RuntimeOptions;
+use oden_core::anyhow::Error;
+use oden_core_testing::create_runtime_from_snapshot;
 
 static SNAPSHOT: &[u8] =
   include_bytes!(concat!(env!("OUT_DIR"), "/SNAPSHOT.bin"));
@@ -23,7 +23,7 @@ use crate::metrics::create_metrics;
 
 fn main() -> Result<(), Error> {
   eprintln!(
-    "🛑 deno_core binary is meant for development and testing purposes."
+    "🛑 oden_core binary is meant for development and testing purposes."
   );
 
   let args = match Args::parse(std::env::args().skip(1)) {
@@ -64,7 +64,7 @@ fn main() -> Result<(), Error> {
         create_metrics(args.strace_ops, args.strace_ops_summary);
 
       let (runtime, worker_host_side) =
-        deno_core_testing::create_runtime_from_snapshot_with_options(
+        oden_core_testing::create_runtime_from_snapshot_with_options(
           SNAPSHOT,
           inspector_server.is_some(),
           None,
@@ -88,14 +88,14 @@ fn main() -> Result<(), Error> {
   js_runtime
     .op_state()
     .borrow_mut()
-    .put(deno_core::error::InitialCwd(Arc::new(
-      deno_core::url::Url::from_directory_path(
+    .put(oden_core::error::InitialCwd(Arc::new(
+      oden_core::url::Url::from_directory_path(
         std::env::current_dir().context("Unable to get CWD")?,
       )
       .unwrap(),
     )));
 
-  let main_module: deno_core::url::Url = deno_core::resolve_path(
+  let main_module: oden_core::url::Url = oden_core::resolve_path(
     &file_path,
     &std::env::current_dir().context("Unable to get CWD")?,
   )?;
@@ -282,7 +282,7 @@ fn init_v8_flags(v8_flags: &[String]) {
     .any(|flag| flag == "-help" || flag == "--help");
   // Keep in sync with `standalone.rs`.
   let v8_flags = construct_v8_flags(v8_flags, env_v8_flags);
-  let unrecognized_v8_flags = deno_core::v8_set_flags(v8_flags)
+  let unrecognized_v8_flags = oden_core::v8_set_flags(v8_flags)
     .into_iter()
     .skip(1)
     .collect::<Vec<_>>();

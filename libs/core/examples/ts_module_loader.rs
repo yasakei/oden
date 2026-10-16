@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 //! This example shows how to use swc to transpile TypeScript and JSX/TSX
 //! modules.
 //!
-//! It will only transpile, not typecheck (like Deno's `--no-check` flag).
+//! It will only transpile, not typecheck (like Oden's `--no-check` flag).
 
 // NB(bartlomieju): this is fine for example code
 #![allow(clippy::print_stdout, reason = "example code")]
@@ -17,20 +17,20 @@ use anyhow::Context;
 use deno_ast::MediaType;
 use deno_ast::ParseParams;
 use deno_ast::SourceMapOption;
-use deno_core::JsRuntime;
-use deno_core::ModuleLoadOptions;
-use deno_core::ModuleLoadReferrer;
-use deno_core::ModuleLoadResponse;
-use deno_core::ModuleLoader;
-use deno_core::ModuleSource;
-use deno_core::ModuleSourceCode;
-use deno_core::ModuleSpecifier;
-use deno_core::ModuleType;
-use deno_core::ResolutionKind;
-use deno_core::RuntimeOptions;
-use deno_core::error::ModuleLoaderError;
-use deno_core::resolve_import;
-use deno_core::resolve_path;
+use oden_core::JsRuntime;
+use oden_core::ModuleLoadOptions;
+use oden_core::ModuleLoadReferrer;
+use oden_core::ModuleLoadResponse;
+use oden_core::ModuleLoader;
+use oden_core::ModuleSource;
+use oden_core::ModuleSourceCode;
+use oden_core::ModuleSpecifier;
+use oden_core::ModuleType;
+use oden_core::ResolutionKind;
+use oden_core::RuntimeOptions;
+use oden_core::error::ModuleLoaderError;
+use oden_core::resolve_import;
+use oden_core::resolve_path;
 use deno_error::JsErrorBox;
 
 // TODO(bartlomieju): this is duplicated in `testing/checkin`

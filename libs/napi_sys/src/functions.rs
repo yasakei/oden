@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Forked from napi-sys 2.2.2 functions.rs — all feature gates removed,
 // all napi versions flattened into a single block.

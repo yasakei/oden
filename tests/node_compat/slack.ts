@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // deno-lint-ignore-file no-console
 
 import { LogLevel, WebClient } from "npm:@slack/web-api@7.8.0";
@@ -8,8 +8,8 @@ import {
 } from "./add_day_summary_to_month_summary.ts";
 import { parse as parseJsonc } from "@std/jsonc";
 
-const token = Deno.env.get("SLACK_TOKEN");
-const channel = Deno.env.get("SLACK_CHANNEL");
+const token = Oden.env.get("SLACK_TOKEN");
+const channel = Oden.env.get("SLACK_CHANNEL");
 
 if (!token) {
   console.error("SLACK_TOKEN is required");
@@ -102,7 +102,7 @@ function createMessage(monthSummary: MonthSummary) {
   })\n`;
 
   mrkdwn +=
-    `<https://node-test-viewer.deno.deno.net/results/${date}|(Full report)>`;
+    `<https://node-test-viewer.oden.oden.net/results/${date}|(Full report)>`;
 
   return [
     {
@@ -357,7 +357,7 @@ async function generateUnabledPassingBlocks(
   console.log("Checking for passing-but-not-enabled tests...");
 
   // Read config.jsonc to get enabled test names
-  const configText = await Deno.readTextFile(
+  const configText = await Oden.readTextFile(
     "tests/node_compat/config.jsonc",
   );
   const config = parseJsonc(configText) as { tests: Record<string, unknown> };
@@ -414,7 +414,7 @@ async function generateUnabledPassingBlocks(
 }
 
 async function main() {
-  const monthSummary = await Deno.readTextFile("tests/node_compat/summary.json")
+  const monthSummary = await Oden.readTextFile("tests/node_compat/summary.json")
     .then(JSON.parse) as MonthSummary;
 
   try {

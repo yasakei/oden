@@ -1,5 +1,5 @@
 import { greet } from "./main.ts";
 
-Deno.test("greet", () => {
+Oden.test("greet", () => {
   greet("world");
 });

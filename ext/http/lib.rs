@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::cell::RefCell;
@@ -25,37 +25,37 @@ use async_compression::tokio::write::GzipEncoder;
 use base64::Engine;
 use base64::prelude::BASE64_STANDARD;
 use bytes::Bytes;
-use deno_core::AsyncRefCell;
-use deno_core::AsyncResult;
-use deno_core::BufView;
-use deno_core::CancelFuture;
-use deno_core::CancelHandle;
-use deno_core::CancelTryFuture;
-use deno_core::JsBuffer;
-use deno_core::OpState;
-use deno_core::RcRef;
-use deno_core::Resource;
-use deno_core::ResourceId;
-use deno_core::StringOrBuffer;
-use deno_core::convert::ByteString;
-use deno_core::futures::FutureExt;
-use deno_core::futures::Stream;
-use deno_core::futures::StreamExt;
-use deno_core::futures::TryFutureExt;
-use deno_core::futures::channel::mpsc;
-use deno_core::futures::channel::oneshot;
-use deno_core::futures::future::RemoteHandle;
-use deno_core::futures::future::Shared;
-use deno_core::futures::stream::Peekable;
-use deno_core::op2;
-use deno_core::unsync::spawn;
+use oden_core::AsyncRefCell;
+use oden_core::AsyncResult;
+use oden_core::BufView;
+use oden_core::CancelFuture;
+use oden_core::CancelHandle;
+use oden_core::CancelTryFuture;
+use oden_core::JsBuffer;
+use oden_core::OpState;
+use oden_core::RcRef;
+use oden_core::Resource;
+use oden_core::ResourceId;
+use oden_core::StringOrBuffer;
+use oden_core::convert::ByteString;
+use oden_core::futures::FutureExt;
+use oden_core::futures::Stream;
+use oden_core::futures::StreamExt;
+use oden_core::futures::TryFutureExt;
+use oden_core::futures::channel::mpsc;
+use oden_core::futures::channel::oneshot;
+use oden_core::futures::future::RemoteHandle;
+use oden_core::futures::future::Shared;
+use oden_core::futures::stream::Peekable;
+use oden_core::op2;
+use oden_core::unsync::spawn;
 use deno_error::JsErrorBox;
-use deno_net::raw::NetworkStream;
-use deno_telemetry::Histogram;
-use deno_telemetry::MeterProvider;
-use deno_telemetry::OTEL_GLOBALS;
-use deno_telemetry::UpDownCounter;
-use deno_websocket::ws_create_server_stream;
+use oden_net::raw::NetworkStream;
+use oden_telemetry::Histogram;
+use oden_telemetry::MeterProvider;
+use oden_telemetry::OTEL_GLOBALS;
+use oden_telemetry::UpDownCounter;
+use oden_websocket::ws_create_server_stream;
 use flate2::Compression;
 use flate2::write::GzEncoder;
 use http_body_util::Channel;
@@ -200,9 +200,9 @@ pub struct Options {
 }
 
 #[cfg(not(feature = "default_property_extractor"))]
-deno_core::extension!(
-  deno_http,
-  deps = [deno_web, deno_net, deno_fetch, deno_websocket],
+oden_core::extension!(
+  oden_http,
+  deps = [oden_web, oden_net, oden_fetch, oden_websocket],
   parameters = [ HTTP: HttpPropertyExtractor ],
   ops = [
     op_http_accept,
@@ -264,9 +264,9 @@ deno_core::extension!(
 );
 
 #[cfg(feature = "default_property_extractor")]
-deno_core::extension!(
-  deno_http,
-  deps = [deno_web, deno_net, deno_fetch, deno_websocket],
+oden_core::extension!(
+  oden_http,
+  deps = [oden_web, oden_net, oden_fetch, oden_websocket],
   ops = [
     op_http_accept,
     op_http_headers,
@@ -331,10 +331,10 @@ deno_core::extension!(
 pub enum HttpError {
   #[class(inherit)]
   #[error(transparent)]
-  Resource(#[from] deno_core::error::ResourceError),
+  Resource(#[from] oden_core::error::ResourceError),
   #[class(inherit)]
   #[error(transparent)]
-  Canceled(#[from] deno_core::Canceled),
+  Canceled(#[from] oden_core::Canceled),
   #[class("Http")]
   #[error("{0}")]
   Hyper(#[source] Arc<hyper::Error>),
@@ -452,33 +452,33 @@ impl OtelInfoAttributes {
     }
   }
 
-  fn for_counter(&self) -> Vec<deno_telemetry::KeyValue> {
+  fn for_counter(&self) -> Vec<oden_telemetry::KeyValue> {
     let mut attributes = vec![
-      deno_telemetry::KeyValue::new(
+      oden_telemetry::KeyValue::new(
         "http.request.method",
         self.http_request_method.clone(),
       ),
-      deno_telemetry::KeyValue::new("url.scheme", self.url_scheme.clone()),
+      oden_telemetry::KeyValue::new("url.scheme", self.url_scheme.clone()),
     ];
 
     if let Some(address) = self.server_address.clone() {
-      attributes.push(deno_telemetry::KeyValue::new("server.address", address));
+      attributes.push(oden_telemetry::KeyValue::new("server.address", address));
     }
     if let Some(port) = self.server_port {
-      attributes.push(deno_telemetry::KeyValue::new("server.port", port));
+      attributes.push(oden_telemetry::KeyValue::new("server.port", port));
     }
 
     attributes
   }
 
-  fn for_histogram(&self) -> Vec<deno_telemetry::KeyValue> {
+  fn for_histogram(&self) -> Vec<oden_telemetry::KeyValue> {
     let mut histogram_attributes = vec![
-      deno_telemetry::KeyValue::new(
+      oden_telemetry::KeyValue::new(
         "http.request.method",
         self.http_request_method.clone(),
       ),
-      deno_telemetry::KeyValue::new("url.scheme", self.url_scheme.clone()),
-      deno_telemetry::KeyValue::new(
+      oden_telemetry::KeyValue::new("url.scheme", self.url_scheme.clone()),
+      oden_telemetry::KeyValue::new(
         "network.protocol.version",
         self.network_protocol_version,
       ),
@@ -486,14 +486,14 @@ impl OtelInfoAttributes {
 
     if let Some(address) = self.server_address.clone() {
       histogram_attributes
-        .push(deno_telemetry::KeyValue::new("server.address", address));
+        .push(oden_telemetry::KeyValue::new("server.address", address));
     }
     if let Some(port) = self.server_port {
       histogram_attributes
-        .push(deno_telemetry::KeyValue::new("server.port", port));
+        .push(oden_telemetry::KeyValue::new("server.port", port));
     }
     if let Some(status_code) = self.http_response_status_code {
-      histogram_attributes.push(deno_telemetry::KeyValue::new(
+      histogram_attributes.push(oden_telemetry::KeyValue::new(
         "http.response.status_code",
         status_code,
       ));
@@ -501,12 +501,12 @@ impl OtelInfoAttributes {
 
     if let Some(error) = self.error_type {
       histogram_attributes
-        .push(deno_telemetry::KeyValue::new("error.type", error));
+        .push(oden_telemetry::KeyValue::new("error.type", error));
     }
 
     if let Some(route) = self.http_route.clone() {
       histogram_attributes
-        .push(deno_telemetry::KeyValue::new("http.route", route));
+        .push(oden_telemetry::KeyValue::new("http.route", route));
     }
 
     histogram_attributes
@@ -515,7 +515,7 @@ impl OtelInfoAttributes {
 
 impl OtelInfo {
   fn new(
-    otel: &deno_telemetry::OtelGlobals,
+    otel: &oden_telemetry::OtelGlobals,
     instant: std::time::Instant,
     request_size: u64,
     attributes: OtelInfoAttributes,
@@ -1150,7 +1150,7 @@ impl Drop for BodyUncompressedSender {
 }
 
 // We use a tuple instead of struct to avoid serialization overhead of the keys.
-#[derive(deno_core::ToV8)]
+#[derive(oden_core::ToV8)]
 struct NextRequestResponse(
   // read_stream_rid:
   ResourceId,
@@ -1622,7 +1622,7 @@ async fn op_http_write(
 
 /// Gracefully closes the write half of the HTTP stream. Note that this does not
 /// remove the HTTP stream resource from the resource table; it still has to be
-/// closed with `Deno.core.close()`.
+/// closed with `Oden.core.close()`.
 #[op2]
 async fn op_http_shutdown(
   state: Rc<RefCell<OpState>>,
@@ -1711,7 +1711,7 @@ where
   Fut::Output: 'static,
 {
   fn execute(&self, fut: Fut) {
-    deno_core::unsync::spawn(fut);
+    oden_core::unsync::spawn(fut);
   }
 }
 
@@ -1790,7 +1790,7 @@ fn extract_network_stream<U: CanDowncastUpgrade>(
       Err(x) => x,
     };
   let upgraded = match maybe_extract_network_stream::<
-    deno_net::ops_tls::TlsStream<TcpStream>,
+    oden_net::ops_tls::TlsStream<TcpStream>,
     _,
   >(upgraded)
   {
@@ -1811,7 +1811,7 @@ fn extract_network_stream<U: CanDowncastUpgrade>(
       Err(x) => x,
     };
   let upgraded =
-    match maybe_extract_network_stream::<deno_net::tunnel::TunnelStream, _>(
+    match maybe_extract_network_stream::<oden_net::tunnel::TunnelStream, _>(
       upgraded,
     ) {
       Ok(res) => return res,
@@ -1830,11 +1830,11 @@ fn extract_network_stream<U: CanDowncastUpgrade>(
 
 #[op2]
 pub fn op_http_serve_address_override() -> (u8, String, u32, bool) {
-  if let Ok(val) = std::env::var("DENO_SERVE_ADDRESS") {
+  if let Ok(val) = std::env::var("ODEN_SERVE_ADDRESS") {
     return parse_serve_address(&val);
   };
 
-  if deno_net::tunnel::get_tunnel().is_some() {
+  if oden_net::tunnel::get_tunnel().is_some() {
     return (4, String::new(), 0, true);
   }
 
@@ -1843,7 +1843,7 @@ pub fn op_http_serve_address_override() -> (u8, String, u32, bool) {
 
 #[op2(fast)]
 pub fn op_http_serve_default_compression() -> bool {
-  match std::env::var("DENO_SERVE_AUTOMATIC_COMPRESSION") {
+  match std::env::var("ODEN_SERVE_AUTOMATIC_COMPRESSION") {
     Ok(value) => !matches!(value.to_ascii_lowercase().as_str(), "0" | "false"),
     Err(_) => false,
   }
@@ -1866,7 +1866,7 @@ fn parse_serve_address(input: &str) -> (u8, String, u32, bool) {
           (1, hostname, addr.port() as u32, duplicate)
         }
         Err(_) => {
-          log::error!("DENO_SERVE_ADDRESS: invalid TCP address: {}", addr);
+          log::error!("ODEN_SERVE_ADDRESS: invalid TCP address: {}", addr);
           (0, String::new(), 0, false)
         }
       }
@@ -1874,7 +1874,7 @@ fn parse_serve_address(input: &str) -> (u8, String, u32, bool) {
     Some(("unix", addr)) => {
       // Unix socket path
       if addr.is_empty() {
-        log::error!("DENO_SERVE_ADDRESS: empty unix socket path");
+        log::error!("ODEN_SERVE_ADDRESS: empty unix socket path");
         return (0, String::new(), 0, duplicate);
       }
       (2, addr.to_string(), 0, duplicate)
@@ -1889,7 +1889,7 @@ fn parse_serve_address(input: &str) -> (u8, String, u32, bool) {
             match cid.parse::<u32>() {
               Ok(cid) => cid.to_string(),
               Err(_) => {
-                log::error!("DENO_SERVE_ADDRESS: invalid vsock CID: {}", cid);
+                log::error!("ODEN_SERVE_ADDRESS: invalid vsock CID: {}", cid);
                 return (0, String::new(), 0, false);
               }
             }
@@ -1897,7 +1897,7 @@ fn parse_serve_address(input: &str) -> (u8, String, u32, bool) {
           let port = match port.parse::<u32>() {
             Ok(port) => port,
             Err(_) => {
-              log::error!("DENO_SERVE_ADDRESS: invalid vsock port: {}", port);
+              log::error!("ODEN_SERVE_ADDRESS: invalid vsock port: {}", port);
               return (0, String::new(), 0, false);
             }
           };
@@ -1908,7 +1908,7 @@ fn parse_serve_address(input: &str) -> (u8, String, u32, bool) {
     }
     Some(("tunnel", _)) => (4, String::new(), 0, duplicate),
     Some((_, _)) | None => {
-      log::error!("DENO_SERVE_ADDRESS: invalid address format: {}", input);
+      log::error!("ODEN_SERVE_ADDRESS: invalid address format: {}", input);
       (0, String::new(), 0, false)
     }
   }
@@ -1921,12 +1921,12 @@ pub static SERVE_NOTIFIER: Notify = Notify::const_new();
 static SERVE_KIND: AtomicU32 = AtomicU32::new(0);
 
 /// Returns the kind of server that triggered [`SERVE_NOTIFIER`]:
-/// `"deno-serve"` for `Deno.serve`, `"node-http"` for a `node:http` or
+/// `"oden-serve"` for `Oden.serve`, `"node-http"` for a `node:http` or
 /// `node:https` server, `"node-http2"` for a `node:http2` server, or
 /// `None` when unknown.
 pub fn serving_server_kind() -> Option<&'static str> {
   match SERVE_KIND.load(Ordering::Acquire) {
-    1 => Some("deno-serve"),
+    1 => Some("oden-serve"),
     2 => Some("node-http"),
     3 => Some("node-http2"),
     _ => None,

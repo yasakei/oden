@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // translated primarily from: https://github.com/nodejs/node/blob/2acc8bc6a9a830b38d101ac70390b8c5c9a14bf3/lib/internal/fs/glob.js#L258
 // with glob() and globSync() from: https://github.com/nodejs/node/blob/2acc8bc6a9a830b38d101ac70390b8c5c9a14bf3/lib/fs.js#L3167
 import { core, primordials } from "ext:core/mod.js";
@@ -9,17 +9,17 @@ const {
   validateObject,
   validateString,
   validateStringArray,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
-const { isMacOS, isWindows } = core.loadExtScript("ext:deno_node/_util/os.ts");
-const { kEmptyObject } = core.loadExtScript("ext:deno_node/internal/util.mjs");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
+const { isMacOS, isWindows } = core.loadExtScript("ext:oden_node/_util/os.ts");
+const { kEmptyObject } = core.loadExtScript("ext:oden_node/internal/util.mjs");
 const lazyProcess = core.createLazyLoader("node:process");
 const lazyReaddir = core.createLazyLoader(
-  "ext:deno_node/_fs/_fs_readdir.ts",
+  "ext:oden_node/_fs/_fs_readdir.ts",
 );
 const {
   lstatPromise: lstat,
   lstatSync,
-} = core.loadExtScript("ext:deno_node/_fs/_fs_lstat.ts");
+} = core.loadExtScript("ext:oden_node/_fs/_fs_lstat.ts");
 
 const {
   basename,
@@ -27,22 +27,22 @@ const {
   isAbsolute,
   join,
   resolve,
-} = core.loadExtScript("ext:deno_node/path/mod.ts");
+} = core.loadExtScript("ext:oden_node/path/mod.ts");
 import {
   type Dirent,
   DirentFromStats,
-} from "ext:deno_node/internal/fs/utils.mjs";
+} from "ext:oden_node/internal/fs/utils.mjs";
 
 const {
   ERR_INVALID_ARG_TYPE,
   hideStackFrames,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
 
-const { default: assert } = core.loadExtScript("ext:deno_node/assert.ts");
+const { default: assert } = core.loadExtScript("ext:oden_node/assert.ts");
 
-import type { ErrnoException } from "ext:deno_node/_global.d.ts";
+import type { ErrnoException } from "ext:oden_node/_global.d.ts";
 const { toPathIfFileURL } = core.loadExtScript(
-  "ext:deno_node/internal/url.ts",
+  "ext:oden_node/internal/url.ts",
 );
 
 interface GlobOptionsBase {
@@ -121,7 +121,7 @@ const {
   ObjectPrototypeIsPrototypeOf,
 } = primordials;
 
-const lazyMinimatch = core.createLazyLoader("ext:deno_node/deps/minimatch.js");
+const lazyMinimatch = core.createLazyLoader("ext:oden_node/deps/minimatch.js");
 
 /**
  * @param {string} path
@@ -477,7 +477,7 @@ export class Glob {
         this.#isExcluded = (value) =>
           ArrayPrototypeSome(matchers, (matcher) => {
             // No primordial exists for Minimatch.prototype.match.
-            // deno-lint-ignore deno-internal/prefer-primordials
+            // deno-lint-ignore oden-internal/prefer-primordials
             return matcher.match(value);
           });
         this.#results.setup(this.#root, this.#isExcluded);
@@ -863,7 +863,7 @@ export class Glob {
       for (let i = 0; i < item.patterns.length; i++) {
         const iter = this.#iterateSubpatterns(item.path, item.patterns[i]);
         while (true) {
-          // deno-lint-ignore deno-internal/prefer-primordials
+          // deno-lint-ignore oden-internal/prefer-primordials
           const { done, value } = await iter.next();
           if (done) break;
           yield value;
@@ -1191,7 +1191,7 @@ export function matchGlobPattern(
 ): boolean {
   validateString(path, "path");
   validateString(pattern, "pattern");
-  // deno-lint-ignore deno-internal/prefer-primordials
+  // deno-lint-ignore oden-internal/prefer-primordials
   return cachedMatcher(pattern, windows).match(path);
 }
 

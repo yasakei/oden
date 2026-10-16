@@ -1,6 +1,6 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_core::ModuleSpecifier;
+use oden_core::ModuleSpecifier;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum CodeCacheType {

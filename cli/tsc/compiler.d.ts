@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Contains types that can be used to validate and check `99_main_compiler.js`
 
@@ -42,7 +42,7 @@ declare global {
     __proto__: any;
   }
 
-  interface DenoCore {
+  interface OdenCore {
     encode(value: string): Uint8Array;
     // deno-lint-ignore no-explicit-any
     ops: Record<string, (...args: unknown[]) => any>;

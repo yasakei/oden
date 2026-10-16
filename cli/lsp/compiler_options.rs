@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::BTreeMap;
 use std::collections::HashMap;
@@ -6,17 +6,17 @@ use std::collections::HashSet;
 use std::sync::Arc;
 
 use deno_ast::MediaType;
-use deno_config::deno_json::CompilerOptions;
-use deno_config::glob::FilePatterns;
-use deno_config::glob::WalkEntry;
-use deno_config::workspace::TsTypeLib;
-use deno_core::url::Url;
-use deno_resolver::deno_json::CompilerOptionsKey;
-use deno_resolver::deno_json::CompilerOptionsResolver;
-use deno_resolver::deno_json::CompilerOptionsType;
-use deno_resolver::deno_json::JsxImportSourceConfig;
-use deno_resolver::deno_json::TsConfigFile;
-use deno_resolver::deno_json::get_base_compiler_options_for_emit;
+use oden_config::oden_json::CompilerOptions;
+use oden_config::glob::FilePatterns;
+use oden_config::glob::WalkEntry;
+use oden_config::workspace::TsTypeLib;
+use oden_core::url::Url;
+use oden_resolver::oden_json::CompilerOptionsKey;
+use oden_resolver::oden_json::CompilerOptionsResolver;
+use oden_resolver::oden_json::CompilerOptionsType;
+use oden_resolver::oden_json::JsxImportSourceConfig;
+use oden_resolver::oden_json::TsConfigFile;
+use oden_resolver::oden_json::get_base_compiler_options_for_emit;
 
 use crate::lsp::config::Config;
 use crate::lsp::logging::lsp_warn;
@@ -125,7 +125,7 @@ impl LspCompilerOptionsResolver {
               .workspace_dir_or_source_url()
               .cloned(),
             compiler_options: d
-              .compiler_options_for_lib(TsTypeLib::DenoWindow)
+              .compiler_options_for_lib(TsTypeLib::OdenWindow)
               .inspect_err(|err| {
                 lsp_warn!("{err:#}");
               })
@@ -134,7 +134,7 @@ impl LspCompilerOptionsResolver {
               .unwrap_or_else(|| {
                 Arc::new(get_base_compiler_options_for_emit(
                   CompilerOptionsType::Check {
-                    lib: TsTypeLib::DenoWindow,
+                    lib: TsTypeLib::OdenWindow,
                   },
                   d.source_kind,
                 ))

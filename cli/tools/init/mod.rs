@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::io::IsTerminal;
@@ -7,19 +7,19 @@ use std::path::Path;
 
 use color_print::cformat;
 use color_print::cstr;
-use deno_config::deno_json::NodeModulesDirMode;
-use deno_core::anyhow::Context;
-use deno_core::anyhow::bail;
-use deno_core::error::AnyError;
-use deno_core::futures::FutureExt;
-use deno_core::serde_json::json;
-use deno_lib::args::UnstableConfig;
-use deno_npm_installer::PackagesAllowedScripts;
-use deno_runtime::WorkerExecutionMode;
+use oden_config::oden_json::NodeModulesDirMode;
+use oden_core::anyhow::Context;
+use oden_core::anyhow::bail;
+use oden_core::error::AnyError;
+use oden_core::futures::FutureExt;
+use oden_core::serde_json::json;
+use oden_lib::args::UnstableConfig;
+use oden_npm_installer::PackagesAllowedScripts;
+use oden_runtime::WorkerExecutionMode;
 use deno_semver::jsr::JsrPackageReqReference;
 use log::info;
 
-use crate::args::DenoSubcommand;
+use crate::args::OdenSubcommand;
 use crate::args::Flags;
 use crate::args::InitFlags;
 use crate::args::InternalFlags;
@@ -66,10 +66,10 @@ pub async fn init_project(
 
     create_json_file(
       &dir,
-      "deno.json",
+      "oden.json",
       &json!({
         "tasks": {
-          "dev": "deno run --watch main.ts"
+          "dev": "oden run --watch main.ts"
         }
       }),
     )?;
@@ -101,7 +101,7 @@ export default {
 
     return new Response("Not found", { status: 404 });
   },
-} satisfies Deno.ServeDefaultExport;
+} satisfies Oden.ServeDefaultExport;
 "#,
     )?;
     create_file(
@@ -110,25 +110,25 @@ export default {
       r#"import { assertEquals } from "@std/assert";
 import server from "./main.ts";
 
-Deno.test(async function serverFetch() {
+Oden.test(async function serverFetch() {
   const req = new Request("https://deno.land");
   const res = await server.fetch(req);
   assertEquals(await res.text(), "Home page");
 });
 
-Deno.test(async function serverFetchNotFound() {
+Oden.test(async function serverFetchNotFound() {
   const req = new Request("https://deno.land/404");
   const res = await server.fetch(req);
   assertEquals(res.status, 404);
 });
 
-Deno.test(async function serverFetchUsers() {
+Oden.test(async function serverFetchUsers() {
   const req = new Request("https://deno.land/users/123");
   const res = await server.fetch(req);
   assertEquals(await res.text(), "123");
 });
 
-Deno.test(async function serverFetchStatic() {
+Oden.test(async function serverFetchStatic() {
   const req = new Request("https://deno.land/static/hello.js");
   const res = await server.fetch(req);
   assertEquals(await res.text(), 'console.log("Hello, world!");\n');
@@ -148,10 +148,10 @@ Deno.test(async function serverFetchStatic() {
 
     create_json_file(
       &dir,
-      "deno.json",
+      "oden.json",
       &json!({
         "tasks": {
-          "dev": "deno serve --watch -R main.ts",
+          "dev": "oden serve --watch -R main.ts",
         },
         "imports": {
           "@std/assert": "jsr:@std/assert@1",
@@ -181,7 +181,7 @@ Deno.test(async function serverFetchStatic() {
       r#"import { assertEquals } from "@std/assert";
 import { add } from "./mod.ts";
 
-Deno.test(function addTest() {
+Oden.test(function addTest() {
   assertEquals(add(2, 3), 5);
 });
 "#,
@@ -189,13 +189,13 @@ Deno.test(function addTest() {
 
     create_json_file(
       &dir,
-      "deno.json",
+      "oden.json",
       &json!({
         "name": project_name,
         "version": "0.1.0",
         "exports": "./mod.ts",
         "tasks": {
-          "dev": "deno test --watch"
+          "dev": "oden test --watch"
         },
         "license": "MIT",
         "imports": {
@@ -217,13 +217,13 @@ Deno.test(function addTest() {
     });
   }
 
-  return new Response("<h1>Welcome to Deno!</h1>", {
+  return new Response("<h1>Welcome to Oden!</h1>", {
     headers: { "content-type": "text/html" },
   });
 }
 
 if (import.meta.main) {
-  Deno.serve(handler);
+  Oden.serve(handler);
 }
 "#,
     )?;
@@ -233,14 +233,14 @@ if (import.meta.main) {
       r#"import { assertEquals } from "@std/assert";
 import { handler } from "./main.ts";
 
-Deno.test("returns html on /", async () => {
+Oden.test("returns html on /", async () => {
   const res = handler(new Request("http://localhost/"));
   assertEquals(res.headers.get("content-type"), "text/html");
   const body = await res.text();
-  assertEquals(body.includes("Welcome to Deno"), true);
+  assertEquals(body.includes("Welcome to Oden"), true);
 });
 
-Deno.test("returns json on /api", async () => {
+Oden.test("returns json on /api", async () => {
   const res = handler(new Request("http://localhost/api"));
   const data = await res.json();
   assertEquals(data.message, "Hello, world!");
@@ -251,10 +251,10 @@ Deno.test("returns json on /api", async () => {
 
     create_json_file(
       &dir,
-      "deno.json",
+      "oden.json",
       &json!({
         "tasks": {
-          "dev": "deno run --watch --allow-net main.ts"
+          "dev": "oden run --watch --allow-net main.ts"
         },
         "imports": {
           "@std/assert": "jsr:@std/assert@1"
@@ -273,49 +273,49 @@ Deno.test("returns json on /api", async () => {
   }
   if init_flags.empty {
     info!("  {}", colors::gray("# Run the program"));
-    info!("  deno run main.ts");
+    info!("  oden run main.ts");
     info!("");
     info!(
       "  {}",
       colors::gray("# Run the program and watch for file changes")
     );
-    info!("  deno task dev");
+    info!("  oden task dev");
   } else if init_flags.serve {
     info!("  {}", colors::gray("# Run the server"));
-    info!("  deno serve -R main.ts");
+    info!("  oden serve -R main.ts");
     info!("");
     info!(
       "  {}",
       colors::gray("# Run the server and watch for file changes")
     );
-    info!("  deno task dev");
+    info!("  oden task dev");
     info!("");
     info!("  {}", colors::gray("# Run the tests"));
-    info!("  deno test -R");
+    info!("  oden test -R");
   } else if init_flags.lib {
     info!("  {}", colors::gray("# Run the tests"));
-    info!("  deno test");
+    info!("  oden test");
     info!("");
     info!(
       "  {}",
       colors::gray("# Run the tests and watch for file changes")
     );
-    info!("  deno task dev");
+    info!("  oden task dev");
     info!("");
     info!("  {}", colors::gray("# Publish to JSR (dry run)"));
-    info!("  deno publish --dry-run");
+    info!("  oden publish --dry-run");
   } else {
     info!("  {}", colors::gray("# Run the server"));
-    info!("  deno run --allow-net main.ts");
+    info!("  oden run --allow-net main.ts");
     info!("");
     info!(
       "  {}",
       colors::gray("# Run the server and watch for file changes")
     );
-    info!("  deno task dev");
+    info!("  oden task dev");
     info!("");
     info!("  {}", colors::gray("# Run the tests"));
-    info!("  deno test");
+    info!("  oden test");
   }
   Ok(0)
 }
@@ -342,7 +342,7 @@ async fn init_npm(
     allow_scripts: PackagesAllowedScripts::All,
     argv: args,
     node_modules_dir: Some(NodeModulesDirMode::Auto),
-    subcommand: DenoSubcommand::Run(RunFlags {
+    subcommand: OdenSubcommand::Run(RunFlags {
       script: script_name,
       ..Default::default()
     }),
@@ -428,7 +428,7 @@ fn confirm_package_trust(
     log::info!(
       "{}",
       cformat!(
-        "You can initialize project manually by running <u>deno run {}</> and applying desired permissions.",
+        "You can initialize project manually by running <u>oden run {}</> and applying desired permissions.",
         std::iter::once(script_name)
           .chain(args.iter().map(|a| a.as_ref()))
           .collect::<Vec<_>>()
@@ -441,7 +441,7 @@ fn confirm_package_trust(
   if std::io::stdin().is_terminal() {
     log::info!(
       cstr!(
-        "⚠️  Do you fully trust <y>{}</> package? Deno will invoke code from it with all permissions. Do you want to continue? <p(245)>[y/n]</>"
+        "⚠️  Do you fully trust <y>{}</> package? Oden will invoke code from it with all permissions. Do you want to continue? <p(245)>[y/n]</>"
       ),
       script_name
     );
@@ -480,7 +480,7 @@ async fn init_jsr(
       ..Default::default()
     },
     argv: args,
-    subcommand: DenoSubcommand::Run(RunFlags {
+    subcommand: OdenSubcommand::Run(RunFlags {
       script: script_name,
       ..Default::default()
     }),
@@ -519,9 +519,9 @@ fn jsr_name_to_create_script(name: &str) -> String {
 fn create_json_file(
   dir: &Path,
   filename: &str,
-  value: &deno_core::serde_json::Value,
+  value: &oden_core::serde_json::Value,
 ) -> Result<(), AnyError> {
-  let mut text = deno_core::serde_json::to_string_pretty(value)?;
+  let mut text = oden_core::serde_json::to_string_pretty(value)?;
   text.push('\n');
   create_file(dir, filename, &text)
 }

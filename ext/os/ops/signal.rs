@@ -1,24 +1,24 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 use std::borrow::Cow;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use deno_core::AsyncRefCell;
-use deno_core::OpState;
-use deno_core::RcRef;
-use deno_core::Resource;
-use deno_core::ResourceId;
-use deno_core::error::ResourceError;
-use deno_core::op2;
+use oden_core::AsyncRefCell;
+use oden_core::OpState;
+use oden_core::RcRef;
+use oden_core::Resource;
+use oden_core::ResourceId;
+use oden_core::error::ResourceError;
+use oden_core::op2;
 
 #[derive(Debug, thiserror::Error, deno_error::JsError)]
 pub enum SignalError {
   #[class(type)]
   #[error(transparent)]
-  InvalidSignalStr(#[from] deno_signals::InvalidSignalStrError),
+  InvalidSignalStr(#[from] oden_signals::InvalidSignalStrError),
   #[class(type)]
   #[error(transparent)]
-  InvalidSignalInt(#[from] deno_signals::InvalidSignalIntError),
+  InvalidSignalInt(#[from] oden_signals::InvalidSignalIntError),
   #[class(type)]
   #[error("Binding to signal '{0}' is not allowed")]
   SignalNotAllowed(String),
@@ -39,13 +39,13 @@ impl Resource for SignalStreamResource {
   }
 
   fn close(self: Rc<Self>) {
-    deno_signals::unregister(self.signo, self.id);
+    oden_signals::unregister(self.signo, self.id);
   }
 }
 
 impl Drop for SignalStreamResource {
   fn drop(&mut self) {
-    deno_signals::unregister(self.signo, self.id);
+    oden_signals::unregister(self.signo, self.id);
   }
 }
 
@@ -55,13 +55,13 @@ pub fn op_signal_bind(
   state: &mut OpState,
   #[string] sig: &str,
 ) -> Result<ResourceId, SignalError> {
-  let signo = deno_signals::signal_str_to_int(sig)?;
-  if deno_signals::is_forbidden(signo) {
+  let signo = oden_signals::signal_str_to_int(sig)?;
+  if oden_signals::is_forbidden(signo) {
     return Err(SignalError::SignalNotAllowed(sig.to_string()));
   }
 
   let (tx, rx) = tokio::sync::watch::channel(());
-  let id = deno_signals::register(
+  let id = oden_signals::register(
     signo,
     true,
     Box::new(move || {

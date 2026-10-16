@@ -1,6 +1,6 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_core::error::AnyError;
+use oden_core::error::AnyError;
 use imara_diff::Algorithm;
 use imara_diff::Diff;
 use imara_diff::InternedInput;
@@ -159,8 +159,8 @@ mod tests {
 
   #[test]
   fn test_get_edits_mbc() {
-    let a = "const bar = \"👍🇺🇸😃\";\nconsole.log('hello deno')\n";
-    let b = "const bar = \"👍🇺🇸😃\";\nconsole.log(\"hello deno\");\n";
+    let a = "const bar = \"👍🇺🇸😃\";\nconsole.log('hello oden')\n";
+    let b = "const bar = \"👍🇺🇸😃\";\nconsole.log(\"hello oden\");\n";
     let actual = get_edits(a, b, &LineIndex::new(a));
     // Line-level diff replaces only the changed line
     assert_eq!(
@@ -176,7 +176,7 @@ mod tests {
             character: 0
           }
         },
-        new_text: "console.log(\"hello deno\");\n".to_string()
+        new_text: "console.log(\"hello oden\");\n".to_string()
       }]
     )
   }

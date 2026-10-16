@@ -1,6 +1,6 @@
-#!/usr/bin/env -S deno run -RW
+#!/usr/bin/env -S oden run -RW
 
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // deno-lint-ignore-file no-console
 
 /**
@@ -9,16 +9,16 @@
  * Run this script when you updated the git submodule at `tests/util/std`.
  */
 
-import denoConfig from "../tests/util/std/deno.json" with { type: "json" };
+import odenConfig from "../tests/util/std/oden.json" with { type: "json" };
 import { join } from "jsr:@std/path@1/posix/join";
 
 const rootImportMap: { imports: Record<string, string> } = { imports: {} };
 const coreImportMap: { imports: Record<string, string> } = JSON.parse(
-  Deno.readTextFileSync("./tools/core_import_map.json"),
+  Oden.readTextFileSync("./tools/core_import_map.json"),
 );
-for (const workspace of denoConfig.workspace) {
-  const { default: pkgDenoConfig } = await import(
-    `../tests/util/std/${workspace}/deno.json`,
+for (const workspace of odenConfig.workspace) {
+  const { default: pkgOdenConfig } = await import(
+    `../tests/util/std/${workspace}/oden.json`,
     {
       with: { type: "json" },
     }
@@ -26,12 +26,12 @@ for (const workspace of denoConfig.workspace) {
 
   for (
     const [moduleName, modulePath] of Object.entries(
-      pkgDenoConfig.exports as Record<string, string>,
+      pkgOdenConfig.exports as Record<string, string>,
     )
   ) {
-    rootImportMap.imports[join(pkgDenoConfig.name, moduleName)] =
+    rootImportMap.imports[join(pkgOdenConfig.name, moduleName)] =
       `./tests/util/std/${join(workspace, modulePath)}`;
-    coreImportMap.imports[join(pkgDenoConfig.name, moduleName)] =
+    coreImportMap.imports[join(pkgOdenConfig.name, moduleName)] =
       `../tests/util/std/${join(workspace, modulePath)}`;
   }
 }
@@ -40,12 +40,12 @@ rootImportMap.imports = sortObjectByKey(rootImportMap.imports);
 coreImportMap.imports = sortObjectByKey(coreImportMap.imports);
 
 console.log("Writing to ./import_map.json");
-await Deno.writeTextFile(
+await Oden.writeTextFile(
   "./import_map.json",
   JSON.stringify(rootImportMap, null, 2) + "\n",
 );
 console.log("Writing to ./tools/core_import_map.json");
-await Deno.writeTextFile(
+await Oden.writeTextFile(
   "./tools/core_import_map.json",
   JSON.stringify(coreImportMap, null, 2) + "\n",
 );

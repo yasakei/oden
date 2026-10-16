@@ -1,30 +1,30 @@
-# Copyright 2018-2026 the Deno authors. MIT license.
+# Copyright 2018-2026 the Oden authors. MIT license.
 [package]
-name = "deno_config"
+name = "oden_config"
 version = "0.109.0"
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Config file implementation for the Deno CLI"
+description = "Config file implementation for the Oden CLI"
 
 [lib]
 path = "lib.rs"
 
 [features]
 default = ["workspace"]
-deno_json = ["deno_semver", "jsonc-parser", "glob", "ignore", "import_map"]
-package_json = ["deno_package_json"]
-sync = ["deno_maybe_sync/sync", "deno_package_json/sync"]
-workspace = ["deno_json", "package_json"]
+oden_json = ["deno_semver", "jsonc-parser", "glob", "ignore", "import_map"]
+package_json = ["oden_package_json"]
+sync = ["oden_maybe_sync/sync", "oden_package_json/sync"]
+workspace = ["oden_json", "package_json"]
 
 [dependencies]
 boxed_error.workspace = true
 capacity_builder = { workspace = true }
 chrono.workspace = true
 deno_error = { workspace = true, features = ["url"] }
-deno_maybe_sync.workspace = true
-deno_package_json = { workspace = true, optional = true }
+oden_maybe_sync.workspace = true
+oden_package_json = { workspace = true, optional = true }
 deno_path_util.workspace = true
 deno_semver = { workspace = true, optional = true }
 glob = { workspace = true, optional = true }

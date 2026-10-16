@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Regression test for https://github.com/denoland/deno/issues/36499.
 //
@@ -23,7 +23,7 @@ import { assert, loadTestLibrary } from "./common.js";
 
 const lib = loadTestLibrary();
 
-Deno.test({
+Oden.test({
   name: "napi wrap finalizers run at most once (#36499)",
   // The threadsafe function intentionally outlives the test body.
   sanitizeOps: false,

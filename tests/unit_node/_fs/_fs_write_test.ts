@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { closeSync, openSync, write, writeSync } from "node:fs";
 import { open } from "node:fs/promises";
@@ -7,10 +7,10 @@ import { Buffer } from "node:buffer";
 
 const decoder = new TextDecoder("utf-8");
 
-Deno.test({
+Oden.test({
   name: "Data is written to the file with the correct length",
   async fn() {
-    const tempFile: string = await Deno.makeTempFile();
+    const tempFile: string = await Oden.makeTempFile();
     await using file = await open(tempFile, "w+");
     const buffer = Buffer.from("hello world");
     const bytesWrite = await new Promise((resolve, reject) => {
@@ -20,35 +20,35 @@ Deno.test({
       });
     });
 
-    const data = await Deno.readFile(tempFile);
-    await Deno.remove(tempFile);
+    const data = await Oden.readFile(tempFile);
+    await Oden.remove(tempFile);
 
     assertEquals(bytesWrite, 5);
     assertEquals(decoder.decode(data), "hello");
   },
 });
 
-Deno.test({
+Oden.test({
   name: "Data is written synchronously to the file with the correct length",
   fn() {
-    const tempFile: string = Deno.makeTempFileSync();
+    const tempFile: string = Oden.makeTempFileSync();
     const fd = openSync(tempFile, "w+");
     const buffer = Buffer.from("hello world");
     const bytesWrite = writeSync(fd, buffer, 0, 5);
 
-    const data = Deno.readFileSync(tempFile);
+    const data = Oden.readFileSync(tempFile);
     closeSync(fd);
-    Deno.removeSync(tempFile);
+    Oden.removeSync(tempFile);
 
     assertEquals(bytesWrite, 5);
     assertEquals(decoder.decode(data), "hello");
   },
 });
 
-Deno.test({
+Oden.test({
   name: "Async write with option object",
   async fn() {
-    const tempFile = await Deno.makeTempFile();
+    const tempFile = await Oden.makeTempFile();
     await using file = await open(tempFile, "w+");
     const buffer = Buffer.from("hello world!");
 
@@ -65,7 +65,7 @@ Deno.test({
       );
     });
 
-    const data = await Deno.readFile(tempFile);
+    const data = await Oden.readFile(tempFile);
     assertEquals(bytesWritten, 5);
     assertEquals(decoder.decode(data), "hello");
 
@@ -82,17 +82,17 @@ Deno.test({
       );
     });
 
-    const data2 = await Deno.readFile(tempFile);
-    await Deno.remove(tempFile);
+    const data2 = await Oden.readFile(tempFile);
+    await Oden.remove(tempFile);
     assertEquals(bytesWritten2, 2);
     assertEquals(decoder.decode(data2), "hewoo");
   },
 });
 
-Deno.test({
+Oden.test({
   name: "Sync write with option object",
   fn() {
-    const tempFile = Deno.makeTempFileSync();
+    const tempFile = Oden.makeTempFileSync();
     const fd = openSync(tempFile, "w+");
     const buffer = Buffer.from("hello world!");
 
@@ -105,7 +105,7 @@ Deno.test({
       position: 0,
     });
 
-    const data = Deno.readFileSync(tempFile);
+    const data = Oden.readFileSync(tempFile);
     assertEquals(bytesWritten, 5);
     assertEquals(decoder.decode(data), "hello");
 
@@ -118,27 +118,27 @@ Deno.test({
       position: 2,
     });
 
-    const data2 = Deno.readFileSync(tempFile);
-    Deno.removeSync(tempFile);
+    const data2 = Oden.readFileSync(tempFile);
+    Oden.removeSync(tempFile);
     assertEquals(bytesWritten2, 2);
     assertEquals(decoder.decode(data2), "hewoo");
     closeSync(fd);
   },
 });
 
-Deno.test({
+Oden.test({
   name: "Data is padded if position > length",
   fn() {
-    const tempFile: string = Deno.makeTempFileSync();
+    const tempFile: string = Oden.makeTempFileSync();
     const fd = openSync(tempFile, "w+");
 
     const str = "hello world";
     const buffer = Buffer.from(str);
     const bytesWritten = writeSync(fd, buffer, 0, str.length, 4);
 
-    const data = Deno.readFileSync(tempFile);
+    const data = Oden.readFileSync(tempFile);
     closeSync(fd);
-    Deno.removeSync(tempFile);
+    Oden.removeSync(tempFile);
 
     assertEquals(bytesWritten, str.length);
     // Check if result is padded
@@ -146,10 +146,10 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "write with offset TypedArray buffers",
   async fn() {
-    const tempFile: string = Deno.makeTempFileSync();
+    const tempFile: string = Oden.makeTempFileSync();
     await using file = await open(tempFile, "w+");
     const arrayBuffer = new ArrayBuffer(128);
     const resetBuffer = () => {
@@ -177,7 +177,7 @@ Deno.test({
           }
           let nWritten = writeSync(file.fd, buffer, offset, bytes.length, 0);
 
-          let data = Deno.readFileSync(tempFile);
+          let data = Oden.readFileSync(tempFile);
 
           assertEquals(nWritten, bytes.length);
           // console.log(constr, innerOffset, offset);
@@ -196,7 +196,7 @@ Deno.test({
             )
           );
 
-          data = Deno.readFileSync(tempFile);
+          data = Oden.readFileSync(tempFile);
           assertEquals(nWritten, 5);
           assertEquals(data, new Uint8Array(bytes));
         }
@@ -205,32 +205,32 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "writeSync: negative position value writes at current position",
   fn() {
-    const tempFile: string = Deno.makeTempFileSync();
+    const tempFile: string = Oden.makeTempFileSync();
     const fd = openSync(tempFile, "w+");
     const buffer = Buffer.from("hello world");
 
     // Write 'hello'
     writeSync(fd, buffer, 0, 5, -1);
-    const data = Deno.readFileSync(tempFile);
+    const data = Oden.readFileSync(tempFile);
     assertEquals(decoder.decode(data), "hello");
 
     // Write ' world'
     writeSync(fd, buffer, 5, 6, -1);
-    const data2 = Deno.readFileSync(tempFile);
+    const data2 = Oden.readFileSync(tempFile);
     assertEquals(decoder.decode(data2), "hello world");
 
-    Deno.removeSync(tempFile);
+    Oden.removeSync(tempFile);
     closeSync(fd);
   },
 });
 
-Deno.test({
+Oden.test({
   name: "write: negative position value writes at current position",
   async fn() {
-    const tempFile: string = await Deno.makeTempFile();
+    const tempFile: string = await Oden.makeTempFile();
     await using file = await open(tempFile, "w+");
     const buffer = Buffer.from("hello world");
 
@@ -242,7 +242,7 @@ Deno.test({
       });
     });
 
-    const data = await Deno.readFile(tempFile);
+    const data = await Oden.readFile(tempFile);
     assertEquals(decoder.decode(data), "hello");
 
     // Write ' world'
@@ -253,9 +253,9 @@ Deno.test({
       });
     });
 
-    const data2 = await Deno.readFile(tempFile);
+    const data2 = await Oden.readFile(tempFile);
     assertEquals(decoder.decode(data2), "hello world");
 
-    await Deno.remove(tempFile);
+    await Oden.remove(tempFile);
   },
 });

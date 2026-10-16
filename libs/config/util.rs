@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use chrono::DateTime;
 use chrono::Duration;
 use thiserror::Error;
 
-use crate::deno_json::NewestDependencyDate;
+use crate::oden_json::NewestDependencyDate;
 
 pub fn is_skippable_io_error(e: &std::io::Error) -> bool {
   use std::io::ErrorKind::*;

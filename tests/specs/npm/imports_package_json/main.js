@@ -1,4 +1,4 @@
-import data from "@denotest/imports-package-json";
+import data from "@odentest/imports-package-json";
 
 console.log(data.hi);
 console.log(data.bye);

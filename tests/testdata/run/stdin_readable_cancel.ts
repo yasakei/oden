@@ -1,4 +1,4 @@
-const reader = Deno.stdin.readable.getReader();
+const reader = Oden.stdin.readable.getReader();
 
 setTimeout(async () => {
   await reader.cancel("done");

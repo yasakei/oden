@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import crypto, { KeyFormat } from "node:crypto";
 import path from "node:path";
 import { Buffer } from "node:buffer";
 import { assert } from "@std/assert/mod.ts";
 import asymmetric from "./testdata/asymmetric.json" with { type: "json" };
 
-Deno.test("crypto.createPrivateKey", async (t) => {
+Oden.test("crypto.createPrivateKey", async (t) => {
   for (const key of asymmetric) {
     await testCreatePrivateKey(t, key.name, "pem", "pkcs8");
     await testCreatePrivateKey(t, key.name, "der", "pkcs8");
@@ -13,7 +13,7 @@ Deno.test("crypto.createPrivateKey", async (t) => {
 });
 
 function testCreatePrivateKey(
-  t: Deno.TestContext,
+  t: Oden.TestContext,
   name: string,
   format: KeyFormat,
   type: "pkcs8" | "pkcs1" | "sec1",
@@ -24,7 +24,7 @@ function testCreatePrivateKey(
       "./tests/unit_node/crypto/testdata/asymmetric",
       `${name}.${type}.${format}`,
     );
-    const key = Buffer.from(Deno.readFileSync(file));
+    const key = Buffer.from(Oden.readFileSync(file));
     const privateKey = crypto.createPrivateKey({ key, format, type });
     assert(privateKey);
   });

@@ -1,5 +1,5 @@
-#!/usr/bin/env -S deno run --check --allow-write=. --allow-read=. --lock=./tools/deno.lock.json
-// Copyright 2018-2026 the Deno authors. MIT license.
+#!/usr/bin/env -S oden run --check --allow-write=. --allow-read=. --lock=./tools/oden.lock.json
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   conditions,
   createWorkflow,
@@ -46,13 +46,13 @@ const setupRust = step.dependsOn(cloneNodeCompatSuite)({
   uses: "dsherret/rust-toolchain-file@v1",
 });
 
-const setupDeno = step.dependsOn(setupRust)({
-  name: "Setup Deno",
-  uses: "denoland/setup-deno@v2",
-  with: { "deno-version": "canary" },
+const setupOden = step.dependsOn(setupRust)({
+  name: "Setup Oden",
+  uses: "denoland/setup-oden@v2",
+  with: { "oden-version": "canary" },
 });
 
-const installPython = step.dependsOn(setupDeno)({
+const installPython = step.dependsOn(setupOden)({
   name: "Install Python",
   uses: "actions/setup-python@v6",
   with: { "python-version": 3.11 },
@@ -65,7 +65,7 @@ const runTests = step.dependsOn(installPython)({
     CI_SHARD_INDEX: matrix.shard_index,
     CI_SHARD_TOTAL: matrix.shard_total,
   },
-  run: "deno task --cwd tests/node_compat/runner test --report",
+  run: "oden task --cwd tests/node_compat/runner test --report",
 });
 
 const gzipReport = step.dependsOn(runTests)({
@@ -83,7 +83,7 @@ const uploadReport = step.dependsOn(gzipReport)({
     AWS_DEFAULT_REGION: "${{vars.S3_REGION }}",
   },
   run:
-    "aws s3 cp tests/node_compat/report.json.gz s3://dl-deno-land/node-compat-test/$(date +%F)/report-${{matrix.os}}-${{matrix.shard_index}}.json.gz",
+    "aws s3 cp tests/node_compat/report.json.gz s3://dl-oden-land/node-compat-test/$(date +%F)/report-${{matrix.os}}-${{matrix.shard_index}}.json.gz",
 });
 
 const testJob = job("test", {
@@ -103,7 +103,7 @@ const testJob = job("test", {
     checkout,
     cloneNodeCompatSuite,
     setupRust,
-    setupDeno,
+    setupOden,
     installPython,
     runTests,
     gzipReport,
@@ -125,12 +125,12 @@ const summaryCloneStd = step.dependsOn(summaryCheckout)({
   run: "git submodule update --init --recursive --depth=1 -- ./tests/util/std",
 });
 
-const summarySetupDeno = step.dependsOn(summaryCloneStd)({
-  name: "Setup Deno",
-  uses: "denoland/setup-deno@v2",
+const summarySetupOden = step.dependsOn(summaryCloneStd)({
+  name: "Setup Oden",
+  uses: "denoland/setup-oden@v2",
 });
 
-const summaryInstallPython = step.dependsOn(summarySetupDeno)({
+const summaryInstallPython = step.dependsOn(summarySetupOden)({
   name: "Install Python",
   uses: "actions/setup-python@v6",
   with: { "python-version": 3.11 },
@@ -139,7 +139,7 @@ const summaryInstallPython = step.dependsOn(summarySetupDeno)({
 const addDaySummary = step.dependsOn(summaryInstallPython)({
   name: "Add the day summary to the month summary",
   run:
-    "deno -A --config tests/config/deno.json tests/node_compat/add_day_summary_to_month_summary.ts",
+    "oden -A --config tests/config/oden.json tests/node_compat/add_day_summary_to_month_summary.ts",
 });
 
 const gzipMonthSummary = step.dependsOn(addDaySummary)({
@@ -156,12 +156,12 @@ const uploadMonthSummary = step.dependsOn(gzipMonthSummary)({
     AWS_DEFAULT_REGION: "${{vars.S3_REGION }}",
   },
   run:
-    "aws s3 cp tests/node_compat/summary.json.gz s3://dl-deno-land/node-compat-test/summary-$(date +%Y-%m).json.gz",
+    "aws s3 cp tests/node_compat/summary.json.gz s3://dl-oden-land/node-compat-test/summary-$(date +%Y-%m).json.gz",
 });
 
 const postSlack = step.dependsOn(uploadMonthSummary)({
   name: "Post message to slack channel",
-  run: "deno -A --config tests/config/deno.json tests/node_compat/slack.ts",
+  run: "oden -A --config tests/config/oden.json tests/node_compat/slack.ts",
   env: {
     SLACK_TOKEN: "${{ secrets.NODE_COMPAT_SLACK_TOKEN }}",
     SLACK_CHANNEL: "${{ secrets.NODE_COMPAT_SLACK_CHANNEL }}",

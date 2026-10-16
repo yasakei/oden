@@ -1,52 +1,52 @@
-Deno.mkdirSync("subdir");
+Oden.mkdirSync("subdir");
 
 // async file
 {
-  const path = await Deno.makeTempFile({ dir: `subdir` });
+  const path = await Oden.makeTempFile({ dir: `subdir` });
   try {
     if (!path.match(/^subdir[/\\][^/\\]+/)) {
       throw Error("bad " + path);
     }
     console.log("good", path);
   } finally {
-    await Deno.remove(path);
+    await Oden.remove(path);
   }
 }
 // sync file
 {
-  const path = Deno.makeTempFileSync({ dir: `subdir` });
+  const path = Oden.makeTempFileSync({ dir: `subdir` });
   try {
     if (!path.match(/^subdir[/\\][^/\\]+/)) {
       throw Error("bad " + path);
     }
     console.log("good", path);
   } finally {
-    await Deno.remove(path);
+    await Oden.remove(path);
   }
 }
 
 // async dir
 {
-  const path = await Deno.makeTempDir({ dir: `subdir` });
+  const path = await Oden.makeTempDir({ dir: `subdir` });
   try {
     if (!path.match(/^subdir[/\\][^/\\]+/)) {
       throw Error("bad " + path);
     }
     console.log("good", path);
   } finally {
-    await Deno.remove(path);
+    await Oden.remove(path);
   }
 }
 
 // sync dir
 {
-  const path = Deno.makeTempDirSync({ dir: `subdir` });
+  const path = Oden.makeTempDirSync({ dir: `subdir` });
   try {
     if (!path.match(/^subdir[/\\][^/\\]+/)) {
       throw Error("bad " + path);
     }
     console.log("good", path);
   } finally {
-    await Deno.remove(path);
+    await Oden.remove(path);
   }
 }

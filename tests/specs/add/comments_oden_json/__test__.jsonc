@@ -1,0 +1,16 @@
+{
+  "tempDir": true,
+  "steps": [
+    {
+      "args": "add npm:@odentest/esm-basic jsr:@odentest/add",
+      "output": "[WILDCARD]"
+    },
+    {
+      "args": [
+        "eval",
+        "console.log(Oden.readTextFileSync('oden.jsonc').trim())"
+      ],
+      "output": "oden.jsonc.out"
+    }
+  ]
+}

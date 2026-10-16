@@ -1,0 +1,4 @@
+{
+  "args": "run -A --quiet npm:@odentest/bin@0.6.0/cli.mjs this is a test",
+  "output": "oden_run_esm.out"
+}

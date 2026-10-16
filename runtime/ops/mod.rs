@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 pub mod bootstrap;
 pub mod desktop;
@@ -12,8 +12,8 @@ pub mod worker_host;
 
 use std::sync::Arc;
 
-use deno_core::OpState;
-use deno_features::FeatureChecker;
+use oden_core::OpState;
+use oden_features::FeatureChecker;
 
 /// Helper for checking unstable features. Used for sync ops.
 pub fn check_unstable(state: &OpState, feature: &str, api_name: &str) {

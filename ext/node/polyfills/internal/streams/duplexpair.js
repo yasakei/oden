@@ -1,11 +1,11 @@
 // deno-lint-ignore-file
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import process from "node:process";
 import { core, primordials } from "ext:core/mod.js";
 import { Duplex } from "node:stream";
 const assert = core.loadExtScript(
-  "ext:deno_node/internal/assert.mjs",
+  "ext:oden_node/internal/assert.mjs",
 );
 "use strict";
 const {

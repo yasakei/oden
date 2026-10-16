@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! `SubtleCrypto.verify()` body in Rust — symmetric mirror of
 //! [`crate::subtle_sign`]. The per-algorithm parameter dictionary
@@ -9,10 +9,10 @@
 
 use std::borrow::Cow;
 
-use deno_core::v8;
-use deno_core::webidl::ContextFn;
-use deno_core::webidl::WebIdlConverter;
-use deno_core::webidl::WebIdlError;
+use oden_core::v8;
+use oden_core::webidl::ContextFn;
+use oden_core::webidl::WebIdlConverter;
+use oden_core::webidl::WebIdlError;
 use deno_error::JsErrorBox;
 
 use crate::CryptoError;

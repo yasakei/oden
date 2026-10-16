@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import {
   assert,
@@ -11,9 +11,9 @@ import { opendir, opendirSync } from "node:fs";
 import { Buffer } from "node:buffer";
 import { assertCallbackErrorUncaught } from "../_test_utils.ts";
 
-Deno.test("[node/fs] opendir()", async (t) => {
-  const path = await Deno.makeTempDir();
-  const file = await Deno.makeTempFile();
+Oden.test("[node/fs] opendir()", async (t) => {
+  const path = await Oden.makeTempDir();
+  const file = await Oden.makeTempFile();
 
   await t.step(
     "fails if encoding is invalid",
@@ -98,13 +98,13 @@ Deno.test("[node/fs] opendir()", async (t) => {
     });
   });
 
-  await Deno.remove(path);
-  await Deno.remove(file);
+  await Oden.remove(path);
+  await Oden.remove(file);
 });
 
-Deno.test("[node/fs] opendirSync()", async (t) => {
-  const path = await Deno.makeTempDir();
-  const file = await Deno.makeTempFile();
+Oden.test("[node/fs] opendirSync()", async (t) => {
+  const path = await Oden.makeTempDir();
+  const file = await Oden.makeTempFile();
 
   await t.step("fails if encoding is invalid", () => {
     assertThrows(
@@ -141,6 +141,6 @@ Deno.test("[node/fs] opendirSync()", async (t) => {
     assert(opendirSync(new URL(`file://` + path)));
   });
 
-  await Deno.remove(path);
-  await Deno.remove(file);
+  await Oden.remove(path);
+  await Oden.remove(file);
 });

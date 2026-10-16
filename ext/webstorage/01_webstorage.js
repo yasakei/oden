@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 /// <reference path="../../core/internal.d.ts" />
 
@@ -97,7 +97,7 @@ function createStorage(persistent) {
     },
   });
 
-  storage[SymbolFor("Deno.privateCustomInspect")] = function (
+  storage[SymbolFor("Oden.privateCustomInspect")] = function (
     inspect,
     inspectOptions,
   ) {

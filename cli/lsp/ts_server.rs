@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::str::FromStr;
 use std::sync::Arc;
 
-use deno_core::anyhow::anyhow;
-use deno_core::error::AnyError;
-use deno_core::futures::future::Shared;
-use deno_resolver::deno_json::CompilerOptionsKey;
+use oden_core::anyhow::anyhow;
+use oden_core::error::AnyError;
+use oden_core::futures::future::Shared;
+use oden_resolver::oden_json::CompilerOptionsKey;
 use indexmap::IndexMap;
 use indexmap::IndexSet;
 use lsp_types::Uri;
@@ -328,7 +328,7 @@ impl TsServer {
     range: lsp::Range,
     context: &lsp::CodeActionContext,
     file_diagnostics: Shared<impl Future<Output = Arc<Vec<lsp::Diagnostic>>>>,
-    has_deno_code_actions: bool,
+    has_oden_code_actions: bool,
     language_server: &language_server::Inner,
     snapshot: Arc<StateSnapshot>,
     token: &CancellationToken,
@@ -338,7 +338,7 @@ impl TsServer {
         let supported_code_fixes =
           ts_server.get_supported_code_fixes(snapshot.clone()).await?;
         let fixable_diagnostics = context.diagnostics.iter().filter(|d| {
-          d.source.as_deref() == Some("deno-ts")
+          d.source.as_deref() == Some("oden-ts")
             && match &d.code {
               Some(lsp::NumberOrString::String(code)) => {
                 supported_code_fixes.contains(code)
@@ -415,7 +415,7 @@ impl TsServer {
         }
 
         let mut actions = collector
-          .into_code_actions(has_deno_code_actions)
+          .into_code_actions(has_oden_code_actions)
           .map(lsp::CodeActionOrCommand::CodeAction)
           .collect::<Vec<_>>();
 

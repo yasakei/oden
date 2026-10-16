@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 /// <reference types="npm:@types/node" />
 import {
   assert,
@@ -19,7 +19,7 @@ async function runReadvFixture<T>(
     new URL("./testdata/readv_short_read.ts", import.meta.url),
   );
   const isPipe = mode !== "file";
-  const child = new Deno.Command(Deno.execPath(), {
+  const child = new Oden.Command(Oden.execPath(), {
     args: ["run", "-A", fixture, mode],
     stdin: isPipe ? "piped" : "null",
     stdout: "piped",
@@ -27,7 +27,7 @@ async function runReadvFixture<T>(
     signal: AbortSignal.timeout(10_000),
   }).spawn();
 
-  let output: Deno.CommandOutput;
+  let output: Oden.CommandOutput;
   try {
     if (mode === "pipe-async") {
       const reader = child.stderr.getReader();
@@ -107,7 +107,7 @@ async function readTest<T extends NodeJS.ArrayBufferView>(
     .finally(() => closeSync(fd1));
 }
 
-Deno.test({
+Oden.test({
   name: "readSuccess",
   async fn() {
     const moduleDir = path.dirname(path.fromFileUrl(import.meta.url));
@@ -128,7 +128,7 @@ Deno.test({
   },
 });
 
-Deno.test("readv returns short reads and preserves positions", async () => {
+Oden.test("readv returns short reads and preserves positions", async () => {
   const result = await runReadvFixture("file");
   assertEquals(result, {
     sync: {
@@ -182,7 +182,7 @@ Deno.test("readv returns short reads and preserves positions", async () => {
   });
 });
 
-Deno.test("readv returns a short pipe read without waiting for EOF", async (t) => {
+Oden.test("readv returns a short pipe read without waiting for EOF", async (t) => {
   await t.step("sync", async () => {
     const result = await runReadvFixture("pipe-sync");
     assertEquals(result, {
@@ -203,7 +203,7 @@ Deno.test("readv returns a short pipe read without waiting for EOF", async (t) =
   });
 });
 
-Deno.test({
+Oden.test({
   name:
     "[std/node/fs] Read only five bytes, so that the position moves to five",
   async fn() {
@@ -225,7 +225,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name:
     "[std/node/fs] position option of fs.read() specifies where to begin reading from in the file",
   async fn() {
@@ -266,12 +266,12 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[std/node/fs] Read fs.read(fd, options, cb) signature",
   async fn() {
     const { promise, reject, resolve } = Promise.withResolvers<void>();
-    const file = Deno.makeTempFileSync();
-    Deno.writeTextFileSync(file, "hi there");
+    const file = Oden.makeTempFileSync();
+    Oden.writeTextFileSync(file, "hi there");
     const fd = openSync(file, "r+");
     const buf = Buffer.alloc(11);
     read(
@@ -302,12 +302,12 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[std/node/fs] Read fs.read(fd, cb) signature",
   async fn() {
     const { promise, resolve, reject } = Promise.withResolvers<void>();
-    const file = Deno.makeTempFileSync();
-    Deno.writeTextFileSync(file, "hi deno");
+    const file = Oden.makeTempFileSync();
+    Oden.writeTextFileSync(file, "hi oden");
     const fd = openSync(file, "r+");
     read(fd, (err, bytesRead, data) => {
       try {
@@ -325,7 +325,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "SYNC: readSuccess",
   fn() {
     const moduleDir = path.dirname(path.fromFileUrl(import.meta.url));
@@ -344,7 +344,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[std/node/fs] Read only two bytes, so that the position moves to two",
   fn() {
     const moduleDir = path.dirname(path.fromFileUrl(import.meta.url));
@@ -357,7 +357,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name:
     "[std/node/fs] position option of fs.readSync() specifies where to begin reading from in the file",
   fn() {
@@ -390,11 +390,11 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[std/node/fs] Read fs.readSync(fd, buffer[, options]) signature",
   fn() {
-    const file = Deno.makeTempFileSync();
-    Deno.writeTextFileSync(file, "hello deno");
+    const file = Oden.makeTempFileSync();
+    Oden.writeTextFileSync(file, "hello oden");
     const buffer = Buffer.alloc(1024);
     const fd = openSync(file, "r+");
     const bytesRead = readSync(fd, buffer, {
@@ -407,11 +407,11 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[std/node/fs] fs.read is async",
   async fn(t) {
-    const file = await Deno.makeTempFile();
-    await Deno.writeTextFile(file, "abc");
+    const file = await Oden.makeTempFile();
+    await Oden.writeTextFile(file, "abc");
 
     await t.step("without position option", async () => {
       const { promise, resolve } = Promise.withResolvers<void>();
@@ -440,11 +440,11 @@ Deno.test({
       await promise;
     });
 
-    await Deno.remove(file);
+    await Oden.remove(file);
   },
 });
 
-Deno.test({
+Oden.test({
   name: "SYNC: read with no offsetOropts argument",
   fn() {
     const moduleDir = path.dirname(path.fromFileUrl(import.meta.url));
@@ -459,7 +459,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "read with offset TypedArray buffers",
   async fn() {
     const moduleDir = path.dirname(path.fromFileUrl(import.meta.url));
@@ -541,11 +541,11 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "readSync: option object parameter works",
   fn() {
-    const tmpFile = Deno.makeTempFileSync();
-    Deno.writeTextFileSync(tmpFile, "hello world!");
+    const tmpFile = Oden.makeTempFileSync();
+    Oden.writeTextFileSync(tmpFile, "hello world!");
 
     const fd = openSync(tmpFile, "r");
     const buffer = Buffer.alloc(6);
@@ -560,15 +560,15 @@ Deno.test({
     assertStrictEquals(buffer.toString("utf8", 1, 6), "world");
 
     closeSync(fd);
-    Deno.removeSync(tmpFile);
+    Oden.removeSync(tmpFile);
   },
 });
 
-Deno.test({
+Oden.test({
   name: "read: option object parameter works",
   async fn() {
-    const tmpFile = Deno.makeTempFileSync();
-    Deno.writeTextFileSync(tmpFile, "hello world!");
+    const tmpFile = Oden.makeTempFileSync();
+    Oden.writeTextFileSync(tmpFile, "hello world!");
 
     const fd = openSync(tmpFile, "r");
     const buffer = Buffer.alloc(11);
@@ -614,15 +614,15 @@ Deno.test({
     });
 
     closeSync(fd);
-    Deno.removeSync(tmpFile);
+    Oden.removeSync(tmpFile);
   },
 });
 
-Deno.test({
+Oden.test({
   name: "FileHandle.read: option object parameter works",
   async fn() {
-    const tmpFile = Deno.makeTempFileSync();
-    Deno.writeTextFileSync(tmpFile, "hello world!");
+    const tmpFile = Oden.makeTempFileSync();
+    Oden.writeTextFileSync(tmpFile, "hello world!");
 
     await using file = await openPromise(tmpFile, "r");
     const buffer = Buffer.alloc(11);
@@ -648,6 +648,6 @@ Deno.test({
     assertStrictEquals(result2.bytesRead, 5);
     assertStrictEquals(buffer.toString("utf8", 6, 11), "world");
 
-    Deno.removeSync(tmpFile);
+    Oden.removeSync(tmpFile);
   },
 });

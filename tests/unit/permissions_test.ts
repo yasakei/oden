@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   assert,
   assertEquals,
@@ -6,89 +6,89 @@ import {
   assertThrows,
 } from "./test_util.ts";
 
-Deno.test(async function permissionInvalidName() {
+Oden.test(async function permissionInvalidName() {
   await assertRejects(async () => {
     // deno-lint-ignore no-explicit-any
-    await Deno.permissions.query({ name: "foo" as any });
+    await Oden.permissions.query({ name: "foo" as any });
   }, TypeError);
 });
 
-Deno.test(function permissionInvalidNameSync() {
+Oden.test(function permissionInvalidNameSync() {
   assertThrows(() => {
     // deno-lint-ignore no-explicit-any
-    Deno.permissions.querySync({ name: "foo" as any });
+    Oden.permissions.querySync({ name: "foo" as any });
   }, TypeError);
 });
 
-Deno.test(
+Oden.test(
   { permissions: { net: [] } },
   async function permissionNetInvalidHost() {
     await assertRejects(async () => {
-      await Deno.permissions.query({ name: "net", host: ":" });
+      await Oden.permissions.query({ name: "net", host: ":" });
     }, URIError);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { net: [] } },
   function permissionNetInvalidHostSync() {
     assertThrows(() => {
-      Deno.permissions.querySync({ name: "net", host: ":" });
+      Oden.permissions.querySync({ name: "net", host: ":" });
     }, URIError);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { sys: [] } },
   async function permissionSysValidKind() {
-    await Deno.permissions.query({ name: "sys", kind: "loadavg" });
-    await Deno.permissions.query({ name: "sys", kind: "osRelease" });
-    await Deno.permissions.query({ name: "sys", kind: "osUptime" });
-    await Deno.permissions.query({ name: "sys", kind: "networkInterfaces" });
-    await Deno.permissions.query({ name: "sys", kind: "systemMemoryInfo" });
-    await Deno.permissions.query({ name: "sys", kind: "hostname" });
-    await Deno.permissions.query({ name: "sys", kind: "uid" });
-    await Deno.permissions.query({ name: "sys", kind: "gid" });
-    await Deno.permissions.query({ name: "sys", kind: "cpus" });
+    await Oden.permissions.query({ name: "sys", kind: "loadavg" });
+    await Oden.permissions.query({ name: "sys", kind: "osRelease" });
+    await Oden.permissions.query({ name: "sys", kind: "osUptime" });
+    await Oden.permissions.query({ name: "sys", kind: "networkInterfaces" });
+    await Oden.permissions.query({ name: "sys", kind: "systemMemoryInfo" });
+    await Oden.permissions.query({ name: "sys", kind: "hostname" });
+    await Oden.permissions.query({ name: "sys", kind: "uid" });
+    await Oden.permissions.query({ name: "sys", kind: "gid" });
+    await Oden.permissions.query({ name: "sys", kind: "cpus" });
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { sys: [] } },
   function permissionSysValidKindSync() {
-    Deno.permissions.querySync({ name: "sys", kind: "loadavg" });
-    Deno.permissions.querySync({ name: "sys", kind: "osRelease" });
-    Deno.permissions.querySync({ name: "sys", kind: "networkInterfaces" });
-    Deno.permissions.querySync({ name: "sys", kind: "systemMemoryInfo" });
-    Deno.permissions.querySync({ name: "sys", kind: "hostname" });
-    Deno.permissions.querySync({ name: "sys", kind: "uid" });
-    Deno.permissions.querySync({ name: "sys", kind: "gid" });
-    Deno.permissions.querySync({ name: "sys", kind: "cpus" });
+    Oden.permissions.querySync({ name: "sys", kind: "loadavg" });
+    Oden.permissions.querySync({ name: "sys", kind: "osRelease" });
+    Oden.permissions.querySync({ name: "sys", kind: "networkInterfaces" });
+    Oden.permissions.querySync({ name: "sys", kind: "systemMemoryInfo" });
+    Oden.permissions.querySync({ name: "sys", kind: "hostname" });
+    Oden.permissions.querySync({ name: "sys", kind: "uid" });
+    Oden.permissions.querySync({ name: "sys", kind: "gid" });
+    Oden.permissions.querySync({ name: "sys", kind: "cpus" });
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { sys: [] } },
   async function permissionSysInvalidKind() {
     await assertRejects(async () => {
       // deno-lint-ignore no-explicit-any
-      await Deno.permissions.query({ name: "sys", kind: "abc" as any });
+      await Oden.permissions.query({ name: "sys", kind: "abc" as any });
     }, TypeError);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { sys: [] } },
   function permissionSysInvalidKindSync() {
     assertThrows(() => {
       // deno-lint-ignore no-explicit-any
-      Deno.permissions.querySync({ name: "sys", kind: "abc" as any });
+      Oden.permissions.querySync({ name: "sys", kind: "abc" as any });
     }, TypeError);
   },
 );
 
-Deno.test(async function permissionQueryReturnsEventTarget() {
-  const status = await Deno.permissions.query({ name: "read", path: "." });
+Oden.test(async function permissionQueryReturnsEventTarget() {
+  const status = await Oden.permissions.query({ name: "read", path: "." });
   assert(["granted", "denied", "prompt"].includes(status.state));
   let called = false;
   status.addEventListener("change", () => {
@@ -97,12 +97,12 @@ Deno.test(async function permissionQueryReturnsEventTarget() {
   status.dispatchEvent(new Event("change"));
   assert(called);
   assert(
-    status === (await Deno.permissions.query({ name: "read", path: "." })),
+    status === (await Oden.permissions.query({ name: "read", path: "." })),
   );
 });
 
-Deno.test(function permissionQueryReturnsEventTargetSync() {
-  const status = Deno.permissions.querySync({ name: "read", path: "." });
+Oden.test(function permissionQueryReturnsEventTargetSync() {
+  const status = Oden.permissions.querySync({ name: "read", path: "." });
   assert(["granted", "denied", "prompt"].includes(status.state));
   let called = false;
   status.addEventListener("change", () => {
@@ -110,85 +110,85 @@ Deno.test(function permissionQueryReturnsEventTargetSync() {
   });
   status.dispatchEvent(new Event("change"));
   assert(called);
-  assert(status === Deno.permissions.querySync({ name: "read", path: "." }));
+  assert(status === Oden.permissions.querySync({ name: "read", path: "." }));
 });
 
-Deno.test(async function permissionQueryForReadReturnsSameStatus() {
-  const status1 = await Deno.permissions.query({
+Oden.test(async function permissionQueryForReadReturnsSameStatus() {
+  const status1 = await Oden.permissions.query({
     name: "read",
     path: ".",
   });
-  const status2 = await Deno.permissions.query({
-    name: "read",
-    path: ".",
-  });
-  assert(status1 === status2);
-});
-
-Deno.test(function permissionQueryForReadReturnsSameStatusSync() {
-  const status1 = Deno.permissions.querySync({
-    name: "read",
-    path: ".",
-  });
-  const status2 = Deno.permissions.querySync({
+  const status2 = await Oden.permissions.query({
     name: "read",
     path: ".",
   });
   assert(status1 === status2);
 });
 
-Deno.test(function permissionsIllegalConstructor() {
-  assertThrows(() => new Deno.Permissions(), TypeError, "Illegal constructor");
-  assertEquals(Deno.Permissions.length, 0);
+Oden.test(function permissionQueryForReadReturnsSameStatusSync() {
+  const status1 = Oden.permissions.querySync({
+    name: "read",
+    path: ".",
+  });
+  const status2 = Oden.permissions.querySync({
+    name: "read",
+    path: ".",
+  });
+  assert(status1 === status2);
 });
 
-Deno.test(function permissionStatusIllegalConstructor() {
+Oden.test(function permissionsIllegalConstructor() {
+  assertThrows(() => new Oden.Permissions(), TypeError, "Illegal constructor");
+  assertEquals(Oden.Permissions.length, 0);
+});
+
+Oden.test(function permissionStatusIllegalConstructor() {
   assertThrows(
-    () => new Deno.PermissionStatus(),
+    () => new Oden.PermissionStatus(),
     TypeError,
     "Illegal constructor",
   );
-  assertEquals(Deno.PermissionStatus.length, 0);
+  assertEquals(Oden.PermissionStatus.length, 0);
 });
 
 // Regression test for https://github.com/denoland/deno/issues/17020
-Deno.test(
+Oden.test(
   { permissions: { read: [], write: [], ffi: [], run: [] } },
   async function permissionURL() {
     const path = new URL(".", import.meta.url);
 
-    await Deno.permissions.query({ name: "read", path });
-    await Deno.permissions.query({ name: "write", path });
-    await Deno.permissions.query({ name: "ffi", path });
-    await Deno.permissions.query({ name: "run", command: path });
+    await Oden.permissions.query({ name: "read", path });
+    await Oden.permissions.query({ name: "write", path });
+    await Oden.permissions.query({ name: "ffi", path });
+    await Oden.permissions.query({ name: "run", command: path });
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: [], write: [], ffi: [], run: [] } },
   function permissionURLSync() {
-    Deno.permissions.querySync({
+    Oden.permissions.querySync({
       name: "read",
       path: new URL(".", import.meta.url),
     });
-    Deno.permissions.querySync({
+    Oden.permissions.querySync({
       name: "write",
       path: new URL(".", import.meta.url),
     });
-    Deno.permissions.querySync({
+    Oden.permissions.querySync({
       name: "run",
       command: new URL(".", import.meta.url),
     });
   },
 );
 
-Deno.test(async function permissionDescriptorValidation() {
+Oden.test(async function permissionDescriptorValidation() {
   for (const value of [undefined, null, {}]) {
     for (const method of ["query", "request", "revoke"]) {
       await assertRejects(
         async () => {
           // deno-lint-ignore no-explicit-any
-          await (Deno.permissions as any)[method](value as any);
+          await (Oden.permissions as any)[method](value as any);
         },
         TypeError,
         '"undefined" is not a valid permission name',
@@ -197,13 +197,13 @@ Deno.test(async function permissionDescriptorValidation() {
   }
 });
 
-Deno.test(function permissionDescriptorValidationSync() {
+Oden.test(function permissionDescriptorValidationSync() {
   for (const value of [undefined, null, {}]) {
     for (const method of ["querySync", "revokeSync", "requestSync"]) {
       assertThrows(
         () => {
           // deno-lint-ignore no-explicit-any
-          (Deno.permissions as any)[method](value as any);
+          (Oden.permissions as any)[method](value as any);
         },
         TypeError,
         '"undefined" is not a valid permission name',
@@ -213,56 +213,56 @@ Deno.test(function permissionDescriptorValidationSync() {
 });
 
 // Regression test for https://github.com/denoland/deno/issues/15894.
-Deno.test(async function permissionStatusObjectsNotEqual() {
+Oden.test(async function permissionStatusObjectsNotEqual() {
   assert(
-    await Deno.permissions.query({ name: "env", variable: "A" }) !=
-      await Deno.permissions.query({ name: "env", variable: "B" }),
+    await Oden.permissions.query({ name: "env", variable: "A" }) !=
+      await Oden.permissions.query({ name: "env", variable: "B" }),
   );
 });
 
-Deno.test(function permissionStatusObjectsNotEqualSync() {
+Oden.test(function permissionStatusObjectsNotEqualSync() {
   assert(
-    Deno.permissions.querySync({ name: "env", variable: "A" }) !=
-      Deno.permissions.querySync({ name: "env", variable: "B" }),
+    Oden.permissions.querySync({ name: "env", variable: "A" }) !=
+      Oden.permissions.querySync({ name: "env", variable: "B" }),
   );
 });
 
-Deno.test(
+Oden.test(
   { permissions: { import: ["jsr.io:443"] } },
   async function permissionQueryImport() {
-    await Deno.permissions.query({ name: "import", host: "jsr.io:443" });
-    await Deno.permissions.query({ name: "import", host: "deno.test:443" });
+    await Oden.permissions.query({ name: "import", host: "jsr.io:443" });
+    await Oden.permissions.query({ name: "import", host: "oden.test:443" });
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true } },
   function permissionDevTtyReadAllowed() {
-    if (Deno.build.os !== "linux" && Deno.build.os !== "darwin") {
+    if (Oden.build.os !== "linux" && Oden.build.os !== "darwin") {
       return;
     }
     try {
-      const f = Deno.openSync("/dev/tty", { read: true });
+      const f = Oden.openSync("/dev/tty", { read: true });
       f.close();
     } catch (e) {
       // CI environments may lack /dev/tty (NXIO). We only check for permission errors.
-      if (e instanceof Deno.errors.NotCapable) {
+      if (e instanceof Oden.errors.NotCapable) {
         throw e;
       }
     }
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function permissionDevTtyWriteBlocked() {
-    if (Deno.build.os !== "linux" && Deno.build.os !== "darwin") {
+    if (Oden.build.os !== "linux" && Oden.build.os !== "darwin") {
       return;
     }
     assertThrows(() => {
       // Write access to /dev/tty is always blocked to prevent prompt spoofing.
-      const f = Deno.openSync("/dev/tty", { write: true });
+      const f = Oden.openSync("/dev/tty", { write: true });
       f.close();
-    }, Deno.errors.NotCapable);
+    }, Oden.errors.NotCapable);
   },
 );

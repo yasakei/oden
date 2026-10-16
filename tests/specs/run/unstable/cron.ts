@@ -1,1 +1,1 @@
-Deno.cron();
+Oden.cron();

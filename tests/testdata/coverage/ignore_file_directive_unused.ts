@@ -1,4 +1,4 @@
-// deno-coverage-ignore-file
+// oden-coverage-ignore-file
 
 export function unused(condition: boolean): boolean {
   if (condition) {

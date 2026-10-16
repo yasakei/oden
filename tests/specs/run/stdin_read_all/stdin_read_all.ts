@@ -7,11 +7,11 @@ const pending = [];
 for (let i = 0; i < 50; i++) {
   const buf = new Uint8Array(1);
   pending.push(
-    Deno.stdin.read(buf).then(() => {
-      return Deno.stdout.write(buf);
+    Oden.stdin.read(buf).then(() => {
+      return Oden.stdout.write(buf);
     }),
   );
 }
 
 await Promise.all(pending);
-await Deno.stdout.write(encoder.encode("\n"));
+await Oden.stdout.write(encoder.encode("\n"));

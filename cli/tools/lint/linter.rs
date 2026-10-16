@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::collections::HashSet;
@@ -11,20 +11,20 @@ use deno_ast::MediaType;
 use deno_ast::ModuleSpecifier;
 use deno_ast::ParsedSource;
 use deno_ast::SourceTextInfo;
-use deno_core::anyhow::Context;
-use deno_core::error::AnyError;
-use deno_core::futures::FutureExt as _;
-use deno_core::parking_lot::Mutex;
+use oden_core::anyhow::Context;
+use oden_core::error::AnyError;
+use oden_core::futures::FutureExt as _;
+use oden_core::parking_lot::Mutex;
 use deno_graph::ModuleGraph;
 use deno_lint::diagnostic::LintDiagnostic;
 use deno_lint::linter::ExternalLinterCb;
 use deno_lint::linter::ExternalLinterResult;
-use deno_lint::linter::LintConfig as DenoLintConfig;
+use deno_lint::linter::LintConfig as OdenLintConfig;
 use deno_lint::linter::LintFileOptions;
-use deno_lint::linter::Linter as DenoLintLinter;
+use deno_lint::linter::Linter as OdenLintLinter;
 use deno_lint::linter::LinterOptions;
 use deno_path_util::fs::atomic_write_file_with_retries;
-use deno_runtime::tokio_util;
+use oden_runtime::tokio_util;
 
 use super::ConfiguredRules;
 use super::plugins;
@@ -38,7 +38,7 @@ use crate::util::text_encoding::Utf16Map;
 pub struct CliLinterOptions {
   pub configured_rules: ConfiguredRules,
   pub fix: bool,
-  pub deno_lint_config: DenoLintConfig,
+  pub deno_lint_config: OdenLintConfig,
   pub maybe_plugin_runner: Option<Arc<PluginHostProxy>>,
 }
 
@@ -46,8 +46,8 @@ pub struct CliLinterOptions {
 pub struct CliLinter {
   fix: bool,
   package_rules: Vec<Box<dyn PackageLintRule>>,
-  linter: DenoLintLinter,
-  deno_lint_config: DenoLintConfig,
+  linter: OdenLintLinter,
+  deno_lint_config: OdenLintConfig,
   maybe_plugin_runner: Option<Arc<PluginHostProxy>>,
 }
 
@@ -69,7 +69,7 @@ impl CliLinter {
     Self {
       fix: options.fix,
       package_rules,
-      linter: DenoLintLinter::new(LinterOptions {
+      linter: OdenLintLinter::new(LinterOptions {
         rules: deno_lint_rules,
         all_rule_codes: options.configured_rules.all_rule_codes,
         custom_ignore_file_directive: None,
@@ -174,7 +174,7 @@ impl CliLinter {
     source_code: String,
     file_path: &Path,
     external_linter_container: ExternalLinterContainer,
-  ) -> Result<(ParsedSource, Vec<LintDiagnostic>), deno_core::anyhow::Error> {
+  ) -> Result<(ParsedSource, Vec<LintDiagnostic>), oden_core::anyhow::Error> {
     // initial lint
     let (source, diagnostics) = self.linter.lint_file(LintFileOptions {
       specifier: specifier.clone(),
@@ -245,8 +245,8 @@ impl CliLinter {
 fn apply_lint_fixes_and_relint(
   specifier: &ModuleSpecifier,
   media_type: MediaType,
-  linter: &DenoLintLinter,
-  config: DenoLintConfig,
+  linter: &OdenLintLinter,
+  config: OdenLintConfig,
   original_source: &ParsedSource,
   diagnostics: &[LintDiagnostic],
   external_linter_container: &ExternalLinterContainer,

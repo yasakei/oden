@@ -20,14 +20,14 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
-          token: '${{ secrets.DENOBOT_PAT }}'
-      - name: Install deno
-        uses: denoland/setup-deno@667a34cdef165d8d2b2e98dde39547c9daac7282
+          token: '${{ secrets.ODENBOT_PAT }}'
+      - name: Install oden
+        uses: denoland/setup-oden@667a34cdef165d8d2b2e98dde39547c9daac7282
         with:
-          deno-version: v2.x
+          oden-version: v2.x
       - name: Create release tag and check forward commit to main
         env:
-          GITHUB_TOKEN: '${{ secrets.DENOBOT_PAT }}'
+          GITHUB_TOKEN: '${{ secrets.ODENBOT_PAT }}'
           GH_WORKFLOW_ACTOR: '${{ github.actor }}'
         run: |-
           git config user.email "${{ github.actor }}@users.noreply.github.com"
@@ -35,4 +35,4 @@ jobs:
           ./tools/release/04_post_publish.ts
 
 # gagen:pin actions/checkout@v6 = de0fac2e4500dabe0009e67214ff5f5447ce83dd
-# gagen:pin denoland/setup-deno@v2 = 667a34cdef165d8d2b2e98dde39547c9daac7282
+# gagen:pin denoland/setup-oden@v2 = 667a34cdef165d8d2b2e98dde39547c9daac7282

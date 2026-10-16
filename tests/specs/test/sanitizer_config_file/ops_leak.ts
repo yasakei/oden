@@ -1,3 +1,3 @@
-Deno.test("timer leak", () => {
+Oden.test("timer leak", () => {
   setTimeout(() => {}, 10000);
 });

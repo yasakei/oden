@@ -1,24 +1,24 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 
 // Mirrors lib/cluster.js. Node decides at module-load whether to require
 // `internal/cluster/primary` or `internal/cluster/child` from
-// process.env.NODE_UNIQUE_ID. In Deno, the IIFE initializes the primary side
+// process.env.NODE_UNIQUE_ID. In Oden, the IIFE initializes the primary side
 // at module load, and `01_require.js`'s `initialize` flips to the child side
 // via the `__initCluster` callback (after triggering this script when
 // NODE_UNIQUE_ID is set).
 
 // TODO(petamoriken): enable prefer-primordials for node polyfills
-// deno-lint-ignore-file no-explicit-any deno-internal/prefer-primordials
+// deno-lint-ignore-file no-explicit-any oden-internal/prefer-primordials
 
 (function () {
 const { core, internals } = __bootstrap;
-const { EventEmitter } = core.loadExtScript("ext:deno_node/_events.mjs");
+const { EventEmitter } = core.loadExtScript("ext:oden_node/_events.mjs");
 const { init: initPrimary } = core.loadExtScript(
-  "ext:deno_node/internal/cluster/primary.ts",
+  "ext:oden_node/internal/cluster/primary.ts",
 );
 const { init: initChild } = core.loadExtScript(
-  "ext:deno_node/internal/cluster/child.ts",
+  "ext:oden_node/internal/cluster/child.ts",
 );
 
 const cluster: any = new EventEmitter();

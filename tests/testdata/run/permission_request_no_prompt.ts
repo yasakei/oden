@@ -1,1 +1,1 @@
-console.log(await Deno.permissions.request({ name: "read" }));
+console.log(await Oden.permissions.request({ name: "read" }));

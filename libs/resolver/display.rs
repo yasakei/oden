@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! It would be best to move these utilities out of this
 //! crate as this is not specific to resolution, but for
@@ -316,10 +316,10 @@ mod tests {
     let before = r#"{
   "version": "5",
   "packages": {
-    "npm:@denotest/add@1": "1.0.0"
+    "npm:@odentest/add@1": "1.0.0"
   },
   "npm": {
-    "@denotest/add@1.0.0": {
+    "@odentest/add@1.0.0": {
       "integrity": "abc",
       "tarball": "http://localhost/add/1.0.0.tgz"
     }
@@ -328,15 +328,15 @@ mod tests {
     let after = r#"{
   "version": "5",
   "packages": {
-    "npm:@denotest/add@1": "1.0.0",
-    "npm:@denotest/subtract@1": "1.0.0"
+    "npm:@odentest/add@1": "1.0.0",
+    "npm:@odentest/subtract@1": "1.0.0"
   },
   "npm": {
-    "@denotest/add@1.0.0": {
+    "@odentest/add@1.0.0": {
       "integrity": "abc",
       "tarball": "http://localhost/add/1.0.0.tgz"
     },
-    "@denotest/subtract@1.0.0": {
+    "@odentest/subtract@1.0.0": {
       "integrity": "def",
       "tarball": "http://localhost/subtract/1.0.0.tgz"
     }
@@ -346,12 +346,12 @@ mod tests {
       before,
       after,
       concat!(
-        " 4 | -    \"npm:@denotest/add@1\": \"1.0.0\"\n",
-        " 4 | +    \"npm:@denotest/add@1\": \"1.0.0\",\n",
-        " 5 | +    \"npm:@denotest/subtract@1\": \"1.0.0\"\n",
+        " 4 | -    \"npm:@odentest/add@1\": \"1.0.0\"\n",
+        " 4 | +    \"npm:@odentest/add@1\": \"1.0.0\",\n",
+        " 5 | +    \"npm:@odentest/subtract@1\": \"1.0.0\"\n",
         "   | ...\n",
         "11 | +    },\n",
-        "12 | +    \"@denotest/subtract@1.0.0\": {\n",
+        "12 | +    \"@odentest/subtract@1.0.0\": {\n",
         "13 | +      \"integrity\": \"def\",\n",
         "14 | +      \"tarball\": \"http://localhost/subtract/1.0.0.tgz\"\n",
       ),

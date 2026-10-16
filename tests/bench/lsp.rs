@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashMap;
 use std::path::Path;
@@ -75,7 +75,7 @@ fn patch_uris<'a>(
   }
 }
 
-fn bench_deco_apps_edits(deno_exe: &Path) -> Duration {
+fn bench_deco_apps_edits(oden_exe: &Path) -> Duration {
   let mut requests: Vec<tower_lsp::jsonrpc::Request> =
     serde_json::from_slice(FIXTURE_DECO_APPS).unwrap();
   let apps =
@@ -87,17 +87,17 @@ fn bench_deco_apps_edits(deno_exe: &Path) -> Duration {
 
   let mut client = LspClientBuilder::new()
     .set_root_dir(apps.clone())
-    .deno_exe(deno_exe)
+    .oden_exe(oden_exe)
     .build();
   client.initialize(|c| {
     c.set_workspace_folders(vec![tower_lsp::lsp_types::WorkspaceFolder {
       uri: apps.uri_dir(),
       name: "apps".to_string(),
     }]);
-    c.set_deno_enable(true);
+    c.set_oden_enable(true);
     c.set_unstable(true);
     c.set_preload_limit(1000);
-    c.set_config(apps.join("deno.json").as_path().to_string_lossy());
+    c.set_config(apps.join("oden.json").as_path().to_string_lossy());
   });
 
   let start = std::time::Instant::now();
@@ -121,17 +121,17 @@ fn bench_deco_apps_edits(deno_exe: &Path) -> Duration {
   // with a fairly large number of documents in memory.
   // make sure that's the case
   let res = client.write_request(
-    "deno/virtualTextDocument",
+    "oden/virtualTextDocument",
     json!({
       "textDocument": {
-        "uri": "deno:/status.md"
+        "uri": "oden:/status.md"
       }
     }),
   );
   let open_re = lazy_regex::regex!(r"Open: (\d+)");
   let server_re = lazy_regex::regex!(r"Server: (\d+)");
   let res = res.as_str().unwrap().to_string();
-  assert!(res.starts_with("# Deno Language Server Status"));
+  assert!(res.starts_with("# Oden Language Server Status"));
   let open_count = open_re
     .captures(&res)
     .unwrap()
@@ -159,14 +159,14 @@ fn bench_deco_apps_edits(deno_exe: &Path) -> Duration {
 /// A benchmark that opens a 8000+ line TypeScript document, adds a function to
 /// the end of the document and does a level of hovering and gets quick fix
 /// code actions.
-fn bench_big_file_edits(deno_exe: &Path) -> Duration {
-  let mut client = LspClientBuilder::new().deno_exe(deno_exe).build();
+fn bench_big_file_edits(oden_exe: &Path) -> Duration {
+  let mut client = LspClientBuilder::new().oden_exe(oden_exe).build();
   client.initialize_default();
   let (method, _): (String, Option<Value>) = client.read_notification();
-  assert_eq!(method, "deno/didRefreshDenoConfigurationTree");
-  client.change_configuration(json!({ "deno": { "enable": true } }));
+  assert_eq!(method, "oden/didRefreshOdenConfigurationTree");
+  client.change_configuration(json!({ "oden": { "enable": true } }));
   let (method, _): (String, Option<Value>) = client.read_notification();
-  assert_eq!(method, "deno/didRefreshDenoConfigurationTree");
+  assert_eq!(method, "oden/didRefreshOdenConfigurationTree");
 
   client.write_notification(
     "textDocument/didOpen",
@@ -211,12 +211,12 @@ fn bench_big_file_edits(deno_exe: &Path) -> Duration {
   client.duration()
 }
 
-fn bench_code_lens(deno_exe: &Path) -> Duration {
-  let mut client = LspClientBuilder::new().deno_exe(deno_exe).build();
+fn bench_code_lens(oden_exe: &Path) -> Duration {
+  let mut client = LspClientBuilder::new().oden_exe(oden_exe).build();
   client.initialize_default();
   let (method, _): (String, Option<Value>) = client.read_notification();
-  assert_eq!(method, "deno/didRefreshDenoConfigurationTree");
-  client.change_configuration(json!({ "deno": {
+  assert_eq!(method, "oden/didRefreshOdenConfigurationTree");
+  client.change_configuration(json!({ "oden": {
     "enable": true,
     "codeLens": {
       "implementations": true,
@@ -225,7 +225,7 @@ fn bench_code_lens(deno_exe: &Path) -> Duration {
     },
   } }));
   let (method, _): (String, Option<Value>) = client.read_notification();
-  assert_eq!(method, "deno/didRefreshDenoConfigurationTree");
+  assert_eq!(method, "oden/didRefreshOdenConfigurationTree");
 
   client.write_notification(
     "textDocument/didOpen",
@@ -256,14 +256,14 @@ fn bench_code_lens(deno_exe: &Path) -> Duration {
   client.duration()
 }
 
-fn bench_find_replace(deno_exe: &Path) -> Duration {
-  let mut client = LspClientBuilder::new().deno_exe(deno_exe).build();
+fn bench_find_replace(oden_exe: &Path) -> Duration {
+  let mut client = LspClientBuilder::new().oden_exe(oden_exe).build();
   client.initialize_default();
   let (method, _): (String, Option<Value>) = client.read_notification();
-  assert_eq!(method, "deno/didRefreshDenoConfigurationTree");
-  client.change_configuration(json!({ "deno": { "enable": true } }));
+  assert_eq!(method, "oden/didRefreshOdenConfigurationTree");
+  client.change_configuration(json!({ "oden": { "enable": true } }));
   let (method, _): (String, Option<Value>) = client.read_notification();
-  assert_eq!(method, "deno/didRefreshDenoConfigurationTree");
+  assert_eq!(method, "oden/didRefreshOdenConfigurationTree");
 
   for i in 0..10 {
     client.write_notification(
@@ -331,14 +331,14 @@ fn bench_find_replace(deno_exe: &Path) -> Duration {
 }
 
 /// A test that starts up the LSP, opens a single line document, and exits.
-fn bench_startup_shutdown(deno_exe: &Path) -> Duration {
-  let mut client = LspClientBuilder::new().deno_exe(deno_exe).build();
+fn bench_startup_shutdown(oden_exe: &Path) -> Duration {
+  let mut client = LspClientBuilder::new().oden_exe(oden_exe).build();
   client.initialize_default();
   let (method, _): (String, Option<Value>) = client.read_notification();
-  assert_eq!(method, "deno/didRefreshDenoConfigurationTree");
-  client.change_configuration(json!({ "deno": { "enable": true } }));
+  assert_eq!(method, "oden/didRefreshOdenConfigurationTree");
+  client.change_configuration(json!({ "oden": { "enable": true } }));
   let (method, _): (String, Option<Value>) = client.read_notification();
-  assert_eq!(method, "deno/didRefreshDenoConfigurationTree");
+  assert_eq!(method, "oden/didRefreshOdenConfigurationTree");
 
   client.write_notification(
     "textDocument/didOpen",
@@ -347,7 +347,7 @@ fn bench_startup_shutdown(deno_exe: &Path) -> Duration {
         "uri": "file:///a/file.ts",
         "languageId": "typescript",
         "version": 1,
-        "text": "console.log(Deno.args);\n"
+        "text": "console.log(Oden.args);\n"
       }
     }),
   );
@@ -360,14 +360,14 @@ fn bench_startup_shutdown(deno_exe: &Path) -> Duration {
 }
 
 /// Generate benchmarks for the LSP server.
-pub fn benchmarks(deno_exe: &Path) -> HashMap<String, i64> {
+pub fn benchmarks(oden_exe: &Path) -> HashMap<String, i64> {
   println!("-> Start benchmarking lsp");
   let mut exec_times = HashMap::new();
 
   println!("   - Simple Startup/Shutdown ");
   let mut times = Vec::new();
   for _ in 0..10 {
-    times.push(bench_startup_shutdown(deno_exe));
+    times.push(bench_startup_shutdown(oden_exe));
   }
   let mean =
     (times.iter().sum::<Duration>() / times.len() as u32).as_millis() as i64;
@@ -377,7 +377,7 @@ pub fn benchmarks(deno_exe: &Path) -> HashMap<String, i64> {
   println!("   - Big Document/Several Edits ");
   let mut times = Vec::new();
   for _ in 0..5 {
-    times.push(bench_big_file_edits(deno_exe));
+    times.push(bench_big_file_edits(oden_exe));
   }
   let mean =
     (times.iter().sum::<Duration>() / times.len() as u32).as_millis() as i64;
@@ -387,7 +387,7 @@ pub fn benchmarks(deno_exe: &Path) -> HashMap<String, i64> {
   println!("   - Find/Replace");
   let mut times = Vec::new();
   for _ in 0..10 {
-    times.push(bench_find_replace(deno_exe));
+    times.push(bench_find_replace(oden_exe));
   }
   let mean =
     (times.iter().sum::<Duration>() / times.len() as u32).as_millis() as i64;
@@ -397,7 +397,7 @@ pub fn benchmarks(deno_exe: &Path) -> HashMap<String, i64> {
   println!("   - Code Lens");
   let mut times = Vec::new();
   for _ in 0..10 {
-    times.push(bench_code_lens(deno_exe));
+    times.push(bench_code_lens(oden_exe));
   }
   let mean =
     (times.iter().sum::<Duration>() / times.len() as u32).as_millis() as i64;
@@ -407,7 +407,7 @@ pub fn benchmarks(deno_exe: &Path) -> HashMap<String, i64> {
   println!("   - deco-cx/apps Multiple Edits + Navigation");
   let mut times = Vec::new();
   for _ in 0..5 {
-    times.push(bench_deco_apps_edits(deno_exe));
+    times.push(bench_deco_apps_edits(oden_exe));
   }
   let mean =
     (times.iter().sum::<Duration>() / times.len() as u32).as_millis() as i64;

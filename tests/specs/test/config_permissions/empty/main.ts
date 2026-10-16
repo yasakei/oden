@@ -1,3 +1,3 @@
-Deno.test("empty permissions test", () => {
+Oden.test("empty permissions test", () => {
   console.log("Test runs successfully");
 });

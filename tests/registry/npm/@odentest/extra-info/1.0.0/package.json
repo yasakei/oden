@@ -1,0 +1,10 @@
+{
+  "name": "@odentest/extra-info",
+  "version": "1.0.0",
+  "bin": {
+    "odentest-extra-info": "./bin/main.js"
+  },
+  "scripts": {
+    "postinstall": "echo 'postinstall'"
+  }
+}

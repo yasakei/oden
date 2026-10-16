@@ -1,15 +1,15 @@
 // Tests that large response bodies are fully delivered through the
-// DENO_SERVE_ADDRESS override listener, with and without a known
-// content-length. Deno.Conn.write() may perform partial writes when the
+// ODEN_SERVE_ADDRESS override listener, with and without a known
+// content-length. Oden.Conn.write() may perform partial writes when the
 // transport send buffer fills up (vsock buffers are 64 KiB), which the
 // override socket must handle.
 const OVERRIDE_PORT = 12473;
 const SIZE = 32 * 1024 * 1024;
 
-const child = new Deno.Command(Deno.execPath(), {
+const child = new Oden.Command(Oden.execPath(), {
   args: ["run", "-A", "server.mjs"],
   env: {
-    DENO_SERVE_ADDRESS: `duplicate,tcp:127.0.0.1:${OVERRIDE_PORT}`,
+    ODEN_SERVE_ADDRESS: `duplicate,tcp:127.0.0.1:${OVERRIDE_PORT}`,
   },
   cwd: import.meta.dirname,
   stdout: "piped",

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   assert,
   assertArrayEquals,
@@ -19,16 +19,16 @@ const {
   op_file_open,
   op_async_make_cppgc_resource,
   op_async_get_cppgc_resource,
-} = Deno.core.ops;
+} = Oden.core.ops;
 
 test(async function testPipe() {
   assertEquals("prototype" in op_pipe_create, false);
   assertEquals("prototype" in op_constructable_test, true);
 
   const [p1, p2] = op_pipe_create();
-  assertEquals(3, await Deno.core.write(p1, new Uint8Array([1, 2, 3])));
+  assertEquals(3, await Oden.core.write(p1, new Uint8Array([1, 2, 3])));
   const buf = new Uint8Array(10);
-  assertEquals(3, await Deno.core.read(p2, buf));
+  assertEquals(3, await Oden.core.read(p2, buf));
   assertArrayEquals(buf.subarray(0, 3), [1, 2, 3]);
 });
 
@@ -36,11 +36,11 @@ test(async function testPipeSmallRead() {
   const [p1, p2] = op_pipe_create();
   assertEquals(
     6,
-    await Deno.core.write(p1, new Uint8Array([1, 2, 3, 4, 5, 6])),
+    await Oden.core.write(p1, new Uint8Array([1, 2, 3, 4, 5, 6])),
   );
   const buf = new Uint8Array(1);
   for (let i = 1; i <= 6; i++) {
-    assertEquals(1, await Deno.core.read(p2, buf));
+    assertEquals(1, await Oden.core.read(p2, buf));
     assertArrayEquals(buf.subarray(0), [i]);
   }
 });
@@ -48,44 +48,44 @@ test(async function testPipeSmallRead() {
 test(async function opsAsyncBadResource() {
   try {
     const nonExistingRid = 9999;
-    await Deno.core.read(
+    await Oden.core.read(
       nonExistingRid,
       new Uint8Array(100),
     );
   } catch (e) {
-    assert(e instanceof Deno.core.BadResource);
+    assert(e instanceof Oden.core.BadResource);
   }
 });
 
 test(function opsSyncBadResource() {
   try {
     const nonExistingRid = 9999;
-    Deno.core.readSync(
+    Oden.core.readSync(
       nonExistingRid,
       new Uint8Array(100),
     );
   } catch (e) {
-    assert(e instanceof Deno.core.BadResource);
+    assert(e instanceof Oden.core.BadResource);
   }
 });
 
 test(async function testFileIsNotTerminal() {
   const file = await op_file_open("./README.md", true);
-  assert(!Deno.core.isTerminal(file));
+  assert(!Oden.core.isTerminal(file));
 });
 
 test(async function testFileReadUnref() {
   const file = await op_file_open("./README.md", true);
 
   let called = false;
-  await Deno.core.read(file, new Uint8Array(100))
+  await Oden.core.read(file, new Uint8Array(100))
     .then(() => {
       called = true;
     });
   assert(called);
 
   const file2 = await op_file_open("./README.md", false);
-  Deno.core.read(file2, new Uint8Array(100))
+  Oden.core.read(file2, new Uint8Array(100))
     .then(() => {
       throw new Error("should not be called");
     });

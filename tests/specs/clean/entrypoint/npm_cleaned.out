@@ -1,8 +1,8 @@
-./denodir
+./odendir
 - dep_analysis_cache[WILDCARD]
 - npm
 -- localhost_4260
---- @denotest
+--- @odentest
 ---- add
 ----- 1.0.0
 ----- registry.json
@@ -11,13 +11,13 @@
 - remote
 
 ./node_modules
-- .deno
+- .oden
 -- [WILDCARD]
--- @denotest+add@1.0.0
+-- @odentest+add@1.0.0
 --- .initialized
 --- node_modules
----- @denotest
+---- @odentest
 ----- add
 -- node_modules
-- @denotest
+- @odentest
 -- add (symlink)

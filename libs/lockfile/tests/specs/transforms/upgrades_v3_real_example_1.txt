@@ -3,9 +3,9 @@
   "version": "3",
   "packages": {
     "specifiers": {
-      "jsr:@deno/cache-dir@^0.8.0": "jsr:@deno/cache-dir@0.8.0",
-      "jsr:@deno/dnt@^0.41.2": "jsr:@deno/dnt@0.41.2",
-      "jsr:@deno/graph@^0.69.7": "jsr:@deno/graph@0.69.10",
+      "jsr:@oden/cache-dir@^0.8.0": "jsr:@oden/cache-dir@0.8.0",
+      "jsr:@oden/dnt@^0.41.2": "jsr:@oden/dnt@0.41.2",
+      "jsr:@oden/graph@^0.69.7": "jsr:@oden/graph@0.69.10",
       "jsr:@std/assert@^0.218.2": "jsr:@std/assert@0.218.2",
       "jsr:@std/assert@^0.225.2": "jsr:@std/assert@0.225.3",
       "jsr:@std/bytes@^0.218.2": "jsr:@std/bytes@0.218.2",
@@ -19,18 +19,18 @@
       "npm:jsonc-parser": "npm:jsonc-parser@3.2.1"
     },
     "jsr": {
-      "@deno/cache-dir@0.8.0": {
+      "@oden/cache-dir@0.8.0": {
         "integrity": "e87e80a404958f6350d903e6238b72afb92468378b0b32111f7a1e4916ac7fe7",
         "dependencies": [
-          "jsr:@deno/graph@^0.69.7",
+          "jsr:@oden/graph@^0.69.7",
           "jsr:@std/fs@^0.218.2",
           "jsr:@std/io@^0.218.2"
         ]
       },
-      "@deno/dnt@0.41.2": {
+      "@oden/dnt@0.41.2": {
         "integrity": "27bd0b42ab92ec1e892cb1f95e4b3bce84151dad89dadb422ccf5b3d7d026e9c",
         "dependencies": [
-          "jsr:@deno/cache-dir@^0.8.0",
+          "jsr:@oden/cache-dir@^0.8.0",
           "jsr:@std/fmt@^0.218.2",
           "jsr:@std/fs@^0.218.2",
           "jsr:@std/path@^0.218.2",
@@ -38,7 +38,7 @@
           "npm:code-block-writer@^13.0.1"
         ]
       },
-      "@deno/graph@0.69.10": {
+      "@oden/graph@0.69.10": {
         "integrity": "38fe22ac5686f6ece5daeec5a4df65c6314d7d32adcc33f77917a13cfaffa26f"
       },
       "@std/assert@0.218.2": {
@@ -329,7 +329,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@deno/dnt@^0.41.2",
+      "jsr:@oden/dnt@^0.41.2",
       "jsr:@std/path@^0.225.1"
     ],
     "packageJson": {
@@ -344,9 +344,9 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@deno/cache-dir@0.8": "0.8.0",
-    "jsr:@deno/dnt@~0.41.2": "0.41.2",
-    "jsr:@deno/graph@~0.69.7": "0.69.10",
+    "jsr:@oden/cache-dir@0.8": "0.8.0",
+    "jsr:@oden/dnt@~0.41.2": "0.41.2",
+    "jsr:@oden/graph@~0.69.7": "0.69.10",
     "jsr:@std/assert@~0.218.2": "0.218.2",
     "jsr:@std/assert@~0.225.2": "0.225.3",
     "jsr:@std/bytes@~0.218.2": "0.218.2",
@@ -360,18 +360,18 @@
     "npm:jsonc-parser@*": "3.2.1"
   },
   "jsr": {
-    "@deno/cache-dir@0.8.0": {
+    "@oden/cache-dir@0.8.0": {
       "integrity": "e87e80a404958f6350d903e6238b72afb92468378b0b32111f7a1e4916ac7fe7",
       "dependencies": [
-        "jsr:@deno/graph",
+        "jsr:@oden/graph",
         "jsr:@std/fs",
         "jsr:@std/io"
       ]
     },
-    "@deno/dnt@0.41.2": {
+    "@oden/dnt@0.41.2": {
       "integrity": "27bd0b42ab92ec1e892cb1f95e4b3bce84151dad89dadb422ccf5b3d7d026e9c",
       "dependencies": [
-        "jsr:@deno/cache-dir",
+        "jsr:@oden/cache-dir",
         "jsr:@std/fmt",
         "jsr:@std/fs",
         "jsr:@std/path@~0.218.2",
@@ -379,7 +379,7 @@
         "npm:code-block-writer"
       ]
     },
-    "@deno/graph@0.69.10": {
+    "@oden/graph@0.69.10": {
       "integrity": "38fe22ac5686f6ece5daeec5a4df65c6314d7d32adcc33f77917a13cfaffa26f"
     },
     "@std/assert@0.218.2": {
@@ -657,7 +657,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@deno/dnt@~0.41.2",
+      "jsr:@oden/dnt@~0.41.2",
       "jsr:@std/path@~0.225.1"
     ],
     "packageJson": {

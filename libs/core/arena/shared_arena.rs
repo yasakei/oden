@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::alloc::Layout;
 use std::cell::Cell;
@@ -300,7 +300,7 @@ impl<T> ArenaShared<T> {
   /// # Example
   ///
   /// ```rust
-  /// # use deno_core::arena::ArenaShared;
+  /// # use oden_core::arena::ArenaShared;
   ///
   /// // Define a struct that will be allocated within the arena
   /// struct MyStruct {

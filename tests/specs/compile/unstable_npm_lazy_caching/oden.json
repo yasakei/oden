@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "@odentest/add": "npm:@odentest/add",
+    "@odentest/subtract": "npm:@odentest/subtract"
+  }
+}

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Based on https://github.com/nodejs/node/blob/889ad35d3d41e376870f785b0c1b669cb732013d/lib/internal/per_context/primordials.js
 // Copyright Joyent, Inc. and other Node contributors.
@@ -29,7 +29,7 @@
 // benchmark all changes made in performance-sensitive areas of the codebase.
 // See: https://github.com/nodejs/node/pull/38248
 
-// deno-lint-ignore-file deno-internal/prefer-primordials
+// deno-lint-ignore-file oden-internal/prefer-primordials
 
 "use strict";
 

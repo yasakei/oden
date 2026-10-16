@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use super::fmt::format_test_error;
 use super::fmt::to_relative_path_or_remote_url;
@@ -173,7 +173,7 @@ pub(super) fn report_exit(
 ) {
   writeln!(
     writer,
-    "\n{} A test called Deno.exit({}) while the exit sanitizer was disabled (sanitizeExit: false). Aborting the test run.",
+    "\n{} A test called Oden.exit({}) while the exit sanitizer was disabled (sanitizeExit: false). Aborting the test run.",
     colors::yellow("warning"),
     exit_code,
   )
@@ -215,7 +215,7 @@ pub(super) fn report_isolate_exit(
   };
   writeln!(
     writer,
-    "\n{} {} called `Deno.exit({})` from outside any test. The isolate was terminated; remaining test files will continue.",
+    "\n{} {} called `Oden.exit({})` from outside any test. The isolate was terminated; remaining test files will continue.",
     label,
     location,
     exit_code,

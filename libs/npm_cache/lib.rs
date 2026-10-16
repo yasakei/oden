@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::BTreeMap;
 use std::collections::HashSet;
@@ -7,13 +7,13 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use deno_cache_dir::file_fetcher::CacheSetting;
-use deno_cache_dir::npm::NpmCacheDir;
+use oden_cache_dir::file_fetcher::CacheSetting;
+use oden_cache_dir::npm::NpmCacheDir;
 use deno_error::JsErrorBox;
-use deno_npm::NpmPackageCacheFolderId;
-use deno_npm::fast_registry_json;
-use deno_npmrc::RegistryConfig;
-use deno_npmrc::ResolvedNpmRc;
+use oden_npm::NpmPackageCacheFolderId;
+use oden_npm::fast_registry_json;
+use oden_npmrc::RegistryConfig;
+use oden_npmrc::ResolvedNpmRc;
 use deno_path_util::fs::atomic_write_file_with_retries;
 use deno_semver::StackString;
 use deno_semver::Version;
@@ -99,7 +99,7 @@ impl NpmPackumentFormat {
   ) -> Self {
     // the `no-downgrade` trust policy reads `_npmUser`/`attestations`, which
     // are only present in the full packument
-    if npmrc.trust_policy != deno_npmrc::TrustPolicyConfig::Off {
+    if npmrc.trust_policy != oden_npmrc::TrustPolicyConfig::Off {
       NpmPackumentFormat::Full
     } else if let Some(date) = newest_dependency_date {
       NpmPackumentFormat::AbbreviatedUnlessModifiedSince(date)
@@ -422,7 +422,7 @@ impl<TSys: NpmCacheSys> NpmCache<TSys> {
 
     spawn_blocking(move || {
       let (info, cache_metadata) =
-        deno_npm::registry::NpmPackageInfo::from_packument_bytes_with_cache_info(
+        oden_npm::registry::NpmPackageInfo::from_packument_bytes_with_cache_info(
           file_bytes.into_owned(),
         )
         .map_err(|err| serde_json::Error::io(std::io::Error::other(err)))?;
@@ -558,7 +558,7 @@ fn slim_package_info_bytes(
   }
 
   if let Some(etag) = etag {
-    write_json_property_name(&mut output, &mut first, "_deno.etag")
+    write_json_property_name(&mut output, &mut first, "_oden.etag")
       .map_err(JsErrorBox::from_err)?;
     serde_json::to_writer(&mut output, etag).map_err(JsErrorBox::from_err)?;
   }
@@ -567,7 +567,7 @@ fn slim_package_info_bytes(
     // Record that this cache entry came from a full packument response, so
     // an empty `time` map means the registry provides no publish dates and
     // there's no point re-fetching to look for them (see #35761).
-    write_json_property_name(&mut output, &mut first, "_deno.packumentFormat")
+    write_json_property_name(&mut output, &mut first, "_oden.packumentFormat")
       .map_err(JsErrorBox::from_err)?;
     output.extend_from_slice(b"\"full\"");
   }
@@ -768,7 +768,7 @@ fn write_json_property_name(
   Ok(())
 }
 
-const NPM_PACKAGE_SYNC_LOCK_FILENAME: &str = ".deno_sync_lock";
+const NPM_PACKAGE_SYNC_LOCK_FILENAME: &str = ".oden_sync_lock";
 
 #[derive(Debug, thiserror::Error, deno_error::JsError)]
 pub enum WithFolderSyncLockError {
@@ -907,10 +907,10 @@ mod tests {
     }"#;
 
     let original =
-      deno_npm::registry::NpmPackageInfo::from_packument_slice(input).unwrap();
+      oden_npm::registry::NpmPackageInfo::from_packument_slice(input).unwrap();
     let output = slim_package_info_bytes(input, Some("etag"), true).unwrap();
     let reparsed =
-      deno_npm::registry::NpmPackageInfo::from_packument_slice(&output)
+      oden_npm::registry::NpmPackageInfo::from_packument_slice(&output)
         .unwrap();
     let version = Version::parse_from_npm("1.0.0").unwrap();
     let mut expected = original.versions.get(&version).unwrap().clone();
@@ -926,8 +926,8 @@ mod tests {
     let version_json = &value["versions"]["1.0.0"];
 
     assert_eq!(value["name"], "pkg");
-    assert_eq!(value["_deno.etag"], "etag");
-    assert_eq!(value["_deno.packumentFormat"], "full");
+    assert_eq!(value["_oden.etag"], "etag");
+    assert_eq!(value["_oden.packumentFormat"], "full");
     assert_eq!(version_json["hasInstallScript"], true);
     assert_eq!(version_json["_npmUser"]["trustedPublisher"], true);
     assert!(version_json.get("exports").is_none());
@@ -948,9 +948,9 @@ mod tests {
     // abbreviated fetches don't write the marker
     let output = slim_package_info_bytes(input, None, false).unwrap();
     let value: serde_json::Value = serde_json::from_slice(&output).unwrap();
-    assert!(value.get("_deno.packumentFormat").is_none());
+    assert!(value.get("_oden.packumentFormat").is_none());
     let (_, cache_metadata) =
-      deno_npm::registry::NpmPackageInfo::from_packument_bytes_with_cache_info(
+      oden_npm::registry::NpmPackageInfo::from_packument_bytes_with_cache_info(
         output,
       )
       .unwrap();
@@ -961,9 +961,9 @@ mod tests {
     // process start (see #35761)
     let output = slim_package_info_bytes(input, None, true).unwrap();
     let value: serde_json::Value = serde_json::from_slice(&output).unwrap();
-    assert_eq!(value["_deno.packumentFormat"], "full");
+    assert_eq!(value["_oden.packumentFormat"], "full");
     let (info, cache_metadata) =
-      deno_npm::registry::NpmPackageInfo::from_packument_bytes_with_cache_info(
+      oden_npm::registry::NpmPackageInfo::from_packument_bytes_with_cache_info(
         output,
       )
       .unwrap();
@@ -980,7 +980,7 @@ mod tests {
     }"#;
     let output = slim_package_info_bytes(full, None, false).unwrap();
     let (info, cache_metadata) =
-      deno_npm::registry::NpmPackageInfo::from_packument_bytes_with_cache_info(
+      oden_npm::registry::NpmPackageInfo::from_packument_bytes_with_cache_info(
         output,
       )
       .unwrap();
@@ -997,7 +997,7 @@ mod tests {
     let output =
       slim_package_info_bytes(no_versions_time, None, false).unwrap();
     let (_, cache_metadata) =
-      deno_npm::registry::NpmPackageInfo::from_packument_bytes_with_cache_info(
+      oden_npm::registry::NpmPackageInfo::from_packument_bytes_with_cache_info(
         output,
       )
       .unwrap();
@@ -1007,10 +1007,10 @@ mod tests {
     let nested = br#"{
       "name":"pkg",
       "dist-tags":{"latest":"1.0.0"},
-      "versions":{"1.0.0":{"version":"1.0.0","_deno.packumentFormat":"full"}}
+      "versions":{"1.0.0":{"version":"1.0.0","_oden.packumentFormat":"full"}}
     }"#;
     let (_, cache_metadata) =
-      deno_npm::registry::NpmPackageInfo::from_packument_bytes_with_cache_info(
+      oden_npm::registry::NpmPackageInfo::from_packument_bytes_with_cache_info(
         nested.to_vec(),
       )
       .unwrap();
@@ -1070,7 +1070,7 @@ mod tests {
     let value: serde_json::Value = serde_json::from_slice(&output).unwrap();
     assert_eq!(value["modified"], "2024-01-03T00:00:00.000Z");
     let (_, cache_metadata) =
-      deno_npm::registry::NpmPackageInfo::from_packument_bytes_with_cache_info(
+      oden_npm::registry::NpmPackageInfo::from_packument_bytes_with_cache_info(
         output,
       )
       .unwrap();
@@ -1110,6 +1110,6 @@ mod tests {
     assert_eq!(value["versions"]["1.0.2"]["hasInstallScript"], true);
 
     // the whole packument still parses back into an NpmPackageInfo
-    deno_npm::registry::NpmPackageInfo::from_packument_bytes(output).unwrap();
+    oden_npm::registry::NpmPackageInfo::from_packument_bytes(output).unwrap();
   }
 }

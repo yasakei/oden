@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -67,7 +67,7 @@ async fn op_test(
 
 fn setup(mode: Mode) -> (JsRuntime, Arc<AtomicUsize>) {
   let dispatch_count = Arc::new(AtomicUsize::new(0));
-  deno_core::extension!(
+  oden_core::extension!(
     test_ext,
     ops = [op_test],
     options = {

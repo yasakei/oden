@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import {
   assertEquals,
@@ -7,12 +7,12 @@ import {
   pathToAbsoluteFileUrl,
 } from "./test_util.ts";
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function fsFileUtimeSyncSuccess() {
-    const testDir = await Deno.makeTempDir();
+    const testDir = await Oden.makeTempDir();
     const filename = testDir + "/file.txt";
-    using file = await Deno.open(filename, {
+    using file = await Oden.open(filename, {
       create: true,
       write: true,
     });
@@ -22,20 +22,20 @@ Deno.test(
     await file.utime(atime, mtime);
     await file.syncData();
 
-    const fileInfo = Deno.statSync(filename);
+    const fileInfo = Oden.statSync(filename);
     assertEquals(fileInfo.atime, new Date(atime * 1000));
     assertEquals(fileInfo.mtime, new Date(mtime * 1000));
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function fsFileUtimeFailPermissions() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const filename = testDir + "/file.txt";
-    Deno.writeTextFileSync(filename, "");
-    Deno.permissions.revokeSync({ name: "write" });
-    using file = await Deno.open(filename, {
+    Oden.writeTextFileSync(filename, "");
+    Oden.permissions.revokeSync({ name: "write" });
+    using file = await Oden.open(filename, {
       read: true,
       write: false,
     });
@@ -44,18 +44,18 @@ Deno.test(
     const mtime = 50000;
     await assertRejects(
       () => file.utime(atime, mtime),
-      Deno.errors.NotCapable,
+      Oden.errors.NotCapable,
       "Requires write access to",
     );
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function futimeSyncSuccess() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const filename = testDir + "/file.txt";
-    using file = Deno.openSync(filename, {
+    using file = Oden.openSync(filename, {
       create: true,
       write: true,
     });
@@ -65,20 +65,20 @@ Deno.test(
     file.utimeSync(atime, mtime);
     file.syncDataSync();
 
-    const fileInfo = Deno.statSync(filename);
+    const fileInfo = Oden.statSync(filename);
     assertEquals(fileInfo.atime, new Date(atime * 1000));
     assertEquals(fileInfo.mtime, new Date(mtime * 1000));
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function fsFileUtimeSyncFailPermissions() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const filename = testDir + "/file.txt";
-    Deno.writeTextFileSync(filename, "");
-    Deno.permissions.revokeSync({ name: "write" });
-    using file = Deno.openSync(filename, {
+    Oden.writeTextFileSync(filename, "");
+    Oden.permissions.revokeSync({ name: "write" });
+    using file = Oden.openSync(filename, {
       read: true,
       write: false,
     });
@@ -87,116 +87,116 @@ Deno.test(
     const mtime = 50000;
     assertThrows(
       () => file.utimeSync(atime, mtime),
-      Deno.errors.NotCapable,
+      Oden.errors.NotCapable,
       "Requires write access to",
     );
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function utimeSyncFileSuccess() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const filename = testDir + "/file.txt";
-    Deno.writeFileSync(filename, new TextEncoder().encode("hello"), {
+    Oden.writeFileSync(filename, new TextEncoder().encode("hello"), {
       mode: 0o666,
     });
 
     const atime = 1000;
     const mtime = 50000;
-    Deno.utimeSync(filename, atime, mtime);
+    Oden.utimeSync(filename, atime, mtime);
 
-    const fileInfo = Deno.statSync(filename);
+    const fileInfo = Oden.statSync(filename);
     assertEquals(fileInfo.atime, new Date(atime * 1000));
     assertEquals(fileInfo.mtime, new Date(mtime * 1000));
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function utimeSyncUrlSuccess() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const filename = testDir + "/file.txt";
-    Deno.writeFileSync(filename, new TextEncoder().encode("hello"), {
+    Oden.writeFileSync(filename, new TextEncoder().encode("hello"), {
       mode: 0o666,
     });
 
     const atime = 1000;
     const mtime = 50000;
-    Deno.utimeSync(pathToAbsoluteFileUrl(filename), atime, mtime);
+    Oden.utimeSync(pathToAbsoluteFileUrl(filename), atime, mtime);
 
-    const fileInfo = Deno.statSync(filename);
+    const fileInfo = Oden.statSync(filename);
     assertEquals(fileInfo.atime, new Date(atime * 1000));
     assertEquals(fileInfo.mtime, new Date(mtime * 1000));
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function utimeSyncDirectorySuccess() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
 
     const atime = 1000;
     const mtime = 50000;
-    Deno.utimeSync(testDir, atime, mtime);
+    Oden.utimeSync(testDir, atime, mtime);
 
-    const dirInfo = Deno.statSync(testDir);
+    const dirInfo = Oden.statSync(testDir);
     assertEquals(dirInfo.atime, new Date(atime * 1000));
     assertEquals(dirInfo.mtime, new Date(mtime * 1000));
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function utimeSyncDateSuccess() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
 
     const atime = new Date(1000_000);
     const mtime = new Date(50000_000);
-    Deno.utimeSync(testDir, atime, mtime);
+    Oden.utimeSync(testDir, atime, mtime);
 
-    const dirInfo = Deno.statSync(testDir);
+    const dirInfo = Oden.statSync(testDir);
     assertEquals(dirInfo.atime, atime);
     assertEquals(dirInfo.mtime, mtime);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function utimeSyncFileDateSuccess() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const filename = testDir + "/file.txt";
-    Deno.writeFileSync(filename, new TextEncoder().encode("hello"), {
+    Oden.writeFileSync(filename, new TextEncoder().encode("hello"), {
       mode: 0o666,
     });
     const atime = new Date();
     const mtime = new Date();
-    Deno.utimeSync(filename, atime, mtime);
+    Oden.utimeSync(filename, atime, mtime);
 
-    const fileInfo = Deno.statSync(filename);
+    const fileInfo = Oden.statSync(filename);
     assertEquals(fileInfo.atime, atime);
     assertEquals(fileInfo.mtime, mtime);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function utimeSyncLargeNumberSuccess() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
 
     // There are Rust side caps (might be fs relate),
     // so JUST make them slightly larger than UINT32_MAX.
     const atime = 0x100000001;
     const mtime = 0x100000002;
-    Deno.utimeSync(testDir, atime, mtime);
+    Oden.utimeSync(testDir, atime, mtime);
 
-    const dirInfo = Deno.statSync(testDir);
+    const dirInfo = Oden.statSync(testDir);
     assertEquals(dirInfo.atime, new Date(atime * 1000));
     assertEquals(dirInfo.mtime, new Date(mtime * 1000));
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   function utimeSyncNotFound() {
     const atime = 1000;
@@ -204,114 +204,114 @@ Deno.test(
 
     assertThrows(
       () => {
-        Deno.utimeSync("/baddir", atime, mtime);
+        Oden.utimeSync("/baddir", atime, mtime);
       },
-      Deno.errors.NotFound,
+      Oden.errors.NotFound,
       "utime '/baddir'",
     );
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: false } },
   function utimeSyncPerm() {
     const atime = 1000;
     const mtime = 50000;
 
     assertThrows(() => {
-      Deno.utimeSync("/some_dir", atime, mtime);
-    }, Deno.errors.NotCapable);
+      Oden.utimeSync("/some_dir", atime, mtime);
+    }, Oden.errors.NotCapable);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function utimeFileSuccess() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const filename = testDir + "/file.txt";
-    Deno.writeFileSync(filename, new TextEncoder().encode("hello"), {
+    Oden.writeFileSync(filename, new TextEncoder().encode("hello"), {
       mode: 0o666,
     });
 
     const atime = 1000;
     const mtime = 50000;
-    await Deno.utime(filename, atime, mtime);
+    await Oden.utime(filename, atime, mtime);
 
-    const fileInfo = Deno.statSync(filename);
+    const fileInfo = Oden.statSync(filename);
     assertEquals(fileInfo.atime, new Date(atime * 1000));
     assertEquals(fileInfo.mtime, new Date(mtime * 1000));
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function utimeUrlSuccess() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const filename = testDir + "/file.txt";
-    Deno.writeFileSync(filename, new TextEncoder().encode("hello"), {
+    Oden.writeFileSync(filename, new TextEncoder().encode("hello"), {
       mode: 0o666,
     });
 
     const atime = 1000;
     const mtime = 50000;
-    await Deno.utime(pathToAbsoluteFileUrl(filename), atime, mtime);
+    await Oden.utime(pathToAbsoluteFileUrl(filename), atime, mtime);
 
-    const fileInfo = Deno.statSync(filename);
+    const fileInfo = Oden.statSync(filename);
     assertEquals(fileInfo.atime, new Date(atime * 1000));
     assertEquals(fileInfo.mtime, new Date(mtime * 1000));
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function utimeDirectorySuccess() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
 
     const atime = 1000;
     const mtime = 50000;
-    await Deno.utime(testDir, atime, mtime);
+    await Oden.utime(testDir, atime, mtime);
 
-    const dirInfo = Deno.statSync(testDir);
+    const dirInfo = Oden.statSync(testDir);
     assertEquals(dirInfo.atime, new Date(atime * 1000));
     assertEquals(dirInfo.mtime, new Date(mtime * 1000));
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function utimeDateSuccess() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
 
     const atime = new Date(100_000);
     const mtime = new Date(5000_000);
-    await Deno.utime(testDir, atime, mtime);
+    await Oden.utime(testDir, atime, mtime);
 
-    const dirInfo = Deno.statSync(testDir);
+    const dirInfo = Oden.statSync(testDir);
     assertEquals(dirInfo.atime, atime);
     assertEquals(dirInfo.mtime, mtime);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function utimeFileDateSuccess() {
-    const testDir = Deno.makeTempDirSync();
+    const testDir = Oden.makeTempDirSync();
     const filename = testDir + "/file.txt";
-    Deno.writeFileSync(filename, new TextEncoder().encode("hello"), {
+    Oden.writeFileSync(filename, new TextEncoder().encode("hello"), {
       mode: 0o666,
     });
 
     const atime = new Date();
     const mtime = new Date();
-    await Deno.utime(filename, atime, mtime);
+    await Oden.utime(filename, atime, mtime);
 
-    const fileInfo = Deno.statSync(filename);
+    const fileInfo = Oden.statSync(filename);
     assertEquals(fileInfo.atime, atime);
     assertEquals(fileInfo.mtime, mtime);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: true } },
   async function utimeNotFound() {
     const atime = 1000;
@@ -319,22 +319,22 @@ Deno.test(
 
     await assertRejects(
       async () => {
-        await Deno.utime("/baddir", atime, mtime);
+        await Oden.utime("/baddir", atime, mtime);
       },
-      Deno.errors.NotFound,
+      Oden.errors.NotFound,
       "utime '/baddir'",
     );
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true, write: false } },
   async function utimeSyncPerm() {
     const atime = 1000;
     const mtime = 50000;
 
     await assertRejects(async () => {
-      await Deno.utime("/some_dir", atime, mtime);
-    }, Deno.errors.NotCapable);
+      await Oden.utime("/some_dir", atime, mtime);
+    }, Oden.errors.NotCapable);
   },
 );

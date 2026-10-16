@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::collections::HashSet;
@@ -408,7 +408,7 @@ fn strip_unc_prefix(path: PathBuf) -> PathBuf {
 
 /// Strips the unc prefix (ex. \\?\) from Windows paths.
 ///
-/// Lifted from deno_core for use in the tests.
+/// Lifted from oden_core for use in the tests.
 #[cfg(windows)]
 fn strip_unc_prefix(path: PathBuf) -> PathBuf {
   use std::path::Component;
@@ -536,7 +536,7 @@ impl TempDir {
   /// Create a new temporary directory with the given prefix as part of its name, if specified.
   fn new_inner(parent_dir: &Path, prefix: Option<&str>) -> Self {
     let mut builder = tempfile::Builder::new();
-    builder.prefix(prefix.unwrap_or("deno-cli-test"));
+    builder.prefix(prefix.unwrap_or("oden-cli-test"));
     let dir = builder
       .tempdir_in(parent_dir)
       .expect("Failed to create a temporary directory");

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { trace } from "npm:@opentelemetry/api@1.9.0";
 
@@ -13,7 +13,7 @@ async function inner() {
   });
 }
 
-const server = Deno.serve({
+const server = Oden.serve({
   port: 0,
   async onListen({ port }) {
     try {

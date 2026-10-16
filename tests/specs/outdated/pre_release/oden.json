@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "@odentest/npm-has-pre-release": "npm:@odentest/has-pre-release@^2.0.0-beta.1",
+    "@odentest/jsr-has-pre-release": "jsr:@odentest/has-pre-release@^2.0.0-beta.1",
+    "@odentest/has-only-pre-release": "jsr:@odentest/has-only-pre-release@^2.0.0-beta.1"
+  }
+}

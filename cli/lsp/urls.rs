@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::path::Component;
 use std::path::Path;
@@ -6,10 +6,10 @@ use std::path::PathBuf;
 use std::path::Prefix;
 use std::str::FromStr;
 
-use deno_config::UrlToFilePathError;
-use deno_core::error::AnyError;
-use deno_core::url::Position;
-use deno_core::url::Url;
+use oden_config::UrlToFilePathError;
+use oden_core::error::AnyError;
+use oden_core::url::Position;
+use oden_core::url::Url;
 use deno_path_util::url_to_file_path;
 use lsp_types::Uri;
 
@@ -146,7 +146,7 @@ pub fn uri_to_url(uri: &Uri) -> Url {
     let scheme = uri.scheme();
     if !scheme.as_str().eq_ignore_ascii_case("untitled")
       && !scheme.as_str().eq_ignore_ascii_case("vscode-notebook-cell")
-      && !scheme.as_str().eq_ignore_ascii_case("deno-notebook-cell")
+      && !scheme.as_str().eq_ignore_ascii_case("oden-notebook-cell")
       && !scheme.as_str().eq_ignore_ascii_case("vscode-userdata")
     {
       return None;
@@ -184,7 +184,7 @@ pub fn uri_is_file_like(uri: &Uri) -> bool {
   scheme.as_str().eq_ignore_ascii_case("file")
     || scheme.as_str().eq_ignore_ascii_case("untitled")
     || scheme.as_str().eq_ignore_ascii_case("vscode-notebook-cell")
-    || scheme.as_str().eq_ignore_ascii_case("deno-notebook-cell")
+    || scheme.as_str().eq_ignore_ascii_case("oden-notebook-cell")
     || scheme.as_str().eq_ignore_ascii_case("vscode-userdata")
 }
 
@@ -197,7 +197,7 @@ pub fn uri_is_in_memory(uri: &Uri) -> bool {
   let scheme = uri.scheme();
   scheme.as_str().eq_ignore_ascii_case("untitled")
     || scheme.as_str().eq_ignore_ascii_case("vscode-notebook-cell")
-    || scheme.as_str().eq_ignore_ascii_case("deno-notebook-cell")
+    || scheme.as_str().eq_ignore_ascii_case("oden-notebook-cell")
 }
 
 fn normalize_url(url: Url) -> Url {

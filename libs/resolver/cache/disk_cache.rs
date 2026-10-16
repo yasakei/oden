@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::ffi::OsStr;
 use std::path::Component;
@@ -7,8 +7,8 @@ use std::path::PathBuf;
 use std::path::Prefix;
 use std::str;
 
-use deno_cache_dir::CACHE_PERM;
-use deno_cache_dir::url_to_filename;
+use oden_cache_dir::CACHE_PERM;
+use oden_cache_dir::url_to_filename;
 use deno_path_util::fs::atomic_write_file_with_retries;
 use sys_traits::FsRead;
 use url::Host;
@@ -89,8 +89,8 @@ impl<TSys: DiskCacheSys> DiskCache<TSys> {
             path_components.next()
           {
             // Windows doesn't support ":" in filenames, so we need to extract disk prefix
-            // Example: file:///C:/deno/js/unit_test_runner.ts
-            // it should produce: file\c\deno\js\unit_test_runner.ts
+            // Example: file:///C:/oden/js/unit_test_runner.ts
+            // it should produce: file\c\oden\js\unit_test_runner.ts
             match prefix_component.kind() {
               Prefix::Disk(disk_byte) | Prefix::VerbatimDisk(disk_byte) => {
                 let disk = (disk_byte as char).to_string();
@@ -155,9 +155,9 @@ mod tests {
   #[test]
   fn test_get_cache_filename() {
     let cache_location = if cfg!(target_os = "windows") {
-      PathBuf::from(r"C:\deno_dir\")
+      PathBuf::from(r"C:\oden_dir\")
     } else {
-      PathBuf::from("/deno_dir/")
+      PathBuf::from("/oden_dir/")
     };
 
     let cache = DiskCache::new(RealSys, cache_location);
@@ -259,9 +259,9 @@ mod tests {
   #[test]
   fn test_get_cache_filename_invalid_urls() {
     let cache_location = if cfg!(target_os = "windows") {
-      PathBuf::from(r"C:\deno_dir\")
+      PathBuf::from(r"C:\oden_dir\")
     } else {
-      PathBuf::from("/deno_dir/")
+      PathBuf::from("/oden_dir/")
     };
 
     let cache = DiskCache::new(RealSys, cache_location);

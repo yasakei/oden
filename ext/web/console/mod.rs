@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! Rust implementation of the console/inspect machinery that used to live
 //! in `ext/web/01_console.js`. The JS file is now a thin shim over the ops
@@ -19,10 +19,10 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::time::Instant;
 
-use deno_core::GarbageCollected;
-use deno_core::OpState;
-use deno_core::op2;
-use deno_core::v8;
+use oden_core::GarbageCollected;
+use oden_core::OpState;
+use oden_core::op2;
+use oden_core::v8;
 use inspect::*;
 pub use preview::op_preview_entries;
 
@@ -44,7 +44,7 @@ const STR_ABBREVIATE_SIZE: f64 = 10_000.0;
 /// Marker symbol set by the JS shim on its `stylizeNoColor` and
 /// `createStylizeWithColor(...)` functions so the engine can recognize them
 /// and run the lookup natively.
-const STYLIZE_MARKER: &str = "Deno.privateConsoleStylize";
+const STYLIZE_MARKER: &str = "Oden.privateConsoleStylize";
 
 // ---------------------------------------------------------------------------
 // intrinsics

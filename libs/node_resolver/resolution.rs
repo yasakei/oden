@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::collections::BTreeMap;
@@ -13,9 +13,9 @@ use std::sync::atomic::Ordering;
 use anyhow::Error as AnyError;
 use anyhow::bail;
 use deno_media_type::MediaType;
-use deno_package_json::BrowserMapEntry;
-use deno_package_json::PackageJson;
-use deno_package_json::PackageJsonRc;
+use oden_package_json::BrowserMapEntry;
+use oden_package_json::PackageJson;
+use oden_package_json::PackageJsonRc;
 use deno_path_util::url_to_file_path;
 use deno_semver::Version;
 use deno_semver::VersionReq;
@@ -58,7 +58,7 @@ use crate::errors::PackageImportsResolveError;
 use crate::errors::PackageImportsResolveErrorKind;
 use crate::errors::PackagePathNotExportedError;
 use crate::errors::PackageResolveError;
-use crate::errors::PackageSubpathFromDenoModuleResolveError;
+use crate::errors::PackageSubpathFromOdenModuleResolveError;
 use crate::errors::PackageSubpathResolveError;
 use crate::errors::PackageSubpathResolveErrorKind;
 use crate::errors::PackageTargetNotFoundError;
@@ -75,7 +75,7 @@ use crate::path::UrlOrPath;
 use crate::path::UrlOrPathRef;
 
 pub static IMPORT_CONDITIONS: &[Cow<'static, str>] = &[
-  Cow::Borrowed("deno"),
+  Cow::Borrowed("oden"),
   Cow::Borrowed("node"),
   Cow::Borrowed("import"),
   Cow::Borrowed("module-sync"),
@@ -92,7 +92,7 @@ pub struct NodeConditionOptions {
   pub conditions: Vec<Cow<'static, str>>,
   /// Provide a value to override the default import conditions.
   ///
-  /// Defaults to `["deno", "node", "import", "module-sync"]`
+  /// Defaults to `["oden", "node", "import", "module-sync"]`
   pub import_conditions_override: Option<Vec<Cow<'static, str>>>,
   /// Provide a value to override the default require conditions.
   ///
@@ -321,7 +321,7 @@ pub type NodeResolverRc<
   TIsBuiltInNodeModuleChecker,
   TNpmPackageFolderResolver,
   TSys,
-> = deno_maybe_sync::MaybeArc<
+> = oden_maybe_sync::MaybeArc<
   NodeResolver<
     TInNpmPackageChecker,
     TIsBuiltInNodeModuleChecker,
@@ -1011,14 +1011,14 @@ impl<
       })
   }
 
-  pub fn resolve_package_subpath_from_deno_module(
+  pub fn resolve_package_subpath_from_oden_module(
     &self,
     package_dir: &Path,
     package_subpath: Option<&str>,
     maybe_referrer: Option<&Url>,
     resolution_mode: ResolutionMode,
     resolution_kind: NodeResolutionKind,
-  ) -> Result<UrlOrPath, PackageSubpathFromDenoModuleResolveError> {
+  ) -> Result<UrlOrPath, PackageSubpathFromOdenModuleResolveError> {
     // todo(dsherret): don't allocate a string here (maybe use an
     // enum that says the subpath is not prefixed with a ./)
     let package_subpath = package_subpath
@@ -1114,10 +1114,10 @@ impl<
     // TODO(bartlomieju): skipped checking errors for commonJS resolution and
     // "preserveSymlinksMain"/"preserveSymlinks" options.
     let items = match bins {
-      deno_package_json::PackageJsonBins::Directory(path_buf) => {
+      oden_package_json::PackageJsonBins::Directory(path_buf) => {
         self.resolve_npm_commands_from_bin_dir(&path_buf)
       }
-      deno_package_json::PackageJsonBins::Bins(items) => items
+      oden_package_json::PackageJsonBins::Bins(items) => items
         .into_iter()
         .filter_map(|(command, path)| {
           let bin_value = read_bin_value(&path, &self.sys)?;
@@ -2613,7 +2613,7 @@ pub fn read_bin_value<TSys: FsOpen>(
 }
 
 /// This is not ideal, but it works ok because it allows us to bypass
-/// the shebang and execute the script directly with Deno.
+/// the shebang and execute the script directly with Oden.
 fn resolve_execution_path_from_npx_shim(
   file_path: Cow<Path>,
   text: &str,
@@ -3098,7 +3098,7 @@ fn find_package_root_from_node_modules(path: &Path) -> Option<PathBuf> {
 
 #[cfg(test)]
 mod tests {
-  use deno_package_json::PackageJsonBins;
+  use oden_package_json::PackageJsonBins;
   use serde_json::json;
   use sys_traits::FsCreateDirAll;
   use sys_traits::FsWrite;
@@ -3170,7 +3170,7 @@ mod tests {
       TestInNpmPackageChecker,
       TestBuiltInNodeModuleChecker,
       TestNpmPackageFolderResolver,
-      deno_maybe_sync::new_rc(PackageJsonResolver::new(sys.clone(), None)),
+      oden_maybe_sync::new_rc(PackageJsonResolver::new(sys.clone(), None)),
       NodeResolutionSys::new(sys, None),
       NodeResolverOptions::default(),
     )
@@ -3181,7 +3181,7 @@ mod tests {
     assert_eq!(
       IMPORT_CONDITIONS,
       &[
-        Cow::Borrowed("deno"),
+        Cow::Borrowed("oden"),
         Cow::Borrowed("node"),
         Cow::Borrowed("import"),
         Cow::Borrowed("module-sync"),

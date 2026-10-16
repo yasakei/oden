@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Alias for the future `!` type.
 use core::convert::Infallible as Never;
@@ -13,21 +13,21 @@ use std::rc::Rc;
 use std::task::Poll;
 use std::thread;
 
-use deno_core::InspectorMsg;
-use deno_core::InspectorSessionChannels;
-use deno_core::InspectorSessionKind;
-use deno_core::InspectorSessionProxy;
-use deno_core::JsRuntimeInspector;
-use deno_core::anyhow::Context;
-use deno_core::futures::channel::mpsc;
-use deno_core::futures::channel::mpsc::UnboundedReceiver;
-use deno_core::futures::channel::mpsc::UnboundedSender;
-use deno_core::futures::channel::oneshot;
-use deno_core::futures::prelude::*;
-use deno_core::futures::stream::StreamExt;
-use deno_core::serde_json::Value;
-use deno_core::serde_json::json;
-use deno_core::unsync::spawn;
+use oden_core::InspectorMsg;
+use oden_core::InspectorSessionChannels;
+use oden_core::InspectorSessionKind;
+use oden_core::InspectorSessionProxy;
+use oden_core::JsRuntimeInspector;
+use oden_core::anyhow::Context;
+use oden_core::futures::channel::mpsc;
+use oden_core::futures::channel::mpsc::UnboundedReceiver;
+use oden_core::futures::channel::mpsc::UnboundedSender;
+use oden_core::futures::channel::oneshot;
+use oden_core::futures::prelude::*;
+use oden_core::futures::stream::StreamExt;
+use oden_core::serde_json::Value;
+use oden_core::serde_json::json;
+use oden_core::unsync::spawn;
 use fastwebsockets::Frame;
 use fastwebsockets::OpCode;
 use fastwebsockets::WebSocket;
@@ -324,7 +324,7 @@ async fn server(
   let json_version_response = json!({
     "Browser": name,
     "Protocol-Version": "1.3",
-    "V8-Version": deno_core::v8::VERSION_STRING,
+    "V8-Version": oden_core::v8::VERSION_STRING,
   });
 
   // Create the server manually so it can use the Local Executor
@@ -394,7 +394,7 @@ async fn server(
         },
       );
 
-      deno_core::unsync::spawn(async move {
+      oden_core::unsync::spawn(async move {
         let server = hyper::server::conn::http1::Builder::new();
 
         let mut conn =
@@ -435,7 +435,7 @@ async fn listen_for_new_inspectors(
     );
     eprintln!("Visit chrome://inspect to connect to the debugger.");
     if info.wait_for_session {
-      eprintln!("Deno is waiting for debugger to connect.");
+      eprintln!("Oden is waiting for debugger to connect.");
     }
     if inspector_map.borrow_mut().insert(info.uuid, info).is_some() {
       panic!("Inspector UUID already in map");
@@ -526,7 +526,7 @@ impl InspectorInfo {
     let host_listen = format!("{}", self.host);
     let host = host.as_ref().unwrap_or(&host_listen);
     json!({
-      "description": "deno",
+      "description": "oden",
       "devtoolsFrontendUrl": self.get_frontend_url(host),
       "faviconUrl": "https://deno.land/favicon.ico",
       "id": self.uuid.to_string(),
@@ -550,7 +550,7 @@ impl InspectorInfo {
 
   fn get_title(&self) -> String {
     format!(
-      "deno{} [pid: {}]",
+      "oden{} [pid: {}]",
       self
         .thread_name
         .as_ref()

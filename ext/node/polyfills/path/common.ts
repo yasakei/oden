@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // This module is browser compatible.
 (function () {
 const { core, primordials } = __bootstrap;
@@ -11,17 +11,17 @@ const {
   ArrayPrototypeJoin,
   SafeArrayIterator,
 } = primordials;
-const { SEP } = core.loadExtScript("ext:deno_node/path/separator.ts");
+const { SEP } = core.loadExtScript("ext:oden_node/path/separator.ts");
 
 /** Determines the common path from a set of paths, using an optional separator,
  * which defaults to the OS default separator.
  *
  * ```ts
  *       const p = common([
- *         "./deno/std/path/mod.ts",
- *         "./deno/std/fs/mod.ts",
+ *         "./oden/std/path/mod.ts",
+ *         "./oden/std/fs/mod.ts",
  *       ]);
- *       console.log(p); // "./deno/std/"
+ *       console.log(p); // "./oden/std/"
  * ```
  */
 function common(paths: string[], sep = SEP): string {

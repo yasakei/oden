@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::io::Write;
 use std::sync::Once;
@@ -25,7 +25,7 @@ use crate::hyper_client::HyperClient;
 const DEFAULT_GRPC_ENDPOINT: &str = "http://localhost:4317";
 
 const USER_AGENT: &str =
-  concat!("OTel-OTLP-Exporter-Deno/", env!("CARGO_PKG_VERSION"));
+  concat!("OTel-OTLP-Exporter-Oden/", env!("CARGO_PKG_VERSION"));
 
 const TRACES_PATH: &str =
   "/opentelemetry.proto.collector.trace.v1.TraceService/Export";

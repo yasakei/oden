@@ -1,23 +1,23 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 mod permission_checker;
 
 use std::sync::Arc;
 
-use deno_npm_installer::process_state::NpmProcessState;
-use deno_npm_installer::process_state::NpmProcessStateKind;
-use deno_npm_installer::process_state::NpmProcessStateLinkerMode;
-use deno_resolver::npm::ByonmNpmResolver;
-use deno_resolver::npm::ManagedNpmResolverRc;
-use deno_resolver::npm::NpmResolver;
-use deno_runtime::deno_process::NpmProcessStateProvider;
-use deno_runtime::deno_process::NpmProcessStateProviderRc;
+use oden_npm_installer::process_state::NpmProcessState;
+use oden_npm_installer::process_state::NpmProcessStateKind;
+use oden_npm_installer::process_state::NpmProcessStateLinkerMode;
+use oden_resolver::npm::ByonmNpmResolver;
+use oden_resolver::npm::ManagedNpmResolverRc;
+use oden_resolver::npm::NpmResolver;
+use oden_runtime::oden_process::NpmProcessStateProvider;
+use oden_runtime::oden_process::NpmProcessStateProviderRc;
 pub use permission_checker::NpmRegistryReadPermissionChecker;
 pub use permission_checker::NpmRegistryReadPermissionCheckerMode;
 
-use crate::sys::DenoLibSys;
+use crate::sys::OdenLibSys;
 
-pub fn create_npm_process_state_provider<TSys: DenoLibSys>(
+pub fn create_npm_process_state_provider<TSys: OdenLibSys>(
   npm_resolver: &NpmResolver<TSys>,
 ) -> NpmProcessStateProviderRc {
   match npm_resolver {
@@ -31,11 +31,11 @@ pub fn create_npm_process_state_provider<TSys: DenoLibSys>(
 }
 
 #[derive(Debug)]
-pub struct ManagedNpmProcessStateProvider<TSys: DenoLibSys>(
+pub struct ManagedNpmProcessStateProvider<TSys: OdenLibSys>(
   pub ManagedNpmResolverRc<TSys>,
 );
 
-impl<TSys: DenoLibSys> NpmProcessStateProvider
+impl<TSys: OdenLibSys> NpmProcessStateProvider
   for ManagedNpmProcessStateProvider<TSys>
 {
   fn get_npm_process_state(&self) -> String {
@@ -53,11 +53,11 @@ impl<TSys: DenoLibSys> NpmProcessStateProvider
 }
 
 #[derive(Debug)]
-pub struct ByonmNpmProcessStateProvider<TSys: DenoLibSys>(
+pub struct ByonmNpmProcessStateProvider<TSys: OdenLibSys>(
   pub Arc<ByonmNpmResolver<TSys>>,
 );
 
-impl<TSys: DenoLibSys> NpmProcessStateProvider
+impl<TSys: OdenLibSys> NpmProcessStateProvider
   for ByonmNpmProcessStateProvider<TSys>
 {
   fn get_npm_process_state(&self) -> String {

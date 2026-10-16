@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { assertEquals } from "@std/assert/equals";
 import {
@@ -21,7 +21,7 @@ import {
 } from "../../cli/js/40_lint_selector.js";
 import { assertThrows } from "@std/assert";
 
-Deno.test("splitSelectors", () => {
+Oden.test("splitSelectors", () => {
   assertEquals(splitSelectors("*"), ["*"]);
   assertEquals(splitSelectors("*,*"), ["*", "*"]);
   assertEquals(splitSelectors("*,*     "), ["*", "*"]);
@@ -58,7 +58,7 @@ const toAttr = (name: string): number => Attrs[name];
 
 const testParse = (input: string) => parseSelector(input, toTag, toAttr);
 
-Deno.test("Lexer - Elem", () => {
+Oden.test("Lexer - Elem", () => {
   assertEquals(testLexer("Foo"), [
     { token: Token.Word, value: "Foo" },
   ]);
@@ -84,7 +84,7 @@ Deno.test("Lexer - Elem", () => {
   ]);
 });
 
-Deno.test("Lexer - Relation >", () => {
+Oden.test("Lexer - Relation >", () => {
   assertEquals(testLexer("Foo > Bar"), [
     { token: Token.Word, value: "Foo" },
     { token: Token.Op, value: ">" },
@@ -101,7 +101,7 @@ Deno.test("Lexer - Relation >", () => {
   ]);
 });
 
-Deno.test("Lexer - Relation +", () => {
+Oden.test("Lexer - Relation +", () => {
   assertEquals(testLexer("Foo + Bar"), [
     { token: Token.Word, value: "Foo" },
     { token: Token.Op, value: "+" },
@@ -118,7 +118,7 @@ Deno.test("Lexer - Relation +", () => {
   ]);
 });
 
-Deno.test("Lexer - Relation ~", () => {
+Oden.test("Lexer - Relation ~", () => {
   assertEquals(testLexer("Foo ~ Bar"), [
     { token: Token.Word, value: "Foo" },
     { token: Token.Op, value: "~" },
@@ -143,7 +143,7 @@ Deno.test("Lexer - Relation ~", () => {
   ]);
 });
 
-Deno.test("Lexer - Attr", () => {
+Oden.test("Lexer - Attr", () => {
   assertEquals(testLexer("[attr]"), [
     { token: Token.BracketOpen, value: "" },
     { token: Token.Word, value: "attr" },
@@ -229,7 +229,7 @@ Deno.test("Lexer - Attr", () => {
   ]);
 });
 
-Deno.test("Lexer - Pseudo", () => {
+Oden.test("Lexer - Pseudo", () => {
   assertEquals(testLexer(":foo-bar"), [
     { token: Token.Colon, value: "" },
     { token: Token.Word, value: "foo-bar" },
@@ -257,7 +257,7 @@ Deno.test("Lexer - Pseudo", () => {
   ]);
 });
 
-Deno.test("Lexer - field", () => {
+Oden.test("Lexer - field", () => {
   assertEquals(testLexer(".bar"), [
     { token: Token.Dot, value: "" },
     { token: Token.Word, value: "bar" },
@@ -270,7 +270,7 @@ Deno.test("Lexer - field", () => {
   ]);
 });
 
-Deno.test("Parser - Elem", () => {
+Oden.test("Parser - Elem", () => {
   assertEquals(testParse("Foo"), [[
     {
       type: ELEM_NODE,
@@ -280,7 +280,7 @@ Deno.test("Parser - Elem", () => {
   ]]);
 });
 
-Deno.test("Parser - Relation (descendant)", () => {
+Oden.test("Parser - Relation (descendant)", () => {
   assertEquals(testParse("Foo Bar"), [[
     {
       type: ELEM_NODE,
@@ -299,7 +299,7 @@ Deno.test("Parser - Relation (descendant)", () => {
   ]]);
 });
 
-Deno.test("Parser - Relation", () => {
+Oden.test("Parser - Relation", () => {
   assertEquals(testParse("Foo > Bar"), [[
     {
       type: ELEM_NODE,
@@ -352,7 +352,7 @@ Deno.test("Parser - Relation", () => {
   ]]);
 });
 
-Deno.test("Parser - Field", () => {
+Oden.test("Parser - Field", () => {
   assertEquals(testParse("Foo.bar"), [[
     {
       type: ELEM_NODE,
@@ -379,7 +379,7 @@ Deno.test("Parser - Field", () => {
   ]]);
 });
 
-Deno.test("Parser - Attr", () => {
+Oden.test("Parser - Attr", () => {
   assertEquals(testParse("[foo]"), [[
     {
       type: ATTR_EXISTS_NODE,
@@ -465,7 +465,7 @@ Deno.test("Parser - Attr", () => {
 });
 
 // See https://github.com/denoland/deno/issues/30460
-Deno.test("Parser - Attr regex", () => {
+Oden.test("Parser - Attr regex", () => {
   assertEquals(testParse("[bar=/^[a-z]$/]"), [[
     {
       type: ATTR_BIN_NODE,
@@ -485,7 +485,7 @@ Deno.test("Parser - Attr regex", () => {
   ]]);
 });
 
-Deno.test("Parser - Attr nested", () => {
+Oden.test("Parser - Attr nested", () => {
   assertEquals(testParse("[foo.bar]"), [[
     {
       type: ATTR_EXISTS_NODE,
@@ -503,7 +503,7 @@ Deno.test("Parser - Attr nested", () => {
   ]]);
 });
 
-Deno.test("Parser - Pseudo no value", () => {
+Oden.test("Parser - Pseudo no value", () => {
   assertEquals(testParse(":first-child"), [[
     {
       type: PSEUDO_FIRST_CHILD,
@@ -516,7 +516,7 @@ Deno.test("Parser - Pseudo no value", () => {
   ]]);
 });
 
-Deno.test("Parser - Pseudo nth-child", () => {
+Oden.test("Parser - Pseudo nth-child", () => {
   assertEquals(testParse(":nth-child(2)"), [[
     {
       type: PSEUDO_NTH_CHILD,
@@ -576,7 +576,7 @@ Deno.test("Parser - Pseudo nth-child", () => {
   assertThrows(() => testParse(":nth-child(2n - 1 foo)"));
 });
 
-Deno.test("Parser - Pseudo :has()", () => {
+Oden.test("Parser - Pseudo :has()", () => {
   assertEquals(testParse(":has(Foo:has(Foo), Bar)"), [[
     {
       type: PSEUDO_HAS,
@@ -598,7 +598,7 @@ Deno.test("Parser - Pseudo :has()", () => {
   ]]);
 });
 
-Deno.test("Parser - Pseudo :is()/:where()/:matches()", () => {
+Oden.test("Parser - Pseudo :is()/:where()/:matches()", () => {
   assertEquals(testParse(":is(Foo:is(Foo), Bar)"), [[
     {
       type: PSEUDO_IS,
@@ -683,7 +683,7 @@ Deno.test("Parser - Pseudo :is()/:where()/:matches()", () => {
   ]]);
 });
 
-Deno.test("Parser - Pseudo not", () => {
+Oden.test("Parser - Pseudo not", () => {
   assertEquals(testParse(":not(Foo:not(Foo), Bar)"), [[
     {
       type: PSEUDO_NOT,
@@ -705,7 +705,7 @@ Deno.test("Parser - Pseudo not", () => {
   ]]);
 });
 
-Deno.test("Parser - mixed", () => {
+Oden.test("Parser - mixed", () => {
   assertEquals(testParse("Foo[foo=true] Bar"), [[
     {
       type: ELEM_NODE,

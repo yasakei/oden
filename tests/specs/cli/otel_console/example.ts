@@ -1,9 +1,9 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Example: OpenTelemetry console exporter demo
 //
 // Run with:
-//   OTEL_DENO=true OTEL_EXPORTER_OTLP_PROTOCOL=console ./target/debug/deno run -A tests/specs/cli/otel_console/example.ts
+//   OTEL_ODEN=true OTEL_EXPORTER_OTLP_PROTOCOL=console ./target/debug/oden run -A tests/specs/cli/otel_console/example.ts
 //
 // This demonstrates spans, logs, and metrics being printed to stderr
 // in human-readable format — no collector needed.
@@ -23,7 +23,7 @@ const requestDuration = meter.createHistogram("http.request.duration", {
 });
 
 // --- HTTP server with tracing + metrics ---
-const server = Deno.serve({
+const server = Oden.serve({
   port: 8125,
   onListen({ port }) {
     console.log(`Server listening on http://localhost:${port}`);

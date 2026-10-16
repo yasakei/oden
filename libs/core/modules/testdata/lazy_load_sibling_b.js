@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // `value` is in the temporal dead zone until this module is evaluated.
 // If A retrieves B's namespace before B has evaluated, accessing `.value`

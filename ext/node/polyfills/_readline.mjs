@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -39,16 +39,16 @@ const {
   clearScreenDown,
   cursorTo,
   moveCursor,
-} = core.loadExtScript("ext:deno_node/internal/readline/callbacks.mjs");
+} = core.loadExtScript("ext:oden_node/internal/readline/callbacks.mjs");
 const { emitKeypressEvents } = core.loadExtScript(
-  "ext:deno_node/internal/readline/emitKeypressEvents.mjs",
+  "ext:oden_node/internal/readline/emitKeypressEvents.mjs",
 );
-import promises from "ext:deno_node/readline/promises.ts";
+import promises from "ext:oden_node/readline/promises.ts";
 const { validateAbortSignal } = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
-const { promisify } = core.loadExtScript("ext:deno_node/internal/util.mjs");
-const { AbortError } = core.loadExtScript("ext:deno_node/internal/errors.ts");
+const { promisify } = core.loadExtScript("ext:oden_node/internal/util.mjs");
+const { AbortError } = core.loadExtScript("ext:oden_node/internal/errors.ts");
 
 const {
   Interface: _Interface,
@@ -86,7 +86,7 @@ const {
   kWordLeft,
   kWordRight,
   kWriteToOutput,
-} = core.loadExtScript("ext:deno_node/internal/readline/interface.mjs");
+} = core.loadExtScript("ext:oden_node/internal/readline/interface.mjs");
 
 function Interface(input, output, completer, terminal) {
   if (!ObjectPrototypeIsPrototypeOf(Interface.prototype, this)) {

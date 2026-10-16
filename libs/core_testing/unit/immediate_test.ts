@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assert, assertArrayEquals, assertEquals, test } from "checkin:testing";
 
 test(async function testImmediateBasic() {
@@ -139,7 +139,7 @@ test(async function testUnrefImmediateFiresWithOtherWork() {
     immediateFired = true;
   });
   // deno-lint-ignore no-explicit-any
-  (Deno as any).unrefImmediate(imm);
+  (Oden as any).unrefImmediate(imm);
   // The timer keeps the loop alive. After it fires, check the flag.
   setTimeout(() => {
     // Use a second immediate (refed) to check after the check phase

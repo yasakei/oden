@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-//! Translation from npm's `package-lock.json` to a deno.lock v5 JSON string.
+//! Translation from npm's `package-lock.json` to a oden.lock v5 JSON string.
 //!
 //! Only npm packages are translated. The produced lockfile contains the
 //! `specifiers` and `npm` sections derived from the package-lock; everything
 //! else (workspace, jsr, redirects, remote) is left empty for later
-//! population by Deno during resolution.
+//! population by Oden during resolution.
 
 use std::collections::BTreeMap;
 use std::collections::HashMap;
@@ -58,8 +58,8 @@ struct NpmLockPackage {
 }
 
 /// Convert a `package-lock.json` (lockfileVersion 2 or 3) JSON string into a
-/// deno.lock v5 JSON string. Only the npm subset is populated.
-pub fn package_lock_to_deno_lock_v5(
+/// oden.lock v5 JSON string. Only the npm subset is populated.
+pub fn package_lock_to_oden_lock_v5(
   json_text: &str,
 ) -> Result<String, NpmLockfileImportError> {
   let lockfile: NpmLockfile =
@@ -130,7 +130,7 @@ pub fn package_lock_to_deno_lock_v5(
 
     let (regular_deps, optional_peers_from_peers) = {
       // Combine `dependencies` and (non-optional) `peerDependencies` into the
-      // single deno.lock `dependencies` list. Optional peers go in their own
+      // single oden.lock `dependencies` list. Optional peers go in their own
       // bucket.
       let mut regular: Vec<String> = Vec::new();
       let mut opt_peers: Vec<String> = Vec::new();
@@ -284,7 +284,7 @@ fn package_name_from_path(path: &str) -> Option<&str> {
 
 fn is_supported_root_req(req: &str) -> bool {
   // Skip file:, link:, workspace:, git:, https:// tarballs, etc. These
-  // cannot be represented as plain npm specifiers in deno.lock.
+  // cannot be represented as plain npm specifiers in oden.lock.
   !req.starts_with("file:")
     && !req.starts_with("link:")
     && !req.starts_with("workspace:")
@@ -321,7 +321,7 @@ mod tests {
         }
       }
     }"#;
-    let out = package_lock_to_deno_lock_v5(input).unwrap();
+    let out = package_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["version"], "5");
     assert_eq!(v["specifiers"]["npm:lodash@^4.17.0"], "4.17.21");
@@ -354,7 +354,7 @@ mod tests {
         }
       }
     }"#;
-    let out = package_lock_to_deno_lock_v5(input).unwrap();
+    let out = package_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     // a's dependency on b should resolve to its nested copy (2.0.0)
     let a_deps = v["npm"]["a@1.0.0"]["dependencies"].as_array().unwrap();
@@ -378,7 +378,7 @@ mod tests {
         }
       }
     }"#;
-    let out = package_lock_to_deno_lock_v5(input).unwrap();
+    let out = package_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert_eq!(v["specifiers"]["npm:@scope/pkg@^1"], "1.2.3");
     assert!(
@@ -407,7 +407,7 @@ mod tests {
         }
       }
     }"#;
-    let out = package_lock_to_deno_lock_v5(input).unwrap();
+    let out = package_lock_to_oden_lock_v5(input).unwrap();
     let v: Value = serde_json::from_str(&out).unwrap();
     assert!(v["specifiers"].get("npm:ws-pkg@*").is_none());
     assert!(v["npm"].as_object().unwrap().get("ws-pkg").is_none());
@@ -417,14 +417,14 @@ mod tests {
   #[test]
   fn rejects_v1_lockfile() {
     let input = r#"{ "lockfileVersion": 1, "packages": {} }"#;
-    let err = package_lock_to_deno_lock_v5(input).unwrap_err();
+    let err = package_lock_to_oden_lock_v5(input).unwrap_err();
     assert!(matches!(err, NpmLockfileImportError::UnsupportedVersion(1)));
   }
 
   #[test]
   fn rejects_unknown_future_lockfile() {
     let input = r#"{ "lockfileVersion": 4, "packages": {} }"#;
-    let err = package_lock_to_deno_lock_v5(input).unwrap_err();
+    let err = package_lock_to_oden_lock_v5(input).unwrap_err();
     assert!(matches!(err, NpmLockfileImportError::UnsupportedVersion(4)));
   }
 }

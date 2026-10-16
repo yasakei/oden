@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { core, primordials } from "ext:core/mod.js";
 import {
@@ -14,14 +14,14 @@ const {
   SymbolFor,
 } = primordials;
 
-const location = core.loadExtScript("ext:deno_web/12_location.js");
-const console = core.loadExtScript("ext:deno_web/01_console.js");
-const webidl = core.loadExtScript("ext:deno_webidl/00_webidl.js");
+const location = core.loadExtScript("ext:oden_web/12_location.js");
+const console = core.loadExtScript("ext:oden_web/01_console.js");
+const webidl = core.loadExtScript("ext:oden_webidl/00_webidl.js");
 const globalInterfaces = core.loadExtScript(
-  "ext:deno_web/04_global_interfaces.js",
+  "ext:oden_web/04_global_interfaces.js",
 );
-const loadLocks = core.createLazyLoader("ext:deno_web/locks.js");
-const { loadWebGPU } = core.loadExtScript("ext:deno_webgpu/00_init.js");
+const loadLocks = core.createLazyLoader("ext:oden_web/locks.js");
+const { loadWebGPU } = core.loadExtScript("ext:oden_webgpu/00_init.js");
 import {
   NavigatorUAData,
   navigatorUAData,
@@ -87,7 +87,7 @@ class WorkerNavigator {
     webidl.illegalConstructor();
   }
 
-  [SymbolFor("Deno.privateCustomInspect")](inspect, inspectOptions) {
+  [SymbolFor("Oden.privateCustomInspect")](inspect, inspectOptions) {
     return inspect(
       console.createFilteredInspectProxy({
         object: this,

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Module with Top-Level Await
 await new Promise((resolve) => setTimeout(resolve, 100));

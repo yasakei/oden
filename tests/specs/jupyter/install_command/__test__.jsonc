@@ -2,7 +2,7 @@
   "tempDir": true,
   "envs": {
     "PATH": "",
-    "DENO_TEST_JUPYTER_PATH": "$PWD"
+    "ODEN_TEST_JUPYTER_PATH": "$PWD"
   },
   "steps": [{
     "args": "jupyter --install",
@@ -13,7 +13,7 @@
     "output": "already_installed.out",
     "exitCode": 1
   }, {
-    "args": "jupyter --install --name devdeno",
+    "args": "jupyter --install --name devoden",
     "output": "install_name.out",
     "exitCode": 0
   }, {

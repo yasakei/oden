@@ -3,8 +3,8 @@
 // be able to reach. Run with -A only to build the fixture.
 import { DatabaseSync } from "node:sqlite";
 
-Deno.mkdirSync("allowed", { recursive: true });
-Deno.mkdirSync("denied", { recursive: true });
+Oden.mkdirSync("allowed", { recursive: true });
+Oden.mkdirSync("denied", { recursive: true });
 
 const db = new DatabaseSync("denied/secret.db");
 db.exec("CREATE TABLE secrets(v TEXT)");

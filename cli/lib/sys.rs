@@ -1,6 +1,6 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
-use deno_node::ExtNodeSys;
+use oden_node::ExtNodeSys;
 use sys_traits::EnvVar;
 use sys_traits::FsCanonicalize;
 use sys_traits::FsCreateDirAll;
@@ -14,7 +14,7 @@ use sys_traits::SystemRandom;
 use sys_traits::ThreadSleep;
 
 #[sys_traits::auto_impl]
-pub trait DenoLibSys:
+pub trait OdenLibSys:
   EnvVar
   + FsCanonicalize
   + FsCreateDirAll

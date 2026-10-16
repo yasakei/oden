@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::HashSet;
 use std::io;
@@ -11,7 +11,7 @@ use crossterm::event::KeyEvent;
 use crossterm::event::KeyEventKind;
 use crossterm::event::KeyModifiers;
 use crossterm::terminal;
-use deno_core::anyhow;
+use oden_core::anyhow;
 use deno_terminal::colors;
 use unicode_width::UnicodeWidthStr;
 

@@ -1,5 +1,5 @@
-#!/usr/bin/env -S deno run --allow-read --allow-run
-// Copyright 2018-2026 the Deno authors. MIT license.
+#!/usr/bin/env -S oden run --allow-read --allow-run
+// Copyright 2018-2026 the Oden authors. MIT license.
 // deno-lint-ignore-file no-console camelcase
 
 import { join, resolve } from "node:path";
@@ -31,13 +31,13 @@ interface Options {
 }
 
 function hostTarget(): string {
-  if (Deno.build.os === "darwin") {
-    return `${Deno.build.arch}-apple-darwin`;
+  if (Oden.build.os === "darwin") {
+    return `${Oden.build.arch}-apple-darwin`;
   }
-  if (Deno.build.os === "linux") {
-    return `${Deno.build.arch}-unknown-linux-gnu`;
+  if (Oden.build.os === "linux") {
+    return `${Oden.build.arch}-unknown-linux-gnu`;
   }
-  throw new Error(`unsupported host ${Deno.build.os}-${Deno.build.arch}`);
+  throw new Error(`unsupported host ${Oden.build.os}-${Oden.build.arch}`);
 }
 
 function usage(): never {
@@ -45,7 +45,7 @@ function usage(): never {
     "usage: verify_orderfile.ts --baseline-binary PATH --binary PATH " +
       "[--order PATH] [--target TRIPLE] [--output PATH]",
   );
-  Deno.exit(2);
+  Oden.exit(2);
 }
 
 function parseArgs(args: string[]): Options {
@@ -88,14 +88,14 @@ async function newestCargoOrder(target: string): Promise<string> {
   const buildRoot = resolve("target", "release", "build");
   const name = `startup-order-${target}.order`;
   const candidates: Array<{ path: string; modified: number }> = [];
-  for await (const entry of Deno.readDir(buildRoot)) {
-    if (!entry.isDirectory || !entry.name.startsWith("deno-")) continue;
+  for await (const entry of Oden.readDir(buildRoot)) {
+    if (!entry.isDirectory || !entry.name.startsWith("oden-")) continue;
     const path = join(buildRoot, entry.name, "out", name);
     try {
-      const stat = await Deno.stat(path);
+      const stat = await Oden.stat(path);
       candidates.push({ path, modified: stat.mtime?.getTime() ?? 0 });
     } catch (error) {
-      if (!(error instanceof Deno.errors.NotFound)) throw error;
+      if (!(error instanceof Oden.errors.NotFound)) throw error;
     }
   }
   candidates.sort((left, right) => right.modified - left.modified);
@@ -115,7 +115,7 @@ async function loadTextSymbols(
   const args = target.endsWith("apple-darwin")
     ? ["llvm-nm", "--defined-only", "--numeric-sort", binary]
     : ["--defined-only", "--numeric-sort", binary];
-  const output = await new Deno.Command(command, {
+  const output = await new Oden.Command(command, {
     args,
     stdout: "piped",
     stderr: "piped",
@@ -175,13 +175,13 @@ function measureOrder(
 }
 
 if (import.meta.main) {
-  const options = parseArgs(Deno.args);
+  const options = parseArgs(Oden.args);
   if (!SUPPORTED_TARGETS.has(options.target)) {
     throw new Error(`startup ordering is unsupported for ${options.target}`);
   }
 
   const orderPath = options.order ?? await newestCargoOrder(options.target);
-  const orderBytes = await Deno.readFile(orderPath);
+  const orderBytes = await Oden.readFile(orderPath);
   const orderHash = await sha256(orderBytes);
   const orderNames = decoder.decode(orderBytes).split("\n")
     .filter((line) => line.length > 0 && !line.startsWith("#"));
@@ -241,7 +241,7 @@ if (import.meta.main) {
 
   console.log(JSON.stringify(report, null, 2));
   if (options.output !== undefined) {
-    await Deno.writeTextFile(
+    await Oden.writeTextFile(
       options.output,
       `${JSON.stringify(report, null, 2)}\n`,
     );

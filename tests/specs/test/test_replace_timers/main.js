@@ -1,4 +1,4 @@
-Deno.test("foo", async (t) => {
+Oden.test("foo", async (t) => {
   globalThis.setTimeout = () => {};
   globalThis.clearTimeout = () => {};
   globalThis.setInterval = () => {};

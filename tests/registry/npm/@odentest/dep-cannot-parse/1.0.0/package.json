@@ -1,0 +1,7 @@
+{
+  "name": "@odentest/dep-cannot-parse",
+  "version": "1.0.0",
+  "dependencies": {
+    "@odentest/esm-basic": "unknown-scheme:unknown"
+  }
+}

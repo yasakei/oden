@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 const EXPECTED_OP_COUNT = 44;
 // Two fewer than the main scope: the clipboard ops are stripped from workers
@@ -7,11 +7,11 @@ const EXPECTED_WORKER_OP_COUNT = 20;
 
 function getExposedOpNames(): string[] {
   // @ts-ignore TS doesn't allow to index with symbol
-  const core = Deno[Deno.internal].core;
+  const core = Oden[Oden.internal].core;
   return Object.keys(core.ops);
 }
 
-Deno.test(function checkExposedOps() {
+Oden.test(function checkExposedOps() {
   const opNames = getExposedOpNames();
 
   if (opNames.length !== EXPECTED_OP_COUNT) {
@@ -26,9 +26,9 @@ Deno.test(function checkExposedOps() {
     throw new Error("Desktop update signature verification op is not exposed");
   }
 });
-Deno.test(function internalCoreOnlyHidesExtensionLoaders() {
+Oden.test(function internalCoreOnlyHidesExtensionLoaders() {
   // @ts-ignore TS doesn't allow to index with symbol
-  const core = Deno[Deno.internal].core;
+  const core = Oden[Oden.internal].core;
 
   for (const name of ["createLazyLoader", "loadExtScript"]) {
     if (name in core) {
@@ -43,13 +43,13 @@ Deno.test(function internalCoreOnlyHidesExtensionLoaders() {
   }
 });
 
-Deno.test(async function workerDoesNotExposeImportedOps() {
+Oden.test(async function workerDoesNotExposeImportedOps() {
   const mainOpNames = getExposedOpNames();
   const worker = new Worker(
     `data:application/javascript,${
       encodeURIComponent(`
         // @ts-ignore TS doesn't allow to index with symbol
-        const core = Deno[Deno.internal].core;
+        const core = Oden[Oden.internal].core;
         postMessage(Object.keys(core.ops));
       `)
     }`,

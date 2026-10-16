@@ -1,4 +1,4 @@
-await Deno.bundle({
+await Oden.bundle({
   entrypoints: ["./foo.cjs"],
   platform: "browser",
   outputPath: "bundle.js",

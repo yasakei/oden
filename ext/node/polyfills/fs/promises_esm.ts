@@ -1,6 +1,6 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { core } from "ext:core/mod.js";
-const mod = core.loadExtScript("ext:deno_node/fs/promises.ts");
+const mod = core.loadExtScript("ext:oden_node/fs/promises.ts");
 
 export const access = mod.access;
 export const constants = mod.constants;

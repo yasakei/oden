@@ -1,0 +1,8 @@
+{
+  "name": "@scope/my-pkg",
+  "version": "1.0.0",
+  "exports": "./mod.ts",
+  "imports": {
+    "@odentest/add": "jsr:@odentest/add@1"
+  }
+}

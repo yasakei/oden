@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -67,7 +67,7 @@ use url::Url;
 
 use super::TempDir;
 use crate::PathRef;
-use crate::deno_exe_path;
+use crate::oden_exe_path;
 use crate::eprintln;
 use crate::jsr_registry_url;
 use crate::npm_registry_url;
@@ -237,10 +237,10 @@ impl InitializeParamsBuilder {
   pub fn new(config: Value) -> Self {
     let mut config_as_options = json!({});
     if let Some(object) = config.as_object() {
-      if let Some(deno) = object.get("deno")
-        && let Some(deno) = deno.as_object()
+      if let Some(oden) = object.get("oden")
+        && let Some(oden) = oden.as_object()
       {
-        config_as_options = json!(deno.clone());
+        config_as_options = json!(oden.clone());
       }
       let config_as_options = config_as_options.as_object_mut().unwrap();
       if let Some(typescript) = object.get("typescript") {
@@ -502,7 +502,7 @@ impl InitializeParamsBuilder {
     self
   }
 
-  pub fn set_deno_enable(&mut self, value: bool) -> &mut Self {
+  pub fn set_oden_enable(&mut self, value: bool) -> &mut Self {
     let options = self.initialization_options_mut();
     options.insert("enable".to_string(), value.into());
     self
@@ -587,9 +587,9 @@ pub struct LspClientBuilder {
   stderr_inherit: bool,
   stderr_null: bool,
   log_debug: bool,
-  deno_exe: PathRef,
+  oden_exe: PathRef,
   root_dir: PathRef,
-  deno_dir: TempDir,
+  oden_dir: TempDir,
   envs: HashMap<OsString, OsString>,
   collect_perf: bool,
 }
@@ -600,21 +600,21 @@ impl LspClientBuilder {
     Self::new_with_dir(TempDir::new())
   }
 
-  pub fn new_with_dir(deno_dir: TempDir) -> Self {
+  pub fn new_with_dir(oden_dir: TempDir) -> Self {
     Self {
       stderr_inherit: false,
       stderr_null: false,
       log_debug: false,
-      deno_exe: deno_exe_path(),
-      root_dir: deno_dir.path().clone(),
-      deno_dir,
+      oden_exe: oden_exe_path(),
+      root_dir: oden_dir.path().clone(),
+      oden_dir,
       envs: Default::default(),
       collect_perf: false,
     }
   }
 
-  pub fn deno_exe(mut self, exe_path: impl AsRef<Path>) -> Self {
-    self.deno_exe = PathRef::new(exe_path);
+  pub fn oden_exe(mut self, exe_path: impl AsRef<Path>) -> Self {
+    self.oden_exe = PathRef::new(exe_path);
     self
   }
 
@@ -667,19 +667,19 @@ impl LspClientBuilder {
   }
 
   pub fn build_result(&self) -> Result<LspClient> {
-    let deno_dir = self.deno_dir.clone();
-    let mut command = Command::new(&self.deno_exe);
+    let oden_dir = self.oden_dir.clone();
+    let mut command = Command::new(&self.oden_exe);
     let mut args = vec!["lsp".to_string()];
     if self.log_debug {
       args.push("--log-level=debug".to_string());
     }
     command
-      .env("DENO_DIR", deno_dir.path())
+      .env("ODEN_DIR", oden_dir.path())
       .env("NPM_CONFIG_REGISTRY", npm_registry_url())
       .env("JSR_URL", jsr_registry_url())
       // turn on diagnostic synchronization communication
-      .env("DENO_INTERNAL_DIAGNOSTIC_BATCH_NOTIFICATIONS", "1")
-      .env("DENO_NO_UPDATE_CHECK", "1")
+      .env("ODEN_INTERNAL_DIAGNOSTIC_BATCH_NOTIFICATIONS", "1")
+      .env("ODEN_NO_UPDATE_CHECK", "1")
       .args(args)
       .stdin(Stdio::piped())
       .stdout(Stdio::piped());
@@ -747,7 +747,7 @@ impl LspClientBuilder {
       start: Instant::now(),
       root_dir: self.root_dir.clone(),
       writer,
-      deno_dir,
+      oden_dir,
       stderr_lines_rx,
       config: json!("{}"),
       supports_workspace_configuration: false,
@@ -848,7 +848,7 @@ pub struct LspClient {
   request_id: u64,
   start: Instant,
   writer: io::BufWriter<ChildStdin>,
-  deno_dir: TempDir,
+  oden_dir: TempDir,
   root_dir: PathRef,
   stderr_lines_rx: Option<mpsc::Receiver<String>>,
   config: serde_json::Value,
@@ -873,8 +873,8 @@ impl Drop for LspClient {
 }
 
 impl LspClient {
-  pub fn deno_dir(&self) -> &TempDir {
-    &self.deno_dir
+  pub fn oden_dir(&self) -> &TempDir {
+    &self.oden_dir
   }
 
   pub fn duration(&self) -> Duration {
@@ -942,7 +942,7 @@ impl LspClient {
   ) {
     self.initialize_with_config(
       do_build,
-      json!({ "deno": {
+      json!({ "oden": {
         "enable": true,
         "cache": null,
         "certificateStores": null,
@@ -995,12 +995,12 @@ impl LspClient {
       && let Some(options) = options.as_object()
       && let Some(config) = config.as_object_mut()
     {
-      let mut deno = options.clone();
+      let mut oden = options.clone();
       let typescript = options.get("typescript");
       let javascript = options.get("javascript");
-      deno.remove("typescript");
-      deno.remove("javascript");
-      config.insert("deno".to_string(), json!(deno));
+      oden.remove("typescript");
+      oden.remove("javascript");
+      config.insert("oden".to_string(), json!(oden));
       if let Some(typescript) = typescript {
         config.insert("typescript".to_string(), typescript.clone());
       }
@@ -1165,7 +1165,7 @@ impl LspClient {
     self.write_request(
       "workspace/executeCommand",
       json!({
-        "command": "deno.cache",
+        "command": "oden.cache",
         "arguments": [specifiers.into_iter().collect::<Vec<_>>(), referrer],
       }),
     );
@@ -1175,7 +1175,7 @@ impl LspClient {
     self.write_request(
       "workspace/executeCommand",
       json!({
-        "command": "deno.cache",
+        "command": "oden.cache",
         "arguments": [[], specifier],
       }),
     );
@@ -1207,13 +1207,13 @@ impl LspClient {
       );
     }
     self.read_notification_with_method::<()>(
-      "deno/internalTestDiagnosticBatchStart",
+      "oden/internalTestDiagnosticBatchStart",
     );
     // Most tests have just one open document.
     let mut diagnostics = Vec::with_capacity(1);
     loop {
       let (method, params) = self.read_notification::<Value>();
-      if method == "deno/internalTestDiagnosticBatchEnd" {
+      if method == "oden/internalTestDiagnosticBatchEnd" {
         break;
       }
       if method == "textDocument/publishDiagnostics" {

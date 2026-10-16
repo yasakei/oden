@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! Helpers for the V8 `host_defined_options` PrimitiveArray attached to a
 //! script's origin. Index 0 of the array stores a `Uint32` "kind" the

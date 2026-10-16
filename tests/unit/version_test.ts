@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { assert, assertEquals } from "./test_util.ts";
 
-Deno.test(function version() {
+Oden.test(function version() {
   const pattern = /^\d+\.\d+\.\d+/;
-  assert(pattern.test(Deno.version.deno));
-  assert(pattern.test(Deno.version.v8));
-  assertEquals(Deno.version.typescript, "6.0.3");
+  assert(pattern.test(Oden.version.oden));
+  assert(pattern.test(Oden.version.v8));
+  assertEquals(Oden.version.typescript, "6.0.3");
 });

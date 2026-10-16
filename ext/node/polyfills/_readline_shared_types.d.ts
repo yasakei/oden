@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Part of https://github.com/DefinitelyTyped/DefinitelyTyped/blob/cd61f5b4d3d143108569ec3f88adc0eb34b961c4/types/node/readline.d.ts
 
@@ -7,7 +7,7 @@
 import type {
   ReadableStream,
   WritableStream,
-} from "ext:deno_node/_global.d.ts";
+} from "ext:oden_node/_global.d.ts";
 
 export type Completer = (line: string) => CompleterResult;
 export type AsyncCompleter = (

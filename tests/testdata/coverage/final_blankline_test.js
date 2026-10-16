@@ -1,5 +1,5 @@
 import example from "./final_blankline.js";
 
-Deno.test("Example.", () => {
+Oden.test("Example.", () => {
   example();
 });

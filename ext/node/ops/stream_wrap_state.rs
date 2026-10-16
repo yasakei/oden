@@ -1,13 +1,13 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::Cell;
 use std::collections::HashMap;
 use std::ffi::c_void;
 use std::rc::Rc;
 
-use deno_core::uv_compat::uv_buf_t;
-use deno_core::uv_compat::uv_stream_t;
-use deno_core::v8;
+use oden_core::uv_compat::uv_buf_t;
+use oden_core::uv_compat::uv_stream_t;
+use oden_core::v8;
 
 #[derive(Clone, Copy)]
 pub(crate) struct ReadInterceptor {

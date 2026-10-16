@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Node.js contributors. All rights reserved. MIT License.
 
 /** NOT IMPLEMENTED
@@ -6,8 +6,8 @@
  * ERR_QUICSESSION_VERSION_NEGOTIATION
  * ERR_REQUIRE_ESM
  * ERR_QUIC_ERROR
- * ERR_SYSTEM_ERROR //System error, shouldn't ever happen inside Deno
- * ERR_TTY_INIT_FAILED //System error, shouldn't ever happen inside Deno
+ * ERR_SYSTEM_ERROR //System error, shouldn't ever happen inside Oden
+ * ERR_TTY_INIT_FAILED //System error, shouldn't ever happen inside Oden
  * ERR_INVALID_PACKAGE_CONFIG // package.json stuff, probably useless
  */
 
@@ -67,21 +67,21 @@ const {
   URIErrorPrototype,
 } = primordials;
 const { format, inspect } = core.loadExtScript(
-  "ext:deno_node/internal/util/inspect.mjs",
+  "ext:oden_node/internal/util/inspect.mjs",
 );
-const { codes } = core.loadExtScript("ext:deno_node/internal/error_codes.ts");
+const { codes } = core.loadExtScript("ext:oden_node/internal/error_codes.ts");
 const {
   codeMap,
   errorMap,
   mapSysErrnoToUvErrno,
   UV_EBADF,
-} = core.loadExtScript("ext:deno_node/internal_binding/uv.ts");
-const { isWindows } = core.loadExtScript("ext:deno_node/_util/os.ts");
+} = core.loadExtScript("ext:oden_node/internal_binding/uv.ts");
+const { isWindows } = core.loadExtScript("ext:oden_node/_util/os.ts");
 const { os: osConstants } = core.loadExtScript(
-  "ext:deno_node/internal_binding/constants.ts",
+  "ext:oden_node/internal_binding/constants.ts",
 );
 const { hideStackFrames } = core.loadExtScript(
-  "ext:deno_node/internal/hide_stack_frames.ts",
+  "ext:oden_node/internal/hide_stack_frames.ts",
 );
 
 // Lazy loader for getSystemErrorName to break circular dep with _utils.ts
@@ -89,7 +89,7 @@ let _getSystemErrorName;
 function getSystemErrorName(code) {
   if (!_getSystemErrorName) {
     _getSystemErrorName =
-      core.loadExtScript("ext:deno_node/_utils.ts").getSystemErrorName;
+      core.loadExtScript("ext:oden_node/_utils.ts").getSystemErrorName;
   }
   return _getSystemErrorName(code);
 }
@@ -374,11 +374,11 @@ const handleDnsError = hideStackFrames(
       return dnsException(err?.uv_errcode, syscall, address);
     }
 
-    if (ObjectPrototypeIsPrototypeOf(Deno.errors.NotCapable.prototype, err)) {
+    if (ObjectPrototypeIsPrototypeOf(Oden.errors.NotCapable.prototype, err)) {
       return dnsException(codeMap.get("EPERM")!, syscall, address);
     }
 
-    return denoErrorToNodeError(err, { syscall });
+    return odenErrorToNodeError(err, { syscall });
   },
 );
 
@@ -3108,8 +3108,8 @@ interface UvExceptionContext {
   path?: string;
   dest?: string;
 }
-function denoErrorToNodeError(e: Error, ctx: UvExceptionContext) {
-  if (ObjectPrototypeIsPrototypeOf(Deno.errors.BadResource.prototype, e)) {
+function odenErrorToNodeError(e: Error, ctx: UvExceptionContext) {
+  if (ObjectPrototypeIsPrototypeOf(Oden.errors.BadResource.prototype, e)) {
     return uvException({
       errno: UV_EBADF,
       ...ctx,
@@ -3128,11 +3128,11 @@ function denoErrorToNodeError(e: Error, ctx: UvExceptionContext) {
   return ex;
 }
 
-function denoWriteFileErrorToNodeError(
+function odenWriteFileErrorToNodeError(
   e: Error,
   ctx: UvExceptionContext,
 ) {
-  if (ObjectPrototypeIsPrototypeOf(Deno.errors.BadResource.prototype, e)) {
+  if (ObjectPrototypeIsPrototypeOf(Oden.errors.BadResource.prototype, e)) {
     return uvException({
       errno: UV_EBADF,
       ...ctx,
@@ -3162,7 +3162,7 @@ function denoWriteFileErrorToNodeError(
   });
 }
 
-const denoErrorToNodeSystemError = hideStackFrames((
+const odenErrorToNodeSystemError = hideStackFrames((
   e: Error,
   syscall: string,
 ): Error => {
@@ -3666,9 +3666,9 @@ return {
   aggregateTwoErrors,
   codes,
   connResetException,
-  denoErrorToNodeError,
-  denoErrorToNodeSystemError,
-  denoWriteFileErrorToNodeError,
+  odenErrorToNodeError,
+  odenErrorToNodeSystemError,
+  odenWriteFileErrorToNodeError,
   dnsException,
   DNSException: dnsException,
   errnoException,
@@ -3975,8 +3975,8 @@ return {
     aggregateTwoErrors,
     codes,
     connResetException,
-    denoErrorToNodeError,
-    denoErrorToNodeSystemError,
+    odenErrorToNodeError,
+    odenErrorToNodeSystemError,
     dnsException,
     DNSException: dnsException,
     errnoException,

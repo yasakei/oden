@@ -4,7 +4,7 @@
  * (The MIT License)
  *
  * Copyright (c) 2014 Jonathan Ong <me@jongleberry.com>
- * Copyright (c) 2020 the Deno authors
+ * Copyright (c) 2020 the Oden authors
  * Copyright (c) 2020 the oak authors
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -2473,7 +2473,7 @@ export const db: {
     "source": "iana",
     "extensions": ["uvz", "uvvz"],
   },
-  "application/vnd.denovo.fcselayout-link": {
+  "application/vnd.odenvo.fcselayout-link": {
     "source": "iana",
     "extensions": ["fe_launch"],
   },

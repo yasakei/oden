@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   assert,
   assertEquals,
@@ -8,92 +8,92 @@ import {
   unreachable,
 } from "./test_util.ts";
 
-Deno.test({ permissions: { read: true } }, function readFileSyncSuccess() {
-  const data = Deno.readFileSync("tests/testdata/assets/fixture.json");
+Oden.test({ permissions: { read: true } }, function readFileSyncSuccess() {
+  const data = Oden.readFileSync("tests/testdata/assets/fixture.json");
   assert(data.byteLength > 0);
   const decoder = new TextDecoder("utf-8");
   const json = decoder.decode(data);
   const pkg = JSON.parse(json);
-  assertEquals(pkg.name, "deno");
+  assertEquals(pkg.name, "oden");
 });
 
-Deno.test({ permissions: { read: true } }, function readFileSyncUrl() {
-  const data = Deno.readFileSync(
+Oden.test({ permissions: { read: true } }, function readFileSyncUrl() {
+  const data = Oden.readFileSync(
     pathToAbsoluteFileUrl("tests/testdata/assets/fixture.json"),
   );
   assert(data.byteLength > 0);
   const decoder = new TextDecoder("utf-8");
   const json = decoder.decode(data);
   const pkg = JSON.parse(json);
-  assertEquals(pkg.name, "deno");
+  assertEquals(pkg.name, "oden");
 });
 
-Deno.test({ permissions: { read: false } }, function readFileSyncPerm() {
+Oden.test({ permissions: { read: false } }, function readFileSyncPerm() {
   assertThrows(() => {
-    Deno.readFileSync("tests/testdata/assets/fixture.json");
-  }, Deno.errors.NotCapable);
+    Oden.readFileSync("tests/testdata/assets/fixture.json");
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test({ permissions: { read: true } }, function readFileSyncNotFound() {
+Oden.test({ permissions: { read: true } }, function readFileSyncNotFound() {
   assertThrows(() => {
-    Deno.readFileSync("bad_filename");
-  }, Deno.errors.NotFound);
+    Oden.readFileSync("bad_filename");
+  }, Oden.errors.NotFound);
 });
 
-Deno.test({ permissions: { read: true } }, async function readFileUrl() {
-  const data = await Deno.readFile(
+Oden.test({ permissions: { read: true } }, async function readFileUrl() {
+  const data = await Oden.readFile(
     pathToAbsoluteFileUrl("tests/testdata/assets/fixture.json"),
   );
   assert(data.byteLength > 0);
   const decoder = new TextDecoder("utf-8");
   const json = decoder.decode(data);
   const pkg = JSON.parse(json);
-  assertEquals(pkg.name, "deno");
+  assertEquals(pkg.name, "oden");
 });
 
-Deno.test({ permissions: { read: true } }, async function readFileSuccess() {
-  const data = await Deno.readFile("tests/testdata/assets/fixture.json");
+Oden.test({ permissions: { read: true } }, async function readFileSuccess() {
+  const data = await Oden.readFile("tests/testdata/assets/fixture.json");
   assert(data.byteLength > 0);
   const decoder = new TextDecoder("utf-8");
   const json = decoder.decode(data);
   const pkg = JSON.parse(json);
-  assertEquals(pkg.name, "deno");
+  assertEquals(pkg.name, "oden");
 });
 
-Deno.test({ permissions: { read: false } }, async function readFilePerm() {
+Oden.test({ permissions: { read: false } }, async function readFilePerm() {
   await assertRejects(async () => {
-    await Deno.readFile("tests/testdata/assets/fixture.json");
-  }, Deno.errors.NotCapable);
+    await Oden.readFile("tests/testdata/assets/fixture.json");
+  }, Oden.errors.NotCapable);
 });
 
-Deno.test({ permissions: { read: true } }, function readFileSyncLoop() {
+Oden.test({ permissions: { read: true } }, function readFileSyncLoop() {
   for (let i = 0; i < 256; i++) {
-    Deno.readFileSync("tests/testdata/assets/fixture.json");
+    Oden.readFileSync("tests/testdata/assets/fixture.json");
   }
 });
 
-Deno.test(
+Oden.test(
   { permissions: { read: true } },
   async function readFileDoesNotLeakResources() {
-    await assertRejects(async () => await Deno.readFile("cli"));
+    await assertRejects(async () => await Oden.readFile("cli"));
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true } },
   function readFileSyncDoesNotLeakResources() {
-    assertThrows(() => Deno.readFileSync("cli"));
+    assertThrows(() => Oden.readFileSync("cli"));
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true } },
   async function readFileWithAbortSignal() {
     const ac = new AbortController();
     queueMicrotask(() => ac.abort());
     const error = await assertRejects(
       async () => {
-        await Deno.readFile("tests/testdata/assets/fixture.json", {
+        await Oden.readFile("tests/testdata/assets/fixture.json", {
           signal: ac.signal,
         });
       },
@@ -103,7 +103,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true } },
   async function readFileWithAbortSignalReason() {
     const ac = new AbortController();
@@ -111,7 +111,7 @@ Deno.test(
     queueMicrotask(() => ac.abort(abortReason));
     const error = await assertRejects(
       async () => {
-        await Deno.readFile("tests/testdata/assets/fixture.json", {
+        await Oden.readFile("tests/testdata/assets/fixture.json", {
           signal: ac.signal,
         });
       },
@@ -120,13 +120,13 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true } },
   async function readFileWithAbortSignalPrimitiveReason() {
     const ac = new AbortController();
     queueMicrotask(() => ac.abort("Some string"));
     try {
-      await Deno.readFile("tests/testdata/assets/fixture.json", {
+      await Oden.readFile("tests/testdata/assets/fixture.json", {
         signal: ac.signal,
       });
       unreachable();
@@ -137,40 +137,40 @@ Deno.test(
 );
 
 // Test that AbortController's cancel handle is cleaned-up correctly, and do not leak resources.
-Deno.test(
+Oden.test(
   { permissions: { read: true } },
   async function readFileWithAbortSignalNotCalled() {
     const ac = new AbortController();
-    await Deno.readFile("tests/testdata/assets/fixture.json", {
+    await Oden.readFile("tests/testdata/assets/fixture.json", {
       signal: ac.signal,
     });
   },
 );
 
-Deno.test(
-  { ignore: Deno.build.os !== "linux" },
+Oden.test(
+  { ignore: Oden.build.os !== "linux" },
   async function readFileProcFs() {
-    const data = await Deno.readFile("/proc/self/stat");
+    const data = await Oden.readFile("/proc/self/stat");
     assert(data.byteLength > 0);
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true } },
   async function readFileNotFoundErrorCode() {
     try {
-      await Deno.readFile("definitely-not-found.json");
+      await Oden.readFile("definitely-not-found.json");
     } catch (e) {
       assertEquals((e as { code: string }).code, "ENOENT");
     }
   },
 );
 
-Deno.test(
+Oden.test(
   { permissions: { read: true } },
   async function readFileIsDirectoryErrorCode() {
     try {
-      await Deno.readFile("tests/testdata/assets/");
+      await Oden.readFile("tests/testdata/assets/");
     } catch (e) {
       assertEquals((e as { code: string }).code, "EISDIR");
     }

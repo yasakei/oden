@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 //! A tiny, hand-rolled, borrow-first serialization format for the snapshot
 //! sidecar data.
 //!
 //! This replaces `bincode` for the two snapshot sidecar call sites. The data is
-//! entirely internal to `deno_core` and is versioned by the snapshot hash, so
+//! entirely internal to `oden_core` and is versioned by the snapshot hash, so
 //! there is no backwards-compatibility requirement — but we still write a
 //! format version word up front so a mismatch fails loudly instead of
 //! producing garbage.

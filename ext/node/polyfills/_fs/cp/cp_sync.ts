@@ -1,14 +1,14 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Adapted from Node.js. Copyright Joyent, Inc. and other Node contributors.
 
 (function () {
 const { core } = __bootstrap;
 const {
-  denoErrorToNodeError,
+  odenErrorToNodeError,
   ERR_INVALID_RETURN_VALUE,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
 const { op_node_cp_sync } = core.ops;
-const { throwCpError } = core.loadExtScript("ext:deno_node/_fs/cp/cp.ts");
+const { throwCpError } = core.loadExtScript("ext:oden_node/_fs/cp/cp.ts");
 
 const {
   isPromise,
@@ -21,7 +21,7 @@ function cpSyncFn(
 ) {
   try {
     if (opts.filter) {
-      // deno-lint-ignore deno-internal/prefer-primordials
+      // deno-lint-ignore oden-internal/prefer-primordials
       const shouldCopy = opts.filter(src, dest);
       if (isPromise(shouldCopy)) {
         throw new ERR_INVALID_RETURN_VALUE("boolean", "filter", shouldCopy);
@@ -43,7 +43,7 @@ function cpSyncFn(
     );
   } catch (err) {
     if (typeof err?.os_errno === "number") {
-      throw denoErrorToNodeError(err, {
+      throw odenErrorToNodeError(err, {
         path: err.path,
         dest: err.dest,
         syscall: err.syscall,

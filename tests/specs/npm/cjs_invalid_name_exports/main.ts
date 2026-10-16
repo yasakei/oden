@@ -1,3 +1,3 @@
-import * as foo from "npm:@denotest/cjs-invalid-name-exports";
+import * as foo from "npm:@odentest/cjs-invalid-name-exports";
 
 console.log(foo);

@@ -1,15 +1,15 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::cell::Cell;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use deno_core::GarbageCollected;
-use deno_core::ToV8;
-use deno_core::op2;
-use deno_core::v8;
-use deno_core::v8::GetPropertyNamesArgs;
-use deno_core::v8_static_strings;
+use oden_core::GarbageCollected;
+use oden_core::ToV8;
+use oden_core::op2;
+use oden_core::v8;
+use oden_core::v8::GetPropertyNamesArgs;
+use oden_core::v8_static_strings;
 use rusqlite::ffi;
 
 use super::SqliteError;
@@ -403,7 +403,7 @@ pub(crate) fn check_error_code2(r: i32) -> Result<(), SqliteError> {
 
 // SAFETY: we're sure this can be GCed
 unsafe impl GarbageCollected for StatementSync {
-  fn trace(&self, _visitor: &mut deno_core::v8::cppgc::Visitor) {}
+  fn trace(&self, _visitor: &mut oden_core::v8::cppgc::Visitor) {}
 
   fn get_name(&self) -> &'static std::ffi::CStr {
     c"StatementSync"
@@ -760,7 +760,7 @@ impl StatementSync {
     macro_rules! v8_static_strings {
       ($($ident:ident = $str:literal),* $(,)?) => {
         $(
-          pub static $ident: deno_core::FastStaticString = deno_core::ascii_str!($str);
+          pub static $ident: oden_core::FastStaticString = oden_core::ascii_str!($str);
         )*
       };
     }

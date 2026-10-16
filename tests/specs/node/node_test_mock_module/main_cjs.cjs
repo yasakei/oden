@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Mocking a CommonJS module required by a CommonJS importer: named exports are
 // applied onto the default export, the default cache behavior gives a fresh
 // exports object on every require, and restore() brings the original back.

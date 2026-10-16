@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { core } from "ext:core/mod.js";
 const {
   AssertionError,
@@ -21,7 +21,7 @@ const {
   strict,
   strictEqual,
   throws,
-} = core.loadExtScript("ext:deno_node/assert.ts");
+} = core.loadExtScript("ext:oden_node/assert.ts");
 
 export {
   AssertionError,

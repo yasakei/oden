@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::io::ErrorKind;
@@ -6,8 +6,8 @@ use std::path::PathBuf;
 use std::time::SystemTime;
 
 use deno_error::JsError;
-use deno_maybe_sync::MaybeSend;
-use deno_maybe_sync::MaybeSync;
+use oden_maybe_sync::MaybeSend;
+use oden_maybe_sync::MaybeSync;
 use serde::Deserialize;
 use serde::Serialize;
 use thiserror::Error;
@@ -45,7 +45,7 @@ impl GlobalToLocalCopy {
 /// information instead of re-requesting the URL on every process start.
 /// Similar to how redirects are stored as body-less entries distinguished
 /// by their "location" header.
-pub const NOT_FOUND_CACHE_HEADER: &str = "x-deno-not-found";
+pub const NOT_FOUND_CACHE_HEADER: &str = "x-oden-not-found";
 
 #[derive(Debug, Error, JsError)]
 #[class(type)]
@@ -94,7 +94,7 @@ impl<'a> Checksum<'a> {
 pub fn url_to_filename(url: &Url) -> std::io::Result<PathBuf> {
   // Replaces port part with a special string token (because
   // ":" cannot be used in filename on some platforms).
-  // Ex: $DENO_DIR/remote/https/deno.land/
+  // Ex: $ODEN_DIR/remote/https/deno.land/
   let Some(cache_parts) = base_url_to_filename_parts(url) else {
     return Err(std::io::Error::new(
       ErrorKind::InvalidInput,
@@ -114,7 +114,7 @@ pub fn url_to_filename(url: &Url) -> std::io::Result<PathBuf> {
   };
 
   // NOTE: fragment is omitted on purpose - it's not taken into
-  // account when caching - it denotes parts of webpage, which
+  // account when caching - it odentes parts of webpage, which
   // in case of static resources doesn't make much sense
   let hashed_filename = checksum(rest_str.as_bytes());
   let capacity = cache_parts.iter().map(|s| s.len() + 1).sum::<usize>()
@@ -168,7 +168,7 @@ pub struct HttpCacheItemKey<'a> {
 }
 
 #[allow(clippy::disallowed_types, reason = "arc wrapper type")]
-pub type HttpCacheRc = deno_maybe_sync::MaybeArc<dyn HttpCache>;
+pub type HttpCacheRc = oden_maybe_sync::MaybeArc<dyn HttpCache>;
 
 pub trait HttpCache: MaybeSend + MaybeSync + std::fmt::Debug {
   /// A pre-computed key for looking up items in the cache.

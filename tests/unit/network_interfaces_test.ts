@@ -1,14 +1,14 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { assert } from "./test_util.ts";
 
-Deno.test(
+Oden.test(
   {
-    name: "Deno.networkInterfaces",
+    name: "Oden.networkInterfaces",
     permissions: { sys: ["networkInterfaces"] },
   },
   () => {
-    const networkInterfaces = Deno.networkInterfaces();
+    const networkInterfaces = Oden.networkInterfaces();
     assert(Array.isArray(networkInterfaces));
     assert(networkInterfaces.length > 0);
     for (

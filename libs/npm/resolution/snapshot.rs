@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
@@ -9,7 +9,7 @@ use std::collections::hash_map;
 use std::sync::Arc;
 
 use deno_error::JsError;
-use deno_lockfile::Lockfile;
+use oden_lockfile::Lockfile;
 use deno_semver::StackString;
 use deno_semver::VersionReq;
 use deno_semver::package::PackageName;
@@ -197,7 +197,7 @@ impl SerializedNpmResolutionSnapshot {
   /// strings differ only in cycle-unrolling depth. Without merging them,
   /// each variant becomes a separate `Module._cache` entry at install
   /// time and identity comparisons across require chains fail (e.g.
-  /// NestJS DI comparing `ModuleRef` constructors). See deno#26427.
+  /// NestJS DI comparing `ModuleRef` constructors). See oden#26427.
   ///
   /// Equivalent variants are remapped to a single canonical id and the
   /// duplicate entries are dropped. Acts iteratively because merging one
@@ -716,7 +716,7 @@ impl NpmResolutionSnapshot {
     });
     match package_nv {
       Some(nv) => self
-        .resolve_package_from_deno_module(nv)
+        .resolve_package_from_oden_module(nv)
         // ignore the nv not found error and return a req not found
         .map_err(|_| PackageReqNotFoundError(req.clone())),
       None => Err(PackageReqNotFoundError(req.clone())),
@@ -750,8 +750,8 @@ impl NpmResolutionSnapshot {
       })
   }
 
-  /// Resolve a package id from a deno module.
-  pub fn resolve_package_id_from_deno_module(
+  /// Resolve a package id from a oden module.
+  pub fn resolve_package_id_from_oden_module(
     &self,
     nv: &PackageNv,
   ) -> Result<&NpmPackageId, PackageNvNotFoundError> {
@@ -761,13 +761,13 @@ impl NpmResolutionSnapshot {
     }
   }
 
-  /// Resolve a package from a deno module.
-  pub fn resolve_package_from_deno_module(
+  /// Resolve a package from a oden module.
+  pub fn resolve_package_from_oden_module(
     &self,
     nv: &PackageNv,
   ) -> Result<&NpmResolutionPackage, PackageNvNotFoundError> {
     self
-      .resolve_package_id_from_deno_module(nv)
+      .resolve_package_id_from_oden_module(nv)
       .map(|id| self.packages.get(id).unwrap())
   }
 
@@ -1062,7 +1062,7 @@ pub struct SnapshotFromLockfileParams<'a> {
   /// [`SerializedNpmResolutionSnapshot::dedup_equivalent_peer_variants`]).
   /// This is a purely in-memory normalization of the loaded snapshot; it
   /// does not by itself rewrite the lockfile. It is safe to enable on the
-  /// `deno run` path: it lets lockfiles written by an older deno (whose
+  /// `oden run` path: it lets lockfiles written by an older oden (whose
   /// peer-dep id encoding differs) still satisfy the requirements, so the
   /// graph isn't needlessly re-resolved against the registry (which would
   /// fail under `--cached-only`).
@@ -1287,11 +1287,11 @@ pub fn snapshot_from_lockfile(
     // unrolling depth. Merge them so install produces a single physical
     // copy per nv (matches pnpm) — preserving class identity for
     // libraries that rely on decorator metadata (NestJS DI). See
-    // deno#26427.
+    // oden#26427.
     //
-    // This also lets a lockfile written by an older deno (whose peer-dep
+    // This also lets a lockfile written by an older oden (whose peer-dep
     // encoding differs from the current one) still satisfy the
-    // requirements, so `deno run` doesn't re-resolve the whole graph
+    // requirements, so `oden run` doesn't re-resolve the whole graph
     // against the registry — which would fail offline under
     // `--cached-only`. The merge is in-memory only and doesn't rewrite the
     // lockfile unless a real resolution subsequently runs.
@@ -1305,7 +1305,7 @@ pub fn snapshot_from_lockfile(
 mod tests {
   use std::path::PathBuf;
 
-  use deno_lockfile::NewLockfileOptions;
+  use oden_lockfile::NewLockfileOptions;
   use deno_semver::Version;
   use pretty_assertions::assert_eq;
 
@@ -1747,7 +1747,7 @@ mod tests {
     let api = TestNpmRegistryApi::default();
     let lockfile = Lockfile::new(
       NewLockfileOptions {
-        file_path: PathBuf::from("/deno.lock"),
+        file_path: PathBuf::from("/oden.lock"),
         content,
         overwrite: false,
       },
@@ -1779,7 +1779,7 @@ mod tests {
 
     let lockfile = Lockfile::new(
       NewLockfileOptions {
-        file_path: PathBuf::from("/deno.lock"),
+        file_path: PathBuf::from("/oden.lock"),
         content: r#"{
         "version": "2",
         "remote": {},
@@ -1834,7 +1834,7 @@ mod tests {
 
     let lockfile = Lockfile::new(
       NewLockfileOptions {
-        file_path: PathBuf::from("/deno.lock"),
+        file_path: PathBuf::from("/oden.lock"),
         content: r#"{
         "version": "4",
         "specifiers": {
@@ -2169,7 +2169,7 @@ mod tests {
     let api = TestNpmRegistryApi::default();
     let lockfile = Lockfile::new(
       NewLockfileOptions {
-        file_path: PathBuf::from("/deno.lock"),
+        file_path: PathBuf::from("/oden.lock"),
         content: r#"{
           "version": "5",
           "specifiers": {
@@ -2232,7 +2232,7 @@ mod tests {
     let api = TestNpmRegistryApi::default();
     let lockfile = Lockfile::new(
       NewLockfileOptions {
-        file_path: PathBuf::from("/deno.lock"),
+        file_path: PathBuf::from("/oden.lock"),
         content: r#"{
           "version": "5",
           "specifiers": {
@@ -2293,14 +2293,14 @@ mod tests {
   }
 
   // Regression test for offline `--cached-only` isolates booting from a
-  // lockfile written by an older deno: the peer-dep id encoding changed
+  // lockfile written by an older oden: the peer-dep id encoding changed
   // (cycle unrolling depth), so a complete older lockfile contains
   // redundant peer variants of the same name+version. Loading it on the
   // run path with `dedup_equivalent_peer_variants: true` must collapse the
   // variants so the requirement still resolves and the snapshot stays
-  // valid — otherwise deno treats the lockfile as stale and re-resolves
+  // valid — otherwise oden treats the lockfile as stale and re-resolves
   // against the registry, which fails under `--cached-only`. See the
-  // denoland/deno-private#77 investigation and deno#26427.
+  // denoland/deno-private#77 investigation and oden#26427.
   #[tokio::test]
   async fn test_snapshot_from_lockfile_dedups_old_peer_encoding() {
     let api = TestNpmRegistryApi::default();
@@ -2328,7 +2328,7 @@ mod tests {
     let make_lockfile = || async {
       Lockfile::new(
         NewLockfileOptions {
-          file_path: PathBuf::from("/deno.lock"),
+          file_path: PathBuf::from("/oden.lock"),
           content,
           overwrite: false,
         },

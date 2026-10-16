@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -11,23 +11,23 @@ use std::rc::Rc;
 use std::sync::Arc;
 
 use console_static_text::ansi::strip_ansi_codes;
-use deno_config::workspace::FolderConfigs;
-use deno_config::workspace::TaskDefinition;
-use deno_config::workspace::TaskOrScript;
-use deno_config::workspace::WorkspaceDirectory;
-use deno_config::workspace::WorkspaceMemberTasksConfig;
-use deno_config::workspace::WorkspaceTasksConfig;
-use deno_core::anyhow::Context;
-use deno_core::anyhow::anyhow;
-use deno_core::anyhow::bail;
-use deno_core::error::AnyError;
-use deno_core::futures::FutureExt;
-use deno_core::futures::StreamExt;
-use deno_core::futures::future::LocalBoxFuture;
-use deno_core::futures::stream::futures_unordered;
-use deno_core::serde_json::Value;
-use deno_core::url::Url;
-use deno_npm_installer::PackageCaching;
+use oden_config::workspace::FolderConfigs;
+use oden_config::workspace::TaskDefinition;
+use oden_config::workspace::TaskOrScript;
+use oden_config::workspace::WorkspaceDirectory;
+use oden_config::workspace::WorkspaceMemberTasksConfig;
+use oden_config::workspace::WorkspaceTasksConfig;
+use oden_core::anyhow::Context;
+use oden_core::anyhow::anyhow;
+use oden_core::anyhow::bail;
+use oden_core::error::AnyError;
+use oden_core::futures::FutureExt;
+use oden_core::futures::StreamExt;
+use oden_core::futures::future::LocalBoxFuture;
+use oden_core::futures::stream::futures_unordered;
+use oden_core::serde_json::Value;
+use oden_core::url::Url;
+use oden_npm_installer::PackageCaching;
 use deno_path_util::normalize_path;
 use deno_task_shell::KillSignal;
 use deno_task_shell::ShellCommand;
@@ -62,9 +62,9 @@ pub async fn execute_script(
   let factory = CliFactory::from_flags(flags.clone());
   let cli_options = factory.cli_options()?;
   let start_dir = &cli_options.start_dir;
-  if !start_dir.has_deno_or_pkg_json() && !task_flags.eval {
+  if !start_dir.has_oden_or_pkg_json() && !task_flags.eval {
     bail!(
-      "deno task couldn't find deno.json(c) or package.json. See https://docs.deno.com/go/config"
+      "oden task couldn't find oden.json(c) or package.json. See https://docs.deno.com/go/config"
     )
   }
   let force_use_pkg_json =
@@ -197,19 +197,19 @@ pub async fn execute_script(
   let node_resolver = factory.node_resolver().await?;
   let progress_bar = factory.text_only_progress_bar();
   let task_cache =
-    crate::tools::task_cache::TaskCache::new(&factory.deno_dir()?.root);
+    crate::tools::task_cache::TaskCache::new(&factory.oden_dir()?.root);
   let mut env_vars = task_runner::real_env_vars();
 
   if flags.tunnel {
-    env_vars.insert("DENO_CONNECTED".into(), "1".into());
+    env_vars.insert("ODEN_CONNECTED".into(), "1".into());
   }
 
-  // Precedence: explicit `--jobs` flag > `DENO_JOBS` env var >
+  // Precedence: explicit `--jobs` flag > `ODEN_JOBS` env var >
   // `available_parallelism()` default.
   let no_of_concurrent_tasks = task_flags
     .concurrency
     .or_else(|| {
-      std::env::var("DENO_JOBS")
+      std::env::var("ODEN_JOBS")
         .ok()?
         .parse::<NonZeroUsize>()
         .ok()
@@ -235,7 +235,7 @@ pub async fn execute_script(
   run_future_forwarding_signals(kill_signal.clone(), async {
     if task_flags.eval {
       return task_runner
-        .run_deno_task(
+        .run_oden_task(
           &Url::from_directory_path(cli_options.initial_cwd()).unwrap(),
           None,
           None,
@@ -328,7 +328,7 @@ fn compute_concurrent_task_color_indices(
 }
 
 /// Returns the workspace member's display name for a task's prefix label —
-/// its `name` from deno.json/package.json if set, otherwise the folder's
+/// its `name` from oden.json/package.json if set, otherwise the folder's
 /// directory name as a fallback so unnamed sibling packages stay
 /// distinguishable. Tasks from the workspace root get no fallback (their
 /// root folder name is typically not a meaningful package name).
@@ -424,7 +424,7 @@ impl<'a> TaskRunner<'a> {
     task_name: &str,
     kill_signal: &KillSignal,
     argv: &'a [String],
-  ) -> Result<i32, deno_core::anyhow::Error> {
+  ) -> Result<i32, oden_core::anyhow::Error> {
     let mut sorted: Vec<ResolvedTask<'a>> = Vec::new();
     for pkg in packages {
       if let Err(err) = sort_tasks_topo(pkg, &mut sorted) {
@@ -485,7 +485,7 @@ impl<'a> TaskRunner<'a> {
     tasks: Vec<ResolvedTask<'a>>,
     kill_signal: &KillSignal,
     args: &[String],
-  ) -> Result<i32, deno_core::anyhow::Error> {
+  ) -> Result<i32, oden_core::anyhow::Error> {
     let workspace_root_url: &Url =
       self.cli_options.workspace().root_dir_url().as_ref();
     let concurrent_task_color_indices = if self.task_flags.no_prefix {
@@ -587,7 +587,7 @@ impl<'a> TaskRunner<'a> {
               match task.task_or_script {
                 TaskOrScript::Task { task: def, .. } => {
                   runner
-                    .run_deno_task(
+                    .run_oden_task(
                       task.task_or_script.folder_url(),
                       task.task_or_script.package_name(),
                       label_name,
@@ -702,7 +702,7 @@ impl<'a> TaskRunner<'a> {
     clippy::too_many_arguments,
     reason = "task execution threads several independent inputs; refactoring into a struct is deferred"
   )]
-  pub async fn run_deno_task(
+  pub async fn run_oden_task(
     &self,
     dir_url: &Url,
     package_name: Option<&str>,
@@ -717,7 +717,7 @@ impl<'a> TaskRunner<'a> {
     // `None` means a dependency always runs (is non-cacheable), which makes
     // this task non-cacheable too.
     dep_fingerprints: Option<Vec<String>>,
-  ) -> Result<i32, deno_core::anyhow::Error> {
+  ) -> Result<i32, oden_core::anyhow::Error> {
     let Some(command) = &definition.command else {
       self.record_fingerprint(task_id, None);
       self.output_task(
@@ -844,7 +844,7 @@ impl<'a> TaskRunner<'a> {
     kill_signal: KillSignal,
     argv: &[String],
     parallel_info: Option<ParallelInfo>,
-  ) -> Result<i32, deno_core::anyhow::Error> {
+  ) -> Result<i32, oden_core::anyhow::Error> {
     // ensure the npm packages are installed if using a managed resolver
     self.maybe_npm_install().await?;
 
@@ -855,7 +855,7 @@ impl<'a> TaskRunner<'a> {
 
     // At this point we already checked if the task name exists in package.json.
     // We can therefore check for "pre" and "post" scripts too, since we're only
-    // dealing with package.json here and not deno.json
+    // dealing with package.json here and not oden.json
     let task_names = vec![
       format!("pre{}", task_name),
       task_name.to_string(),
@@ -872,7 +872,7 @@ impl<'a> TaskRunner<'a> {
     // npm sets a number of `npm_*` env vars when running a package.json script.
     // Build them once (the `npm_package_*` vars from the script's package.json
     // plus the process-level `npm_execpath`/`npm_node_execpath`/`npm_command`)
-    // so that `deno task` matches npm's behavior (see #35251, #35306). The
+    // so that `oden task` matches npm's behavior (see #35251, #35306). The
     // per-script `npm_lifecycle_*` vars are overwritten in place each iteration,
     // so this single map is reused across the package's pre/run/post scripts.
     let pkg_json = self
@@ -1134,8 +1134,8 @@ fn matches_package(
   is_workspace_root: bool,
 ) -> bool {
   if !force_use_pkg_json
-    && let Some(deno_json) = &config.deno_json
-    && let Some(name) = &deno_json.json.name
+    && let Some(oden_json) = &config.oden_json
+    && let Some(name) = &oden_json.json.name
     && regex.is_match(name)
   {
     return true;
@@ -1149,7 +1149,7 @@ fn matches_package(
   }
 
   // Fall back to matching the workspace member's directory name so that
-  // `deno task --filter <dir>` works when the package name diverges
+  // `oden task --filter <dir>` works when the package name diverges
   // from the directory (#28620). Skip the workspace root so it is never
   // accidentally selected by `--filter *`.
   if !is_workspace_root
@@ -1172,13 +1172,13 @@ fn matches_package(
 /// Process vars (independent of the package):
 /// - `npm_execpath`: the package manager executable. npm points this at
 ///   `npm-cli.js`; like pnpm/yarn point it at their own binary, we point it at
-///   the running `deno` executable.
+///   the running `oden` executable.
 /// - `npm_node_execpath`: the JS runtime executing the script. npm sets this to
-///   the `node` binary; under `deno task` the runtime is `deno` itself.
-/// - `npm_command`: the npm command being run. `deno task <name>` runs a script
+///   the `node` binary; under `oden task` the runtime is `oden` itself.
+/// - `npm_command`: the npm command being run. `oden task <name>` runs a script
 ///   the same way `npm run <name>` does, which npm reports as `run-script`.
 fn npm_script_env_vars(
-  pkg_json: Option<&deno_package_json::PackageJson>,
+  pkg_json: Option<&oden_package_json::PackageJson>,
 ) -> HashMap<OsString, OsString> {
   let mut env_vars = HashMap::new();
   if let Some(pkg_json) = pkg_json {
@@ -1206,7 +1206,7 @@ fn npm_script_env_vars(
     }
   }
   if let Ok(exe) = std::env::current_exe() {
-    // Normalize so `npm_execpath`/`npm_node_execpath` match `Deno.execPath()`
+    // Normalize so `npm_execpath`/`npm_node_execpath` match `Oden.execPath()`
     // exactly (it normalizes `current_exe()` too).
     let exe = normalize_path(Cow::Owned(exe))
       .into_owned()
@@ -1294,9 +1294,9 @@ fn print_available_tasks_workspace(
     let mut tasks_config = member_dir.to_tasks_config()?;
 
     let mut pkg_name = folder
-      .deno_json
+      .oden_json
       .as_ref()
-      .and_then(|deno| deno.json.name.clone())
+      .and_then(|oden| oden.json.name.clone())
       .or(folder.pkg_json.as_ref().and_then(|pkg| pkg.name.clone()));
 
     if force_use_pkg_json {
@@ -1316,7 +1316,7 @@ fn print_available_tasks_workspace(
     log::warn!(
       "{}",
       colors::red(format!(
-        "No package name matched the filter '{}' in available 'deno.json' or 'package.json' files.",
+        "No package name matched the filter '{}' in available 'oden.json' or 'package.json' files.",
         filter
       ))
     );
@@ -1327,7 +1327,7 @@ fn print_available_tasks_workspace(
 
 pub struct AvailableTaskDescription {
   pub is_root: bool,
-  pub is_deno: bool,
+  pub is_oden: bool,
   pub name: String,
   pub task: TaskDefinition,
 }
@@ -1336,7 +1336,7 @@ pub fn get_available_tasks_for_completion(
   flags: Arc<Flags>,
 ) -> Result<Vec<AvailableTaskDescription>, AnyError> {
   let recursive = match &flags.subcommand {
-    crate::args::DenoSubcommand::Task(task_flags) => {
+    crate::args::OdenSubcommand::Task(task_flags) => {
       task_flags.recursive || task_flags.filter.is_some()
     }
     _ => false,
@@ -1377,7 +1377,7 @@ fn get_available_tasks(
   let mut task_descriptions = Vec::with_capacity(tasks_config.tasks_count());
 
   for config in [&tasks_config.member, &tasks_config.root] {
-    if let Some(config) = config.deno_json.as_ref() {
+    if let Some(config) = config.oden_json.as_ref() {
       let is_root = !is_cwd_root_dir
         && config.folder_url
           == *workspace_dir.workspace.root_dir_url().as_ref();
@@ -1388,7 +1388,7 @@ fn get_available_tasks(
         }
         task_descriptions.push(AvailableTaskDescription {
           is_root,
-          is_deno: true,
+          is_oden: true,
           name: name.to_string(),
           task: definition.clone(),
         });
@@ -1406,9 +1406,9 @@ fn get_available_tasks(
 
         task_descriptions.push(AvailableTaskDescription {
           is_root,
-          is_deno: false,
+          is_oden: false,
           name: name.to_string(),
-          task: deno_config::deno_json::TaskDefinition {
+          task: oden_config::oden_json::TaskDefinition {
             command: Some(script.to_string()),
             dependencies: vec![],
             description: None,
@@ -1454,12 +1454,12 @@ fn print_available_tasks(
       "- {}{}",
       colors::cyan(desc.name),
       if desc.is_root {
-        if desc.is_deno {
+        if desc.is_oden {
           format!(" {}", colors::italic_gray("(workspace)"))
         } else {
           format!(" {}", colors::italic_gray("(workspace package.json)"))
         }
-      } else if desc.is_deno {
+      } else if desc.is_oden {
         "".to_string()
       } else {
         format!(" {}", colors::italic_gray("(package.json)"))
@@ -1543,7 +1543,7 @@ fn match_tasks(
   let mut matched: IndexSet<String> = IndexSet::new();
   let mut visited: HashSet<String> = HashSet::new();
 
-  // Match tasks in deno.json
+  // Match tasks in oden.json
   for name in tasks_config.task_names() {
     if task_name_filter.matches(name) && !visited.contains(name) {
       matched.insert(name.to_string());
@@ -1647,9 +1647,9 @@ mod tests {
     ));
 
     let filter = arg_to_task_name_filter("test:*").unwrap();
-    assert!(filter.matches("test:deno"));
+    assert!(filter.matches("test:oden"));
     assert!(filter.matches("test:dprint"));
-    assert!(!filter.matches("update:latest:deno"));
+    assert!(!filter.matches("update:latest:oden"));
   }
 
   #[test]
@@ -1659,7 +1659,7 @@ mod tests {
     assert!(filter.matches("test:integration"));
     assert!(!filter.matches("test:e2e"));
     assert!(!filter.matches("test:interactive"));
-    assert!(!filter.matches("update:latest:deno"));
+    assert!(!filter.matches("update:latest:oden"));
 
     let filter = arg_to_task_name_filter("*(!build)").unwrap();
     assert!(filter.matches("test"));

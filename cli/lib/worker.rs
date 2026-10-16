@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::path::Path;
 use std::path::PathBuf;
@@ -6,65 +6,65 @@ use std::rc::Rc;
 use std::sync::Arc;
 
 use boxed_error::Boxed;
-use deno_bundle_runtime::BundleProvider;
-use deno_core::ModuleSpecifier;
-use deno_core::error::JsError;
-use deno_node::NodeRequireLoaderRc;
-use deno_node::ops::ipc::ChildIpcSerialization;
+use oden_bundle_runtime::BundleProvider;
+use oden_core::ModuleSpecifier;
+use oden_core::error::JsError;
+use oden_node::NodeRequireLoaderRc;
+use oden_node::ops::ipc::ChildIpcSerialization;
 use deno_path_util::url_from_file_path;
 use deno_path_util::url_to_file_path;
-use deno_resolver::npm::DenoInNpmPackageChecker;
-use deno_resolver::npm::NpmResolver;
-use deno_runtime::BootstrapOptions;
-use deno_runtime::CpuProfilerConfig;
-use deno_runtime::FeatureChecker;
-use deno_runtime::UNSTABLE_FEATURES;
-use deno_runtime::WorkerExecutionMode;
-use deno_runtime::WorkerLogLevel;
-use deno_runtime::colors;
-use deno_runtime::deno_core;
-use deno_runtime::deno_core::CompiledWasmModuleStore;
-use deno_runtime::deno_core::Extension;
-use deno_runtime::deno_core::JsRuntime;
-use deno_runtime::deno_core::LocalInspectorSession;
-use deno_runtime::deno_core::ModuleLoader;
-use deno_runtime::deno_core::SharedArrayBufferStore;
-use deno_runtime::deno_core::error::CoreError;
-use deno_runtime::deno_core::v8;
-use deno_runtime::deno_fs;
-use deno_runtime::deno_inspector_server::MainInspectorSessionChannel;
-use deno_runtime::deno_napi::DenoRtNativeAddonLoaderRc;
-use deno_runtime::deno_node::NodeExtInitServices;
-use deno_runtime::deno_node::NodeRequireLoader;
-use deno_runtime::deno_node::NodeResolver;
-use deno_runtime::deno_permissions::PermissionsContainer;
-use deno_runtime::deno_process::NpmProcessStateProviderRc;
-use deno_runtime::deno_telemetry::OtelConfig;
-use deno_runtime::deno_tls::RootCertStoreProvider;
-use deno_runtime::deno_web::Blob;
-use deno_runtime::deno_web::BlobStoreTrait;
-use deno_runtime::deno_web::InMemoryBroadcastChannel;
-use deno_runtime::fmt_errors::format_js_error;
-use deno_runtime::ops::worker_host::CreateWebWorkerCb;
-use deno_runtime::web_worker::WebWorker;
-use deno_runtime::web_worker::WebWorkerOptions;
-use deno_runtime::web_worker::WebWorkerServiceOptions;
-use deno_runtime::worker::MainWorker;
-use deno_runtime::worker::WorkerOptions;
-use deno_runtime::worker::WorkerServiceOptions;
+use oden_resolver::npm::OdenInNpmPackageChecker;
+use oden_resolver::npm::NpmResolver;
+use oden_runtime::BootstrapOptions;
+use oden_runtime::CpuProfilerConfig;
+use oden_runtime::FeatureChecker;
+use oden_runtime::UNSTABLE_FEATURES;
+use oden_runtime::WorkerExecutionMode;
+use oden_runtime::WorkerLogLevel;
+use oden_runtime::colors;
+use oden_runtime::oden_core;
+use oden_runtime::oden_core::CompiledWasmModuleStore;
+use oden_runtime::oden_core::Extension;
+use oden_runtime::oden_core::JsRuntime;
+use oden_runtime::oden_core::LocalInspectorSession;
+use oden_runtime::oden_core::ModuleLoader;
+use oden_runtime::oden_core::SharedArrayBufferStore;
+use oden_runtime::oden_core::error::CoreError;
+use oden_runtime::oden_core::v8;
+use oden_runtime::oden_fs;
+use oden_runtime::oden_inspector_server::MainInspectorSessionChannel;
+use oden_runtime::oden_napi::OdenRtNativeAddonLoaderRc;
+use oden_runtime::oden_node::NodeExtInitServices;
+use oden_runtime::oden_node::NodeRequireLoader;
+use oden_runtime::oden_node::NodeResolver;
+use oden_runtime::oden_permissions::PermissionsContainer;
+use oden_runtime::oden_process::NpmProcessStateProviderRc;
+use oden_runtime::oden_telemetry::OtelConfig;
+use oden_runtime::oden_tls::RootCertStoreProvider;
+use oden_runtime::oden_web::Blob;
+use oden_runtime::oden_web::BlobStoreTrait;
+use oden_runtime::oden_web::InMemoryBroadcastChannel;
+use oden_runtime::fmt_errors::format_js_error;
+use oden_runtime::ops::worker_host::CreateWebWorkerCb;
+use oden_runtime::web_worker::WebWorker;
+use oden_runtime::web_worker::WebWorkerOptions;
+use oden_runtime::web_worker::WebWorkerServiceOptions;
+use oden_runtime::worker::MainWorker;
+use oden_runtime::worker::WorkerOptions;
+use oden_runtime::worker::WorkerServiceOptions;
 use node_resolver::UrlOrPath;
 use node_resolver::errors::ResolvePkgJsonBinExportError;
 use url::Url;
 
 use crate::args::has_trace_permissions_enabled;
-use crate::sys::DenoLibSys;
+use crate::sys::OdenLibSys;
 use crate::util::checksum;
 
 pub struct CreateModuleLoaderResult {
   pub module_loader: Rc<dyn ModuleLoader>,
   pub node_require_loader: Rc<dyn NodeRequireLoader>,
   pub hook_registry:
-    Option<deno_runtime::deno_node::ops::module_hooks::LoaderHookRegistry>,
+    Option<oden_runtime::oden_node::ops::module_hooks::LoaderHookRegistry>,
 }
 
 pub trait ModuleLoaderFactory: Send + Sync {
@@ -111,7 +111,7 @@ impl StorageKeyResolver {
   /// app gets a single persistent store, independent of the main module URL
   /// (which is not stable across differently named binaries). The `app:`
   /// prefix namespaces this key from URL-derived keys so a compiled app and a
-  /// `deno run` of the same origin can't collide in the shared, temp-backed
+  /// `oden run` of the same origin can't collide in the shared, temp-backed
   /// `caches` directory (which is keyed by the hash of this string rather than
   /// by the per-app data directory).
   pub fn from_compile_app_name(app_name: &str) -> Self {
@@ -141,7 +141,7 @@ impl StorageKeyResolver {
   }
 }
 
-/// Returns the persistent Cache API storage root beneath Deno's origin data
+/// Returns the persistent Cache API storage root beneath Oden's origin data
 /// directory. Each storage key uses a hashed child directory of this root.
 pub fn get_cache_storage_dir(origin_data_folder_path: &Path) -> PathBuf {
   origin_data_folder_path.join("web_cache")
@@ -157,9 +157,9 @@ fn get_cache_storage_dir_for_key(
 
 /// By default V8 uses 1.4Gb heap limit which is meant for browser tabs.
 /// Instead probe for the total memory on the system and use it instead
-/// as a default. In case the platform is Linux and `DENO_USE_CGROUPS` is set,
+/// as a default. In case the platform is Linux and `ODEN_USE_CGROUPS` is set,
 /// parse cgroup config to get the cgroup-constrained memory limit.
-pub fn create_isolate_create_params<TSys: DenoLibSys>(
+pub fn create_isolate_create_params<TSys: OdenLibSys>(
   #[allow(
     unused_variables,
     reason = "used only in Linux to get cgroup-constrained memory limit"
@@ -175,7 +175,7 @@ pub fn create_isolate_create_params<TSys: DenoLibSys>(
   }
   #[cfg(not(any(target_os = "android", target_os = "linux")))]
   {
-    let maybe_mem_info = deno_runtime::deno_os::sys_info::mem_info();
+    let maybe_mem_info = oden_runtime::oden_os::sys_info::mem_info();
     maybe_mem_info.map(|mem_info| {
       v8::CreateParams::default()
         .heap_limits_from_system_memory(mem_info.total, 0)
@@ -185,18 +185,18 @@ pub fn create_isolate_create_params<TSys: DenoLibSys>(
 
 #[cfg(any(target_os = "android", target_os = "linux"))]
 mod linux {
-  use deno_runtime::deno_node::ops::process::cgroup::CgroupVersion;
-  use deno_runtime::deno_node::ops::process::cgroup::parse_self_cgroup;
+  use oden_runtime::oden_node::ops::process::cgroup::CgroupVersion;
+  use oden_runtime::oden_node::ops::process::cgroup::parse_self_cgroup;
 
   /// Get memory limit with cgroup (either v1 or v2) taken into account.
-  pub(super) fn get_memory_limit<TSys: crate::sys::DenoLibSys>(
+  pub(super) fn get_memory_limit<TSys: crate::sys::OdenLibSys>(
     sys: &TSys,
   ) -> Option<u64> {
-    let system_total_memory = deno_runtime::deno_os::sys_info::mem_info()
+    let system_total_memory = oden_runtime::oden_os::sys_info::mem_info()
       .map(|mem_info| mem_info.total);
 
-    // For performance, parse cgroup config only when DENO_USE_CGROUPS is set
-    if sys.env_var_os("DENO_USE_CGROUPS").is_none() {
+    // For performance, parse cgroup config only when ODEN_USE_CGROUPS is set
+    if sys.env_var_os("ODEN_USE_CGROUPS").is_none() {
       return system_total_memory;
     }
 
@@ -256,7 +256,7 @@ pub enum ResolveNpmBinaryEntrypointFallbackError {
   #[class(inherit)]
   #[error(transparent)]
   PackageSubpathResolve(
-    node_resolver::errors::PackageSubpathFromDenoModuleResolveError,
+    node_resolver::errors::PackageSubpathFromOdenModuleResolveError,
   ),
   #[class(generic)]
   #[error("Cannot find module '{0}'")]
@@ -273,7 +273,7 @@ pub struct LibMainWorkerOptions {
   pub inspect_wait: bool,
   pub trace_ops: Option<Vec<String>>,
   pub is_inspecting: bool,
-  /// If this is a `deno compile`-ed executable.
+  /// If this is a `oden compile`-ed executable.
   pub is_standalone: bool,
   // If the runtime should try to use `export default { fetch }`
   pub auto_serve: bool,
@@ -308,20 +308,20 @@ pub struct LibWorkerFactoryRoots {
   pub shared_array_buffer_store: SharedArrayBufferStore,
 }
 
-struct LibWorkerFactorySharedState<TSys: DenoLibSys> {
+struct LibWorkerFactorySharedState<TSys: OdenLibSys> {
   blob_store: Arc<dyn BlobStoreTrait>,
   broadcast_channel: InMemoryBroadcastChannel,
-  code_cache: Option<Arc<dyn deno_runtime::code_cache::CodeCache>>,
+  code_cache: Option<Arc<dyn oden_runtime::code_cache::CodeCache>>,
   compiled_wasm_module_store: CompiledWasmModuleStore,
-  deno_rt_native_addon_loader: Option<DenoRtNativeAddonLoaderRc>,
+  oden_rt_native_addon_loader: Option<OdenRtNativeAddonLoaderRc>,
   feature_checker: Arc<FeatureChecker>,
-  fs: Arc<dyn deno_fs::FileSystem>,
+  fs: Arc<dyn oden_fs::FileSystem>,
   maybe_coverage_dir: Option<PathBuf>,
   maybe_cpu_prof_config: Option<CpuProfilerConfig>,
   main_inspector_session_tx: MainInspectorSessionChannel,
   module_loader_factory: Box<dyn ModuleLoaderFactory>,
   node_resolver:
-    Arc<NodeResolver<DenoInNpmPackageChecker, NpmResolver<TSys>, TSys>>,
+    Arc<NodeResolver<OdenInNpmPackageChecker, NpmResolver<TSys>, TSys>>,
   npm_process_state_provider: NpmProcessStateProviderRc,
   pkg_json_resolver: Arc<node_resolver::PackageJsonResolver<TSys>>,
   root_cert_store_provider: Arc<dyn RootCertStoreProvider>,
@@ -332,7 +332,7 @@ struct LibWorkerFactorySharedState<TSys: DenoLibSys> {
   bundle_provider: Option<Arc<dyn BundleProvider>>,
 }
 
-impl<TSys: DenoLibSys> LibWorkerFactorySharedState<TSys> {
+impl<TSys: OdenLibSys> LibWorkerFactorySharedState<TSys> {
   fn resolve_unstable_features(
     &self,
     feature_checker: &FeatureChecker,
@@ -349,7 +349,7 @@ impl<TSys: DenoLibSys> LibWorkerFactorySharedState<TSys> {
   fn create_node_init_services(
     &self,
     node_require_loader: NodeRequireLoaderRc,
-  ) -> NodeExtInitServices<DenoInNpmPackageChecker, NpmResolver<TSys>, TSys> {
+  ) -> NodeExtInitServices<OdenInNpmPackageChecker, NpmResolver<TSys>, TSys> {
     NodeExtInitServices {
       node_require_loader,
       node_resolver: self.node_resolver.clone(),
@@ -360,7 +360,7 @@ impl<TSys: DenoLibSys> LibWorkerFactorySharedState<TSys> {
 
   fn create_web_worker_callback(
     self: &Arc<Self>,
-    stdio: deno_runtime::deno_io::Stdio,
+    stdio: oden_runtime::oden_io::Stdio,
   ) -> Arc<CreateWebWorkerCb> {
     let shared = self.clone();
     Arc::new(move |args| {
@@ -397,7 +397,7 @@ impl<TSys: DenoLibSys> LibWorkerFactorySharedState<TSys> {
         shared.resolve_unstable_features(feature_checker.as_ref());
 
       let services = WebWorkerServiceOptions {
-        deno_rt_native_addon_loader: shared.deno_rt_native_addon_loader.clone(),
+        oden_rt_native_addon_loader: shared.oden_rt_native_addon_loader.clone(),
         root_cert_store_provider: Some(shared.root_cert_store_provider.clone()),
         module_loader,
         fs: shared.fs.clone(),
@@ -452,7 +452,7 @@ impl<TSys: DenoLibSys> LibWorkerFactorySharedState<TSys> {
         // unspecified fields), matching Node.js behavior.
         // Note: integer division truncates sub-MB fractions, which is fine
         // since V8 and Node.js both work in whole-MB granularity here.
-        let resolved = deno_node::ops::worker_threads::ResolvedResourceLimits {
+        let resolved = oden_node::ops::worker_threads::ResolvedResourceLimits {
           max_young_generation_size_mb: params
             .max_young_generation_size_in_bytes()
             / mb,
@@ -461,7 +461,7 @@ impl<TSys: DenoLibSys> LibWorkerFactorySharedState<TSys> {
           code_range_size_mb: params.code_range_size_in_bytes() / mb,
           stack_size_mb: limits
             .stack_size_mb
-            .unwrap_or(deno_node::ops::worker_threads::DEFAULT_STACK_SIZE_MB),
+            .unwrap_or(oden_node::ops::worker_threads::DEFAULT_STACK_SIZE_MB),
         };
 
         (Some(params), Some(resolved))
@@ -474,18 +474,18 @@ impl<TSys: DenoLibSys> LibWorkerFactorySharedState<TSys> {
         main_module: args.main_module.clone(),
         worker_id: args.worker_id,
         bootstrap: BootstrapOptions {
-          deno_version: crate::version::DENO_VERSION_INFO.deno.to_string(),
+          oden_version: crate::version::ODEN_VERSION_INFO.oden.to_string(),
           args: shared.options.argv.clone(),
           cpu_count: std::thread::available_parallelism()
             .map(|p| p.get())
             .unwrap_or(1),
           log_level: shared.options.log_level,
           enable_testing_features: shared.options.enable_testing_features,
-          locale: deno_core::v8::icu::get_language_tag(),
+          locale: oden_core::v8::icu::get_language_tag(),
           location: Some(args.main_module),
           color_level: colors::get_color_level(),
           unstable_features,
-          user_agent: crate::version::DENO_VERSION_INFO.user_agent.to_string(),
+          user_agent: crate::version::ODEN_VERSION_INFO.user_agent.to_string(),
           inspect: shared.options.is_inspecting,
           is_standalone: shared.options.is_standalone,
           auto_serve: shared.options.auto_serve,
@@ -577,23 +577,23 @@ impl<TSys: DenoLibSys> LibWorkerFactorySharedState<TSys> {
   }
 }
 
-pub struct LibMainWorkerFactory<TSys: DenoLibSys> {
+pub struct LibMainWorkerFactory<TSys: OdenLibSys> {
   shared: Arc<LibWorkerFactorySharedState<TSys>>,
 }
 
-impl<TSys: DenoLibSys> LibMainWorkerFactory<TSys> {
+impl<TSys: OdenLibSys> LibMainWorkerFactory<TSys> {
   #[allow(clippy::too_many_arguments, reason = "construction")]
   pub fn new(
     blob_store: Arc<dyn BlobStoreTrait>,
-    code_cache: Option<Arc<dyn deno_runtime::code_cache::CodeCache>>,
-    deno_rt_native_addon_loader: Option<DenoRtNativeAddonLoaderRc>,
+    code_cache: Option<Arc<dyn oden_runtime::code_cache::CodeCache>>,
+    oden_rt_native_addon_loader: Option<OdenRtNativeAddonLoaderRc>,
     feature_checker: Arc<FeatureChecker>,
-    fs: Arc<dyn deno_fs::FileSystem>,
+    fs: Arc<dyn oden_fs::FileSystem>,
     maybe_coverage_dir: Option<PathBuf>,
     maybe_cpu_prof_config: Option<CpuProfilerConfig>,
     module_loader_factory: Box<dyn ModuleLoaderFactory>,
     node_resolver: Arc<
-      NodeResolver<DenoInNpmPackageChecker, NpmResolver<TSys>, TSys>,
+      NodeResolver<OdenInNpmPackageChecker, NpmResolver<TSys>, TSys>,
     >,
     npm_process_state_provider: NpmProcessStateProviderRc,
     pkg_json_resolver: Arc<node_resolver::PackageJsonResolver<TSys>>,
@@ -610,7 +610,7 @@ impl<TSys: DenoLibSys> LibMainWorkerFactory<TSys> {
         broadcast_channel: Default::default(),
         code_cache,
         compiled_wasm_module_store: roots.compiled_wasm_module_store,
-        deno_rt_native_addon_loader,
+        oden_rt_native_addon_loader,
         feature_checker,
         fs,
         maybe_coverage_dir,
@@ -659,8 +659,8 @@ impl<TSys: DenoLibSys> LibMainWorkerFactory<TSys> {
     require_modules: Vec<Url>,
     permissions: PermissionsContainer,
     custom_extensions: Vec<Extension>,
-    stdio: deno_runtime::deno_io::Stdio,
-    unconfigured_runtime: Option<deno_runtime::UnconfiguredRuntime>,
+    stdio: oden_runtime::oden_io::Stdio,
+    unconfigured_runtime: Option<oden_runtime::UnconfiguredRuntime>,
   ) -> Result<LibMainWorker, CoreError> {
     let shared = &self.shared;
     let CreateModuleLoaderResult {
@@ -697,7 +697,7 @@ impl<TSys: DenoLibSys> LibMainWorkerFactory<TSys> {
     });
 
     let services = WorkerServiceOptions {
-      deno_rt_native_addon_loader: shared.deno_rt_native_addon_loader.clone(),
+      oden_rt_native_addon_loader: shared.oden_rt_native_addon_loader.clone(),
       root_cert_store_provider: Some(shared.root_cert_store_provider.clone()),
       module_loader,
       fs: shared.fs.clone(),
@@ -724,18 +724,18 @@ impl<TSys: DenoLibSys> LibMainWorkerFactory<TSys> {
 
     let options = WorkerOptions {
       bootstrap: BootstrapOptions {
-        deno_version: crate::version::DENO_VERSION_INFO.deno.to_string(),
+        oden_version: crate::version::ODEN_VERSION_INFO.oden.to_string(),
         args: shared.options.argv.clone(),
         cpu_count: std::thread::available_parallelism()
           .map(|p| p.get())
           .unwrap_or(1),
         log_level: shared.options.log_level,
         enable_testing_features: shared.options.enable_testing_features,
-        locale: deno_core::v8::icu::get_language_tag(),
+        locale: oden_core::v8::icu::get_language_tag(),
         location: shared.options.location.clone(),
         color_level: colors::get_color_level(),
         unstable_features,
-        user_agent: crate::version::DENO_VERSION_INFO.user_agent.to_string(),
+        user_agent: crate::version::ODEN_VERSION_INFO.user_agent.to_string(),
         inspect: shared.options.is_inspecting,
         is_standalone: shared.options.is_standalone,
         auto_serve: shared.options.auto_serve,
@@ -856,7 +856,7 @@ impl<TSys: DenoLibSys> LibMainWorkerFactory<TSys> {
     let specifier = self
       .shared
       .node_resolver
-      .resolve_package_subpath_from_deno_module(
+      .resolve_package_subpath_from_oden_module(
         package_folder,
         sub_path,
         /* referrer */ None,
@@ -910,7 +910,7 @@ impl LibMainWorker {
   #[inline]
   pub fn create_inspector_session(
     &mut self,
-    cb: deno_core::InspectorSessionSend,
+    cb: oden_core::InspectorSessionSend,
   ) -> LocalInspectorSession {
     self.worker.create_inspector_session(cb)
   }
@@ -1095,7 +1095,7 @@ mod test {
 
   #[test]
   fn cache_storage_dir_is_under_origin_data() {
-    let origin_data_dir = PathBuf::from("deno_dir").join("location_data");
+    let origin_data_dir = PathBuf::from("oden_dir").join("location_data");
     let key = "file:///project/main.ts";
 
     assert_eq!(

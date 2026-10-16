@@ -1,0 +1,6 @@
+{
+  "workspace": ["packages/foo", "packages/bar"],
+  "imports": {
+    "@odentest/subtract": "jsr:@odentest/subtract@^1.0.0"
+  }
+}

@@ -1,16 +1,16 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use deno_core::GarbageCollected;
-use deno_core::WebIDL;
-use deno_core::cppgc::Ref;
-use deno_core::op2;
-use deno_core::v8;
-use deno_core::webidl::WebIdlConverter;
+use oden_core::GarbageCollected;
+use oden_core::WebIDL;
+use oden_core::cppgc::Ref;
+use oden_core::op2;
+use oden_core::v8;
+use oden_core::webidl::WebIdlConverter;
 use deno_error::JsErrorBox;
-use deno_image::image::DynamicImage;
-use deno_image::image::GenericImageView;
+use oden_image::image::DynamicImage;
+use oden_image::image::GenericImageView;
 use wgpu_core::resource::TextureDescriptor;
 use wgpu_types::CompositeAlphaMode;
 use wgpu_types::Extent3d;
@@ -229,7 +229,7 @@ impl GPUCanvasContext {
         }
       };
 
-      let texture_obj = deno_core::cppgc::make_cppgc_object(scope, texture);
+      let texture_obj = oden_core::cppgc::make_cppgc_object(scope, texture);
       let texture_obj = v8::Global::new(scope, texture_obj);
 
       *current_texture = Some(texture_obj.clone());
@@ -305,7 +305,7 @@ impl GPUCanvasContext {
     else {
       image.replace_with(|image| {
         let (width, height) = image.dimensions();
-        let image = deno_image::image::RgbaImage::new(width, height);
+        let image = oden_image::image::RgbaImage::new(width, height);
         DynamicImage::from(image)
       });
 
@@ -323,7 +323,7 @@ impl GPUCanvasContext {
 
       let local = v8::Local::new(scope, texture).cast::<v8::Value>();
       let underlying_texture =
-        deno_core::cppgc::try_unwrap_cppgc_object::<GPUTexture>(scope, local)
+        oden_core::cppgc::try_unwrap_cppgc_object::<GPUTexture>(scope, local)
           .unwrap();
 
       let (command_encoder, err) =
@@ -350,7 +350,7 @@ impl GPUCanvasContext {
       image.replace_with(|image| {
         let (width, height) = image.dimensions();
         let image =
-          deno_image::image::RgbaImage::from_raw(width, height, data).unwrap();
+          oden_image::image::RgbaImage::from_raw(width, height, data).unwrap();
         DynamicImage::from(image)
       });
     }
@@ -362,7 +362,7 @@ impl GPUCanvasContext {
     if let Some(texture) = self.current_texture.borrow().as_ref() {
       let local = v8::Local::new(scope, texture).cast::<v8::Value>();
       let underlying_texture =
-        deno_core::cppgc::try_unwrap_cppgc_object::<GPUTexture>(scope, local)
+        oden_core::cppgc::try_unwrap_cppgc_object::<GPUTexture>(scope, local)
           .unwrap();
 
       underlying_texture
@@ -659,7 +659,7 @@ pub fn create<'s>(
   _prefix: &'static str,
   _context: &'static str,
 ) -> Result<v8::Global<v8::Value>, JsErrorBox> {
-  let obj = deno_core::cppgc::make_cppgc_object(
+  let obj = oden_core::cppgc::make_cppgc_object(
     scope,
     GPUCanvasContext {
       canvas,

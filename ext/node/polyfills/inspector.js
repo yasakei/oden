@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 
 (function () {
@@ -18,14 +18,14 @@ const {
 } = core.ops;
 const lazyProcess = core.createLazyLoader("node:process");
 const lazyWorkerThreads = core.createLazyLoader("node:worker_threads");
-const { EventEmitter } = core.loadExtScript("ext:deno_node/_events.mjs");
+const { EventEmitter } = core.loadExtScript("ext:oden_node/_events.mjs");
 const {
   isUint32,
   validateFunction,
   validateInt32,
   validateObject,
   validateString,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
 const {
   ERR_INSPECTOR_ALREADY_ACTIVATED,
   ERR_INSPECTOR_ALREADY_CONNECTED,
@@ -34,7 +34,7 @@ const {
   ERR_INSPECTOR_NOT_ACTIVE,
   ERR_INSPECTOR_NOT_CONNECTED,
   ERR_INSPECTOR_NOT_WORKER,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
 
 function isLoopback(host) {
   const hostLower = StringPrototypeToLowerCase(host);

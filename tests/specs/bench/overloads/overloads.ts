@@ -1,6 +1,6 @@
-Deno.bench("bench0", () => {});
-Deno.bench(function bench1() {});
-Deno.bench({ name: "bench2", fn: () => {} });
-Deno.bench("bench3", { permissions: "none" }, () => {});
-Deno.bench({ name: "bench4" }, () => {});
-Deno.bench({ ignore: true }, function bench5() {});
+Oden.bench("bench0", () => {});
+Oden.bench(function bench1() {});
+Oden.bench({ name: "bench2", fn: () => {} });
+Oden.bench("bench3", { permissions: "none" }, () => {});
+Oden.bench({ name: "bench4" }, () => {});
+Oden.bench({ ignore: true }, function bench5() {});

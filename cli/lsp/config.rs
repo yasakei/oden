@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
@@ -11,50 +11,50 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use deno_ast::MediaType;
-use deno_config::deno_json::DenoJsonCache;
-use deno_config::deno_json::FmtConfig;
-use deno_config::deno_json::FmtOptionsConfig;
-use deno_config::deno_json::NodeModulesDirMode;
-use deno_config::deno_json::TestConfig;
-use deno_config::glob::FilePatterns;
-use deno_config::glob::PathOrPatternSet;
-use deno_config::workspace::UrlRc;
-use deno_config::workspace::VendorEnablement;
-use deno_config::workspace::Workspace;
-use deno_config::workspace::WorkspaceCache;
-use deno_config::workspace::WorkspaceDirectory;
-use deno_config::workspace::WorkspaceDirectoryEmptyOptions;
-use deno_config::workspace::WorkspaceDiscoverOptions;
-use deno_config::workspace::WorkspaceRc;
-use deno_core::ModuleSpecifier;
-use deno_core::anyhow::anyhow;
-use deno_core::error::AnyError;
-use deno_core::parking_lot::Mutex;
-use deno_core::serde::Deserialize;
-use deno_core::serde::Serialize;
-use deno_core::serde::de::DeserializeOwned;
-use deno_core::serde_json;
-use deno_core::serde_json::Value;
-use deno_core::url::Url;
-use deno_lib::args::has_flag_env_var;
-use deno_lib::util::hash::FastInsecureHasher;
-use deno_npm_cache::NpmCacheSetting;
-use deno_npm_installer::LifecycleScriptsConfig;
-use deno_npm_installer::NpmInstallerFactory;
-use deno_npm_installer::NpmInstallerFactoryOptions;
-use deno_npm_installer::graph::NpmCachingStrategy;
-use deno_npm_installer::lifecycle_scripts::NullLifecycleScriptsExecutor;
-use deno_npmrc::ResolvedNpmRc;
-use deno_package_json::PackageJsonCache;
-use deno_package_json::PackageJsonCacheResult;
+use oden_config::oden_json::OdenJsonCache;
+use oden_config::oden_json::FmtConfig;
+use oden_config::oden_json::FmtOptionsConfig;
+use oden_config::oden_json::NodeModulesDirMode;
+use oden_config::oden_json::TestConfig;
+use oden_config::glob::FilePatterns;
+use oden_config::glob::PathOrPatternSet;
+use oden_config::workspace::UrlRc;
+use oden_config::workspace::VendorEnablement;
+use oden_config::workspace::Workspace;
+use oden_config::workspace::WorkspaceCache;
+use oden_config::workspace::WorkspaceDirectory;
+use oden_config::workspace::WorkspaceDirectoryEmptyOptions;
+use oden_config::workspace::WorkspaceDiscoverOptions;
+use oden_config::workspace::WorkspaceRc;
+use oden_core::ModuleSpecifier;
+use oden_core::anyhow::anyhow;
+use oden_core::error::AnyError;
+use oden_core::parking_lot::Mutex;
+use oden_core::serde::Deserialize;
+use oden_core::serde::Serialize;
+use oden_core::serde::de::DeserializeOwned;
+use oden_core::serde_json;
+use oden_core::serde_json::Value;
+use oden_core::url::Url;
+use oden_lib::args::has_flag_env_var;
+use oden_lib::util::hash::FastInsecureHasher;
+use oden_npm_cache::NpmCacheSetting;
+use oden_npm_installer::LifecycleScriptsConfig;
+use oden_npm_installer::NpmInstallerFactory;
+use oden_npm_installer::NpmInstallerFactoryOptions;
+use oden_npm_installer::graph::NpmCachingStrategy;
+use oden_npm_installer::lifecycle_scripts::NullLifecycleScriptsExecutor;
+use oden_npmrc::ResolvedNpmRc;
+use oden_package_json::PackageJsonCache;
+use oden_package_json::PackageJsonCacheResult;
 use deno_path_util::url_to_file_path;
-use deno_resolver::factory::ConfigDiscoveryOption;
-use deno_resolver::factory::ResolverFactory;
-use deno_resolver::factory::ResolverFactoryOptions;
-use deno_resolver::factory::WorkspaceFactory;
-use deno_resolver::factory::WorkspaceFactoryOptions;
-use deno_resolver::workspace::SpecifiedImportMap;
-use deno_runtime::deno_node::PackageJson;
+use oden_resolver::factory::ConfigDiscoveryOption;
+use oden_resolver::factory::ResolverFactory;
+use oden_resolver::factory::ResolverFactoryOptions;
+use oden_resolver::factory::WorkspaceFactory;
+use oden_resolver::factory::WorkspaceFactoryOptions;
+use oden_resolver::workspace::SpecifiedImportMap;
+use oden_runtime::oden_node::PackageJson;
 use indexmap::IndexSet;
 use lsp_types::ClientCapabilities;
 use lsp_types::Uri;
@@ -67,7 +67,7 @@ use super::urls::uri_to_url;
 use super::urls::url_to_uri;
 use crate::args::CliLockfile;
 use crate::args::ConfigFile;
-use crate::cache::DenoDir;
+use crate::cache::OdenDir;
 use crate::file_fetcher::CliFileFetcher;
 use crate::http_util::HttpClientProvider;
 use crate::lsp::logging::lsp_warn;
@@ -78,7 +78,7 @@ use crate::util::fs::canonicalize_path_maybe_not_exists;
 use crate::util::progress_bar::ProgressBar;
 use crate::util::progress_bar::ProgressBarStyle;
 
-pub const SETTINGS_SECTION: &str = "deno";
+pub const SETTINGS_SECTION: &str = "oden";
 
 fn is_true() -> bool {
   true
@@ -145,7 +145,7 @@ pub struct CodeLensSettings {
   /// an impact, the `references` flag needs to be `true`.
   #[serde(default)]
   pub references_all_functions: bool,
-  /// Flag for providing test code lens on `Deno.test` statements.  There is
+  /// Flag for providing test code lens on `Oden.test` statements.  There is
   /// also the `test_args` setting, but this is not used by the server.
   #[serde(default = "is_true")]
   pub test: bool,
@@ -164,7 +164,7 @@ impl Default for CodeLensSettings {
 
 #[derive(Debug, Default, Clone, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
-pub struct DenoCompletionSettings {
+pub struct OdenCompletionSettings {
   #[serde(default)]
   pub imports: ImportCompletionSettings,
 }
@@ -521,23 +521,23 @@ impl InspectSetting {
   }
 }
 
-/// Deno language server specific settings that are applied to a workspace.
+/// Oden language server specific settings that are applied to a workspace.
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct WorkspaceSettings {
-  /// A flag that indicates if Deno is enabled for the workspace.
+  /// A flag that indicates if Oden is enabled for the workspace.
   pub enable: Option<bool>,
 
-  /// A list of paths, using the root_uri as a base that should be Deno
+  /// A list of paths, using the root_uri as a base that should be Oden
   /// disabled.
   #[serde(default)]
   pub disable_paths: Vec<String>,
 
-  /// A list of paths, using the root_uri as a base that should be Deno enabled.
+  /// A list of paths, using the root_uri as a base that should be Oden enabled.
   pub enable_paths: Option<Vec<String>>,
 
   /// An option that points to a path string of the path to utilise as the
-  /// cache/DENO_DIR for the language server.
+  /// cache/ODEN_DIR for the language server.
   #[serde(default, deserialize_with = "empty_string_none")]
   pub cache: Option<String>,
 
@@ -547,7 +547,7 @@ pub struct WorkspaceSettings {
   pub cache_on_save: bool,
 
   /// Override the default stores used to validate certificates. This overrides
-  /// the environment variable `DENO_TLS_CA_STORE` if present.
+  /// the environment variable `ODEN_TLS_CA_STORE` if present.
   pub certificate_stores: Option<Vec<String>>,
 
   /// An option that points to a path string of the config file to apply to
@@ -591,14 +591,14 @@ pub struct WorkspaceSettings {
   pub force_push_based_diagnostics: bool,
 
   #[serde(default)]
-  pub suggest: DenoCompletionSettings,
+  pub suggest: OdenCompletionSettings,
 
   /// Testing settings for the workspace.
   #[serde(default)]
   pub testing: TestingSettings,
 
   /// An option which sets the cert file to use when attempting to fetch remote
-  /// resources. This overrides `DENO_CERT` if present.
+  /// resources. This overrides `ODEN_CERT` if present.
   #[serde(default, deserialize_with = "empty_string_none")]
   pub tls_certificate: Option<String>,
 
@@ -652,7 +652,7 @@ impl Default for WorkspaceSettings {
 
 impl WorkspaceSettings {
   pub fn from_raw_settings(
-    deno: Value,
+    oden: Value,
     javascript: Value,
     typescript: Value,
   ) -> Self {
@@ -671,20 +671,20 @@ impl WorkspaceSettings {
         }
       }
     }
-    let deno_inlay_hints =
-      deno.as_object().and_then(|o| o.get("inlayHints").cloned());
-    let deno_suggest = deno.as_object().and_then(|o| o.get("suggest").cloned());
-    let mut settings: Self = parse_or_default(deno, "settings under \"deno\"");
+    let oden_inlay_hints =
+      oden.as_object().and_then(|o| o.get("inlayHints").cloned());
+    let oden_suggest = oden.as_object().and_then(|o| o.get("suggest").cloned());
+    let mut settings: Self = parse_or_default(oden, "settings under \"oden\"");
     settings.javascript =
       parse_or_default(javascript, "settings under \"javascript\"");
     settings.typescript =
       parse_or_default(typescript, "settings under \"typescript\"");
-    if let Some(inlay_hints) = deno_inlay_hints {
+    if let Some(inlay_hints) = oden_inlay_hints {
       let inlay_hints: InlayHintsSettings =
-        parse_or_default(inlay_hints, "settings under \"deno.inlayHints\"");
+        parse_or_default(inlay_hints, "settings under \"oden.inlayHints\"");
       if inlay_hints.parameter_names.enabled != Default::default() {
         lsp_warn!(
-          "\"deno.inlayHints.parameterNames.enabled\" is deprecated. Instead use \"javascript.inlayHints.parameterNames.enabled\" and \"typescript.inlayHints.parameterNames.enabled\"."
+          "\"oden.inlayHints.parameterNames.enabled\" is deprecated. Instead use \"javascript.inlayHints.parameterNames.enabled\" and \"typescript.inlayHints.parameterNames.enabled\"."
         );
         settings.javascript.inlay_hints.parameter_names.enabled =
           inlay_hints.parameter_names.enabled.clone();
@@ -696,7 +696,7 @@ impl WorkspaceSettings {
         .suppress_when_argument_matches_name
       {
         lsp_warn!(
-          "\"deno.inlayHints.parameterNames.suppressWhenArgumentMatchesName\" is deprecated. Instead use \"javascript.inlayHints.parameterNames.suppressWhenArgumentMatchesName\" and \"typescript.inlayHints.parameterNames.suppressWhenArgumentMatchesName\"."
+          "\"oden.inlayHints.parameterNames.suppressWhenArgumentMatchesName\" is deprecated. Instead use \"javascript.inlayHints.parameterNames.suppressWhenArgumentMatchesName\" and \"typescript.inlayHints.parameterNames.suppressWhenArgumentMatchesName\"."
         );
         settings
           .javascript
@@ -715,7 +715,7 @@ impl WorkspaceSettings {
       }
       if inlay_hints.parameter_types.enabled {
         lsp_warn!(
-          "\"deno.inlayHints.parameterTypes.enabled\" is deprecated. Instead use \"javascript.inlayHints.parameterTypes.enabled\" and \"typescript.inlayHints.parameterTypes.enabled\"."
+          "\"oden.inlayHints.parameterTypes.enabled\" is deprecated. Instead use \"javascript.inlayHints.parameterTypes.enabled\" and \"typescript.inlayHints.parameterTypes.enabled\"."
         );
         settings.javascript.inlay_hints.parameter_types.enabled =
           inlay_hints.parameter_types.enabled;
@@ -724,7 +724,7 @@ impl WorkspaceSettings {
       }
       if inlay_hints.variable_types.enabled {
         lsp_warn!(
-          "\"deno.inlayHints.variableTypes.enabled\" is deprecated. Instead use \"javascript.inlayHints.variableTypes.enabled\" and \"typescript.inlayHints.variableTypes.enabled\"."
+          "\"oden.inlayHints.variableTypes.enabled\" is deprecated. Instead use \"javascript.inlayHints.variableTypes.enabled\" and \"typescript.inlayHints.variableTypes.enabled\"."
         );
         settings.javascript.inlay_hints.variable_types.enabled =
           inlay_hints.variable_types.enabled;
@@ -733,7 +733,7 @@ impl WorkspaceSettings {
       }
       if !inlay_hints.variable_types.suppress_when_type_matches_name {
         lsp_warn!(
-          "\"deno.inlayHints.variableTypes.suppressWhenTypeMatchesName\" is deprecated. Instead use \"javascript.inlayHints.variableTypes.suppressWhenTypeMatchesName\" and \"typescript.inlayHints.variableTypes.suppressWhenTypeMatchesName\"."
+          "\"oden.inlayHints.variableTypes.suppressWhenTypeMatchesName\" is deprecated. Instead use \"javascript.inlayHints.variableTypes.suppressWhenTypeMatchesName\" and \"typescript.inlayHints.variableTypes.suppressWhenTypeMatchesName\"."
         );
         settings
           .javascript
@@ -750,7 +750,7 @@ impl WorkspaceSettings {
       }
       if inlay_hints.property_declaration_types.enabled {
         lsp_warn!(
-          "\"deno.inlayHints.propertyDeclarationTypes.enabled\" is deprecated. Instead use \"javascript.inlayHints.propertyDeclarationTypes.enabled\" and \"typescript.inlayHints.propertyDeclarationTypes.enabled\"."
+          "\"oden.inlayHints.propertyDeclarationTypes.enabled\" is deprecated. Instead use \"javascript.inlayHints.propertyDeclarationTypes.enabled\" and \"typescript.inlayHints.propertyDeclarationTypes.enabled\"."
         );
         settings
           .javascript
@@ -765,7 +765,7 @@ impl WorkspaceSettings {
       }
       if inlay_hints.function_like_return_types.enabled {
         lsp_warn!(
-          "\"deno.inlayHints.functionLikeReturnTypes.enabled\" is deprecated. Instead use \"javascript.inlayHints.functionLikeReturnTypes.enabled\" and \"typescript.inlayHints.functionLikeReturnTypes.enabled\"."
+          "\"oden.inlayHints.functionLikeReturnTypes.enabled\" is deprecated. Instead use \"javascript.inlayHints.functionLikeReturnTypes.enabled\" and \"typescript.inlayHints.functionLikeReturnTypes.enabled\"."
         );
         settings
           .javascript
@@ -780,7 +780,7 @@ impl WorkspaceSettings {
       }
       if inlay_hints.enum_member_values.enabled {
         lsp_warn!(
-          "\"deno.inlayHints.enumMemberValues.enabled\" is deprecated. Instead use \"javascript.inlayHints.enumMemberValues.enabled\" and \"typescript.inlayHints.enumMemberValues.enabled\"."
+          "\"oden.inlayHints.enumMemberValues.enabled\" is deprecated. Instead use \"javascript.inlayHints.enumMemberValues.enabled\" and \"typescript.inlayHints.enumMemberValues.enabled\"."
         );
         settings.javascript.inlay_hints.enum_member_values.enabled =
           inlay_hints.enum_member_values.enabled;
@@ -788,12 +788,12 @@ impl WorkspaceSettings {
           inlay_hints.enum_member_values.enabled;
       }
     }
-    if let Some(suggest) = deno_suggest {
+    if let Some(suggest) = oden_suggest {
       let suggest: CompletionSettings =
-        parse_or_default(suggest, "settings under \"deno.suggest\"");
+        parse_or_default(suggest, "settings under \"oden.suggest\"");
       if suggest.complete_function_calls {
         lsp_warn!(
-          "\"deno.suggest.completeFunctionCalls\" is deprecated. Instead use \"javascript.suggest.completeFunctionCalls\" and \"typescript.suggest.completeFunctionCalls\"."
+          "\"oden.suggest.completeFunctionCalls\" is deprecated. Instead use \"javascript.suggest.completeFunctionCalls\" and \"typescript.suggest.completeFunctionCalls\"."
         );
         settings.javascript.suggest.complete_function_calls =
           suggest.complete_function_calls;
@@ -802,21 +802,21 @@ impl WorkspaceSettings {
       }
       if !suggest.names {
         lsp_warn!(
-          "\"deno.suggest.names\" is deprecated. Instead use \"javascript.suggest.names\" and \"typescript.suggest.names\"."
+          "\"oden.suggest.names\" is deprecated. Instead use \"javascript.suggest.names\" and \"typescript.suggest.names\"."
         );
         settings.javascript.suggest.names = suggest.names;
         settings.typescript.suggest.names = suggest.names;
       }
       if !suggest.paths {
         lsp_warn!(
-          "\"deno.suggest.paths\" is deprecated. Instead use \"javascript.suggest.paths\" and \"typescript.suggest.paths\"."
+          "\"oden.suggest.paths\" is deprecated. Instead use \"javascript.suggest.paths\" and \"typescript.suggest.paths\"."
         );
         settings.javascript.suggest.paths = suggest.paths;
         settings.typescript.suggest.paths = suggest.paths;
       }
       if !suggest.auto_imports {
         lsp_warn!(
-          "\"deno.suggest.autoImports\" is deprecated. Instead use \"javascript.suggest.autoImports\" and \"typescript.suggest.autoImports\"."
+          "\"oden.suggest.autoImports\" is deprecated. Instead use \"javascript.suggest.autoImports\" and \"typescript.suggest.autoImports\"."
         );
         settings.javascript.suggest.auto_imports = suggest.auto_imports;
         settings.typescript.suggest.auto_imports = suggest.auto_imports;
@@ -826,16 +826,16 @@ impl WorkspaceSettings {
   }
 
   pub fn from_initialization_options(options: Value) -> Self {
-    let deno = options;
-    let javascript = deno
+    let oden = options;
+    let javascript = oden
       .as_object()
       .and_then(|o| o.get("javascript").cloned())
       .unwrap_or_default();
-    let typescript = deno
+    let typescript = oden
       .as_object()
       .and_then(|o| o.get("typescript").cloned())
       .unwrap_or_default();
-    Self::from_raw_settings(deno, javascript, typescript)
+    Self::from_raw_settings(oden, javascript, typescript)
   }
 }
 
@@ -881,7 +881,7 @@ impl Settings {
   }
 
   /// Returns `None` if the value should be deferred to the presence of a
-  /// `deno.json` file.
+  /// `oden.json` file.
   pub fn specifier_enabled(&self, specifier: &ModuleSpecifier) -> Option<bool> {
     let Ok(path) = url_to_file_path(specifier) else {
       // Non-file URLs are not disabled by these settings.
@@ -929,7 +929,7 @@ impl Settings {
   }
 
   pub fn enable_settings_hash(&self) -> u64 {
-    let mut hasher = FastInsecureHasher::new_without_deno_version();
+    let mut hasher = FastInsecureHasher::new_without_oden_version();
     let unscoped = self.get_unscoped();
     hasher.write_hashable(unscoped.enable);
     hasher.write_hashable(&unscoped.enable_paths);
@@ -1107,7 +1107,7 @@ impl Config {
   }
 
   pub fn uri_enabled(&self, uri: &Uri) -> bool {
-    if uri.scheme().as_str().eq_ignore_ascii_case("deno") {
+    if uri.scheme().as_str().eq_ignore_ascii_case("oden") {
       return true;
     }
     self.specifier_enabled(&uri_to_url(uri))
@@ -1121,7 +1121,7 @@ impl Config {
     if let Some(data) = &data
       && let Ok(path) = specifier.to_file_path()
     {
-      // deno_config's exclusion checks exclude vendor dirs invariably. We
+      // oden_config's exclusion checks exclude vendor dirs invariably. We
       // don't want that behavior here.
       if data.exclude_files.matches_path(&path)
         && !data
@@ -1135,7 +1135,7 @@ impl Config {
     self
       .settings
       .specifier_enabled(specifier)
-      .unwrap_or_else(|| data.and_then(|d| d.maybe_deno_json()).is_some())
+      .unwrap_or_else(|| data.and_then(|d| d.maybe_oden_json()).is_some())
   }
 
   pub fn specifier_enabled_for_test(
@@ -1256,7 +1256,7 @@ impl Config {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ConfigWatchedFileType {
-  DenoJson,
+  OdenJson,
   Lockfile,
   NpmRc,
   PackageJson,
@@ -1296,7 +1296,7 @@ impl WorkspaceConfigData {
       WorkspaceFactoryOptions {
         additional_config_file_names: &[],
         config_discovery: ConfigDiscoveryOption::DiscoverCwd,
-        maybe_custom_deno_dir_root: None,
+        maybe_custom_oden_dir_root: None,
         is_package_manager_subcommand: false,
         frozen_lockfile: None,
         lock_arg: None,
@@ -1319,7 +1319,7 @@ impl WorkspaceConfigData {
         // these default options are fine because we don't use this for
         // anything other than resolving the lockfile at the moment
         allow_json_imports:
-          deno_resolver::loader::AllowJsonImports::WithAttribute,
+          oden_resolver::loader::AllowJsonImports::WithAttribute,
         compiler_options_overrides: Default::default(),
         is_cjs_resolution_mode: Default::default(),
         on_mapped_resolution_diagnostic: None,
@@ -1447,7 +1447,7 @@ impl ConfigData {
     file_fetcher: &Arc<CliFileFetcher>,
     http_client_provider: &Arc<HttpClientProvider>,
     // sync requirement is because the lsp requires sync
-    deno_json_cache: &(dyn DenoJsonCache + Sync),
+    oden_json_cache: &(dyn OdenJsonCache + Sync),
     pkg_json_cache: &(dyn PackageJsonCache + Sync),
     workspace_cache: &(dyn WorkspaceCache + Sync),
     ws_data_cache: &mut HashMap<UrlRc, WorkspaceConfigData>,
@@ -1460,22 +1460,22 @@ impl ConfigData {
           &CliSys::default(),
           match specified_config {
             Some(config_path) => {
-              deno_config::workspace::WorkspaceDiscoverStart::ConfigFile(
+              oden_config::workspace::WorkspaceDiscoverStart::ConfigFile(
                 config_path,
               )
             }
             None => {
-              deno_config::workspace::WorkspaceDiscoverStart::Paths(&paths)
+              oden_config::workspace::WorkspaceDiscoverStart::Paths(&paths)
             }
           },
           &WorkspaceDiscoverOptions {
             additional_config_file_names: &[],
-            deno_json_cache: Some(deno_json_cache),
+            oden_json_cache: Some(oden_json_cache),
             pkg_json_cache: Some(pkg_json_cache),
             workspace_cache: Some(workspace_cache),
             discover_pkg_json: !has_flag_env_var(
               &CliSys::default(),
-              "DENO_NO_PACKAGE_JSON",
+              "ODEN_NO_PACKAGE_JSON",
             ),
             maybe_vendor_override: None,
           },
@@ -1515,12 +1515,12 @@ impl ConfigData {
         // check if any of these need to be added to the workspace
         let files = [
           (
-            scope.join("deno.json").unwrap(),
-            ConfigWatchedFileType::DenoJson,
+            scope.join("oden.json").unwrap(),
+            ConfigWatchedFileType::OdenJson,
           ),
           (
-            scope.join("deno.jsonc").unwrap(),
-            ConfigWatchedFileType::DenoJson,
+            scope.join("oden.jsonc").unwrap(),
+            ConfigWatchedFileType::OdenJson,
           ),
           (
             scope.join("package.json").unwrap(),
@@ -1582,15 +1582,15 @@ impl ConfigData {
       Some(Arc::new(specifier))
     })();
 
-    if let Some(deno_json) = member_dir.member_deno_json() {
+    if let Some(oden_json) = member_dir.member_oden_json() {
       lsp_log!(
-        "  Resolved Deno configuration file: \"{}\"",
-        deno_json.specifier
+        "  Resolved Oden configuration file: \"{}\"",
+        oden_json.specifier
       );
 
       add_watched_file(
-        deno_json.specifier.clone(),
-        ConfigWatchedFileType::DenoJson,
+        oden_json.specifier.clone(),
+        ConfigWatchedFileType::OdenJson,
       );
     }
 
@@ -1680,12 +1680,12 @@ impl ConfigData {
       );
     }
     let is_config_import_map = member_dir
-      .member_deno_json()
+      .member_oden_json()
       .map(|c| c.is_an_import_map() || c.json.import_map.is_some())
       .or_else(|| {
         member_dir
           .workspace
-          .root_deno_json()
+          .root_oden_json()
           .map(|c| c.is_an_import_map() || c.json.import_map.is_some())
       })
       .unwrap_or(false);
@@ -1765,13 +1765,13 @@ impl ConfigData {
     }
   }
 
-  pub fn maybe_deno_json(
+  pub fn maybe_oden_json(
     &self,
-  ) -> Option<&Arc<deno_config::deno_json::ConfigFile>> {
-    self.member_dir.member_or_root_deno_json()
+  ) -> Option<&Arc<oden_config::oden_json::ConfigFile>> {
+    self.member_dir.member_or_root_oden_json()
   }
 
-  pub fn maybe_pkg_json(&self) -> Option<&Arc<deno_package_json::PackageJson>> {
+  pub fn maybe_pkg_json(&self) -> Option<&Arc<oden_package_json::PackageJson>> {
     self.member_dir.member_or_root_pkg_json()
   }
 
@@ -1826,7 +1826,7 @@ impl ConfigTree {
     self
       .scopes
       .values()
-      .filter_map(|d| d.maybe_deno_json())
+      .filter_map(|d| d.maybe_oden_json())
       .collect()
   }
 
@@ -1867,7 +1867,7 @@ impl ConfigTree {
 
   pub fn to_did_refresh_params(
     &self,
-  ) -> lsp_custom::DidRefreshDenoConfigurationTreeNotificationParams {
+  ) -> lsp_custom::DidRefreshOdenConfigurationTreeNotificationParams {
     let data = self
       .scopes
       .values()
@@ -1876,15 +1876,15 @@ impl ConfigTree {
           Some(data.member_dir.workspace.root_dir_url())
             .filter(|s| *s != data.member_dir.dir_url())
             .and_then(|s| url_to_uri(s).ok());
-        Some(lsp_custom::DenoConfigurationData {
+        Some(lsp_custom::OdenConfigurationData {
           scope_uri: url_to_uri(&data.scope).ok()?,
-          deno_json: data.maybe_deno_json().and_then(|c| {
+          oden_json: data.maybe_oden_json().and_then(|c| {
             if workspace_root_scope_uri.is_some()
               && Some(&c.specifier)
                 == data
                   .member_dir
                   .workspace
-                  .root_deno_json()
+                  .root_oden_json()
                   .map(|c| &c.specifier)
             {
               return None;
@@ -1902,13 +1902,13 @@ impl ConfigTree {
         })
       })
       .collect();
-    let deno_dir_npm_folder_uri = self
+    let oden_dir_npm_folder_uri = self
       .global_npm_cache_url
       .as_ref()
       .and_then(|s| url_to_uri(s).ok());
-    lsp_custom::DidRefreshDenoConfigurationTreeNotificationParams {
+    lsp_custom::DidRefreshOdenConfigurationTreeNotificationParams {
       data,
-      deno_dir_npm_folder_uri,
+      oden_dir_npm_folder_uri,
     }
   }
 
@@ -1925,14 +1925,14 @@ impl ConfigTree {
     workspace_files: &IndexSet<PathBuf>,
     file_fetcher: &Arc<CliFileFetcher>,
     http_client_provider: &Arc<HttpClientProvider>,
-    deno_dir: &DenoDir,
+    oden_dir: &OdenDir,
     reason: &str,
   ) {
     lsp_log!("Refreshing configuration tree ({reason})...");
     // since we're resolving a workspace multiple times in different
     // folders, we want to cache all the lookups and config files across
     // ConfigData::load calls
-    let deno_json_cache = DenoJsonMemCache::default();
+    let oden_json_cache = OdenJsonMemCache::default();
     let pkg_json_cache = PackageJsonMemCache::default();
     let workspace_cache = WorkspaceMemCache::default();
     // Shared per-workspace-root data (lockfile, .npmrc, node_modules dir),
@@ -1968,7 +1968,7 @@ impl ConfigTree {
                 settings,
                 file_fetcher,
                 http_client_provider,
-                &deno_json_cache,
+                &oden_json_cache,
                 &pkg_json_cache,
                 &workspace_cache,
                 &mut ws_data_cache,
@@ -1984,8 +1984,8 @@ impl ConfigTree {
       let Ok(file_url) = Url::from_file_path(path) else {
         continue;
       };
-      if !(file_url.path().ends_with("/deno.json")
-        || file_url.path().ends_with("/deno.jsonc")
+      if !(file_url.path().ends_with("/oden.json")
+        || file_url.path().ends_with("/oden.jsonc")
         || file_url.path().ends_with("/package.json"))
       {
         continue;
@@ -2003,7 +2003,7 @@ impl ConfigTree {
           settings,
           file_fetcher,
           http_client_provider,
-          &deno_json_cache,
+          &oden_json_cache,
           &pkg_json_cache,
           &workspace_cache,
           &mut ws_data_cache,
@@ -2021,7 +2021,7 @@ impl ConfigTree {
           settings,
           file_fetcher,
           http_client_provider,
-          &deno_json_cache,
+          &oden_json_cache,
           &pkg_json_cache,
           &workspace_cache,
           &mut ws_data_cache,
@@ -2033,7 +2033,7 @@ impl ConfigTree {
 
     self.scopes = Arc::new(scopes);
     self.global_npm_cache_url =
-      Url::from_directory_path(deno_dir.npm_folder_path())
+      Url::from_directory_path(oden_dir.npm_folder_path())
         .ok()
         .map(Arc::new);
   }
@@ -2053,8 +2053,8 @@ impl ConfigTree {
     memory_sys.fs_write(&config_path, json_text).unwrap();
     let workspace_dir = WorkspaceDirectory::discover(
       &memory_sys,
-      deno_config::workspace::WorkspaceDiscoverStart::ConfigFile(&config_path),
-      &deno_config::workspace::WorkspaceDiscoverOptions {
+      oden_config::workspace::WorkspaceDiscoverStart::ConfigFile(&config_path),
+      &oden_config::workspace::WorkspaceDiscoverOptions {
         ..Default::default()
       },
     )
@@ -2070,7 +2070,7 @@ impl ConfigTree {
       )
       .await,
     );
-    assert!(data.maybe_deno_json().is_some());
+    assert!(data.maybe_oden_json().is_some());
     self.scopes = Arc::new([(scope, data)].into_iter().collect());
   }
 }
@@ -2080,7 +2080,7 @@ fn resolve_node_modules_dir_mode(
   byonm: bool,
 ) -> NodeModulesDirMode {
   // For the language server, require an explicit opt-in via the
-  // `nodeModulesDir: true` setting in the deno.json file. This is to
+  // `nodeModulesDir: true` setting in the oden.json file. This is to
   // reduce the chance of modifying someone's node_modules directory
   // without them having asked us to do so.
   let node_modules_mode = workspace.node_modules_dir().ok().flatten();
@@ -2102,9 +2102,9 @@ fn resolve_node_modules_dir_mode(
 
 // todo(dsherret): switch to RefCell once the lsp no longer requires Sync
 #[derive(Default)]
-struct DenoJsonMemCache(Mutex<HashMap<PathBuf, Arc<ConfigFile>>>);
+struct OdenJsonMemCache(Mutex<HashMap<PathBuf, Arc<ConfigFile>>>);
 
-impl deno_config::deno_json::DenoJsonCache for DenoJsonMemCache {
+impl oden_config::oden_json::OdenJsonCache for OdenJsonMemCache {
   fn get(&self, path: &Path) -> Option<Arc<ConfigFile>> {
     self.0.lock().get(path).cloned()
   }
@@ -2117,7 +2117,7 @@ impl deno_config::deno_json::DenoJsonCache for DenoJsonMemCache {
 #[derive(Debug, Default)]
 struct PackageJsonMemCache(Mutex<HashMap<PathBuf, Arc<PackageJson>>>);
 
-impl deno_package_json::PackageJsonCache for PackageJsonMemCache {
+impl oden_package_json::PackageJsonCache for PackageJsonMemCache {
   fn get(&self, path: &Path) -> PackageJsonCacheResult {
     self
       .0
@@ -2139,7 +2139,7 @@ impl deno_package_json::PackageJsonCache for PackageJsonMemCache {
 #[derive(Default)]
 struct WorkspaceMemCache(Mutex<HashMap<PathBuf, Arc<Workspace>>>);
 
-impl deno_config::workspace::WorkspaceCache for WorkspaceMemCache {
+impl oden_config::workspace::WorkspaceCache for WorkspaceMemCache {
   fn get(&self, dir_path: &Path) -> Option<Arc<Workspace>> {
     self.0.lock().get(dir_path).cloned()
   }
@@ -2151,9 +2151,9 @@ impl deno_config::workspace::WorkspaceCache for WorkspaceMemCache {
 
 #[cfg(test)]
 mod tests {
-  use deno_core::resolve_url;
-  use deno_core::serde_json;
-  use deno_core::serde_json::json;
+  use oden_core::resolve_url;
+  use oden_core::serde_json;
+  use oden_core::serde_json::json;
   use pretty_assertions::assert_eq;
 
   use super::*;
@@ -2254,7 +2254,7 @@ mod tests {
         lint: true,
         document_preload_limit: 1_000,
         force_push_based_diagnostics: false,
-        suggest: DenoCompletionSettings {
+        suggest: OdenCompletionSettings {
           imports: ImportCompletionSettings {
             auto_discover: true,
             hosts: HashMap::new(),
@@ -2426,7 +2426,7 @@ mod tests {
     config
       .tree
       .inject_config_file(
-        ConfigFile::new("{}", root_uri.join("deno.json").unwrap()).unwrap(),
+        ConfigFile::new("{}", root_uri.join("oden.json").unwrap()).unwrap(),
       )
       .await;
     assert!(config.specifier_enabled(&root_uri));
@@ -2546,7 +2546,7 @@ mod tests {
             },
           })
           .to_string(),
-          root_uri.join("deno.json").unwrap(),
+          root_uri.join("oden.json").unwrap(),
         )
         .unwrap(),
       )
@@ -2571,7 +2571,7 @@ mod tests {
             },
           })
           .to_string(),
-          root_uri.join("deno.json").unwrap(),
+          root_uri.join("oden.json").unwrap(),
         )
         .unwrap(),
       )
@@ -2588,7 +2588,7 @@ mod tests {
             },
           })
           .to_string(),
-          root_uri.join("deno.json").unwrap(),
+          root_uri.join("oden.json").unwrap(),
         )
         .unwrap(),
       )

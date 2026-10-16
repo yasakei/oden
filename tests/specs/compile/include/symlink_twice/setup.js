@@ -1,2 +1,2 @@
-Deno.writeTextFileSync("index.js", "console.log(1);");
-Deno.symlinkSync("index.js", "link.js");
+Oden.writeTextFileSync("index.js", "console.log(1);");
+Oden.symlinkSync("index.js", "link.js");

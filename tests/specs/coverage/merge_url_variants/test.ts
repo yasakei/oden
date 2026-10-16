@@ -2,14 +2,14 @@ import { a } from "./source.ts";
 import { b } from "./source.ts#fragment";
 import { c } from "./source.ts?search";
 
-Deno.test("a", () => {
+Oden.test("a", () => {
   a();
 });
 
-Deno.test("b", () => {
+Oden.test("b", () => {
   b();
 });
 
-Deno.test("c", () => {
+Oden.test("c", () => {
   c();
 });

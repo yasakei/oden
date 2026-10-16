@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // deno-lint-ignore-file no-console
 
@@ -10,12 +10,12 @@ if (import.meta.main) {
   properties.setInstanceData();
   console.log("set instance data");
 } else {
-  Deno.test("napi instance data Release", async () => {
-    const { stdout, stderr, code } = await new Deno.Command(Deno.execPath(), {
+  Oden.test("napi instance data Release", async () => {
+    const { stdout, stderr, code } = await new Oden.Command(Oden.execPath(), {
       args: [
         "run",
         "--config",
-        Deno.realPathSync("../config/deno.json"),
+        Oden.realPathSync("../config/oden.json"),
         "--no-lock",
         "-A",
         "--unstable-ffi",

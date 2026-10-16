@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Based on: https://github.com/nodejs/node/blob/0646eda/lib/constants.js
 
@@ -7,15 +7,15 @@ const { core, primordials } = __bootstrap;
 const { ObjectAssign } = primordials;
 
 const fsConstants = core.loadExtScript(
-  "ext:deno_node/_fs/_fs_constants.ts",
+  "ext:oden_node/_fs/_fs_constants.ts",
 );
 const { constants: osConstants } = core.loadExtScript(
-  "ext:deno_node/os.ts",
+  "ext:oden_node/os.ts",
 );
 const {
   crypto: cryptoConstants,
   zlib: zlibConstants,
-} = core.loadExtScript("ext:deno_node/internal_binding/constants.ts");
+} = core.loadExtScript("ext:oden_node/internal_binding/constants.ts");
 
 const defaultExport = ObjectAssign(
   {},

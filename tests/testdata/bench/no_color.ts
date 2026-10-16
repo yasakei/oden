@@ -1,37 +1,37 @@
-Deno.bench({
+Oden.bench({
   name: "success",
   fn() {},
 });
 
-Deno.bench({
+Oden.bench({
   name: "success long",
   fn() {
     1024n ** 10000n;
   },
 });
 
-Deno.bench({
+Oden.bench({
   name: "success but longer",
   fn() {
     1024n ** 1000000n;
   },
 });
 
-Deno.bench({
+Oden.bench({
   name: "success long and the longest name",
   async fn() {
     await new Promise((resolve) => setTimeout(resolve, 100));
   },
 });
 
-Deno.bench({
+Oden.bench({
   name: "fail",
   fn() {
     throw new Error("fail");
   },
 });
 
-Deno.bench({
+Oden.bench({
   name: "ignored",
   ignore: true,
   fn() {},

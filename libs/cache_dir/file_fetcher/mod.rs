@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -11,8 +11,8 @@ use std::time::SystemTime;
 use boxed_error::Boxed;
 use data_url::DataUrl;
 use deno_error::JsError;
-use deno_maybe_sync::MaybeSend;
-use deno_maybe_sync::MaybeSync;
+use oden_maybe_sync::MaybeSend;
+use oden_maybe_sync::MaybeSync;
 use deno_media_type::MediaType;
 use deno_path_util::url_to_file_path;
 use http::header;
@@ -89,7 +89,7 @@ pub enum FileOrRedirect {
 }
 
 impl FileOrRedirect {
-  fn from_deno_cache_entry(
+  fn from_oden_cache_entry(
     url: &Url,
     cache_entry: CacheEntry,
   ) -> Result<Self, RedirectResolutionError> {
@@ -175,7 +175,7 @@ impl File {
 }
 
 #[allow(clippy::disallowed_types, reason = "arc wrapper type")]
-pub type MemoryFilesRc = deno_maybe_sync::MaybeArc<dyn MemoryFiles>;
+pub type MemoryFilesRc = oden_maybe_sync::MaybeArc<dyn MemoryFiles>;
 
 pub trait MemoryFiles: std::fmt::Debug + MaybeSend + MaybeSync {
   fn get(&self, url: &Url) -> Option<File>;
@@ -746,7 +746,7 @@ impl<TBlobStore: BlobStore, TSys: FileFetcherSys, THttpClient: HttpClient>
 
     match self.http_cache.get(&cache_key, maybe_checksum) {
       Ok(Some(entry)) => {
-        Ok(Some(FileOrRedirect::from_deno_cache_entry(url, entry)?))
+        Ok(Some(FileOrRedirect::from_oden_cache_entry(url, entry)?))
       }
       Ok(None) => Ok(None),
       Err(CacheReadFileError::Io(source)) => Err(
@@ -931,7 +931,7 @@ impl<TBlobStore: BlobStore, TSys: FileFetcherSys, THttpClient: HttpClient>
       }
       SendRequestResponse::NotModified => {
         let (cache_entry, _) = maybe_etag_cache_entry.unwrap();
-        FileOrRedirect::from_deno_cache_entry(url, cache_entry).map_err(|err| {
+        FileOrRedirect::from_oden_cache_entry(url, cache_entry).map_err(|err| {
           FetchNoFollowErrorKind::RedirectResolution(err).into_box()
         })
       }

@@ -1,1 +1,1 @@
-Deno.open("a".repeat(1e5));
+Oden.open("a".repeat(1e5));

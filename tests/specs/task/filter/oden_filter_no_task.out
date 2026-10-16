@@ -1,0 +1,6 @@
+Available tasks (@oden/bar):
+- dev
+    echo '@oden/bar'
+Available tasks (@oden/foo):
+- dev
+    echo '@oden/foo'

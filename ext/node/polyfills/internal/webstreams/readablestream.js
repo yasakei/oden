@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // deno-lint-ignore-file
 
 (function () {
 const { core } = __bootstrap;
 
-const webStreams = core.loadExtScript("ext:deno_web/06_streams.js");
-const streamWeb = core.loadExtScript("ext:deno_node/stream/web.js");
+const webStreams = core.loadExtScript("ext:oden_web/06_streams.js");
+const streamWeb = core.loadExtScript("ext:oden_node/stream/web.js");
 
 const {
   ReadableStream,

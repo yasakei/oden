@@ -1,15 +1,15 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 export interface AstContext {
   buf: Uint8Array;
   strTable: Map<number, string>;
   strTableOffset: number;
   rootOffset: number;
-  nodes: Map<number, Deno.lint.Node>;
+  nodes: Map<number, Oden.lint.Node>;
   spansOffset: number;
   propsOffset: number;
   commentsOffset: number;
-  comments: Array<Deno.lint.LineComment | Deno.lint.BlockComment>;
+  comments: Array<Oden.lint.LineComment | Oden.lint.BlockComment>;
   strByType: number[];
   strByProp: number[];
   typeByStr: Map<string, number>;
@@ -18,7 +18,7 @@ export interface AstContext {
 }
 
 export interface LintState {
-  plugins: Deno.lint.Plugin[];
+  plugins: Oden.lint.Plugin[];
   installedPlugins: Set<string>;
   /** format: `<plugin>/<rule>` */
   ignoredRules: Set<string>;

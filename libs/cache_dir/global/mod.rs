@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::path::PathBuf;
 use std::time::Duration;
 use std::time::SystemTime;
 use std::time::UNIX_EPOCH;
 
-use deno_maybe_sync::MaybeSend;
-use deno_maybe_sync::MaybeSync;
+use oden_maybe_sync::MaybeSend;
+use oden_maybe_sync::MaybeSync;
 use serde::Deserialize;
 use sys_traits::FsCreateDirAll;
 use sys_traits::FsMetadata;
@@ -51,7 +51,7 @@ pub trait GlobalHttpCacheSys:
 
 #[allow(clippy::disallowed_types, reason = "arc wrapper type")]
 pub type GlobalHttpCacheRc<TSys> =
-  deno_maybe_sync::MaybeArc<GlobalHttpCache<TSys>>;
+  oden_maybe_sync::MaybeArc<GlobalHttpCache<TSys>>;
 
 #[derive(Debug)]
 pub struct GlobalHttpCache<Sys: GlobalHttpCacheSys> {
@@ -253,7 +253,7 @@ mod test {
         "data/c21c7fc382b2b0553dc0864aa81a3acacfb7b3d1285ab5ae76da6abec213fb37",
       ),
       (
-        "data:text/plain,Hello%2C%20Deno!",
+        "data:text/plain,Hello%2C%20Oden!",
         "data/967374e3561d6741234131e342bf5c6848b70b13758adfe23ee1a813a8131818",
       ),
     ];

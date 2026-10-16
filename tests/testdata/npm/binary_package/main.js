@@ -1,1 +1,1 @@
-import "npm:@denotest/binary-package";
+import "npm:@odentest/binary-package";

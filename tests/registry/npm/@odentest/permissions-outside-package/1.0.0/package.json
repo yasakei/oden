@@ -1,0 +1,5 @@
+{
+  "name": "@odentest/permissions-outside-package",
+  "version": "1.0.0",
+  "main": "./index.js"
+}

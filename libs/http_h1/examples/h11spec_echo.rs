@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![allow(clippy::print_stderr, reason = "example binary")]
 
@@ -7,15 +7,15 @@ use std::env;
 use std::error::Error;
 use std::str;
 
-use deno_http_h1::BodyKind;
-use deno_http_h1::Error as H1Error;
-use deno_http_h1::Header;
-use deno_http_h1::Response;
-use deno_http_h1::ResponseBody;
-use deno_http_h1::ResponseHead;
-use deno_http_h1::SharedConn;
-use deno_http_h1::SharedScratch;
-use deno_http_h1::Version;
+use oden_http_h1::BodyKind;
+use oden_http_h1::Error as H1Error;
+use oden_http_h1::Header;
+use oden_http_h1::Response;
+use oden_http_h1::ResponseBody;
+use oden_http_h1::ResponseHead;
+use oden_http_h1::SharedConn;
+use oden_http_h1::SharedScratch;
+use oden_http_h1::Version;
 use tokio::net::TcpListener;
 use tokio::net::TcpStream;
 
@@ -105,7 +105,7 @@ struct OwnedRequest {
 }
 
 impl OwnedRequest {
-  fn from_request(request: deno_http_h1::Request<'_>) -> Self {
+  fn from_request(request: oden_http_h1::Request<'_>) -> Self {
     Self {
       method: request.method.to_vec(),
       target: request.target.to_vec(),
@@ -229,7 +229,7 @@ async fn write_echo(
 
   let mut header_bytes: Vec<(Vec<u8>, Vec<u8>)> = vec![
     (b"Date".to_vec(), DATE.to_vec()),
-    (b"Server".to_vec(), b"deno_http_h1/h11spec".to_vec()),
+    (b"Server".to_vec(), b"oden_http_h1/h11spec".to_vec()),
     (b"Content-Type".to_vec(), b"application/json".to_vec()),
   ];
   if request.method == b"OPTIONS" {

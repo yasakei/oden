@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import CP from "node:child_process";
 import net from "node:net";
@@ -30,7 +30,7 @@ function withTimeout<T>(
 }
 
 // TODO(uki00a): Once Node.js's `parallel/test-child-process-spawn-error.js` works, this test case should be removed.
-Deno.test("[node/child_process spawn] The 'error' event is emitted when no binary is found", async () => {
+Oden.test("[node/child_process spawn] The 'error' event is emitted when no binary is found", async () => {
   const deferred = withTimeout<void>();
   const childProcess = spawn("no-such-cmd");
   childProcess.on("error", (_err: Error) => {
@@ -40,9 +40,9 @@ Deno.test("[node/child_process spawn] The 'error' event is emitted when no binar
   await deferred.promise;
 });
 
-Deno.test("[node/child_process spawn] The 'exit' event is emitted with an exit code after the child process ends", async () => {
+Oden.test("[node/child_process spawn] The 'exit' event is emitted with an exit code after the child process ends", async () => {
   const deferred = withTimeout<void>();
-  const childProcess = spawn(Deno.execPath(), ["--help"], {
+  const childProcess = spawn(Oden.execPath(), ["--help"], {
     env: { NO_COLOR: "true" },
   });
   try {
@@ -61,9 +61,9 @@ Deno.test("[node/child_process spawn] The 'exit' event is emitted with an exit c
   }
 });
 
-Deno.test("[node/child_process disconnect] the method exists", async () => {
+Oden.test("[node/child_process disconnect] the method exists", async () => {
   const deferred = withTimeout<void>();
-  const childProcess = spawn(Deno.execPath(), ["--help"], {
+  const childProcess = spawn(Oden.execPath(), ["--help"], {
     env: { NO_COLOR: "true" },
     stdio: ["pipe", "pipe", "pipe", "ipc"],
   });
@@ -80,11 +80,11 @@ Deno.test("[node/child_process disconnect] the method exists", async () => {
   }
 });
 
-Deno.test({
+Oden.test({
   name: "[node/child_process spawn] Verify that stdin and stdout work",
   fn: async () => {
     const deferred = withTimeout<void>();
-    const childProcess = spawn(Deno.execPath(), ["fmt", "-"], {
+    const childProcess = spawn(Oden.execPath(), ["fmt", "-"], {
       env: { NO_COLOR: "true" },
       stdio: ["pipe", "pipe"],
     });
@@ -108,7 +108,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[node/child_process spawn] stdin and stdout with binary data",
   fn: async () => {
     const deferred = withTimeout<void>();
@@ -116,7 +116,7 @@ Deno.test({
       path.dirname(path.fromFileUrl(import.meta.url)),
       "./testdata/binary_stdio.js",
     );
-    const childProcess = spawn(Deno.execPath(), ["run", p], {
+    const childProcess = spawn(Oden.execPath(), ["run", p], {
       env: { NO_COLOR: "true" },
       stdio: ["pipe", "pipe"],
     });
@@ -146,7 +146,7 @@ async function spawnAndGetEnvValue(
 ): Promise<string> {
   const deferred = withTimeout<string>();
   const env = spawn(
-    `"${Deno.execPath()}" eval -p "Deno.env.toObject().BAZ"`,
+    `"${Oden.execPath()}" eval -p "Oden.env.toObject().BAZ"`,
     {
       env: { BAZ: String(inputValue), NO_COLOR: "true" },
       shell: true,
@@ -169,8 +169,8 @@ async function spawnAndGetEnvValue(
   }
 }
 
-Deno.test({
-  ignore: Deno.build.os === "windows",
+Oden.test({
+  ignore: Oden.build.os === "windows",
   name:
     "[node/child_process spawn] Verify that environment values can be numbers",
   async fn() {
@@ -179,8 +179,8 @@ Deno.test({
   },
 });
 
-Deno.test({
-  ignore: Deno.build.os === "windows",
+Oden.test({
+  ignore: Oden.build.os === "windows",
   name:
     "[node/child_process spawn] Verify that environment values can be booleans",
   async fn() {
@@ -194,9 +194,9 @@ Deno.test({
 // Ported from Node 15.5.1
 
 // TODO(uki00a): Remove this case once Node's `parallel/test-child-process-spawn-event.js` works.
-Deno.test("[child_process spawn] 'spawn' event", async () => {
+Oden.test("[child_process spawn] 'spawn' event", async () => {
   const timeout = withTimeout<void>();
-  const subprocess = spawn(Deno.execPath(), ["eval", "console.log('ok')"]);
+  const subprocess = spawn(Oden.execPath(), ["eval", "console.log('ok')"]);
 
   let didSpawn = false;
   subprocess.on("spawn", function () {
@@ -241,7 +241,7 @@ Deno.test("[child_process spawn] 'spawn' event", async () => {
 });
 
 // TODO(uki00a): Remove this case once Node's `parallel/test-child-process-spawn-shell.js` works.
-Deno.test("[child_process spawn] Verify that a shell is executed", async () => {
+Oden.test("[child_process spawn] Verify that a shell is executed", async () => {
   const deferred = withTimeout<void>();
   const doesNotExist = spawn("does-not-exist", { shell: true });
   try {
@@ -252,7 +252,7 @@ Deno.test("[child_process spawn] Verify that a shell is executed", async () => {
     doesNotExist.on("exit", (code: number, signal: null) => {
       assertStrictEquals(signal, null);
 
-      if (Deno.build.os === "windows") {
+      if (Oden.build.os === "windows") {
         assertStrictEquals(code, 1); // Exit code of cmd.exe
       } else {
         assertStrictEquals(code, 127); // Exit code of /bin/sh });
@@ -269,8 +269,8 @@ Deno.test("[child_process spawn] Verify that a shell is executed", async () => {
 });
 
 // TODO(uki00a): Remove this case once Node's `parallel/test-child-process-spawn-shell.js` works.
-Deno.test({
-  ignore: Deno.build.os === "windows",
+Oden.test({
+  ignore: Oden.build.os === "windows",
   name: "[node/child_process spawn] Verify that passing arguments works",
   async fn() {
     const deferred = withTimeout<void>();
@@ -300,8 +300,8 @@ Deno.test({
 });
 
 // TODO(uki00a): Remove this case once Node's `parallel/test-child-process-spawn-shell.js` works.
-Deno.test({
-  ignore: Deno.build.os === "windows",
+Oden.test({
+  ignore: Oden.build.os === "windows",
   name: "[node/child_process spawn] Verity that shell features can be used",
   async fn() {
     const deferred = withTimeout<void>();
@@ -330,14 +330,14 @@ Deno.test({
 });
 
 // TODO(uki00a): Remove this case once Node's `parallel/test-child-process-spawn-shell.js` works.
-Deno.test({
-  ignore: Deno.build.os === "windows",
+Oden.test({
+  ignore: Oden.build.os === "windows",
   name:
     "[node/child_process spawn] Verity that environment is properly inherited",
   async fn() {
     const deferred = withTimeout<void>();
     const env = spawn(
-      `"${Deno.execPath()}" eval -p "Deno.env.toObject().BAZ"`,
+      `"${Oden.execPath()}" eval -p "Oden.env.toObject().BAZ"`,
       {
         env: { BAZ: "buzz", NO_COLOR: "true" },
         shell: true,
@@ -363,7 +363,7 @@ Deno.test({
 });
 /* End of ported part */
 
-Deno.test({
+Oden.test({
   name: "[node/child_process execFile] Get stdout as a string",
   async fn() {
     let child: unknown;
@@ -372,7 +372,7 @@ Deno.test({
       "./testdata/exec_file_text_output.js",
     );
     const promise = new Promise<string | null>((resolve, reject) => {
-      child = execFile(Deno.execPath(), ["run", script], (err, stdout) => {
+      child = execFile(Oden.execPath(), ["run", script], (err, stdout) => {
         if (err) reject(err);
         else if (stdout) resolve(stdout as string);
         else resolve(null);
@@ -389,7 +389,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[node/child_process execFile] Get stdout as a buffer",
   async fn() {
     let child: unknown;
@@ -399,7 +399,7 @@ Deno.test({
     );
     const promise = new Promise<Buffer | null>((resolve, reject) => {
       child = execFile(
-        Deno.execPath(),
+        Oden.execPath(),
         ["run", script],
         { encoding: "buffer" },
         (err, stdout) => {
@@ -421,7 +421,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[node/child_process execFile] Get stderr",
   async fn() {
     let child: unknown;
@@ -432,7 +432,7 @@ Deno.test({
     const promise = new Promise<
       { err: Error | null; stderr?: string | Buffer }
     >((resolve) => {
-      child = execFile(Deno.execPath(), ["run", script], (err, _, stderr) => {
+      child = execFile(Oden.execPath(), ["run", script], (err, _, stderr) => {
         resolve({ err, stderr });
       });
     });
@@ -452,7 +452,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[node/child_process execFile] Exceed given maxBuffer limit",
   async fn() {
     let child: unknown;
@@ -463,7 +463,7 @@ Deno.test({
     const promise = new Promise<
       { err: Error | null; stderr?: string | Buffer }
     >((resolve) => {
-      child = execFile(Deno.execPath(), ["run", script], {
+      child = execFile(Oden.execPath(), ["run", script], {
         encoding: "buffer",
         maxBuffer: 3,
       }, (err, _, stderr) => {
@@ -492,7 +492,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   ignore: true,
   name: "[node/child_process] ChildProcess.unref()",
   async fn() {
@@ -501,7 +501,7 @@ Deno.test({
       "testdata",
       "child_process_unref.js",
     );
-    const childProcess = spawn(Deno.execPath(), [
+    const childProcess = spawn(Oden.execPath(), [
       "run",
       "-A",
       script,
@@ -512,7 +512,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   ignore: true,
   name: "[node/child_process] child_process.fork",
   async fn() {
@@ -538,7 +538,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[node/child_process] child_process.fork with URL",
   async fn() {
     const testdataDir = path.join(
@@ -564,17 +564,17 @@ Deno.test({
   },
 });
 
-Deno.test("[node/child_process execFileSync] 'inherit' stdout and stderr", () => {
-  execFileSync(Deno.execPath(), ["--help"], { stdio: "inherit" });
+Oden.test("[node/child_process execFileSync] 'inherit' stdout and stderr", () => {
+  execFileSync(Oden.execPath(), ["--help"], { stdio: "inherit" });
 });
 
-Deno.test(
+Oden.test(
   "[node/child_process spawn] supports windowsVerbatimArguments option",
-  { ignore: Deno.build.os !== "windows" },
+  { ignore: Oden.build.os !== "windows" },
   async () => {
     const cmdFinished = Promise.withResolvers<void>();
     let output = "";
-    const cp = spawn("cmd", ["/d", "/s", "/c", '"deno ^"--version^""'], {
+    const cp = spawn("cmd", ["/d", "/s", "/c", '"oden ^"--version^""'], {
       stdio: "pipe",
       windowsVerbatimArguments: true,
     });
@@ -583,13 +583,13 @@ Deno.test(
       output += data;
     });
     await cmdFinished.promise;
-    assertStringIncludes(output, "deno");
+    assertStringIncludes(output, "oden");
     assertStringIncludes(output, "v8");
     assertStringIncludes(output, "typescript");
   },
 );
 
-Deno.test(
+Oden.test(
   "[node/child_process spawn] supports stdio array option",
   async () => {
     const cmdFinished = Promise.withResolvers<void>();
@@ -599,7 +599,7 @@ Deno.test(
       "testdata",
       "child_process_stdio.js",
     );
-    const cp = spawn(Deno.execPath(), ["run", "-A", script]);
+    const cp = spawn(Oden.execPath(), ["run", "-A", script]);
     cp.stdout?.on("data", (data) => {
       output += data;
     });
@@ -611,7 +611,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   "[node/child_process spawn] supports stdio [0, 1, 2] option",
   async () => {
     const cmdFinished = Promise.withResolvers<void>();
@@ -621,7 +621,7 @@ Deno.test(
       "testdata",
       "child_process_stdio_012.js",
     );
-    const cp = spawn(Deno.execPath(), ["run", "-A", script]);
+    const cp = spawn(Oden.execPath(), ["run", "-A", script]);
     cp.stdout?.on("data", (data) => {
       output += data;
     });
@@ -633,9 +633,9 @@ Deno.test(
   },
 );
 
-Deno.test({
-  name: "[node/child_process spawn] supports Deno child fd 3 pipe",
-  ignore: Deno.build.os === "windows",
+Oden.test({
+  name: "[node/child_process spawn] supports Oden child fd 3 pipe",
+  ignore: Oden.build.os === "windows",
   async fn() {
     const cmdFinished = Promise.withResolvers<void>();
     let output = "";
@@ -645,7 +645,7 @@ Deno.test({
       "testdata",
       "child_process_extra_stdio_fd3.js",
     );
-    const cp = spawn(Deno.execPath(), ["run", "-A", script], {
+    const cp = spawn(Oden.execPath(), ["run", "-A", script], {
       stdio: ["ignore", "ignore", "pipe", "pipe"],
     });
     const extra = cp.stdio[3];
@@ -668,7 +668,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name:
     "[node/child_process spawn] concurrent spawns with extra pipe fds keep handles valid (#35994)",
   async fn() {
@@ -678,7 +678,7 @@ Deno.test({
     // spawns - raced with handle-value reuse and intermittently failed a
     // sibling spawn with "The handle is invalid. (os error 6)". Spawn a batch
     // concurrently to stress handle reuse and assert none of them fail.
-    const isWindows = Deno.build.os === "windows";
+    const isWindows = Oden.build.os === "windows";
     const command = isWindows ? "cmd.exe" : "/bin/sh";
     const args = isWindows ? ["/c", "exit 0"] : ["-c", "exit 0"];
 
@@ -711,10 +711,10 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name:
-    "[node/child_process spawn] Deno child fd 3 stays claimable by net.Socket",
-  ignore: Deno.build.os === "windows",
+    "[node/child_process spawn] Oden child fd 3 stays claimable by net.Socket",
+  ignore: Oden.build.os === "windows",
   async fn() {
     const cmdFinished = Promise.withResolvers<void>();
     let output = "";
@@ -724,7 +724,7 @@ Deno.test({
       "testdata",
       "child_process_extra_stdio_fd3_socket.js",
     );
-    const cp = spawn(Deno.execPath(), ["run", "-A", script], {
+    const cp = spawn(Oden.execPath(), ["run", "-A", script], {
       stdio: ["ignore", "ignore", "pipe", "pipe"],
     });
     const extra = cp.stdio[3];
@@ -747,10 +747,10 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name:
-    "[node/child_process spawn] Deno child adopts a TCP fd passed as extra stdio",
-  ignore: Deno.build.os === "windows",
+    "[node/child_process spawn] Oden child adopts a TCP fd passed as extra stdio",
+  ignore: Oden.build.os === "windows",
   async fn() {
     const cmdFinished = Promise.withResolvers<void>();
     const received = Promise.withResolvers<string>();
@@ -779,7 +779,7 @@ Deno.test({
         // deno-lint-ignore no-explicit-any
         const rawFd = (client as any)._handle.fdForIpc();
         assert(rawFd >= 0);
-        const cp = spawn(Deno.execPath(), ["run", "-A", script], {
+        const cp = spawn(Oden.execPath(), ["run", "-A", script], {
           stdio: ["ignore", "ignore", "pipe", rawFd],
         });
         cp.stderr?.on("data", (data) => {
@@ -800,10 +800,10 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name:
-    "[node/child_process spawn] Deno child adopts a listening TCP fd passed as extra stdio",
-  ignore: Deno.build.os === "windows",
+    "[node/child_process spawn] Oden child adopts a listening TCP fd passed as extra stdio",
+  ignore: Oden.build.os === "windows",
   async fn() {
     const cmdFinished = Promise.withResolvers<void>();
     const received = Promise.withResolvers<string>();
@@ -823,7 +823,7 @@ Deno.test({
       const rawFd = (bootstrap as any)._handle.fdForIpc();
       assert(rawFd >= 0);
       bootstrap.close(() => {
-        const cp = spawn(Deno.execPath(), ["run", "-A", script], {
+        const cp = spawn(Oden.execPath(), ["run", "-A", script], {
           stdio: ["ignore", "ignore", "pipe", rawFd],
         });
         cp.stderr?.on("data", (data) => {
@@ -850,11 +850,11 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[node/child_process spawn] supports SIGIOT signal",
-  ignore: Deno.build.os === "windows",
+  ignore: Oden.build.os === "windows",
   async fn() {
-    // Note: attempting to kill Deno with SIGABRT causes the process to zombify on certain OSX builds
+    // Note: attempting to kill Oden with SIGABRT causes the process to zombify on certain OSX builds
     // eg: 22.5.0 Darwin Kernel Version 22.5.0: Mon Apr 24 20:53:19 PDT 2023; root:xnu-8796.121.2~5/RELEASE_ARM64_T6020 arm64
     // M2 Pro running Ventura 13.4
 
@@ -877,13 +877,13 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name:
     "[node/child_process spawn] AbortSignal aborts the child and emits AbortError",
   async fn() {
     const ac = new AbortController();
     const cp = spawn(
-      Deno.execPath(),
+      Oden.execPath(),
       ["eval", "setInterval(() => {}, 1000)"],
       { signal: ac.signal },
     );
@@ -898,7 +898,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name:
     "[node/child_process] kill() on an exited process returns false and does not throw",
   async fn() {
@@ -906,7 +906,7 @@ Deno.test({
     // a process that has already exited must not surface a spurious error
     // (PermissionError on Windows / ESRCH on Unix), it should just return
     // false like Node.js does.
-    const cp = spawn(Deno.execPath(), ["eval", "Deno.exit(0)"]);
+    const cp = spawn(Oden.execPath(), ["eval", "Oden.exit(0)"]);
     const exit = withTimeout<void>();
     cp.on("exit", () => exit.resolve());
     await exit.promise;
@@ -914,14 +914,14 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name:
-    "[node/child_process spawn] child inherits Deno.env when options.env is not provided",
+    "[node/child_process spawn] child inherits Oden.env when options.env is not provided",
   async fn() {
     const deferred = withTimeout<string>();
-    Deno.env.set("BAR", "BAR");
+    Oden.env.set("BAR", "BAR");
     const env = spawn(
-      `"${Deno.execPath()}" eval -p "Deno.env.toObject().BAR"`,
+      `"${Oden.execPath()}" eval -p "Oden.env.toObject().BAR"`,
       {
         shell: true,
       },
@@ -940,21 +940,21 @@ Deno.test({
       await deferred.promise;
     } finally {
       env.kill();
-      Deno.env.delete("BAR");
+      Oden.env.delete("BAR");
     }
     const value = await deferred.promise;
     assertEquals(value, "BAR");
   },
 });
 
-Deno.test({
+Oden.test({
   name:
-    "[node/child_process spawn] child doesn't inherit Deno.env when options.env is provided",
+    "[node/child_process spawn] child doesn't inherit Oden.env when options.env is provided",
   async fn() {
     const deferred = withTimeout<string>();
-    Deno.env.set("BAZ", "BAZ");
+    Oden.env.set("BAZ", "BAZ");
     const env = spawn(
-      `"${Deno.execPath()}" eval -p "Deno.env.toObject().BAZ"`,
+      `"${Oden.execPath()}" eval -p "Oden.env.toObject().BAZ"`,
       {
         env: {},
         shell: true,
@@ -974,7 +974,7 @@ Deno.test({
       await deferred.promise;
     } finally {
       env.kill();
-      Deno.env.delete("BAZ");
+      Oden.env.delete("BAZ");
     }
     const value = await deferred.promise;
     assertEquals(value, "undefined");
@@ -982,10 +982,10 @@ Deno.test({
 });
 
 // Regression test for https://github.com/denoland/deno/issues/20373
-Deno.test(async function undefinedValueInEnvVar() {
+Oden.test(async function undefinedValueInEnvVar() {
   const deferred = withTimeout<string>();
   const env = spawn(
-    `"${Deno.execPath()}" eval -p "Deno.env.toObject().BAZ"`,
+    `"${Oden.execPath()}" eval -p "Oden.env.toObject().BAZ"`,
     {
       env: {
         BAZ: "BAZ",
@@ -1017,9 +1017,9 @@ Deno.test(async function undefinedValueInEnvVar() {
 });
 
 // Regression test for https://github.com/denoland/deno/issues/20373
-Deno.test(function spawnSyncUndefinedValueInEnvVar() {
+Oden.test(function spawnSyncUndefinedValueInEnvVar() {
   const ret = spawnSync(
-    `"${Deno.execPath()}" eval -p "Deno.env.toObject().BAZ"`,
+    `"${Oden.execPath()}" eval -p "Oden.env.toObject().BAZ"`,
     {
       env: {
         BAZ: "BAZ",
@@ -1036,9 +1036,9 @@ Deno.test(function spawnSyncUndefinedValueInEnvVar() {
   assertEquals(ret.stdout.toString("utf-8").trim(), "BAZ");
 });
 
-Deno.test(function spawnSyncStdioUndefined() {
+Oden.test(function spawnSyncStdioUndefined() {
   const ret = spawnSync(
-    `"${Deno.execPath()}" eval "console.log('hello');console.error('world')"`,
+    `"${Oden.execPath()}" eval "console.log('hello');console.error('world')"`,
     {
       stdio: [undefined, undefined, undefined],
       shell: true,
@@ -1050,9 +1050,9 @@ Deno.test(function spawnSyncStdioUndefined() {
   assertEquals(ret.stderr.toString("utf-8").trim(), "world");
 });
 
-Deno.test(function spawnSyncExitNonZero() {
+Oden.test(function spawnSyncExitNonZero() {
   const ret = spawnSync(
-    `"${Deno.execPath()}" eval "Deno.exit(22)"`,
+    `"${Oden.execPath()}" eval "Oden.exit(22)"`,
     { shell: true },
   );
 
@@ -1060,7 +1060,7 @@ Deno.test(function spawnSyncExitNonZero() {
 });
 
 // https://github.com/denoland/deno/issues/21630
-Deno.test(async function forkIpcKillDoesNotHang() {
+Oden.test(async function forkIpcKillDoesNotHang() {
   const testdataDir = path.join(
     path.dirname(path.fromFileUrl(import.meta.url)),
     "testdata",
@@ -1082,7 +1082,7 @@ Deno.test(async function forkIpcKillDoesNotHang() {
   await p.promise;
 });
 
-Deno.test(async function stripForkEnableSourceMaps() {
+Oden.test(async function stripForkEnableSourceMaps() {
   const testdataDir = path.join(
     path.dirname(path.fromFileUrl(import.meta.url)),
     "testdata",
@@ -1109,7 +1109,7 @@ Deno.test(async function stripForkEnableSourceMaps() {
   assertEquals(output, "2\n");
 });
 
-Deno.test(async function execFileWithUndefinedTimeout() {
+Oden.test(async function execFileWithUndefinedTimeout() {
   const { promise, resolve, reject } = Promise.withResolvers<void>();
   CP.execFile(
     "git",
@@ -1126,11 +1126,11 @@ Deno.test(async function execFileWithUndefinedTimeout() {
   await promise;
 });
 
-Deno.test(async function spawnCommandNotFoundErrno() {
+Oden.test(async function spawnCommandNotFoundErrno() {
   const { promise, resolve } = Promise.withResolvers<void>();
   const cp = CP.spawn("no-such-command");
   cp.on("error", (err) => {
-    const errno = Deno.build.os === "windows" ? -4058 : -2;
+    const errno = Oden.build.os === "windows" ? -4058 : -2;
     // @ts-ignore: errno missing from typings
     assertEquals(err.errno, errno);
     resolve();
@@ -1139,9 +1139,9 @@ Deno.test(async function spawnCommandNotFoundErrno() {
 });
 
 // https://github.com/denoland/deno/issues/23045
-Deno.test(function spawnCommandNullStdioArray() {
+Oden.test(function spawnCommandNullStdioArray() {
   const ret = spawnSync(
-    `"${Deno.execPath()}" eval "console.log('hello');console.error('world')"`,
+    `"${Oden.execPath()}" eval "console.log('hello');console.error('world')"`,
     {
       stdio: [null, null, null],
       shell: true,
@@ -1151,13 +1151,13 @@ Deno.test(function spawnCommandNullStdioArray() {
   assertEquals(ret.status, 0);
 });
 
-Deno.test(
+Oden.test(
   function stdinInherit() {
     const script = `
       function timeoutPromise(promise, timeout) {
         return new Promise((resolve, reject) => {
           const timeoutId = setTimeout(() => {
-            Deno.exit(69);
+            Oden.exit(69);
           }, timeout);
           promise.then((value) => {
             clearTimeout(timeoutId);
@@ -1169,10 +1169,10 @@ Deno.test(
         });
       }
 
-      await timeoutPromise(Deno.stdin.read(new Uint8Array(1)), 100)
+      await timeoutPromise(Oden.stdin.read(new Uint8Array(1)), 100)
     `;
 
-    const output = spawnSync(Deno.execPath(), ["eval", script], {
+    const output = spawnSync(Oden.execPath(), ["eval", script], {
       stdio: "inherit",
     });
 
@@ -1183,7 +1183,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   async function ipcSerialization() {
     const timeout = withTimeout<void>();
     const script = `
@@ -1231,8 +1231,8 @@ Deno.test(
         process.send(input);
       }
     `;
-    const file = await Deno.makeTempFile();
-    await Deno.writeTextFile(file, script);
+    const file = await Oden.makeTempFile();
+    await Oden.writeTextFile(file, script);
     const child = CP.fork(file, [], {
       stdio: ["inherit", "inherit", "inherit", "ipc"],
     });
@@ -1264,7 +1264,7 @@ Deno.test(
   },
 );
 
-Deno.test(async function ipcSerializationAdvanced() {
+Oden.test(async function ipcSerializationAdvanced() {
   const timeout = withTimeout<void>();
   const script = `
       if (typeof process.send !== "function") {
@@ -1325,8 +1325,8 @@ Deno.test(async function ipcSerializationAdvanced() {
     return buf;
   };
 
-  const file = await Deno.makeTempFile();
-  await Deno.writeTextFile(file, script);
+  const file = await Oden.makeTempFile();
+  await Oden.writeTextFile(file, script);
   const child = CP.fork(file, [], {
     stdio: ["inherit", "inherit", "inherit", "ipc"],
     serialization: "advanced",
@@ -1361,7 +1361,7 @@ Deno.test(async function ipcSerializationAdvanced() {
   assertEquals(i, expect.length);
 });
 
-Deno.test(async function childProcessExitsGracefully() {
+Oden.test(async function childProcessExitsGracefully() {
   const testdataDir = path.join(
     path.dirname(path.fromFileUrl(import.meta.url)),
     "testdata",
@@ -1382,7 +1382,7 @@ Deno.test(async function childProcessExitsGracefully() {
   await p.promise;
 });
 
-Deno.test(async function killMultipleTimesNoError() {
+Oden.test(async function killMultipleTimesNoError() {
   const loop = `
     while (true) {
       await new Promise((resolve) => setTimeout(resolve, 10000));
@@ -1390,8 +1390,8 @@ Deno.test(async function killMultipleTimesNoError() {
   `;
 
   const timeout = withTimeout<void>();
-  const file = await Deno.makeTempFile();
-  await Deno.writeTextFile(file, loop);
+  const file = await Oden.makeTempFile();
+  await Oden.writeTextFile(file, loop);
   const child = CP.fork(file, [], {
     stdio: ["inherit", "inherit", "inherit", "ipc"],
   });
@@ -1408,18 +1408,18 @@ Deno.test(async function killMultipleTimesNoError() {
   await timeout.promise;
 });
 
-Deno.test({
+Oden.test({
   name: "[node/child_process] SIGSTOP and SIGCONT preserve child state",
-  ignore: Deno.build.os === "windows",
+  ignore: Oden.build.os === "windows",
   async fn() {
     const child = CP.spawn(
-      Deno.execPath(),
+      Oden.execPath(),
       [
         "eval",
         `
-          await Deno.stdout.write(new TextEncoder().encode("ready\\n"));
-          for await (const chunk of Deno.stdin.readable) {
-            await Deno.stdout.write(chunk);
+          await Oden.stdout.write(new TextEncoder().encode("ready\\n"));
+          for await (const chunk of Oden.stdin.readable) {
+            await Oden.stdout.write(chunk);
           }
         `,
       ],
@@ -1482,12 +1482,12 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[node/child_process] SIGSTOP and SIGCONT preserve IPC channel",
-  ignore: Deno.build.os === "windows",
+  ignore: Oden.build.os === "windows",
   async fn() {
-    const file = await Deno.makeTempFile();
-    await Deno.writeTextFile(
+    const file = await Oden.makeTempFile();
+    await Oden.writeTextFile(
       file,
       `
         process.on("message", (message) => process.send(message));
@@ -1531,15 +1531,15 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[node/child_process] windows reports the delivered signal",
-  ignore: Deno.build.os !== "windows",
+  ignore: Oden.build.os !== "windows",
   async fn() {
     // Windows has no POSIX termination status, so `signalCode` comes from the
     // signal `kill()` recorded locally. The POSIX stop/resume tests above are
     // skipped here, making this the only coverage of that fallback.
     const child = CP.spawn(
-      Deno.execPath(),
+      Oden.execPath(),
       ["eval", "setInterval(() => {}, 10000)"],
       { stdio: ["ignore", "ignore", "inherit"] },
     );
@@ -1555,7 +1555,7 @@ Deno.test({
 });
 
 // Make sure that you receive messages sent before a "message" event listener is set up
-Deno.test(async function bufferMessagesIfNoListener() {
+Oden.test(async function bufferMessagesIfNoListener() {
   const code = `
     process.on("message", (_) => {
       process.channel.unref();
@@ -1564,8 +1564,8 @@ Deno.test(async function bufferMessagesIfNoListener() {
     process.send("world");
     console.error("sent messages");
   `;
-  const file = await Deno.makeTempFile();
-  await Deno.writeTextFile(file, code);
+  const file = await Oden.makeTempFile();
+  await Oden.writeTextFile(file, code);
   const timeout = withTimeout<void>();
   const child = CP.fork(file, [], {
     stdio: ["inherit", "inherit", "pipe", "ipc"],
@@ -1595,10 +1595,10 @@ Deno.test(async function bufferMessagesIfNoListener() {
   assertEquals(got, 2);
 });
 
-Deno.test(async function sendAfterClosedThrows() {
+Oden.test(async function sendAfterClosedThrows() {
   const code = ``;
-  const file = await Deno.makeTempFile();
-  await Deno.writeTextFile(file, code);
+  const file = await Oden.makeTempFile();
+  await Oden.writeTextFile(file, code);
   const timeout = withTimeout<void>();
   const child = CP.fork(file, [], {
     stdio: ["inherit", "inherit", "inherit", "ipc"],
@@ -1615,10 +1615,10 @@ Deno.test(async function sendAfterClosedThrows() {
   await timeout.promise;
 });
 
-Deno.test(async function noWarningsFlag() {
+Oden.test(async function noWarningsFlag() {
   const code = ``;
-  const file = await Deno.makeTempFile();
-  await Deno.writeTextFile(file, code);
+  const file = await Oden.makeTempFile();
+  await Oden.writeTextFile(file, code);
   const timeout = withTimeout<void>();
   const child = CP.fork(file, [], {
     execArgv: ["--no-warnings"],
@@ -1631,32 +1631,32 @@ Deno.test(async function noWarningsFlag() {
   await timeout.promise;
 });
 
-Deno.test({
+Oden.test({
   name: "[node/child_process] spawnSync supports input option",
   fn() {
     const text = "  console.log('hello')";
     const expected = `console.log("hello");\n`;
     {
-      const { stdout } = spawnSync(Deno.execPath(), ["fmt", "-"], {
+      const { stdout } = spawnSync(Oden.execPath(), ["fmt", "-"], {
         input: text,
       });
       assertEquals(stdout.toString(), expected);
     }
     {
-      const { stdout } = spawnSync(Deno.execPath(), ["fmt", "-"], {
+      const { stdout } = spawnSync(Oden.execPath(), ["fmt", "-"], {
         input: Buffer.from(text),
       });
       assertEquals(stdout.toString(), expected);
     }
     {
-      const { stdout } = spawnSync(Deno.execPath(), ["fmt", "-"], {
+      const { stdout } = spawnSync(Oden.execPath(), ["fmt", "-"], {
         input: new TextEncoder().encode(text),
       });
       assertEquals(stdout.toString(), expected);
     }
     {
       const b = Buffer.from(text);
-      const { stdout } = spawnSync(Deno.execPath(), ["fmt", "-"], {
+      const { stdout } = spawnSync(Oden.execPath(), ["fmt", "-"], {
         input: new DataView(b.buffer, b.byteOffset, b.byteLength),
       });
       assertEquals(stdout.toString(), expected);
@@ -1664,7 +1664,7 @@ Deno.test({
 
     assertThrows(
       () => {
-        spawnSync(Deno.execPath(), ["fmt", "-"], {
+        spawnSync(Oden.execPath(), ["fmt", "-"], {
           // deno-lint-ignore no-explicit-any
           input: {} as any,
         });
@@ -1676,8 +1676,8 @@ Deno.test({
 });
 
 // Regression test for https://github.com/denoland/deno/issues/25776
-Deno.test(async function killSignalZero() {
-  const child = CP.spawn(Deno.execPath(), [
+Oden.test(async function killSignalZero() {
+  const child = CP.spawn(Oden.execPath(), [
     "eval",
     "setTimeout(() => {}, 60_000)",
   ]);
@@ -1693,10 +1693,10 @@ Deno.test(async function killSignalZero() {
   }
 });
 
-Deno.test(async function experimentalFlag() {
+Oden.test(async function experimentalFlag() {
   const code = ``;
-  const file = await Deno.makeTempFile();
-  await Deno.writeTextFile(file, code);
+  const file = await Oden.makeTempFile();
+  await Oden.writeTextFile(file, code);
   const timeout = withTimeout<void>();
   const child = CP.fork(file, [], {
     execArgv: ["--experimental-vm-modules"],
@@ -1712,19 +1712,19 @@ Deno.test(async function experimentalFlag() {
 // Regression test for https://github.com/denoland/deno/issues/26784
 // process.stdout partial writes were silently dropped, causing data
 // truncation when piping >64KB through a subprocess.
-Deno.test(async function stdoutPipePartialWriteNotTruncated() {
+Oden.test(async function stdoutPipePartialWriteNotTruncated() {
   // Child script: pipe a file to stdout via createReadStream
-  const pipeScript = await Deno.makeTempFile({ suffix: ".mjs" });
-  await Deno.writeTextFile(
+  const pipeScript = await Oden.makeTempFile({ suffix: ".mjs" });
+  await Oden.writeTextFile(
     pipeScript,
     `import fs from "node:fs";fs.createReadStream(process.argv[2]).pipe(process.stdout);`,
   );
   // Create a file >65536 bytes with multiple lines (triggers chunked reads)
-  const dataFile = await Deno.makeTempFile();
+  const dataFile = await Oden.makeTempFile();
   const content = "x".repeat(40000) + "\n" + "y".repeat(40000) + "\n";
-  await Deno.writeTextFile(dataFile, content);
+  await Oden.writeTextFile(dataFile, content);
   try {
-    const output = execFileSync(Deno.execPath(), [
+    const output = execFileSync(Oden.execPath(), [
       "run",
       "--allow-read",
       pipeScript,
@@ -1733,47 +1733,47 @@ Deno.test(async function stdoutPipePartialWriteNotTruncated() {
     assertEquals(output.length, content.length);
     assertEquals(output, content);
   } finally {
-    await Deno.remove(pipeScript);
-    await Deno.remove(dataFile);
+    await Oden.remove(pipeScript);
+    await Oden.remove(dataFile);
   }
 });
 
-Deno.test(async function stdoutWriteMultipleChunksNotTruncated() {
+Oden.test(async function stdoutWriteMultipleChunksNotTruncated() {
   // Child script: write two large chunks to stdout directly
-  const script = await Deno.makeTempFile({ suffix: ".mjs" });
-  await Deno.writeTextFile(
+  const script = await Oden.makeTempFile({ suffix: ".mjs" });
+  await Oden.writeTextFile(
     script,
     `const chunk1 = "A".repeat(50000);const chunk2 = "B".repeat(50000);process.stdout.write(chunk1);process.stdout.write(chunk2);`,
   );
   try {
-    const output = execFileSync(Deno.execPath(), ["run", script], {
+    const output = execFileSync(Oden.execPath(), ["run", script], {
       encoding: "utf-8",
       maxBuffer: 50 * 1024 * 1024,
     });
     assertEquals(output.length, 100000);
     assertEquals(output, "A".repeat(50000) + "B".repeat(50000));
   } finally {
-    await Deno.remove(script);
+    await Oden.remove(script);
   }
 });
 
-Deno.test(function spawnSyncShellMetacharactersEscaped() {
+Oden.test(function spawnSyncShellMetacharactersEscaped() {
   // Shell metacharacters in args should be escaped, not interpreted.
   // On Unix, & would launch a background process; on Windows, it
   // would chain a second command. Either way echo should print
   // the literal string.
   const ret = spawnSync(
-    Deno.execPath(),
-    ["eval", "console.log(Deno.args[0])", "--", "a&b|c<d>e"],
+    Oden.execPath(),
+    ["eval", "console.log(Oden.args[0])", "--", "a&b|c<d>e"],
     { shell: true, encoding: "utf-8" },
   );
   assertEquals(ret.status, 0);
   assertEquals(ret.stdout.trim(), "a&b|c<d>e");
 });
 
-Deno.test({
+Oden.test({
   name: "spawn shell preserves pre-quoted arguments",
-  ignore: Deno.build.os === "windows",
+  ignore: Oden.build.os === "windows",
   async fn() {
     for (const quote of ["'", '"']) {
       const deferred = withTimeout<number | null>();
@@ -1793,9 +1793,9 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "spawnSync shell preserves pre-quoted arguments",
-  ignore: Deno.build.os === "windows",
+  ignore: Oden.build.os === "windows",
   fn() {
     for (const quote of ["'", '"']) {
       const ret = spawnSync(
@@ -1820,19 +1820,19 @@ Deno.test({
   },
 });
 
-Deno.test(function spawnSyncReturnsPid() {
-  const ret = spawnSync(Deno.execPath(), ["eval", "console.log('hi')"]);
+Oden.test(function spawnSyncReturnsPid() {
+  const ret = spawnSync(Oden.execPath(), ["eval", "console.log('hi')"]);
   assertEquals(ret.status, 0);
   assertEquals(typeof ret.pid, "number");
   assert(ret.pid > 0);
 });
 
-Deno.test({
+Oden.test({
   name: "spawnWithNumericFdInStdioArray",
-  ignore: Deno.build.os === "windows",
+  ignore: Oden.build.os === "windows",
   async fn() {
     const fs = await import("node:fs");
-    const tmpFile = Deno.makeTempFileSync();
+    const tmpFile = Oden.makeTempFileSync();
     try {
       const fd = fs.openSync(tmpFile, "w");
       const child = spawn("/bin/sh", [
@@ -1848,10 +1848,10 @@ Deno.test({
       const code = await promise;
       fs.closeSync(fd);
       assertEquals(code, 0);
-      const content = Deno.readTextFileSync(tmpFile);
+      const content = Oden.readTextFileSync(tmpFile);
       assertEquals(content, "hello from child\n");
     } finally {
-      Deno.removeSync(tmpFile);
+      Oden.removeSync(tmpFile);
     }
   },
 });

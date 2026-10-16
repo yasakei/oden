@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import * as module from "checkin:testing";
 import { assert, test } from "checkin:testing";
 
 test(function testIsAnyArrayBuffer() {
-  assert(Deno.core.isAnyArrayBuffer(new ArrayBuffer(4)));
-  assert(Deno.core.isAnyArrayBuffer(new SharedArrayBuffer(4)));
-  assert(!Deno.core.isAnyArrayBuffer(new Uint8Array(4)));
+  assert(Oden.core.isAnyArrayBuffer(new ArrayBuffer(4)));
+  assert(Oden.core.isAnyArrayBuffer(new SharedArrayBuffer(4)));
+  assert(!Oden.core.isAnyArrayBuffer(new Uint8Array(4)));
 });
 
 test(function testIsArgumentsObject() {
@@ -13,167 +13,167 @@ test(function testIsArgumentsObject() {
   (function () {
   args = arguments;
   })();
-  assert(Deno.core.isArgumentsObject(args));
-  assert(!Deno.core.isArgumentsObject({}));
+  assert(Oden.core.isArgumentsObject(args));
+  assert(!Oden.core.isArgumentsObject({}));
 });
 
 test(function testIsArrayBuffer() {
-  assert(Deno.core.isArrayBuffer(new ArrayBuffer(4)));
-  assert(!Deno.core.isArrayBuffer(new SharedArrayBuffer(4)));
-  assert(!Deno.core.isArrayBuffer(new Uint8Array(4)));
+  assert(Oden.core.isArrayBuffer(new ArrayBuffer(4)));
+  assert(!Oden.core.isArrayBuffer(new SharedArrayBuffer(4)));
+  assert(!Oden.core.isArrayBuffer(new Uint8Array(4)));
 });
 
 test(function testIsArrayBufferView() {
-  assert(Deno.core.isArrayBufferView(new DataView(new ArrayBuffer(4))));
-  assert(Deno.core.isArrayBufferView(new Uint8Array(4)));
-  assert(!Deno.core.isArrayBufferView(new ArrayBuffer(4)));
+  assert(Oden.core.isArrayBufferView(new DataView(new ArrayBuffer(4))));
+  assert(Oden.core.isArrayBufferView(new Uint8Array(4)));
+  assert(!Oden.core.isArrayBufferView(new ArrayBuffer(4)));
 });
 
 test(function testIsAsyncFunction() {
-  assert(Deno.core.isAsyncFunction(async function () {}));
-  assert(Deno.core.isAsyncFunction(async function* () {}));
-  assert(!Deno.core.isAsyncFunction(function () {}));
-  assert(!Deno.core.isAsyncFunction(function* () {}));
+  assert(Oden.core.isAsyncFunction(async function () {}));
+  assert(Oden.core.isAsyncFunction(async function* () {}));
+  assert(!Oden.core.isAsyncFunction(function () {}));
+  assert(!Oden.core.isAsyncFunction(function* () {}));
 });
 
 test(function testIsBigIntObject() {
-  assert(Deno.core.isBigIntObject(Object(1n)));
-  assert(!Deno.core.isBigIntObject(1n));
-  assert(!Deno.core.isBigIntObject(1));
+  assert(Oden.core.isBigIntObject(Object(1n)));
+  assert(!Oden.core.isBigIntObject(1n));
+  assert(!Oden.core.isBigIntObject(1));
 });
 
 test(function testIsBooleanObject() {
-  assert(Deno.core.isBooleanObject(new Boolean(true)));
-  assert(!Deno.core.isBooleanObject(true));
-  assert(!Deno.core.isBooleanObject("true"));
+  assert(Oden.core.isBooleanObject(new Boolean(true)));
+  assert(!Oden.core.isBooleanObject(true));
+  assert(!Oden.core.isBooleanObject("true"));
 });
 
 test(function testIsBoxedPrimitive() {
-  assert(Deno.core.isBoxedPrimitive(Object(1n)));
-  assert(Deno.core.isBoxedPrimitive(new Boolean(true)));
-  assert(Deno.core.isBoxedPrimitive(new Number(1)));
-  assert(Deno.core.isBoxedPrimitive(Object(Symbol())));
-  assert(Deno.core.isBoxedPrimitive(new String("str")));
-  assert(!Deno.core.isBoxedPrimitive(1n));
-  assert(!Deno.core.isBoxedPrimitive(true));
-  assert(!Deno.core.isBoxedPrimitive(1));
-  assert(!Deno.core.isBoxedPrimitive(Symbol()));
-  assert(!Deno.core.isBoxedPrimitive("str"));
+  assert(Oden.core.isBoxedPrimitive(Object(1n)));
+  assert(Oden.core.isBoxedPrimitive(new Boolean(true)));
+  assert(Oden.core.isBoxedPrimitive(new Number(1)));
+  assert(Oden.core.isBoxedPrimitive(Object(Symbol())));
+  assert(Oden.core.isBoxedPrimitive(new String("str")));
+  assert(!Oden.core.isBoxedPrimitive(1n));
+  assert(!Oden.core.isBoxedPrimitive(true));
+  assert(!Oden.core.isBoxedPrimitive(1));
+  assert(!Oden.core.isBoxedPrimitive(Symbol()));
+  assert(!Oden.core.isBoxedPrimitive("str"));
 });
 
 test(function testIsDataView() {
-  assert(Deno.core.isDataView(new DataView(new ArrayBuffer(4))));
-  assert(!Deno.core.isDataView(new Uint8Array(4)));
-  assert(!Deno.core.isDataView(new ArrayBuffer(4)));
+  assert(Oden.core.isDataView(new DataView(new ArrayBuffer(4))));
+  assert(!Oden.core.isDataView(new Uint8Array(4)));
+  assert(!Oden.core.isDataView(new ArrayBuffer(4)));
 });
 
 test(function testIsDate() {
-  assert(Deno.core.isDate(new Date()));
-  assert(!Deno.core.isDate({}));
+  assert(Oden.core.isDate(new Date()));
+  assert(!Oden.core.isDate({}));
 });
 
 test(function testIsGeneratorFunction() {
-  assert(Deno.core.isGeneratorFunction(async function* () {}));
-  assert(Deno.core.isGeneratorFunction(function* () {}));
-  assert(!Deno.core.isGeneratorFunction(async function () {}));
-  assert(!Deno.core.isGeneratorFunction(function () {}));
+  assert(Oden.core.isGeneratorFunction(async function* () {}));
+  assert(Oden.core.isGeneratorFunction(function* () {}));
+  assert(!Oden.core.isGeneratorFunction(async function () {}));
+  assert(!Oden.core.isGeneratorFunction(function () {}));
 });
 
 test(function testIsGeneratorObject() {
   const generator = (function* () {})();
-  assert(Deno.core.isGeneratorObject(generator));
-  assert(!Deno.core.isGeneratorObject({}));
+  assert(Oden.core.isGeneratorObject(generator));
+  assert(!Oden.core.isGeneratorObject({}));
 });
 
 test(function testIsMap() {
-  assert(Deno.core.isMap(new Map()));
-  assert(!Deno.core.isMap(new Set()));
-  assert(!Deno.core.isMap(new WeakMap()));
-  assert(!Deno.core.isMap(new WeakSet()));
+  assert(Oden.core.isMap(new Map()));
+  assert(!Oden.core.isMap(new Set()));
+  assert(!Oden.core.isMap(new WeakMap()));
+  assert(!Oden.core.isMap(new WeakSet()));
 });
 
 test(function testIsMapIterator() {
   const map = new Map();
-  assert(Deno.core.isMapIterator(map.values()));
-  assert(!Deno.core.isMapIterator(map));
+  assert(Oden.core.isMapIterator(map.values()));
+  assert(!Oden.core.isMapIterator(map));
 });
 
 test(function testIsModuleNamespaceObject() {
-  assert(Deno.core.isModuleNamespaceObject(module));
-  assert(!Deno.core.isModuleNamespaceObject({}));
+  assert(Oden.core.isModuleNamespaceObject(module));
+  assert(!Oden.core.isModuleNamespaceObject({}));
 });
 
 test(function testIsNativeError() {
-  assert(Deno.core.isNativeError(new Error()));
-  assert(Deno.core.isNativeError(new TypeError()));
-  assert(!Deno.core.isNativeError({}));
+  assert(Oden.core.isNativeError(new Error()));
+  assert(Oden.core.isNativeError(new TypeError()));
+  assert(!Oden.core.isNativeError({}));
 });
 
 test(function testIsNativeError() {
-  assert(Deno.core.isNumberObject(new Number(1)));
-  assert(!Deno.core.isNumberObject(1));
+  assert(Oden.core.isNumberObject(new Number(1)));
+  assert(!Oden.core.isNumberObject(1));
 });
 
 test(function testIsPromise() {
-  assert(Deno.core.isPromise(new Promise((resolve) => resolve(1))));
-  assert(!Deno.core.isPromise({}));
+  assert(Oden.core.isPromise(new Promise((resolve) => resolve(1))));
+  assert(!Oden.core.isPromise({}));
 });
 
 test(function testIsProxy() {
-  assert(Deno.core.isProxy(new Proxy({}, {})));
-  assert(!Deno.core.isProxy({}));
+  assert(Oden.core.isProxy(new Proxy({}, {})));
+  assert(!Oden.core.isProxy({}));
 });
 
 test(function testIsRegExp() {
-  assert(Deno.core.isRegExp(/foo/));
-  assert(!Deno.core.isRegExp({}));
+  assert(Oden.core.isRegExp(/foo/));
+  assert(!Oden.core.isRegExp({}));
 });
 
 test(function testIsSet() {
-  assert(Deno.core.isSet(new Set()));
-  assert(!Deno.core.isSet(new Map()));
-  assert(!Deno.core.isSet(new WeakSet()));
-  assert(!Deno.core.isSet(new WeakMap()));
+  assert(Oden.core.isSet(new Set()));
+  assert(!Oden.core.isSet(new Map()));
+  assert(!Oden.core.isSet(new WeakSet()));
+  assert(!Oden.core.isSet(new WeakMap()));
 });
 
 test(function testIsSetIterator() {
   const set = new Set();
-  assert(Deno.core.isSetIterator(set.values()));
-  assert(!Deno.core.isSetIterator(set));
+  assert(Oden.core.isSetIterator(set.values()));
+  assert(!Oden.core.isSetIterator(set));
 });
 
 test(function testIsSharedArrayBuffer() {
-  assert(Deno.core.isSharedArrayBuffer(new SharedArrayBuffer(4)));
-  assert(!Deno.core.isSharedArrayBuffer(new ArrayBuffer(4)));
-  assert(!Deno.core.isSharedArrayBuffer(new Uint8Array(4)));
+  assert(Oden.core.isSharedArrayBuffer(new SharedArrayBuffer(4)));
+  assert(!Oden.core.isSharedArrayBuffer(new ArrayBuffer(4)));
+  assert(!Oden.core.isSharedArrayBuffer(new Uint8Array(4)));
 });
 
 test(function testIsStringObject() {
-  assert(Deno.core.isStringObject(new String("str")));
-  assert(!Deno.core.isStringObject("str"));
+  assert(Oden.core.isStringObject(new String("str")));
+  assert(!Oden.core.isStringObject("str"));
 });
 
 test(function testIsSymbolObject() {
-  assert(Deno.core.isSymbolObject(Object(Symbol())));
-  assert(!Deno.core.isSymbolObject(Symbol()));
+  assert(Oden.core.isSymbolObject(Object(Symbol())));
+  assert(!Oden.core.isSymbolObject(Symbol()));
 });
 
 test(function testIsTypedArray() {
-  assert(Deno.core.isTypedArray(new Uint8Array(4)));
-  assert(!Deno.core.isTypedArray(new DataView(new ArrayBuffer(4))));
-  assert(!Deno.core.isTypedArray(new ArrayBuffer(4)));
+  assert(Oden.core.isTypedArray(new Uint8Array(4)));
+  assert(!Oden.core.isTypedArray(new DataView(new ArrayBuffer(4))));
+  assert(!Oden.core.isTypedArray(new ArrayBuffer(4)));
 });
 
 test(function testIsWeakMap() {
-  assert(Deno.core.isWeakMap(new WeakMap()));
-  assert(!Deno.core.isWeakMap(new WeakSet()));
-  assert(!Deno.core.isWeakMap(new Map()));
-  assert(!Deno.core.isWeakMap(new Set()));
+  assert(Oden.core.isWeakMap(new WeakMap()));
+  assert(!Oden.core.isWeakMap(new WeakSet()));
+  assert(!Oden.core.isWeakMap(new Map()));
+  assert(!Oden.core.isWeakMap(new Set()));
 });
 
 test(function testIsWeakSet() {
-  assert(Deno.core.isWeakSet(new WeakSet()));
-  assert(!Deno.core.isWeakSet(new WeakMap()));
-  assert(!Deno.core.isWeakSet(new Set()));
-  assert(!Deno.core.isWeakSet(new Map()));
+  assert(Oden.core.isWeakSet(new WeakSet()));
+  assert(!Oden.core.isWeakSet(new WeakMap()));
+  assert(!Oden.core.isWeakSet(new Set()));
+  assert(!Oden.core.isWeakSet(new Map()));
 });

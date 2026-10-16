@@ -1,4 +1,4 @@
-Deno.bench("error", function () {
+Oden.bench("error", function () {
   const timer = setTimeout(() => null, 10000);
   try {
     throw new Error("fail");
@@ -7,5 +7,5 @@ Deno.bench("error", function () {
   }
 });
 
-Deno.bench("success", function () {
+Oden.bench("success", function () {
 });

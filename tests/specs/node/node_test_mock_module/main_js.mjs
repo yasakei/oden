@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // A `.js` file in a "type": "module" package is ESM: its default export and
 // named exports must be exposed independently (not merged like a CJS module),
 // and export names that are not valid identifiers (e.g. "foo-bar") must work.

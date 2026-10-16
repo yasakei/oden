@@ -1,5 +1,5 @@
 for (let i = 0; i < 5; i++) {
-  Deno.test({
+  Oden.test({
     name: `test ${i}`,
     ignore: true,
     fn() {
@@ -8,7 +8,7 @@ for (let i = 0; i < 5; i++) {
   });
 }
 for (let i = 5; i < 10; i++) {
-  Deno.test.ignore({
+  Oden.test.ignore({
     name: `test ${i}`,
     fn() {
       throw new Error("unreachable");

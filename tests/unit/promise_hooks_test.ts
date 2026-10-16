@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { assertEquals } from "./test_util.ts";
 
@@ -12,8 +12,8 @@ function monitorPromises(outputArray: string[]) {
     return promiseIds.get(promise);
   }
 
-  // @ts-ignore: Deno[Deno.internal].core allowed
-  Deno[Deno.internal].core.setPromiseHooks(
+  // @ts-ignore: Oden[Oden.internal].core allowed
+  Oden[Oden.internal].core.setPromiseHooks(
     (promise: Promise<unknown>, parentPromise?: Promise<unknown>) => {
       outputArray.push(
         `init ${identify(promise)}` +
@@ -32,7 +32,7 @@ function monitorPromises(outputArray: string[]) {
   );
 }
 
-Deno.test(async function promiseHookBasic() {
+Oden.test(async function promiseHookBasic() {
   // Bogus await here to ensure any pending promise resolution from the
   // test runtime has a chance to run and avoid contaminating our results.
   await Promise.resolve(null);
@@ -87,7 +87,7 @@ Deno.test(async function promiseHookBasic() {
   ]);
 });
 
-Deno.test(async function promiseHookMultipleConsumers() {
+Oden.test(async function promiseHookMultipleConsumers() {
   const hookResultsFirstConsumer: string[] = [];
   const hookResultsSecondConsumer: string[] = [];
 

@@ -1,1 +1,1 @@
-import "npm:@denotest/spawn-keeps-npm-state";
+import "npm:@odentest/spawn-keeps-npm-state";

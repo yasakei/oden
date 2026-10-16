@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -175,7 +175,7 @@ pub struct CreateSnapshotOutput {
 ///  * In your project's source:
 ///    * Load the bytes of the generated snapshot file
 ///      ([`include_bytes`] is useful here)
-///    * Pass those bytes to [`deno_core::JsRuntime::new`] via
+///    * Pass those bytes to [`oden_core::JsRuntime::new`] via
 ///      [`RuntimeOptions::startup_snapshot`]
 ///
 /// For a concrete example, see [core/examples/snapshot/][example].

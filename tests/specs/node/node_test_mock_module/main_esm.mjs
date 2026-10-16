@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Mocking an ESM module imported by an ESM importer: named exports and the
 // default export are exposed independently, the default cache behavior gives a
 // fresh module on every import, and restore() brings the original back.

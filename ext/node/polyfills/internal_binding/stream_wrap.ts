@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -34,10 +34,10 @@ const {
 
 // deno-lint-ignore no-unused-vars
 const { HandleWrap } = core.loadExtScript(
-  "ext:deno_node/internal_binding/handle_wrap.ts",
+  "ext:oden_node/internal_binding/handle_wrap.ts",
 );
 const { AsyncWrap, providerType } = core.loadExtScript(
-  "ext:deno_node/internal_binding/async_wrap.ts",
+  "ext:oden_node/internal_binding/async_wrap.ts",
 );
 
 const enum StreamBaseStateFields {

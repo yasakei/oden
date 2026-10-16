@@ -1,2 +1,2 @@
-import { hello } from "@denotest/node-addon";
+import { hello } from "@odentest/node-addon";
 console.log(hello());

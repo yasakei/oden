@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "add": "jsr:@odentest/add@1",
+    "subtract": "jsr:@odentest/subtract@1"
+  }
+}

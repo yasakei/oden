@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Windows shim generation ported from https://github.com/npm/cmd-shim
 // Original code licensed under the ISC License:
@@ -298,8 +298,8 @@ impl ShimData {
 
 pub fn set_up_bin_shim<'a>(
   sys: &(impl FsOpen + FsWrite + FsMetadata),
-  package: &'a deno_npm::NpmResolutionPackage,
-  extra: &'a deno_npm::NpmPackageExtraInfo,
+  package: &'a oden_npm::NpmResolutionPackage,
+  extra: &'a oden_npm::NpmPackageExtraInfo,
   bin_name: &'a str,
   bin_script: &'a str,
   package_path: &'a Path,

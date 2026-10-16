@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and Node.js contributors. All rights reserved. MIT license.
 
 // deno-lint-ignore-file no-explicit-any
@@ -52,15 +52,15 @@ const {
 const {
   cryptoKeyExportNodeKeyMaterial,
   importCryptoKeySync,
-} = core.loadExtScript("ext:deno_crypto/00_crypto.js");
+} = core.loadExtScript("ext:oden_crypto/00_crypto.js");
 
 const { kHandle } = core.loadExtScript(
-  "ext:deno_node/internal/crypto/constants.ts",
+  "ext:oden_node/internal/crypto/constants.ts",
 );
 
 // Lazy import of cipher.ts to break circular dependency
 const lazyCipher = () =>
-  core.loadExtScript("ext:deno_node/internal/crypto/cipher.ts");
+  core.loadExtScript("ext:oden_node/internal/crypto/cipher.ts");
 
 const {
   ERR_CRYPTO_INCOMPATIBLE_KEY_OPTIONS,
@@ -68,26 +68,26 @@ const {
   ERR_CRYPTO_INVALID_KEY_OBJECT_TYPE,
   ERR_INVALID_ARG_TYPE,
   ERR_INVALID_ARG_VALUE,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
-const { notImplemented } = core.loadExtScript("ext:deno_node/_utils.ts");
-const { Buffer } = core.loadExtScript("ext:deno_node/internal/buffer.mjs");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
+const { notImplemented } = core.loadExtScript("ext:oden_node/_utils.ts");
+const { Buffer } = core.loadExtScript("ext:oden_node/internal/buffer.mjs");
 const {
   isAnyArrayBuffer,
   isArrayBufferView,
-} = core.loadExtScript("ext:deno_node/internal/util/types.ts");
+} = core.loadExtScript("ext:oden_node/internal/util/types.ts");
 const { hideStackFrames } = core.loadExtScript(
-  "ext:deno_node/internal/errors.ts",
+  "ext:oden_node/internal/errors.ts",
 );
 const {
   isCryptoKey,
   isKeyObject,
   kKeyType,
-} = core.loadExtScript("ext:deno_node/internal/crypto/_keys.ts");
+} = core.loadExtScript("ext:oden_node/internal/crypto/_keys.ts");
 const {
   validateObject,
   validateOneOf,
   validateString,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
 
 const getArrayBufferOrView = hideStackFrames(
   (

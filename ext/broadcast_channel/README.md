@@ -1,4 +1,4 @@
-# deno_cache
+# oden_cache
 
 This crate has been deprecated, use
-[deno_web](https://crates.io/crates/deno_web) instead.
+[oden_web](https://crates.io/crates/oden_web) instead.

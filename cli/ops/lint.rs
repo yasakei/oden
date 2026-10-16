@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use deno_ast::MediaType;
 use deno_ast::ModuleSpecifier;
@@ -6,10 +6,10 @@ use deno_ast::ParseDiagnostic;
 use deno_ast::SourceRange;
 use deno_ast::SourceTextInfo;
 use deno_ast::SourceTextProvider;
-use deno_core::FromV8;
-use deno_core::OpState;
-use deno_core::convert::Uint8Array;
-use deno_core::op2;
+use oden_core::FromV8;
+use oden_core::OpState;
+use oden_core::convert::Uint8Array;
+use oden_core::op2;
 use deno_lint::diagnostic::LintDiagnostic;
 use deno_lint::diagnostic::LintDiagnosticDetails;
 use deno_lint::diagnostic::LintDiagnosticRange;
@@ -22,7 +22,7 @@ use crate::tools::lint;
 use crate::tools::lint::PluginLogger;
 use crate::util::text_encoding::Utf16Map;
 
-deno_core::extension!(
+oden_core::extension!(
   deno_lint_ext,
   ops = [
     op_lint_create_serialized_ast,
@@ -45,7 +45,7 @@ deno_core::extension!(
   },
 );
 
-deno_core::extension!(
+oden_core::extension!(
   deno_lint_ext_for_test,
   ops = [op_lint_create_serialized_ast, op_is_cancelled],
   state = |state| {

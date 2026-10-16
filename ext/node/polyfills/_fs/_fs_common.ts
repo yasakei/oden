@@ -1,14 +1,14 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core, primordials } = __bootstrap;
 const { ReflectApply } = primordials;
 const { validateFunction } = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
 
 const lazyFsUtils = core.createLazyLoader(
-  "ext:deno_node/internal/fs/utils.mjs",
+  "ext:oden_node/internal/fs/utils.mjs",
 );
 
 function isFileOptions(
@@ -61,7 +61,7 @@ function getSignal(optOrCallback) {
 }
 
 const __reexport = core.loadExtScript(
-  "ext:deno_node/internal/validators.mjs",
+  "ext:oden_node/internal/validators.mjs",
 );
 const isFd = __reexport.isUint32;
 

@@ -1,5 +1,5 @@
 import { foo } from "./lib.ts";
 
-Deno.test("test", () => {
+Oden.test("test", () => {
   foo();
 });

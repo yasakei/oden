@@ -1,0 +1,8 @@
+{
+  "tasks": {
+    "run": {
+      "command": "oden run.js",
+      "dependencies": ["../package2:run"]
+    }
+  }
+}

@@ -1,25 +1,25 @@
-# Copyright 2018-2026 the Deno authors. MIT license.
+# Copyright 2018-2026 the Oden authors. MIT license.
 
 [package]
-name = "deno_net"
+name = "oden_net"
 version = "0.251.0"
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 readme = "README.md"
 repository.workspace = true
-description = "Networking for Deno"
+description = "Networking for Oden"
 
 [lib]
 path = "lib.rs"
 
 [dependencies]
-deno_core.workspace = true
+oden_core.workspace = true
 deno_error.workspace = true
-deno_features.workspace = true
-deno_permissions.workspace = true
-deno_signals.workspace = true
-deno_tls.workspace = true
+oden_features.workspace = true
+oden_permissions.workspace = true
+oden_signals.workspace = true
+oden_tls.workspace = true
 deno_tunnel.workspace = true
 hickory-proto.workspace = true
 hickory-resolver.workspace = true

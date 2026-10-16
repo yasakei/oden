@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   type BigIntStats,
   type Stats,
@@ -16,17 +16,17 @@ function wait(time: number) {
   });
 }
 
-Deno.test({
+Oden.test({
   name: "watching a file",
   async fn() {
-    const file = Deno.makeTempFileSync();
+    const file = Oden.makeTempFileSync();
     const result: Array<[string, string | null]> = [];
     const watcher = watch(
       file,
       (eventType, filename) => result.push([eventType, filename]),
     );
     await wait(100);
-    Deno.writeTextFileSync(file, "something");
+    Oden.writeTextFileSync(file, "something");
     await wait(100);
     watcher.close();
     await wait(100);
@@ -34,12 +34,12 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "watching a file with options",
   // TODO(bartlomieju): this test is flaky on CI
   ignore: true,
   async fn() {
-    const file = Deno.makeTempFileSync();
+    const file = Oden.makeTempFileSync();
     const spyFn = spy();
     watchFile(
       file,
@@ -48,7 +48,7 @@ Deno.test({
     );
     await wait(100);
     assertEquals(spyFn.calls.length, 0);
-    await Deno.writeTextFile(file, "something");
+    await Oden.writeTextFile(file, "something");
     await wait(100);
     assertEquals(spyFn.calls.length, 1);
     unwatchFile(file);
@@ -57,13 +57,13 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "watchFile detects metadata-only changes (chmod)",
-  ignore: Deno.build.os === "windows",
+  ignore: Oden.build.os === "windows",
   async fn() {
-    const file = Deno.makeTempFileSync();
-    Deno.writeTextFileSync(file, "foo");
-    Deno.chmodSync(file, 0o644);
+    const file = Oden.makeTempFileSync();
+    Oden.writeTextFileSync(file, "foo");
+    Oden.chmodSync(file, 0o644);
 
     const calls: Array<[Stats, Stats]> = [];
     watchFile(
@@ -75,7 +75,7 @@ Deno.test({
     try {
       await wait(50);
       assertEquals(calls.length, 0);
-      Deno.chmodSync(file, 0o600);
+      Oden.chmodSync(file, 0o600);
       await wait(150);
       assertEquals(calls.length, 1);
       assert(calls[0][0].mode !== calls[0][1].mode);
@@ -85,11 +85,11 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "watchFile honors bigint option",
   async fn() {
-    const file = Deno.makeTempFileSync();
-    Deno.writeTextFileSync(file, "foo");
+    const file = Oden.makeTempFileSync();
+    Oden.writeTextFileSync(file, "foo");
 
     const calls: Array<[BigIntStats, BigIntStats]> = [];
     watchFile(
@@ -100,7 +100,7 @@ Deno.test({
 
     try {
       await wait(50);
-      Deno.writeTextFileSync(file, "bar");
+      Oden.writeTextFileSync(file, "bar");
       await wait(150);
       assert(calls.length >= 1);
       assertEquals(typeof calls[0][0].mtimeMs, "bigint");
@@ -111,27 +111,27 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "watch.unref() should work",
   sanitizeOps: false,
   sanitizeResources: false,
   async fn() {
-    const file = Deno.makeTempFileSync();
+    const file = Oden.makeTempFileSync();
     const watcher = watch(file, () => {});
     // Wait for the watcher to be initialized
     await wait(10);
-    // @ts-ignore node types are outdated in deno.
+    // @ts-ignore node types are outdated in oden.
     watcher.unref();
   },
 });
 
-Deno.test({
+Oden.test({
   name: "node [fs/promises] watch should return async iterable",
   sanitizeOps: false,
   sanitizeResources: false,
   async fn() {
-    const file = Deno.makeTempFileSync();
-    Deno.writeTextFileSync(file, "foo");
+    const file = Oden.makeTempFileSync();
+    Oden.writeTextFileSync(file, "foo");
 
     const result: { eventType: string; filename: string | null }[] = [];
 
@@ -145,11 +145,11 @@ Deno.test({
     const deferred = Promise.withResolvers<void>();
     let stopLength = 0;
     setTimeout(async () => {
-      Deno.writeTextFileSync(file, "something");
+      Oden.writeTextFileSync(file, "something");
       controller.abort();
       stopLength = result.length;
       await wait(100);
-      Deno.writeTextFileSync(file, "something else");
+      Oden.writeTextFileSync(file, "something else");
       await wait(100);
       deferred.resolve();
     }, 100);

@@ -1,15 +1,15 @@
-Deno.bench("console.log", function () {
+Oden.bench("console.log", function () {
   console.log("log");
 });
 
-Deno.bench("console.error", function () {
+Oden.bench("console.error", function () {
   console.error("error");
 });
 
-Deno.bench("console.info", function () {
+Oden.bench("console.info", function () {
   console.info("info");
 });
 
-Deno.bench("console.warn", function () {
+Oden.bench("console.warn", function () {
   console.info("warn");
 });

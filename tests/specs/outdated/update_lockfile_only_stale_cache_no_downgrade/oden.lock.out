@@ -1,0 +1,14 @@
+{
+  "version": "5",
+  "specifiers": {
+    "npm:@odentest/has-patch-versions@*": "0.2.0"
+  },
+[WILDCARD]
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@odentest/has-patch-versions@*"
+      ]
+    }
+  }
+}

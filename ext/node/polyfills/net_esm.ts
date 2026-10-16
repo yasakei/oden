@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Side-effect imports: net.ts uses `createLazyLoader` for these at module
 // top level, which requires them to already be loaded by the time net.ts
 // IIFE runs. Without this, eager importers of `node:net` (the `_http_*`
@@ -7,7 +7,7 @@
 import "node:stream";
 import "node:dns";
 import { core } from "ext:core/mod.js";
-const mod = core.loadExtScript("ext:deno_node/net.ts");
+const mod = core.loadExtScript("ext:oden_node/net.ts");
 
 export const BlockList = mod.BlockList;
 export const isIP = mod.isIP;

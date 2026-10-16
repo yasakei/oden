@@ -1,5 +1,5 @@
-#!/usr/bin/env -S deno run --check --allow-write=. --allow-read=. --lock=./tools/deno.lock.json
-// Copyright 2018-2026 the Deno authors. MIT license.
+#!/usr/bin/env -S oden run --check --allow-write=. --allow-read=. --lock=./tools/oden.lock.json
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   createWorkflow,
   defineMatrix,
@@ -23,13 +23,13 @@ const buildClone = step.dependsOn(buildConfigureGit)({
   with: { submodules: "recursive" },
 });
 
-const buildInstallDeno = step.dependsOn(buildClone)({
-  name: "Install Deno",
-  uses: "denoland/setup-deno@v2",
-  with: { "deno-version": "v2.7.1" },
+const buildInstallOden = step.dependsOn(buildClone)({
+  name: "Install Oden",
+  uses: "denoland/setup-oden@v2",
+  with: { "oden-version": "v2.7.1" },
 });
 
-const buildNpm = step.dependsOn(buildInstallDeno)({
+const buildNpm = step.dependsOn(buildInstallOden)({
   name: "Build npm packages",
   run: "./tools/release/npm/build.ts ${{ inputs.version || '' }}",
 });
@@ -97,10 +97,10 @@ const writeVerdaccioConfig = step.dependsOn(extractDist)({
     "storage: ./storage",
     "uplinks: {}",
     "packages:",
-    "  '@deno/*':",
+    "  '@oden/*':",
     "    access: $all",
     "    publish: $all",
-    "  'deno':",
+    "  'oden':",
     "    access: $all",
     "    publish: $all",
     "  '**':",
@@ -152,195 +152,195 @@ const publishVerdaccio = step.dependsOn(configureNpm)({
   outputs: ["version"],
   run: [
     'DIST_DIR="tools/release/npm/dist"',
-    'for pkg_dir in "$DIST_DIR"/@deno/*/; do',
+    'for pkg_dir in "$DIST_DIR"/@oden/*/; do',
     '  echo "Publishing $(basename "$pkg_dir") to Verdaccio..."',
     '  (cd "$pkg_dir" && npm publish --registry http://localhost:4873/)',
     "done",
-    'echo "Publishing deno to Verdaccio..."',
-    '(cd "$DIST_DIR/deno" && npm publish --registry http://localhost:4873/)',
-    "VERSION=$(node -p \"require('./$DIST_DIR/deno/package.json').version\")",
+    'echo "Publishing oden to Verdaccio..."',
+    '(cd "$DIST_DIR/oden" && npm publish --registry http://localhost:4873/)',
+    "VERSION=$(node -p \"require('./$DIST_DIR/oden/package.json').version\")",
     'echo "version=$VERSION" >> "$GITHUB_OUTPUT"',
   ],
 });
 
 const testNpmInstall = step.dependsOn(publishVerdaccio)({
-  name: "Test npm install deno",
+  name: "Test npm install oden",
   run: [
     'TEST_DIR="${{ runner.temp }}/npm-test"',
     'mkdir -p "$TEST_DIR"',
     'cd "$TEST_DIR"',
     "npm init -y",
-    'EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"',
-    "npm install deno@${{ steps.publish-verdaccio.outputs.version }}",
-    'ACTUAL="$(npx deno -v)"',
+    'EXPECTED_VERSION="oden ${{ steps.publish-verdaccio.outputs.version }}"',
+    "npm install oden@${{ steps.publish-verdaccio.outputs.version }}",
+    'ACTUAL="$(npx oden -v)"',
     'echo "$ACTUAL"',
     '[ "$ACTUAL" = "$EXPECTED_VERSION" ] || { echo "Version mismatch: expected \'$EXPECTED_VERSION\', got \'$ACTUAL\'"; exit 1; }',
   ],
 });
 
 const testBinCjs = step.dependsOn(testNpmInstall)({
-  name: "Test deno via bin.cjs fallback",
+  name: "Test oden via bin.cjs fallback",
   run: [
     'cd "${{ runner.temp }}/npm-test"',
-    "node node_modules/deno/bin.cjs eval \"console.log('npm package works')\"",
+    "node node_modules/oden/bin.cjs eval \"console.log('npm package works')\"",
   ],
 });
 
 const testReadonlyFs = step.dependsOn(testBinCjs)({
-  name: "Test deno via simulated readonly file system",
+  name: "Test oden via simulated readonly file system",
   run: [
     'TEST_DIR="${{ runner.temp }}/readonly-test"',
     'mkdir -p "$TEST_DIR"',
     'cd "$TEST_DIR"',
     "npm init -y",
-    "npm install deno@${{ steps.publish-verdaccio.outputs.version }}",
-    "rm -f node_modules/deno/deno*",
-    "DENO_SIMULATED_READONLY_FILE_SYSTEM=1 node node_modules/deno/bin.cjs -v",
+    "npm install oden@${{ steps.publish-verdaccio.outputs.version }}",
+    "rm -f node_modules/oden/oden*",
+    "ODEN_SIMULATED_READONLY_FILE_SYSTEM=1 node node_modules/oden/bin.cjs -v",
   ],
 });
 
 const testNpmGlobalInstall = step.dependsOn(testReadonlyFs)({
-  name: "Test npm global install deno",
+  name: "Test npm global install oden",
   run: [
-    'EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"',
-    "npm install -g deno@${{ steps.publish-verdaccio.outputs.version }}",
-    'ACTUAL="$(deno -v)"',
+    'EXPECTED_VERSION="oden ${{ steps.publish-verdaccio.outputs.version }}"',
+    "npm install -g oden@${{ steps.publish-verdaccio.outputs.version }}",
+    'ACTUAL="$(oden -v)"',
     'echo "$ACTUAL"',
     '[ "$ACTUAL" = "$EXPECTED_VERSION" ] || { echo "Version mismatch: expected \'$EXPECTED_VERSION\', got \'$ACTUAL\'"; exit 1; }',
-    "deno eval \"console.log('global npm install works')\"",
+    "oden eval \"console.log('global npm install works')\"",
     "# Verify the global bin entry points directly at the native binary, not bin.cjs",
     'if [ "$RUNNER_OS" = "Windows" ]; then',
-    '  DENO_CMD="$(npm prefix -g)/deno.cmd"',
-    '  grep -q "bin.cjs" "$DENO_CMD" && { echo "ERROR: deno.cmd still points to bin.cjs"; exit 1; }',
-    '  echo "deno.cmd correctly points to native binary"',
+    '  ODEN_CMD="$(npm prefix -g)/oden.cmd"',
+    '  grep -q "bin.cjs" "$ODEN_CMD" && { echo "ERROR: oden.cmd still points to bin.cjs"; exit 1; }',
+    '  echo "oden.cmd correctly points to native binary"',
     "else",
-    '  DENO_LINK="$(which deno)"',
-    '  LINK_TARGET="$(readlink "$DENO_LINK")"',
-    '  echo "deno symlink target: $LINK_TARGET"',
-    '  echo "$LINK_TARGET" | grep -q "bin.cjs" && { echo "ERROR: deno symlink still points to bin.cjs"; exit 1; }',
-    '  echo "deno symlink correctly points to native binary"',
+    '  ODEN_LINK="$(which oden)"',
+    '  LINK_TARGET="$(readlink "$ODEN_LINK")"',
+    '  echo "oden symlink target: $LINK_TARGET"',
+    '  echo "$LINK_TARGET" | grep -q "bin.cjs" && { echo "ERROR: oden symlink still points to bin.cjs"; exit 1; }',
+    '  echo "oden symlink correctly points to native binary"',
     "fi",
-    "npm uninstall -g deno",
+    "npm uninstall -g oden",
   ],
 });
 
 const testNpmGlobalIgnoreScripts = step.dependsOn(testNpmGlobalInstall)({
-  name: "Test npm global install deno (--ignore-scripts)",
+  name: "Test npm global install oden (--ignore-scripts)",
   run: [
-    'EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"',
-    "npm install -g --ignore-scripts deno@${{ steps.publish-verdaccio.outputs.version }}",
-    'ACTUAL="$(deno -v)"',
+    'EXPECTED_VERSION="oden ${{ steps.publish-verdaccio.outputs.version }}"',
+    "npm install -g --ignore-scripts oden@${{ steps.publish-verdaccio.outputs.version }}",
+    'ACTUAL="$(oden -v)"',
     'echo "$ACTUAL"',
     '[ "$ACTUAL" = "$EXPECTED_VERSION" ] || { echo "Version mismatch: expected \'$EXPECTED_VERSION\', got \'$ACTUAL\'"; exit 1; }',
-    "deno eval \"console.log('global npm install works')\"",
-    "npm uninstall -g deno",
+    "oden eval \"console.log('global npm install works')\"",
+    "npm uninstall -g oden",
   ],
 });
 
 const testPnpmLocalNoScripts = step.dependsOn(testNpmGlobalIgnoreScripts)({
-  name: "Test pnpm local install deno (without postinstall)",
+  name: "Test pnpm local install oden (without postinstall)",
   run: [
     'TEST_DIR="${{ runner.temp }}/pnpm-test-no-scripts"',
     'mkdir -p "$TEST_DIR"',
     'cd "$TEST_DIR"',
     "npm init -y",
-    'EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"',
-    "pnpm install --ignore-scripts deno@${{ steps.publish-verdaccio.outputs.version }} --registry http://localhost:4873/",
-    'ACTUAL="$(node node_modules/deno/bin.cjs -v)"',
+    'EXPECTED_VERSION="oden ${{ steps.publish-verdaccio.outputs.version }}"',
+    "pnpm install --ignore-scripts oden@${{ steps.publish-verdaccio.outputs.version }} --registry http://localhost:4873/",
+    'ACTUAL="$(node node_modules/oden/bin.cjs -v)"',
     'echo "$ACTUAL"',
     '[ "$ACTUAL" = "$EXPECTED_VERSION" ] || { echo "Version mismatch: expected \'$EXPECTED_VERSION\', got \'$ACTUAL\'"; exit 1; }',
   ],
 });
 
 const testPnpmGlobalNoScripts = step.dependsOn(testPnpmLocalNoScripts)({
-  name: "Test pnpm global install deno (without postinstall)",
+  name: "Test pnpm global install oden (without postinstall)",
   run: [
-    'EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"',
-    "pnpm install -g --ignore-scripts deno@${{ steps.publish-verdaccio.outputs.version }} --registry http://localhost:4873/",
-    'ACTUAL="$(deno -v)"',
+    'EXPECTED_VERSION="oden ${{ steps.publish-verdaccio.outputs.version }}"',
+    "pnpm install -g --ignore-scripts oden@${{ steps.publish-verdaccio.outputs.version }} --registry http://localhost:4873/",
+    'ACTUAL="$(oden -v)"',
     'echo "$ACTUAL"',
     '[ "$ACTUAL" = "$EXPECTED_VERSION" ] || { echo "Version mismatch: expected \'$EXPECTED_VERSION\', got \'$ACTUAL\'"; exit 1; }',
-    "pnpm uninstall -g deno",
+    "pnpm uninstall -g oden",
   ],
 });
 
 const testPnpmLocalWithScripts = step.dependsOn(testPnpmGlobalNoScripts)({
-  name: "Test pnpm local install deno (with postinstall)",
+  name: "Test pnpm local install oden (with postinstall)",
   run: [
     'TEST_DIR="${{ runner.temp }}/pnpm-test"',
     'mkdir -p "$TEST_DIR"',
     'cd "$TEST_DIR"',
     "npm init -y",
-    "printf 'allowBuilds:\\n  deno: true\\n' > pnpm-workspace.yaml",
-    'EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"',
-    "pnpm install deno@${{ steps.publish-verdaccio.outputs.version }} --registry http://localhost:4873/",
+    "printf 'allowBuilds:\\n  oden: true\\n' > pnpm-workspace.yaml",
+    'EXPECTED_VERSION="oden ${{ steps.publish-verdaccio.outputs.version }}"',
+    "pnpm install oden@${{ steps.publish-verdaccio.outputs.version }} --registry http://localhost:4873/",
     "# `pnpm exec` may print lockfile verification messages to stdout before",
     "# the command output, so only compare against the last line",
-    'ACTUAL="$(pnpm exec deno -v | tail -n 1)"',
+    'ACTUAL="$(pnpm exec oden -v | tail -n 1)"',
     'echo "$ACTUAL"',
     '[ "$ACTUAL" = "$EXPECTED_VERSION" ] || { echo "Version mismatch: expected \'$EXPECTED_VERSION\', got \'$ACTUAL\'"; exit 1; }',
   ],
 });
 
 const testPnpmGlobalWithScripts = step.dependsOn(testPnpmLocalWithScripts)({
-  name: "Test pnpm global install deno (with postinstall)",
+  name: "Test pnpm global install oden (with postinstall)",
   run: [
     'GLOBAL_DIR="$(pnpm root -g)"',
     'mkdir -p "$GLOBAL_DIR"',
-    "printf 'allowBuilds:\\n  deno: true\\n' > \"$GLOBAL_DIR/pnpm-workspace.yaml\"",
-    'EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"',
-    "pnpm install -g deno@${{ steps.publish-verdaccio.outputs.version }} --registry http://localhost:4873/",
-    'ACTUAL="$(deno -v)"',
+    "printf 'allowBuilds:\\n  oden: true\\n' > \"$GLOBAL_DIR/pnpm-workspace.yaml\"",
+    'EXPECTED_VERSION="oden ${{ steps.publish-verdaccio.outputs.version }}"',
+    "pnpm install -g oden@${{ steps.publish-verdaccio.outputs.version }} --registry http://localhost:4873/",
+    'ACTUAL="$(oden -v)"',
     'echo "$ACTUAL"',
     '[ "$ACTUAL" = "$EXPECTED_VERSION" ] || { echo "Version mismatch: expected \'$EXPECTED_VERSION\', got \'$ACTUAL\'"; exit 1; }',
-    "deno eval \"console.log('global pnpm install works')\"",
-    "pnpm uninstall -g deno",
+    "oden eval \"console.log('global pnpm install works')\"",
+    "pnpm uninstall -g oden",
   ],
 });
 
 const testNpmLocalPowershell = step.dependsOn(testPnpmGlobalWithScripts)({
-  name: "Test npm local install deno (PowerShell)",
+  name: "Test npm local install oden (PowerShell)",
   if: "runner.os == 'Windows'",
   shell: "pwsh",
   run: [
     'cd "${{ runner.temp }}/npm-test"',
-    "npx deno -v",
-    "npx deno eval \"console.log('PowerShell npm local install works')\"",
+    "npx oden -v",
+    "npx oden eval \"console.log('PowerShell npm local install works')\"",
   ],
 });
 
 const testNpmGlobalPowershell = step.dependsOn(testNpmLocalPowershell)({
-  name: "Test npm global install deno (PowerShell)",
+  name: "Test npm global install oden (PowerShell)",
   if: "runner.os == 'Windows'",
   shell: "pwsh",
   run: [
-    "npm install -g deno@${{ steps.publish-verdaccio.outputs.version }}",
-    "deno -v",
-    "deno eval \"console.log('PowerShell npm global install works')\"",
-    "npm uninstall -g deno",
+    "npm install -g oden@${{ steps.publish-verdaccio.outputs.version }}",
+    "oden -v",
+    "oden eval \"console.log('PowerShell npm global install works')\"",
+    "npm uninstall -g oden",
   ],
 });
 
 const testNpmLocalCmd = step.dependsOn(testNpmGlobalPowershell)({
-  name: "Test npm local install deno (cmd)",
+  name: "Test npm local install oden (cmd)",
   if: "runner.os == 'Windows'",
   shell: "cmd",
   run: [
     'cd "${{ runner.temp }}/npm-test"',
-    "npx deno -v",
-    "npx deno eval \"console.log('cmd npm local install works')\"",
+    "npx oden -v",
+    "npx oden eval \"console.log('cmd npm local install works')\"",
   ],
 });
 
 const testNpmGlobalCmd = step.dependsOn(testNpmLocalCmd)({
-  name: "Test npm global install deno (cmd)",
+  name: "Test npm global install oden (cmd)",
   if: "runner.os == 'Windows'",
   shell: "cmd",
   run: [
-    "npm install -g deno@${{ steps.publish-verdaccio.outputs.version }}",
-    "deno -v",
-    "deno eval \"console.log('cmd npm global install works')\"",
-    "npm uninstall -g deno",
+    "npm install -g oden@${{ steps.publish-verdaccio.outputs.version }}",
+    "oden -v",
+    "oden eval \"console.log('cmd npm global install works')\"",
+    "npm uninstall -g oden",
   ],
 });
 
@@ -377,13 +377,13 @@ const publishClone = step.dependsOn(publishConfigureGit)({
   with: { submodules: "recursive" },
 });
 
-const publishInstallDeno = step.dependsOn(publishClone)({
-  name: "Install Deno",
-  uses: "denoland/setup-deno@v2",
-  with: { "deno-version": "v2.7.1" },
+const publishInstallOden = step.dependsOn(publishClone)({
+  name: "Install Oden",
+  uses: "denoland/setup-oden@v2",
+  with: { "oden-version": "v2.7.1" },
 });
 
-const publishInstallNode = step.dependsOn(publishInstallDeno)({
+const publishInstallNode = step.dependsOn(publishInstallOden)({
   name: "Install Node",
   uses: "actions/setup-node@v6",
   with: {

@@ -1,14 +1,14 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { assertEquals, assertThrows, fail } from "@std/assert";
 import { utimes, utimesSync } from "node:fs";
 
 const randomDate = new Date(Date.now() + 1000);
 
-Deno.test({
+Oden.test({
   name:
     "ASYNC: change the file system timestamps of the object referenced by path",
   async fn() {
-    const file: string = Deno.makeTempFileSync();
+    const file: string = Oden.makeTempFileSync();
 
     await new Promise<void>((resolve, reject) => {
       utimes(file, randomDate, randomDate, (err: Error | null) => {
@@ -18,7 +18,7 @@ Deno.test({
     })
       .then(
         () => {
-          const fileInfo: Deno.FileInfo = Deno.lstatSync(file);
+          const fileInfo: Oden.FileInfo = Oden.lstatSync(file);
           assertEquals(fileInfo.mtime, randomDate);
           assertEquals(fileInfo.mtime, randomDate);
         },
@@ -26,11 +26,11 @@ Deno.test({
           fail("No error expected");
         },
       )
-      .finally(() => Deno.removeSync(file));
+      .finally(() => Oden.removeSync(file));
   },
 });
 
-Deno.test({
+Oden.test({
   name: "ASYNC: should throw error if atime is infinity",
   fn() {
     assertThrows(
@@ -43,7 +43,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "ASYNC: should throw error if atime is NaN",
   fn() {
     assertThrows(
@@ -56,24 +56,24 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name:
     "SYNC: change the file system timestamps of the object referenced by path",
   fn() {
-    const file: string = Deno.makeTempFileSync();
+    const file: string = Oden.makeTempFileSync();
     try {
       utimesSync(file, randomDate, randomDate);
 
-      const fileInfo: Deno.FileInfo = Deno.lstatSync(file);
+      const fileInfo: Oden.FileInfo = Oden.lstatSync(file);
 
       assertEquals(fileInfo.mtime, randomDate);
     } finally {
-      Deno.removeSync(file);
+      Oden.removeSync(file);
     }
   },
 });
 
-Deno.test({
+Oden.test({
   name: "SYNC: should throw error if atime is NaN",
   fn() {
     assertThrows(
@@ -86,7 +86,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "SYNC: should throw error if atime is Infinity",
   fn() {
     assertThrows(

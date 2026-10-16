@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::rc::Rc;
 
-use deno_core::AsyncRefCell;
-use deno_core::AsyncResult;
-use deno_core::CancelHandle;
-use deno_core::CancelTryFuture;
-use deno_core::RcRef;
+use oden_core::AsyncRefCell;
+use oden_core::AsyncResult;
+use oden_core::CancelHandle;
+use oden_core::CancelTryFuture;
+use oden_core::RcRef;
 use tokio::io::AsyncReadExt;
 use tokio::io::AsyncWriteExt;
 
@@ -45,26 +45,26 @@ mod as_raw_handle {
   }
 }
 
-impl deno_core::Resource for BiPipeResource {
+impl oden_core::Resource for BiPipeResource {
   fn close(self: Rc<Self>) {
     self.cancel.cancel();
   }
 
-  fn backing_handle(self: Rc<Self>) -> Option<deno_core::ResourceHandle> {
+  fn backing_handle(self: Rc<Self>) -> Option<oden_core::ResourceHandle> {
     #[cfg(unix)]
     {
-      Some(deno_core::ResourceHandle::from_fd_like(&self.raw_handle))
+      Some(oden_core::ResourceHandle::from_fd_like(&self.raw_handle))
     }
     #[cfg(windows)]
     {
-      Some(deno_core::ResourceHandle::from_fd_like(
+      Some(oden_core::ResourceHandle::from_fd_like(
         &as_raw_handle::RawHandleWrap(self.raw_handle),
       ))
     }
   }
 
-  deno_core::impl_readable_byob!();
-  deno_core::impl_writable!();
+  oden_core::impl_readable_byob!();
+  oden_core::impl_writable!();
 }
 
 impl BiPipeResource {
@@ -402,7 +402,7 @@ fn from_raw(
 fn from_raw(
   handle: RawBiPipeHandle,
 ) -> Result<(BiPipeRead, BiPipeWrite), std::io::Error> {
-  // Safety: We cannot use `get_osfhandle` because Deno statically links to msvcrt. It is not guaranteed that the
+  // Safety: We cannot use `get_osfhandle` because Oden statically links to msvcrt. It is not guaranteed that the
   // fd handle map will be the same.
   let pipe = unsafe {
     tokio::net::windows::named_pipe::NamedPipeClient::from_raw_handle(

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Tests for tools/lint_plugins/prefer_primordials.ts
 // Ported from deno_lint's prefer_primordials rule.
@@ -33,10 +33,10 @@ import plugin, {
   MSG,
 } from "../../tools/lint_plugins/prefer_primordials.ts";
 
-const RULE_ID = "deno-internal/prefer-primordials";
+const RULE_ID = "oden-internal/prefer-primordials";
 
-function lint(source: string, fileName = "source.ts"): Deno.lint.Diagnostic[] {
-  return Deno.lint.runPlugin(plugin, fileName, source);
+function lint(source: string, fileName = "source.ts"): Oden.lint.Diagnostic[] {
+  return Oden.lint.runPlugin(plugin, fileName, source);
 }
 
 function assertOk(source: string) {
@@ -74,7 +74,7 @@ function assertErr(
   }
 }
 
-Deno.test(function preferPrimordialsValid() {
+Oden.test(function preferPrimordialsValid() {
   assertOk(`
 const { Array } = primordials;
 new Array();
@@ -276,7 +276,7 @@ class A {
   `);
 });
 
-Deno.test(function preferPrimordialsInvalid() {
+Oden.test(function preferPrimordialsInvalid() {
   assertErr(`const foo = Symbol("foo");`, [
     { message: MSG.GlobalIntrinsic, hint: HINT.GlobalIntrinsic },
   ]);

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core, primordials } = __bootstrap;
@@ -20,16 +20,16 @@ const {
   SymbolFor,
 } = primordials;
 
-const webidl = core.loadExtScript("ext:deno_webidl/00_webidl.js");
+const webidl = core.loadExtScript("ext:oden_webidl/00_webidl.js");
 const { createFilteredInspectProxy } = core.loadExtScript(
-  "ext:deno_web/01_console.js",
+  "ext:oden_web/01_console.js",
 );
 
 const DOMPointPrototype = DOMPoint.prototype;
 const DOMPointReadOnlyPrototype = DOMPointReadOnly.prototype;
 ObjectDefineProperty(
   DOMPointReadOnlyPrototype,
-  SymbolFor("Deno.privateCustomInspect"),
+  SymbolFor("Oden.privateCustomInspect"),
   {
     __proto__: null,
     value: function customInspect(inspect, inspectOptions) {
@@ -57,7 +57,7 @@ const DOMRectPrototype = DOMRect.prototype;
 const DOMRectReadOnlyPrototype = DOMRectReadOnly.prototype;
 ObjectDefineProperty(
   DOMRectReadOnlyPrototype,
-  SymbolFor("Deno.privateCustomInspect"),
+  SymbolFor("Oden.privateCustomInspect"),
   {
     __proto__: null,
     value: function customInspect(inspect, inspectOptions) {
@@ -82,7 +82,7 @@ webidl.configureInterface(DOMRect);
 webidl.configureInterface(DOMRectReadOnly);
 
 const DOMQuadPrototype = DOMQuad.prototype;
-ObjectDefineProperty(DOMQuadPrototype, SymbolFor("Deno.privateCustomInspect"), {
+ObjectDefineProperty(DOMQuadPrototype, SymbolFor("Oden.privateCustomInspect"), {
   __proto__: null,
   value: function customInspect(inspect, inspectOptions) {
     return inspect(
@@ -104,7 +104,7 @@ const DOMMatrixPrototype = DOMMatrix.prototype;
 const DOMMatrixReadOnlyPrototype = DOMMatrixReadOnly.prototype;
 ObjectDefineProperty(
   DOMMatrixReadOnlyPrototype,
-  SymbolFor("Deno.privateCustomInspect"),
+  SymbolFor("Oden.privateCustomInspect"),
   {
     __proto__: null,
     value: function customInspect(inspect, inspectOptions) {

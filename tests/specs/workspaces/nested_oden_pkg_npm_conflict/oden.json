@@ -1,0 +1,7 @@
+{
+  "nodeModulesDir": "manual",
+  "workspace": ["./member"],
+  "imports": {
+    "@odentest/add": "npm:@odentest/add@0.5"
+  }
+}

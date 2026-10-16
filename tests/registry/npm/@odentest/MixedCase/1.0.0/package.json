@@ -1,0 +1,7 @@
+{
+  "name": "@odentest/MixedCase",
+  "version": "1.0.0",
+  "dependencies": {
+    "@odentest/CAPITALS": "^1"
+  }
+}

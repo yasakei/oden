@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Forked from napi-sys (https://github.com/napi-rs/napi-rs)
 // to avoid build-time dependency on Node.js binaries and to allow

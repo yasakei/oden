@@ -1,12 +1,12 @@
 // Copyright the Browserify authors. MIT License.
 // Ported mostly from https://github.com/browserify/path-browserify/
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core } = __bootstrap;
-const { isWindows } = core.loadExtScript("ext:deno_node/_util/os.ts");
-const _win32 = core.loadExtScript("ext:deno_node/path/_win32.ts").default;
-const _posix = core.loadExtScript("ext:deno_node/path/_posix.ts").default;
+const { isWindows } = core.loadExtScript("ext:oden_node/_util/os.ts");
+const _win32 = core.loadExtScript("ext:oden_node/path/_win32.ts").default;
+const _posix = core.loadExtScript("ext:oden_node/path/_posix.ts").default;
 
 const win32 = {
   ..._win32,
@@ -41,7 +41,7 @@ const {
   _makeLong,
   matchesGlob,
 } = path;
-const { common } = core.loadExtScript("ext:deno_node/path/common.ts");
+const { common } = core.loadExtScript("ext:oden_node/path/common.ts");
 
 return {
   win32,

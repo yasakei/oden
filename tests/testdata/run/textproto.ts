@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -81,22 +81,22 @@ export class TextProtoReader {
 
     buf = await this.r.peek(1);
     if (buf === null) {
-      throw new Deno.errors.UnexpectedEof();
+      throw new Oden.errors.UnexpectedEof();
     } else if (WHITESPACES.includes(buf[0])) {
-      throw new Deno.errors.InvalidData(
+      throw new Oden.errors.InvalidData(
         `malformed MIME header initial line: ${str(line)}`,
       );
     }
 
     while (true) {
       const kv = await this.readLineSlice(); // readContinuedLineSlice
-      if (kv === null) throw new Deno.errors.UnexpectedEof();
+      if (kv === null) throw new Oden.errors.UnexpectedEof();
       if (kv.byteLength === 0) return m;
 
       // Key ends at first colon
       let i = kv.indexOf(CHAR_COLON);
       if (i < 0) {
-        throw new Deno.errors.InvalidData(
+        throw new Oden.errors.InvalidData(
           `malformed MIME header line: ${str(kv)}`,
         );
       }
@@ -106,7 +106,7 @@ export class TextProtoReader {
 
       // As per RFC 7230 field-name is a token,
       // tokens consist of one or more chars.
-      // We could throw `Deno.errors.InvalidData` here,
+      // We could throw `Oden.errors.InvalidData` here,
       // but better to be liberal in what we
       // accept, so if we get an empty key, skip it.
       if (key == "") {

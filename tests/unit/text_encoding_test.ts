@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   assert,
   assertEquals,
@@ -6,19 +6,19 @@ import {
   assertThrows,
 } from "./test_util.ts";
 
-Deno.test(function btoaSuccess() {
+Oden.test(function btoaSuccess() {
   const text = "hello world";
   const encoded = btoa(text);
   assertEquals(encoded, "aGVsbG8gd29ybGQ=");
 });
 
-Deno.test(function atobSuccess() {
+Oden.test(function atobSuccess() {
   const encoded = "aGVsbG8gd29ybGQ=";
   const decoded = atob(encoded);
   assertEquals(decoded, "hello world");
 });
 
-Deno.test(function atobWithAsciiWhitespace() {
+Oden.test(function atobWithAsciiWhitespace() {
   const encodedList = [
     " aGVsbG8gd29ybGQ=",
     "  aGVsbG8gd29ybGQ=",
@@ -35,7 +35,7 @@ Deno.test(function atobWithAsciiWhitespace() {
   }
 });
 
-Deno.test(function atobThrows() {
+Oden.test(function atobThrows() {
   let threw = false;
   try {
     atob("aGVsbG8gd29ybGQ==");
@@ -45,7 +45,7 @@ Deno.test(function atobThrows() {
   assert(threw);
 });
 
-Deno.test(function atobThrows2() {
+Oden.test(function atobThrows2() {
   let threw = false;
   try {
     atob("aGVsbG8gd29ybGQ===");
@@ -55,7 +55,7 @@ Deno.test(function atobThrows2() {
   assert(threw);
 });
 
-Deno.test(function atobThrows3() {
+Oden.test(function atobThrows3() {
   let threw = false;
   try {
     atob("foobar!!");
@@ -70,15 +70,15 @@ Deno.test(function atobThrows3() {
   assert(threw);
 });
 
-Deno.test(function btoaFailed() {
+Oden.test(function btoaFailed() {
   const text = "你好";
   assertThrows(() => {
     btoa(text);
   }, DOMException);
 });
 
-Deno.test(function textDecoder2() {
-  // deno-fmt-ignore
+Oden.test(function textDecoder2() {
+  // oden-fmt-ignore
   const fixture = new Uint8Array([
     0xf0, 0x9d, 0x93, 0xbd,
     0xf0, 0x9d, 0x93, 0xae,
@@ -91,13 +91,13 @@ Deno.test(function textDecoder2() {
 
 // ignoreBOM is tested through WPT
 
-Deno.test(function textDecoderASCII() {
+Oden.test(function textDecoderASCII() {
   const fixture = new Uint8Array([0x89, 0x95, 0x9f, 0xbf]);
   const decoder = new TextDecoder("ascii");
   assertEquals(decoder.decode(fixture), "‰•Ÿ¿");
 });
 
-Deno.test(function textDecoderErrorEncoding() {
+Oden.test(function textDecoderErrorEncoding() {
   let didThrow = false;
   try {
     new TextDecoder("Foo");
@@ -109,10 +109,10 @@ Deno.test(function textDecoderErrorEncoding() {
   assert(didThrow);
 });
 
-Deno.test(function textEncoder() {
+Oden.test(function textEncoder() {
   const fixture = "𝓽𝓮𝔁𝓽";
   const encoder = new TextEncoder();
-  // deno-fmt-ignore
+  // oden-fmt-ignore
   assertEquals(Array.from(encoder.encode(fixture)), [
     0xf0, 0x9d, 0x93, 0xbd,
     0xf0, 0x9d, 0x93, 0xae,
@@ -121,27 +121,27 @@ Deno.test(function textEncoder() {
   ]);
 });
 
-Deno.test(function textEncodeInto() {
+Oden.test(function textEncodeInto() {
   const fixture = "text";
   const encoder = new TextEncoder();
   const bytes = new Uint8Array(5);
   const result = encoder.encodeInto(fixture, bytes);
   assertEquals(result.read, 4);
   assertEquals(result.written, 4);
-  // deno-fmt-ignore
+  // oden-fmt-ignore
   assertEquals(Array.from(bytes), [
     0x74, 0x65, 0x78, 0x74, 0x00,
   ]);
 });
 
-Deno.test(function textEncodeInto2() {
+Oden.test(function textEncodeInto2() {
   const fixture = "𝓽𝓮𝔁𝓽";
   const encoder = new TextEncoder();
   const bytes = new Uint8Array(17);
   const result = encoder.encodeInto(fixture, bytes);
   assertEquals(result.read, 8);
   assertEquals(result.written, 16);
-  // deno-fmt-ignore
+  // oden-fmt-ignore
   assertEquals(Array.from(bytes), [
     0xf0, 0x9d, 0x93, 0xbd,
     0xf0, 0x9d, 0x93, 0xae,
@@ -150,27 +150,27 @@ Deno.test(function textEncodeInto2() {
   ]);
 });
 
-Deno.test(function textEncodeInto3() {
+Oden.test(function textEncodeInto3() {
   const fixture = "𝓽𝓮𝔁𝓽";
   const encoder = new TextEncoder();
   const bytes = new Uint8Array(5);
   const result = encoder.encodeInto(fixture, bytes);
   assertEquals(result.read, 2);
   assertEquals(result.written, 4);
-  // deno-fmt-ignore
+  // oden-fmt-ignore
   assertEquals(Array.from(bytes), [
     0xf0, 0x9d, 0x93, 0xbd, 0x00,
   ]);
 });
 
-Deno.test(function loneSurrogateEncodeInto() {
+Oden.test(function loneSurrogateEncodeInto() {
   const fixture = "lone𝄞\ud888surrogate";
   const encoder = new TextEncoder();
   const bytes = new Uint8Array(20);
   const result = encoder.encodeInto(fixture, bytes);
   assertEquals(result.read, 16);
   assertEquals(result.written, 20);
-  // deno-fmt-ignore
+  // oden-fmt-ignore
   assertEquals(Array.from(bytes), [
     0x6c, 0x6f, 0x6e, 0x65,
     0xf0, 0x9d, 0x84, 0x9e,
@@ -180,46 +180,46 @@ Deno.test(function loneSurrogateEncodeInto() {
   ]);
 });
 
-Deno.test(function loneSurrogateEncodeInto2() {
+Oden.test(function loneSurrogateEncodeInto2() {
   const fixture = "\ud800";
   const encoder = new TextEncoder();
   const bytes = new Uint8Array(3);
   const result = encoder.encodeInto(fixture, bytes);
   assertEquals(result.read, 1);
   assertEquals(result.written, 3);
-  // deno-fmt-ignore
+  // oden-fmt-ignore
   assertEquals(Array.from(bytes), [
     0xef, 0xbf, 0xbd
   ]);
 });
 
-Deno.test(function loneSurrogateEncodeInto3() {
+Oden.test(function loneSurrogateEncodeInto3() {
   const fixture = "\udc00";
   const encoder = new TextEncoder();
   const bytes = new Uint8Array(3);
   const result = encoder.encodeInto(fixture, bytes);
   assertEquals(result.read, 1);
   assertEquals(result.written, 3);
-  // deno-fmt-ignore
+  // oden-fmt-ignore
   assertEquals(Array.from(bytes), [
     0xef, 0xbf, 0xbd
   ]);
 });
 
-Deno.test(function swappedSurrogatePairEncodeInto4() {
+Oden.test(function swappedSurrogatePairEncodeInto4() {
   const fixture = "\udc00\ud800";
   const encoder = new TextEncoder();
   const bytes = new Uint8Array(8);
   const result = encoder.encodeInto(fixture, bytes);
   assertEquals(result.read, 2);
   assertEquals(result.written, 6);
-  // deno-fmt-ignore
+  // oden-fmt-ignore
   assertEquals(Array.from(bytes), [
     0xef, 0xbf, 0xbd, 0xef, 0xbf, 0xbd, 0x00, 0x00
   ]);
 });
 
-Deno.test(function textDecoderSharedUint8Array() {
+Oden.test(function textDecoderSharedUint8Array() {
   const ab = new SharedArrayBuffer(6);
   const dataView = new DataView(ab);
   const charCodeA = "A".charCodeAt(0);
@@ -232,7 +232,7 @@ Deno.test(function textDecoderSharedUint8Array() {
   assertEquals(actual, "ABCDEF");
 });
 
-Deno.test(function textDecoderSharedInt32Array() {
+Oden.test(function textDecoderSharedInt32Array() {
   const ab = new SharedArrayBuffer(8);
   const dataView = new DataView(ab);
   const charCodeA = "A".charCodeAt(0);
@@ -245,7 +245,7 @@ Deno.test(function textDecoderSharedInt32Array() {
   assertEquals(actual, "ABCDEFGH");
 });
 
-Deno.test(function textDecoderSharedOffsetView() {
+Oden.test(function textDecoderSharedOffsetView() {
   const ab = new SharedArrayBuffer(6);
   const dataView = new DataView(ab);
   const charCodeA = "A".charCodeAt(0);
@@ -258,13 +258,13 @@ Deno.test(function textDecoderSharedOffsetView() {
   assertEquals(new TextDecoder().decode(new DataView(ab, 1, 3)), "BCD");
 });
 
-Deno.test(function textDecoderSharedMultibyte() {
+Oden.test(function textDecoderSharedMultibyte() {
   const ab = new SharedArrayBuffer(2);
   new Uint8Array(ab).set([0xc2, 0xa9]); // UTF-8 "©"
   assertEquals(new TextDecoder().decode(new Uint8Array(ab)), "©");
 });
 
-Deno.test(function toStringShouldBeWebCompatibility() {
+Oden.test(function toStringShouldBeWebCompatibility() {
   const encoder = new TextEncoder();
   assertEquals(encoder.toString(), "[object TextEncoder]");
 
@@ -272,7 +272,7 @@ Deno.test(function toStringShouldBeWebCompatibility() {
   assertEquals(decoder.toString(), "[object TextDecoder]");
 });
 
-Deno.test(function textEncoderShouldCoerceToString() {
+Oden.test(function textEncoderShouldCoerceToString() {
   const encoder = new TextEncoder();
   const fixtureText = "text";
   const fixture = {
@@ -287,9 +287,9 @@ Deno.test(function textEncoderShouldCoerceToString() {
   assertEquals(decoded, fixtureText);
 });
 
-Deno.test(function binaryEncode() {
-  // @ts-ignore: Deno[Deno.internal].core allowed
-  const core = Deno[Deno.internal].core;
+Oden.test(function binaryEncode() {
+  // @ts-ignore: Oden[Oden.internal].core allowed
+  const core = Oden[Oden.internal].core;
   function asBinaryString(bytes: Uint8Array): string {
     return Array.from(bytes).map(
       (v: number) => String.fromCodePoint(v),
@@ -320,7 +320,7 @@ Deno.test(function binaryEncode() {
   }
 });
 
-Deno.test(
+Oden.test(
   { permissions: { read: true } },
   async function textDecoderStreamCleansUpOnCancel() {
     let cancelled = false;
@@ -344,7 +344,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+Oden.test(
   "TextDecoder should handle empty chunk in stream mode (legacy encodings)",
   () => {
     // big5: [0xa4, 0xa4] => "中" (U+4E2D)

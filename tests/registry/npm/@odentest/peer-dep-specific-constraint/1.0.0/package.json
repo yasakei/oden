@@ -1,0 +1,7 @@
+{
+  "name": "@odentest/peer-dep-specific-constraint",
+  "version": "1.0.0",
+  "peerDependencies": {
+    "@odentest/add": "0.5"
+  }
+}

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { asyncNeverResolves } from "checkin:async";
 
 // make a promise that never resolves so we have
@@ -12,4 +12,4 @@ await import("./dynamic.js");
 console.log("module imported");
 
 // unref to let the event loop exit
-Deno.core.unrefOpPromise(prom);
+Oden.core.unrefOpPromise(prom);

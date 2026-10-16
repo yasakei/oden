@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import events, {
   addAbortListener,
@@ -11,7 +11,7 @@ import { assert, assertEquals, assertStrictEquals } from "@std/assert";
 
 EventEmitter.captureRejections = true;
 
-Deno.test("regression #20441", async () => {
+Oden.test("regression #20441", async () => {
   const { promise, resolve } = Promise.withResolvers<void>();
 
   const ee = new EventEmitter();
@@ -33,7 +33,7 @@ Deno.test("regression #20441", async () => {
   await promise;
 });
 
-Deno.test("eventemitter async resource", () => {
+Oden.test("eventemitter async resource", () => {
   // @ts-ignore: @types/node is outdated
   class Foo extends events.EventEmitterAsyncResource {}
 
@@ -42,7 +42,7 @@ Deno.test("eventemitter async resource", () => {
   foo.emit("bar");
 });
 
-Deno.test("addAbortListener", async () => {
+Oden.test("addAbortListener", async () => {
   const { promise, resolve } = Promise.withResolvers<void>();
   const abortController = new AbortController();
   addAbortListener(abortController.signal, () => {
@@ -52,7 +52,7 @@ Deno.test("addAbortListener", async () => {
   await promise;
 });
 
-Deno.test("EventEmitter works when Object.create is deleted (#29929)", () => {
+Oden.test("EventEmitter works when Object.create is deleted (#29929)", () => {
   const ObjectCreate = Object.create;
   Object.create = undefined!;
   try {
@@ -68,7 +68,7 @@ Deno.test("EventEmitter works when Object.create is deleted (#29929)", () => {
   }
 });
 
-Deno.test("EventEmitter works if Array.prototype.unshift is deleted", () => {
+Oden.test("EventEmitter works if Array.prototype.unshift is deleted", () => {
   const ArrayPrototypeUnshift = Array.prototype.unshift;
   // @ts-ignore -- this is fine for testing purposes
   delete Array.prototype.unshift;
@@ -85,7 +85,7 @@ Deno.test("EventEmitter works if Array.prototype.unshift is deleted", () => {
   }
 });
 
-Deno.test("EventEmitter works if Array.prototype.push is deleted", () => {
+Oden.test("EventEmitter works if Array.prototype.push is deleted", () => {
   const ArrayPrototypePush = Array.prototype.push;
   // @ts-ignore -- this is fine for testing purposes
   delete Array.prototype.push;
@@ -102,7 +102,7 @@ Deno.test("EventEmitter works if Array.prototype.push is deleted", () => {
   }
 });
 
-Deno.test("node:events default and namespace shape matches Node", () => {
+Oden.test("node:events default and namespace shape matches Node", () => {
   // The default export is the EventEmitter constructor with named exports
   // attached as static properties (issue #34261).
   assertStrictEquals(events, EventEmitter);
@@ -133,7 +133,7 @@ Deno.test("node:events default and namespace shape matches Node", () => {
   assertStrictEquals(cjsEvents.errorMonitor, errorMonitor);
 });
 
-Deno.test("require('node:events').addAbortListener works (issue #34261)", async () => {
+Oden.test("require('node:events').addAbortListener works (issue #34261)", async () => {
   const require = createRequire(import.meta.url);
   const { addAbortListener: addAbortListenerCjs } = require("node:events");
   assert(typeof addAbortListenerCjs === "function");
@@ -145,7 +145,7 @@ Deno.test("require('node:events').addAbortListener works (issue #34261)", async 
   await promise;
 });
 
-Deno.test("EventEmitter works if Object.setPrototypeOf is deleted", () => {
+Oden.test("EventEmitter works if Object.setPrototypeOf is deleted", () => {
   const ObjectSetPrototypeOf = Object.setPrototypeOf;
   Object.setPrototypeOf = undefined!;
   try {

@@ -1,0 +1,5 @@
+{
+  "tasks": {
+    "start": "oden run -A script.js"
+  }
+}

@@ -1,1 +1,1 @@
-console.log("hi from deno-test-bin");
+console.log("hi from oden-test-bin");

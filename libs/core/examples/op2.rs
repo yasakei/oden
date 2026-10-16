@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![allow(clippy::disallowed_methods, reason = "test code")]
 
 use std::rc::Rc;
 
 use anyhow::Context;
-use deno_core::*;
+use oden_core::*;
 
 #[op2]
 fn op_use_state(
@@ -33,7 +33,7 @@ fn main() -> Result<(), anyhow::Error> {
   "
   .to_string();
 
-  let mut js_runtime = JsRuntime::new(deno_core::RuntimeOptions {
+  let mut js_runtime = JsRuntime::new(oden_core::RuntimeOptions {
     module_loader: Some(Rc::new(FsModuleLoader)),
     extensions: vec![op2_sample::init()],
     ..Default::default()

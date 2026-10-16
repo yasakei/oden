@@ -1,19 +1,19 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 use std::borrow::Cow;
 use std::net::Ipv4Addr;
 use std::net::SocketAddr;
 use std::net::SocketAddrV4;
 use std::rc::Rc;
 
-use deno_core::OpState;
-use deno_core::ResourceId;
+use oden_core::OpState;
+use oden_core::ResourceId;
 use deno_error::JsErrorBox;
-use deno_net::raw::NetworkStream;
-use deno_net::raw::NetworkStreamAddress;
-use deno_net::raw::NetworkStreamListener;
-use deno_net::raw::NetworkStreamType;
-use deno_net::raw::take_network_stream_listener_resource;
-use deno_net::raw::take_network_stream_resource;
+use oden_net::raw::NetworkStream;
+use oden_net::raw::NetworkStreamAddress;
+use oden_net::raw::NetworkStreamListener;
+use oden_net::raw::NetworkStreamType;
+use oden_net::raw::take_network_stream_listener_resource;
+use oden_net::raw::take_network_stream_resource;
 use hyper::HeaderMap;
 use hyper::Uri;
 use hyper::header::HOST;

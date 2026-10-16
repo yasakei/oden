@@ -1,10 +1,10 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { assertEquals, loadTestLibrary } from "./common.js";
 
 const date = loadTestLibrary();
 
-Deno.test("napi date", function () {
+Oden.test("napi date", function () {
   const dateTypeTestDate = date.createDate(1549183351);
   assertEquals(date.isDate(dateTypeTestDate), true);
   assertEquals(date.isDate(new Date(1549183351)), true);

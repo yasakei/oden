@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Most of the tests for this are in deno_task_shell.
 // These tests are intended to only test integration.
@@ -8,10 +8,10 @@ use util::TestContextBuilder;
 use util::test;
 
 #[test(flaky)]
-fn deno_task_ansi_escape_codes() {
+fn oden_task_ansi_escape_codes() {
   let context = TestContextBuilder::default().use_temp_cwd().build();
   let temp_dir = context.temp_dir();
-  temp_dir.write("deno.json", r#"{
+  temp_dir.write("oden.json", r#"{
   "tasks": {
     "dev": "echo 'BOOO!!!'",
     "next": "\u001b[3F\u001b[0G- dev\u001b[1E\u001b[2K    echo 'I am your friend.'"
@@ -32,11 +32,11 @@ fn deno_task_ansi_escape_codes() {
 }
 
 #[test(flaky)]
-fn deno_task_control_chars() {
+fn oden_task_control_chars() {
   let context = TestContextBuilder::default().use_temp_cwd().build();
   let temp_dir = context.temp_dir();
   temp_dir.write(
-    "deno.json",
+    "oden.json",
     r#"{
   "tasks": {
     "dev": "echo 'BOOO!!!' && \r    echo hi there is my command",

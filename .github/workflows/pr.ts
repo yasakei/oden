@@ -1,5 +1,5 @@
-#!/usr/bin/env -S deno run --check --allow-write=. --allow-read=. --lock=./tools/deno.lock.json
-// Copyright 2018-2026 the Deno authors. MIT license.
+#!/usr/bin/env -S oden run --check --allow-write=. --allow-read=. --lock=./tools/oden.lock.json
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { createWorkflow, step } from "jsr:@david/gagen@0.3.1";
 
 const workflow = createWorkflow({
@@ -15,15 +15,15 @@ const workflow = createWorkflow({
     runsOn: "ubuntu-latest",
     steps: [
       step({
-        name: "Install Deno",
-        uses: "denoland/setup-deno@v2",
-        with: { "deno-version": "canary" },
+        name: "Install Oden",
+        uses: "denoland/setup-oden@v2",
+        with: { "oden-version": "canary" },
       }),
       step({
         name: "Lint",
         env: { PR_TITLE: "${{ github.event.pull_request.title }}" },
         run:
-          'deno run https://raw.githubusercontent.com/denoland/deno/refs/heads/main/tools/verify_pr_title.js "$PR_TITLE"',
+          'oden run https://raw.githubusercontent.com/denoland/deno/refs/heads/main/tools/verify_pr_title.js "$PR_TITLE"',
       }),
     ],
   }],

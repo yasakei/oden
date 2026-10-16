@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 mod cache_db;
 mod caches;
@@ -9,15 +9,15 @@ mod incremental;
 mod module_info;
 mod node;
 
-pub type DenoDir = deno_resolver::cache::DenoDir<CliSys>;
-pub type DenoDirProvider = deno_resolver::cache::DenoDirProvider<CliSys>;
+pub type OdenDir = oden_resolver::cache::OdenDir<CliSys>;
+pub type OdenDirProvider = oden_resolver::cache::OdenDirProvider<CliSys>;
 
 pub use cache_db::CacheDBHash;
 pub use caches::Caches;
 pub use check::TypeCheckCache;
 pub use code_cache::CodeCache;
 /// Permissions used to save a file in the disk caches.
-pub use deno_cache_dir::CACHE_PERM;
+pub use oden_cache_dir::CACHE_PERM;
 pub use fast_check::FastCheckCache;
 pub use incremental::IncrementalCache;
 pub use module_info::ModuleInfoCache;
@@ -25,6 +25,6 @@ pub use node::SqliteNodeAnalysisCache;
 
 use crate::sys::CliSys;
 
-pub type GlobalHttpCache = deno_cache_dir::GlobalHttpCache<CliSys>;
-pub type LocalLspHttpCache = deno_cache_dir::LocalLspHttpCache<CliSys>;
-pub use deno_cache_dir::HttpCache;
+pub type GlobalHttpCache = oden_cache_dir::GlobalHttpCache<CliSys>;
+pub type LocalLspHttpCache = oden_cache_dir::LocalLspHttpCache<CliSys>;
+pub use oden_cache_dir::HttpCache;

@@ -8,9 +8,9 @@
     {
       "args": [
         "eval",
-        "console.log(Deno.readTextFileSync('./deno.lock').trim())"
+        "console.log(Oden.readTextFileSync('./oden.lock').trim())"
       ],
-      "output": "deno.lock.out"
+      "output": "oden.lock.out"
     }
   ]
 }

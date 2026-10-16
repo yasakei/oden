@@ -2,9 +2,9 @@
 
 Embedded Files
 
-[# Note that this doesn't have @denotest/subtract — only @denotest/add is imported.]
+[# Note that this doesn't have @odentest/subtract — only @odentest/add is imported.]
 [WILDLINE]
-├── .deno_compile_node_modules/localhost/@denotest/add/* ([WILDLINE])
+├── .oden_compile_node_modules/localhost/@odentest/add/* ([WILDLINE])
 └── main.ts ([WILDLINE])
 
 [WILDCARD]

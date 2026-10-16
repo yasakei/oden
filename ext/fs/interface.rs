@@ -1,20 +1,20 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use core::str;
 use std::borrow::Cow;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use deno_core::FromV8;
-use deno_io::fs::File;
-use deno_io::fs::FsResult;
-use deno_io::fs::FsStat;
-use deno_io::fs::FsStatFs;
-use deno_maybe_sync::MaybeSend;
-use deno_maybe_sync::MaybeSync;
-use deno_permissions::CheckedPath;
-use deno_permissions::CheckedPathBuf;
-use deno_permissions::OpenAccessKind;
+use oden_core::FromV8;
+use oden_io::fs::File;
+use oden_io::fs::FsResult;
+use oden_io::fs::FsStat;
+use oden_io::fs::FsStatFs;
+use oden_maybe_sync::MaybeSend;
+use oden_maybe_sync::MaybeSync;
+use oden_permissions::CheckedPath;
+use oden_permissions::CheckedPathBuf;
+use oden_permissions::OpenAccessKind;
 use serde::Deserialize;
 
 #[derive(FromV8, Default, Debug, Clone, Copy)]
@@ -189,8 +189,8 @@ pub enum FsFileType {
   Junction,
 }
 
-/// WARNING: This is part of the public JS Deno API.
-#[derive(Debug, Clone, deno_core::ToV8)]
+/// WARNING: This is part of the public JS Oden API.
+#[derive(Debug, Clone, oden_core::ToV8)]
 pub struct FsDirEntry {
   pub name: String,
   pub is_file: bool,
@@ -204,9 +204,9 @@ pub trait FsReadDir: std::fmt::Debug + MaybeSend + MaybeSync {
 }
 
 #[allow(clippy::disallowed_types, reason = "definition")]
-pub type FileSystemRc = deno_maybe_sync::MaybeArc<dyn FileSystem>;
+pub type FileSystemRc = oden_maybe_sync::MaybeArc<dyn FileSystem>;
 #[allow(clippy::disallowed_types, reason = "definition")]
-pub type FsReadDirRc = deno_maybe_sync::MaybeArc<dyn FsReadDir>;
+pub type FsReadDirRc = oden_maybe_sync::MaybeArc<dyn FsReadDir>;
 
 #[async_trait::async_trait(?Send)]
 pub trait FileSystem: std::fmt::Debug + MaybeSend + MaybeSync {

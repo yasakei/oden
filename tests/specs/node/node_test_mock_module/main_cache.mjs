@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // The `cache` option controls whether repeated imports of a mocked module
 // return the same instance (cache: true) or a fresh one (cache: false, the
 // default).

@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 (function () {
 const { core } = __bootstrap;
 const { SocketAddress } = core.loadExtScript(
-  "ext:deno_node/internal/blocklist.mjs",
+  "ext:oden_node/internal/blocklist.mjs",
 );
 const { AF_INET } = core.loadExtScript(
-  "ext:deno_node/internal_binding/block_list.ts",
+  "ext:oden_node/internal_binding/block_list.ts",
 ).default;
 
 class InternalSocketAddress extends SocketAddress {

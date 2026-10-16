@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Adapted from Node.js internal/mime.js
 (function () {
 const { core, primordials } = __bootstrap;
@@ -16,7 +16,7 @@ const {
   SymbolIterator,
 } = primordials;
 const { ERR_INVALID_MIME_SYNTAX } = core.loadExtScript(
-  "ext:deno_node/internal/errors.ts",
+  "ext:oden_node/internal/errors.ts",
 );
 
 const NOT_HTTP_TOKEN_CODE_POINT = new SafeRegExp(

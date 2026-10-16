@@ -1,5 +1,5 @@
-Deno.test("SourceCode.text", () => {
-  const plugin: Deno.lint.Plugin = {
+Oden.test("SourceCode.text", () => {
+  const plugin: Oden.lint.Plugin = {
     name: "sample",
     rules: {
       "test": {
@@ -10,7 +10,7 @@ Deno.test("SourceCode.text", () => {
       },
     },
   };
-  Deno.lint.runPlugin(
+  Oden.lint.runPlugin(
     plugin,
     "./test.js",
     `function add(a, b) {

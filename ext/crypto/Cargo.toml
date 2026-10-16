@@ -1,14 +1,14 @@
-# Copyright 2018-2026 the Deno authors. MIT license.
+# Copyright 2018-2026 the Oden authors. MIT license.
 
 [package]
-name = "deno_crypto"
+name = "oden_crypto"
 version = "0.273.0"
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 readme = "README.md"
 repository.workspace = true
-description = "Web Cryptography API implementation for Deno"
+description = "Web Cryptography API implementation for Oden"
 
 [lib]
 path = "lib.rs"
@@ -24,8 +24,8 @@ cbc.workspace = true
 const-oid.workspace = true
 ctr.workspace = true
 curve25519-dalek.workspace = true
-deno_core.workspace = true
-deno_crypto_provider.workspace = true
+oden_core.workspace = true
+oden_crypto_provider.workspace = true
 deno_error.workspace = true
 ecdsa.workspace = true
 elliptic-curve = { workspace = true, features = ["std", "pem", "arithmetic"] }

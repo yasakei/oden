@@ -3,21 +3,21 @@ import { bar } from "./bar.ts";
 import { qux } from "./baz/qux.ts";
 import { quux } from "./baz/quux.ts";
 
-Deno.test("foo", () => {
+Oden.test("foo", () => {
   foo(true);
   foo(false);
 });
 
-Deno.test("bar", () => {
+Oden.test("bar", () => {
   bar(false);
 });
 
-Deno.test("qux", () => {
+Oden.test("qux", () => {
   qux(true);
   qux(false);
 });
 
-Deno.test("quux", () => {
+Oden.test("quux", () => {
   quux(false);
 });
 

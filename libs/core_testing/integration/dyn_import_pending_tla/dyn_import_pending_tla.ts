@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Test that multiple dynamic imports of a module with pending TLA
 // all resolve to the same module instance without throwing

@@ -1,1 +1,1 @@
-Deno.bench();
+Oden.bench();

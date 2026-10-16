@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 mod backup;
 mod database;
@@ -15,8 +15,8 @@ pub use session::Session;
 pub use sql_tag_store::SQLTagStore;
 pub use statement::StatementSync;
 
-deno_core::extension!(
-  deno_node_sqlite,
+oden_core::extension!(
+  oden_node_sqlite,
   ops = [op_node_database_backup,],
   objects = [
     DatabaseSync,
@@ -32,7 +32,7 @@ pub enum SqliteError {
   #[class(inherit)]
   #[error(transparent)]
   #[property("code" = self.code())]
-  Permission(#[from] deno_permissions::PermissionCheckError),
+  Permission(#[from] oden_permissions::PermissionCheckError),
   #[class(generic)]
   #[error(transparent)]
   #[property("code" = self.code())]

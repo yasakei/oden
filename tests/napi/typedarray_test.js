@@ -1,11 +1,11 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 import { Buffer } from "node:buffer";
 import { assert, assertEquals, loadTestLibrary } from "./common.js";
 
 const typedarray = loadTestLibrary();
 
-Deno.test("napi typedarray uint8", function () {
+Oden.test("napi typedarray uint8", function () {
   const byteArray = new Uint8Array([0, 1, 2]);
   assertEquals(byteArray.length, 3);
 
@@ -17,7 +17,7 @@ Deno.test("napi typedarray uint8", function () {
   assertEquals(byteResult[2], 6);
 });
 
-Deno.test("napi typedarray float64", function () {
+Oden.test("napi typedarray float64", function () {
   const doubleArray = new Float64Array([0.0, 1.1, 2.2]);
   assertEquals(doubleArray.length, 3);
 
@@ -29,7 +29,7 @@ Deno.test("napi typedarray float64", function () {
   assertEquals(Math.round(10 * doubleResult[2]) / 10, -6.6);
 });
 
-Deno.test("napi_is_buffer", () => {
+Oden.test("napi_is_buffer", () => {
   assert(!typedarray.test_is_buffer(5));
   assert(!typedarray.test_is_buffer([]));
   assert(typedarray.test_is_buffer(new Uint8Array()));
@@ -40,7 +40,7 @@ Deno.test("napi_is_buffer", () => {
 // Regression test for #36570: napi_get_typedarray_info must report
 // napi_float16_array (11) rather than aborting, and napi_create_typedarray
 // must accept napi_float16_array. napi_float32_array is 7.
-Deno.test("napi float16 typedarray", () => {
+Oden.test("napi float16 typedarray", () => {
   assertEquals(typedarray.test_typedarray_type(new Float32Array(4)), 7);
   assertEquals(typedarray.test_typedarray_type(new Float16Array(4)), 11);
 
@@ -52,7 +52,7 @@ Deno.test("napi float16 typedarray", () => {
 // TODO(bartlomieju): this test causes segfaults when used with jemalloc.
 // Node documentation provides a hint that this function is not supported by
 // other runtime like electron.
-// Deno.test("napi typedarray external", function () {
+// Oden.test("napi typedarray external", function () {
 //   assertEquals(
 //     new Uint8Array(typedarray.test_external()),
 //     new Uint8Array([0, 1, 2, 3]),

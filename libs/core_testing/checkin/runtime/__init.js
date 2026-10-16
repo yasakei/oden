@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import * as async from "checkin:async";
 import * as console from "checkin:console";
 import * as error from "checkin:error";
@@ -21,7 +21,7 @@ globalThis.clearInterval = timers.clearInterval;
 globalThis.setImmediate = timers.setImmediate;
 globalThis.clearImmediate = timers.clearImmediate;
 globalThis.Worker = worker.Worker;
-Deno.core.addMainModuleHandler((module) => {
+Oden.core.addMainModuleHandler((module) => {
   if (onMainModuleCb) onMainModuleCb(module);
 });
 let onMainModuleCb = () => {};
@@ -33,25 +33,25 @@ Reflect.defineProperty(globalThis, "onmainmodule", {
 Reflect.defineProperty(globalThis, "onerror", {
   set: (cb) => {
     if (cb) {
-      Deno.core.setReportExceptionCallback((error) => {
+      Oden.core.setReportExceptionCallback((error) => {
         let defaultPrevented = false;
         cb({
           error,
           preventDefault: () => defaultPrevented = true,
         });
         if (!defaultPrevented) {
-          Deno.core.reportUnhandledException(error);
+          Oden.core.reportUnhandledException(error);
         }
       });
     } else {
-      Deno.core.setReportExceptionCallback(null);
+      Oden.core.setReportExceptionCallback(null);
     }
   },
 });
 Reflect.defineProperty(globalThis, "onunhandledrejection", {
   set: (cb) => {
     if (cb) {
-      Deno.core.setUnhandledPromiseRejectionHandler((promise, reason) => {
+      Oden.core.setUnhandledPromiseRejectionHandler((promise, reason) => {
         let defaultPrevented = false;
         cb({
           promise,
@@ -61,24 +61,24 @@ Reflect.defineProperty(globalThis, "onunhandledrejection", {
         return defaultPrevented;
       });
     } else {
-      Deno.core.setUnhandledPromiseRejectionHandler(null);
+      Oden.core.setUnhandledPromiseRejectionHandler(null);
     }
   },
 });
 Reflect.defineProperty(globalThis, "onrejectionhandled", {
   set: (cb) => {
     if (cb) {
-      Deno.core.setHandledPromiseRejectionHandler((promise, reason) => {
+      Oden.core.setHandledPromiseRejectionHandler((promise, reason) => {
         cb({
           promise,
           reason,
         });
       });
     } else {
-      Deno.core.setHandledPromiseRejectionHandler(null);
+      Oden.core.setHandledPromiseRejectionHandler(null);
     }
   },
 });
-Deno.unrefTimer = timers.unrefTimer;
-Deno.refTimer = timers.refTimer;
-Deno.unrefImmediate = timers.unrefImmediate;
+Oden.unrefTimer = timers.unrefTimer;
+Oden.refTimer = timers.refTimer;
+Oden.unrefImmediate = timers.unrefImmediate;

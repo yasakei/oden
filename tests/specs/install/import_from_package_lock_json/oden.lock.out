@@ -1,0 +1,19 @@
+{
+  "version": "5",
+  "specifiers": {
+    "npm:@odentest/add@1": "1.0.0"
+  },
+  "npm": {
+    "@odentest/add@1.0.0": {
+      "integrity": "[WILDCARD]",
+      "tarball": "http://localhost:4260/@odentest/add/1.0.0.tgz"
+    }
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@odentest/add@1"
+      ]
+    }
+  }
+}

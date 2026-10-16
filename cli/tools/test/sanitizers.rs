@@ -1,17 +1,17 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
-use deno_core::error::CoreError;
-use deno_core::stats::RuntimeActivity;
-use deno_core::stats::RuntimeActivityDiff;
-use deno_core::stats::RuntimeActivityStats;
-use deno_core::stats::RuntimeActivityStatsFactory;
-use deno_core::stats::RuntimeActivityStatsFilter;
-use deno_core::stats::RuntimeActivityType;
-use deno_runtime::worker::MainWorker;
+use oden_core::error::CoreError;
+use oden_core::stats::RuntimeActivity;
+use oden_core::stats::RuntimeActivityDiff;
+use oden_core::stats::RuntimeActivityStats;
+use oden_core::stats::RuntimeActivityStatsFactory;
+use oden_core::stats::RuntimeActivityStatsFilter;
+use oden_core::stats::RuntimeActivityType;
+use oden_runtime::worker::MainWorker;
 
 use super::poll_event_loop;
 
@@ -227,7 +227,7 @@ pub fn create_test_sanitizer_helper(
 
 /// The sanitizer must ignore ops, resources and timers that were started at the top-level, but
 /// completed and restarted, replacing themselves with the same "thing". For example, if you run a
-/// `Deno.serve` server at the top level and make fetch requests to it during the test, those ops
+/// `Oden.serve` server at the top level and make fetch requests to it during the test, those ops
 /// should not count as completed during the test because they are immediately replaced.
 fn is_empty(
   top_level: &TopLevelSanitizerStats,

@@ -1,14 +1,14 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #[macro_export]
 macro_rules! prelude {
   () => {
     #[allow(unused_imports)]
-    use deno_ops::FromV8;
+    use oden_ops::FromV8;
     #[allow(unused_imports)]
-    use deno_ops::WebIDL;
+    use oden_ops::WebIDL;
     #[allow(unused_imports)]
-    use deno_ops::op2;
+    use oden_ops::op2;
 
     pub fn main() {}
   };

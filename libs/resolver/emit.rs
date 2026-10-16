@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::hash::Hash;
 use std::hash::Hasher;
@@ -21,8 +21,8 @@ use deno_error::JsErrorBox;
 use deno_graph::MediaType;
 use deno_graph::Module;
 use deno_graph::ModuleGraph;
-use deno_maybe_sync::MaybeSend;
-use deno_maybe_sync::MaybeSync;
+use oden_maybe_sync::MaybeSend;
+use oden_maybe_sync::MaybeSync;
 use futures::FutureExt;
 use futures::StreamExt;
 use futures::stream::FuturesUnordered;
@@ -33,9 +33,9 @@ use crate::cache::EmitCacheRc;
 use crate::cache::EmitCacheSys;
 use crate::cache::ParsedSourceCacheRc;
 use crate::cjs::CjsTrackerRc;
-use crate::deno_json::CompilerOptionsParseError;
-use crate::deno_json::CompilerOptionsResolverRc;
-use crate::deno_json::TranspileAndEmitOptions;
+use crate::oden_json::CompilerOptionsParseError;
+use crate::oden_json::CompilerOptionsResolverRc;
+use crate::oden_json::TranspileAndEmitOptions;
 
 #[allow(
   clippy::disallowed_types,
@@ -45,7 +45,7 @@ type ArcStr = std::sync::Arc<str>;
 
 #[allow(clippy::disallowed_types, reason = "definition")]
 pub type EmitterRc<TInNpmPackageChecker, TSys> =
-  deno_maybe_sync::MaybeArc<Emitter<TInNpmPackageChecker, TSys>>;
+  oden_maybe_sync::MaybeArc<Emitter<TInNpmPackageChecker, TSys>>;
 
 #[sys_traits::auto_impl]
 pub trait EmitterSys: EmitCacheSys {}
@@ -154,7 +154,7 @@ impl<TInNpmPackageChecker: InNpmPackageChecker, TSys: EmitterSys>
     parsed_source: deno_ast::ParsedSource,
     module_kind: ModuleKind,
   ) -> Result<ArcStr, EmitParsedSourceHelperError> {
-    // note: this method is used in deno-js-loader
+    // note: this method is used in oden-js-loader
     self
       .maybe_emit_parsed_source_provider(parsed_source, module_kind)
       .await
@@ -281,7 +281,7 @@ impl<TInNpmPackageChecker: InNpmPackageChecker, TSys: EmitterSys>
     }
   }
 
-  pub fn emit_source_for_deno_compile(
+  pub fn emit_source_for_oden_compile(
     &self,
     specifier: &Url,
     media_type: MediaType,
@@ -545,7 +545,7 @@ fn transpile(
   // swc decorator pass otherwise hoists every computed class-member key into
   // a `var _computedKey; _computedKey = ...;` pair at module scope, which
   // looks like a side effect and blocks downstream tree-shaking (e.g. in
-  // `deno bundle`). See denoland/deno#30817.
+  // `oden bundle`). See denoland/deno#30817.
   let owned_options;
   let transpile_options = if !matches!(
     transpile_options.decorators,

@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 #![deny(clippy::print_stderr)]
 #![deny(clippy::print_stdout)]
@@ -11,16 +11,16 @@ use std::borrow::Cow;
 use std::path::Path;
 use std::path::PathBuf;
 
-use deno_core::FastString;
-use deno_core::OpState;
-use deno_core::op2;
-use deno_core::url::Url;
-use deno_core::v8;
-use deno_core::v8::ExternalReference;
+use oden_core::FastString;
+use oden_core::OpState;
+use oden_core::op2;
+use oden_core::url::Url;
+use oden_core::v8;
+use oden_core::v8::ExternalReference;
 use deno_error::JsErrorBox;
-use deno_permissions::OpenAccessKind;
-use deno_permissions::PermissionsContainer;
-use node_resolver::DenoIsBuiltInNodeModuleChecker;
+use oden_permissions::OpenAccessKind;
+use oden_permissions::PermissionsContainer;
+use node_resolver::OdenIsBuiltInNodeModuleChecker;
 use node_resolver::InNpmPackageChecker;
 use node_resolver::IsBuiltInNodeModuleChecker;
 use node_resolver::NpmPackageFolderResolver;
@@ -31,10 +31,10 @@ extern crate libz_sys as zlib;
 
 pub mod ops;
 
-use deno_dotenv::parse_env_content_hook;
-pub use deno_package_json::PackageJson;
-use deno_permissions::PermissionCheckError;
-pub use node_resolver::DENO_SUPPORTED_BUILTIN_NODE_MODULES as SUPPORTED_BUILTIN_NODE_MODULES;
+use oden_dotenv::parse_env_content_hook;
+pub use oden_package_json::PackageJson;
+use oden_permissions::PermissionCheckError;
+pub use node_resolver::ODEN_SUPPORTED_BUILTIN_NODE_MODULES as SUPPORTED_BUILTIN_NODE_MODULES;
 pub use node_resolver::PathClean;
 pub use ops::ipc::ChildPipeFd;
 use ops::vm;
@@ -43,7 +43,7 @@ pub use ops::vm::VM_CONTEXT_INDEX;
 pub use ops::vm::create_v8_context;
 pub use ops::vm::init_global_template;
 
-/// The Node.js version that Deno emulates. This is the single source of truth
+/// The Node.js version that Oden emulates. This is the single source of truth
 /// for the value reported through `process.version` / `process.versions.node`:
 /// the `__NODE_VERSION__` token in `_process/process.ts` is substituted with it
 /// at snapshot build time (see `maybe_transpile_source` in
@@ -53,7 +53,7 @@ pub use ops::vm::init_global_template;
 pub const NODE_VERSION: &str = "26.5.1";
 
 pub fn is_builtin_node_module(module_name: &str) -> bool {
-  DenoIsBuiltInNodeModuleChecker.is_builtin_node_module(module_name)
+  OdenIsBuiltInNodeModuleChecker.is_builtin_node_module(module_name)
 }
 
 #[allow(clippy::disallowed_types, reason = "definition")]
@@ -125,7 +125,7 @@ fn op_node_build_os() -> String {
 enum DotEnvLoadErr {
   #[class(inherit)]
   #[error("{0}")]
-  Fs(#[from] deno_io::fs::FsError),
+  Fs(#[from] oden_io::fs::FsError),
   #[class(inherit)]
   #[error(transparent)]
   Permission(
@@ -142,7 +142,7 @@ fn op_node_load_env_file(
   scope: &mut v8::PinScope<'_, '_>,
   #[string] path: &str,
 ) -> Result<(), DotEnvLoadErr> {
-  let fs = state.borrow::<deno_fs::FileSystemRc>().clone();
+  let fs = state.borrow::<oden_fs::FileSystemRc>().clone();
   let permissions = state.borrow::<PermissionsContainer>().clone();
   permissions
     .check_env_all()
@@ -156,7 +156,7 @@ fn op_node_load_env_file(
     .map_err(DotEnvLoadErr::Permission)?;
 
   let contents = fs.read_text_file_lossy_sync(&path)?;
-  let process_env = deno_os::ProcessEnvGuard::lock();
+  let process_env = oden_os::ProcessEnvGuard::lock();
   parse_env_content_hook(&contents, &mut |key, value| {
     // Follows Node.js behavior where null bytes are stripped from env keys and values
     let key = if let Some(null_pos) = key.find('\0') {
@@ -198,8 +198,8 @@ pub struct NodeExtInitServices<
   pub sys: TSys,
 }
 
-deno_core::extension!(deno_node,
-  deps = [ deno_io, deno_fs ],
+oden_core::extension!(oden_node,
+  deps = [ oden_io, oden_fs ],
   parameters = [TInNpmPackageChecker: InNpmPackageChecker, TNpmPackageFolderResolver: NpmPackageFolderResolver, TSys: ExtNodeSys],
   ops = [
     ops::assert::op_node_get_first_expression,
@@ -361,8 +361,8 @@ deno_core::extension!(deno_node,
     ops::require::op_require_init_paths,
     ops::require::op_require_node_module_paths<TSys>,
     ops::require::op_require_proxy_path,
-    ops::require::op_require_is_deno_dir_package<TInNpmPackageChecker, TNpmPackageFolderResolver, TSys>,
-    ops::require::op_require_resolve_deno_dir<TInNpmPackageChecker, TNpmPackageFolderResolver, TSys>,
+    ops::require::op_require_is_oden_dir_package<TInNpmPackageChecker, TNpmPackageFolderResolver, TSys>,
+    ops::require::op_require_resolve_oden_dir<TInNpmPackageChecker, TNpmPackageFolderResolver, TSys>,
     ops::require::op_require_is_maybe_cjs,
     ops::require::op_require_is_request_relative,
     ops::require::op_require_resolve_lookup_paths,
@@ -469,7 +469,7 @@ deno_core::extension!(deno_node,
   // explicit eager `esm` entry: the whole node process closure
   // (module / process / stream / net / tty / ...) is moved to
   // `lazy_loaded_esm` and only deserialized on first node:* use, so non-node
-  // `deno run` programs never pay for it in the snapshot. An explicit entry
+  // `oden run` programs never pay for it in the snapshot. An explicit entry
   // here that no eager module imports would land in the module map
   // unevaluated and fail snapshot validation with `NonEvaluatedModules`.
   esm = [
@@ -478,7 +478,7 @@ deno_core::extension!(deno_node,
   // Keep the rest of the node-polyfill closures (process / module / net /
   // tty / 01_require) out of the eager evaluation graph: their foundational
   // SFIs and context state are loaded only on first node:* use, so non-node
-  // `deno run` paths skip ~2 MB of node-polyfill deserialization.
+  // `oden run` paths skip ~2 MB of node-polyfill deserialization.
   // node:module previously had to stay eager because lazy bootstrap shifted
   // Agent.keepSocketAlive's setUnrefTimeout(5000) into test execution where
   // the sanitizer saw it as a leak; the timer is now marked is_system in
@@ -798,14 +798,14 @@ deno_core::extension!(deno_node,
     "path/mod.ts",
   ],
   synthetic_esm = [
-    "node:url" = "ext:deno_node/url.ts",
-    "node:util" = "ext:deno_node/util.ts",
-    "node:worker_threads" = "ext:deno_node/worker_threads.ts",
-    "node:zlib" = "ext:deno_node/zlib.js",
+    "node:url" = "ext:oden_node/url.ts",
+    "node:util" = "ext:oden_node/util.ts",
+    "node:worker_threads" = "ext:oden_node/worker_threads.ts",
+    "node:zlib" = "ext:oden_node/zlib.js",
   ],
   options = {
     maybe_init: Option<NodeExtInitServices<TInNpmPackageChecker, TNpmPackageFolderResolver, TSys>>,
-    fs: deno_fs::FileSystemRc,
+    fs: oden_fs::FileSystemRc,
   },
   state = |state, options| {
     state.put(options.fs.clone());
@@ -825,10 +825,10 @@ deno_core::extension!(deno_node,
     state.put(crate::ops::tls::NodeTlsState {
       custom_ca_certs: None,
       client_session_store: std::sync::Arc::new(
-        deno_tls::rustls::client::ClientSessionMemoryCache::new(256),
+        oden_tls::rustls::client::ClientSessionMemoryCache::new(256),
       ),
       client_session_store_insecure: std::sync::Arc::new(
-        deno_tls::rustls::client::ClientSessionMemoryCache::new(256),
+        oden_tls::rustls::client::ClientSessionMemoryCache::new(256),
       ),
       server_ticketer: None,
       cached_default_verifier: None,
@@ -837,7 +837,7 @@ deno_core::extension!(deno_node,
       cached_insecure_no_client_auth: None,
     });
   },
-  customizer = |ext: &mut deno_core::Extension| {
+  customizer = |ext: &mut oden_core::Extension| {
     let external_references = [
       vm::QUERY_MAP_FN.with(|query| {
         ExternalReference {
@@ -929,13 +929,13 @@ pub trait ExtNodeSys:
 pub type NodeResolver<TInNpmPackageChecker, TNpmPackageFolderResolver, TSys> =
   node_resolver::NodeResolver<
     TInNpmPackageChecker,
-    DenoIsBuiltInNodeModuleChecker,
+    OdenIsBuiltInNodeModuleChecker,
     TNpmPackageFolderResolver,
     TSys,
   >;
 #[allow(clippy::disallowed_types, reason = "definition")]
 pub type NodeResolverRc<TInNpmPackageChecker, TNpmPackageFolderResolver, TSys> =
-  deno_fs::sync::MaybeArc<
+  oden_fs::sync::MaybeArc<
     NodeResolver<TInNpmPackageChecker, TNpmPackageFolderResolver, TSys>,
   >;
 
@@ -958,9 +958,9 @@ pub fn create_host_defined_options<'s>(
 pub fn create_vm_dynamic_import_missing_host_defined_options<'s>(
   scope: &mut v8::PinScope<'s, '_>,
 ) -> v8::Local<'s, v8::Data> {
-  deno_core::create_host_defined_options_with_kind(
+  oden_core::create_host_defined_options_with_kind(
     scope,
-    deno_core::host_defined_options_kind::VM_DYNAMIC_IMPORT_MISSING,
+    oden_core::host_defined_options_kind::VM_DYNAMIC_IMPORT_MISSING,
   )
 }
 
@@ -968,9 +968,9 @@ pub fn create_vm_dynamic_import_callback_host_defined_options<'s>(
   scope: &mut v8::PinScope<'s, '_>,
   callback_id: u32,
 ) -> v8::Local<'s, v8::Data> {
-  deno_core::create_host_defined_options_with_kind_and_key(
+  oden_core::create_host_defined_options_with_kind_and_key(
     scope,
-    deno_core::host_defined_options_kind::VM_DYNAMIC_IMPORT_CALLBACK,
+    oden_core::host_defined_options_kind::VM_DYNAMIC_IMPORT_CALLBACK,
     callback_id,
   )
 }

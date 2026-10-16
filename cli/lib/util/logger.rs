@@ -1,13 +1,13 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::io::Write;
 use std::sync::Arc;
 use std::sync::OnceLock;
 
 use arc_swap::ArcSwap;
-use deno_runtime::deno_telemetry;
-use deno_runtime::deno_telemetry::OtelConfig;
-use deno_runtime::deno_telemetry::OtelConsoleConfig;
+use oden_runtime::oden_telemetry;
+use oden_runtime::oden_telemetry::OtelConfig;
+use oden_runtime::oden_telemetry::OtelConsoleConfig;
 
 struct CliLoggerInner {
   otel_console_config: OtelConsoleConfig,
@@ -41,10 +41,10 @@ impl log::Log for CliLogger {
         }
         OtelConsoleConfig::Capture => {
           self.inner.load().logger.log(record);
-          deno_telemetry::handle_log(record);
+          oden_telemetry::handle_log(record);
         }
         OtelConsoleConfig::Replace => {
-          deno_telemetry::handle_log(record);
+          oden_telemetry::handle_log(record);
         }
       }
 
@@ -70,9 +70,9 @@ pub fn init(options: InitLoggingOptions) {
   let log_level = options.maybe_level.unwrap_or(log::Level::Info);
   let logger = env_logger::Builder::from_env(
     env_logger::Env::new()
-      // Use `DENO_LOG` and `DENO_LOG_STYLE` instead of `RUST_` prefix
-      .filter_or("DENO_LOG", log_level.to_level_filter().to_string())
-      .write_style("DENO_LOG_STYLE"),
+      // Use `ODEN_LOG` and `ODEN_LOG_STYLE` instead of `RUST_` prefix
+      .filter_or("ODEN_LOG", log_level.to_level_filter().to_string())
+      .write_style("ODEN_LOG_STYLE"),
   )
   // https://github.com/denoland/deno/issues/6641
   .filter_module("rustyline", log::LevelFilter::Off)
@@ -82,7 +82,7 @@ pub fn init(options: InitLoggingOptions) {
   .filter_module("globset", log::LevelFilter::Error)
   // used to make available the lsp_debug which is then filtered out at runtime
   // in the cli logger
-  .filter_module("deno::lsp::performance", log::LevelFilter::Debug)
+  .filter_module("oden::lsp::performance", log::LevelFilter::Debug)
   .filter_module("rustls", log::LevelFilter::Off)
   // swc_ecma_codegen's `srcmap!` macro emits error-level spans only on debug
   // build:
@@ -97,7 +97,7 @@ pub fn init(options: InitLoggingOptions) {
   .filter_module("tracing::span", log::LevelFilter::Off)
   .filter_module("tower_lsp", log::LevelFilter::Trace)
   .filter_module("opentelemetry_sdk", log::LevelFilter::Off)
-  // for deno_compile, this is too verbose
+  // for oden_compile, this is too verbose
   .filter_module("editpe", log::LevelFilter::Error)
   // too verbose
   .filter_module("cranelift_codegen", log::LevelFilter::Off)
@@ -113,7 +113,7 @@ pub fn init(options: InitLoggingOptions) {
       target.push_str(&line_no.to_string());
     }
     if record.level() <= log::Level::Info
-      || (record.target() == "deno::lsp::performance"
+      || (record.target() == "oden::lsp::performance"
         && record.level() == log::Level::Debug)
     {
       // Print ERROR, WARN, INFO and lsp_debug logs as they are

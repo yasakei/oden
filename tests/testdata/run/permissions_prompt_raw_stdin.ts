@@ -5,6 +5,6 @@
 //
 // Verify that the prompt instead bails out with a clear message and
 // denies the permission.
-Deno.stdin.setRaw(true);
-const status = Deno.permissions.requestSync({ name: "env", variable: "FOO" });
+Oden.stdin.setRaw(true);
+const status = Oden.permissions.requestSync({ name: "env", variable: "FOO" });
 console.log("STATUS:", status.state);

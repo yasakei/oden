@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { core, internals, primordials } = __bootstrap;
@@ -73,7 +73,7 @@ const {
   Number,
 } = primordials;
 
-const { InnerBody } = core.loadExtScript("ext:deno_fetch/22_body.js");
+const { InnerBody } = core.loadExtScript("ext:oden_fetch/22_body.js");
 const {
   dropServeNativeResponse,
   getInnerResponse,
@@ -90,15 +90,15 @@ const {
   SERVE_FAST_HEADER_NONE,
   toInnerResponse,
   wireHeaderList,
-} = core.loadExtScript("ext:deno_fetch/23_response.js");
+} = core.loadExtScript("ext:oden_fetch/23_response.js");
 const {
   abortRequest,
   cacheRequestHeaders,
   fromInnerRequest,
   requestHeadersExposed,
-} = core.loadExtScript("ext:deno_fetch/23_request.js");
+} = core.loadExtScript("ext:oden_fetch/23_request.js");
 const { AbortController } = core.loadExtScript(
-  "ext:deno_web/03_abort_signal.js",
+  "ext:oden_web/03_abort_signal.js",
 );
 const {
   getReadableStreamResourceBacking,
@@ -106,13 +106,13 @@ const {
   readableStreamForRid,
   ReadableStreamPrototype,
   resourceForReadableStream,
-} = core.loadExtScript("ext:deno_web/06_streams.js");
+} = core.loadExtScript("ext:oden_web/06_streams.js");
 const {
   listen,
   listenOptionApiName,
-} = core.loadExtScript("ext:deno_net/01_net.js");
+} = core.loadExtScript("ext:oden_net/01_net.js");
 const { hasTlsKeyPairOptions, listenTls } = core.loadExtScript(
-  "ext:deno_net/02_tls.js",
+  "ext:oden_net/02_tls.js",
 );
 const {
   otelState,
@@ -121,11 +121,11 @@ const {
   currentSnapshot,
   enterSpan,
   restoreSnapshot,
-} = core.loadExtScript("ext:deno_telemetry/telemetry.ts");
+} = core.loadExtScript("ext:oden_telemetry/telemetry.ts");
 const {
   updateSpanFromRequest,
   updateSpanFromServerResponse,
-} = core.loadExtScript("ext:deno_telemetry/util.ts");
+} = core.loadExtScript("ext:oden_telemetry/util.ts");
 
 const _upgraded = Symbol("_upgraded");
 
@@ -222,7 +222,7 @@ class InnerRequest {
         legacyAbortWarned = true;
         // deno-lint-ignore no-console
         console.warn(
-          "Deno.serve: request.signal aborts on successful responses (legacy behavior). To detect when a request has been fully delivered use the `completed` promise on the handler's info argument. Move cleanup to the handler's return path, or opt in to the new behavior with --unstable-no-legacy-abort. See https://docs.deno.com/go/unstable-no-legacy-abort",
+          "Oden.serve: request.signal aborts on successful responses (legacy behavior). To detect when a request has been fully delivered use the `completed` promise on the handler's info argument. Move cleanup to the handler's return path, or opt in to the new behavior with --unstable-no-legacy-abort. See https://docs.deno.com/go/unstable-no-legacy-abort",
         );
       }
       abortRequest(this.request);
@@ -236,16 +236,16 @@ class InnerRequest {
 
   _throwIfUpgraded() {
     if (this.#upgraded) {
-      throw new Deno.errors.Http("Already upgraded");
+      throw new Oden.errors.Http("Already upgraded");
     }
   }
 
   _wantsUpgrade(upgradeType) {
     if (this.#upgraded) {
-      throw new Deno.errors.Http("Already upgraded");
+      throw new Oden.errors.Http("Already upgraded");
     }
     if (this.#external === null) {
-      throw new Deno.errors.Http("Already closed");
+      throw new Oden.errors.Http("Already closed");
     }
 
     if (upgradeType == "upgradeWebSocket") {
@@ -886,7 +886,7 @@ function mapToCallback(context, callback, onError) {
       }
 
       const span = builtinTracer().startSpan(
-        "deno.serve",
+        "oden.serve",
         { kind: 1 },
         activeContext,
       );
@@ -1143,7 +1143,7 @@ function formatHostName(hostname: string): string {
   // because browsers in Windows don't resolve "0.0.0.0".
   // See the discussion in https://github.com/denoland/deno_std/issues/1165
   if (
-    Deno.build.os === "windows" &&
+    Oden.build.os === "windows" &&
     (hostname == "0.0.0.0" || hostname == "::")
   ) {
     return "localhost";
@@ -1153,7 +1153,7 @@ function formatHostName(hostname: string): string {
   return StringPrototypeIncludes(hostname, ":") ? `[${hostname}]` : hostname;
 }
 
-// Flag to track if DENO_SERVE_ADDRESS override has been consumed
+// Flag to track if ODEN_SERVE_ADDRESS override has been consumed
 let serveAddressOverrideConsumed = false;
 
 function serve(arg1, arg2) {
@@ -1308,7 +1308,7 @@ function serveInner(options, handler) {
     const listener = listen({
       transport: "unix",
       path: options.path,
-      [listenOptionApiName]: "Deno.serve",
+      [listenOptionApiName]: "Oden.serve",
     });
     const path = listener.addr.path;
     return serveHttpOnListener(
@@ -1332,7 +1332,7 @@ function serveInner(options, handler) {
       transport: "vsock",
       cid: options.cid,
       port: options.port,
-      [listenOptionApiName]: "Deno.serve",
+      [listenOptionApiName]: "Oden.serve",
     });
     const { cid, port } = listener.addr;
     return serveHttpOnListener(
@@ -1354,7 +1354,7 @@ function serveInner(options, handler) {
   if (wantsTunnel) {
     const listener = listen({
       transport: "tunnel",
-      [listenOptionApiName]: "Deno.serve",
+      [listenOptionApiName]: "Oden.serve",
     });
     return serveHttpOnListener(
       listener,
@@ -1461,7 +1461,7 @@ function serveHttpOnListener(
   const promiseErrorHandler = (error) => {
     internals.log(
       "error",
-      "Terminating Deno.serve loop due to unexpected error",
+      "Terminating Oden.serve loop due to unexpected error",
       error,
     );
     serverContext?.close();
@@ -1514,7 +1514,7 @@ function serveHttpOnConnection(connection, signal, handler, onError, onListen) {
   const promiseErrorHandler = (error) => {
     internals.log(
       "error",
-      "Terminating Deno.serve loop due to unexpected error",
+      "Terminating Oden.serve loop due to unexpected error",
       error,
     );
     serverContext?.close();
@@ -1577,7 +1577,7 @@ function serveHttpOn(context, addr) {
         !ObjectPrototypeIsPrototypeOf(BadResourcePrototype, error) &&
         !ObjectPrototypeIsPrototypeOf(InterruptedPrototype, error)
       ) {
-        throw new Deno.errors.Http(error);
+        throw new Oden.errors.Http(error);
       }
     }
 
@@ -1603,7 +1603,7 @@ function serveHttpOn(context, addr) {
     }
   })();
 
-  // 1 = "deno-serve"; must match `serving_server_kind()` in lib.rs.
+  // 1 = "oden-serve"; must match `serving_server_kind()` in lib.rs.
   op_http_notify_serving(1);
 
   return {
@@ -1674,7 +1674,7 @@ function registerDeclarativeServer(exports) {
     serveHost,
     workerCountWhenMain,
   }) => {
-    const server = Deno.serve({
+    const server = Oden.serve({
       port: servePort,
       hostname: serveHost,
       [kLoadBalanced]: workerCountWhenMain == null
@@ -1708,7 +1708,7 @@ function registerDeclarativeServer(exports) {
 
           internals.log(
             "info",
-            `%cdeno serve%c: Listening on %c${target}%c${nThreads}`,
+            `%coden serve%c: Listening on %c${target}%c${nThreads}`,
             "color: green",
             "color: inherit",
             "color: yellow",
@@ -1721,7 +1721,7 @@ function registerDeclarativeServer(exports) {
       },
     });
 
-    // Wire SIGTERM/SIGINT to a graceful server shutdown so that `deno serve`
+    // Wire SIGTERM/SIGINT to a graceful server shutdown so that `oden serve`
     // drains in-flight requests and exits cleanly (exit code 0) instead of
     // being terminated by the OS default signal handler (exit code 143/130),
     // e.g. when a container is redeployed.
@@ -1729,15 +1729,15 @@ function registerDeclarativeServer(exports) {
       // Stop listening for the signal so a second SIGTERM/SIGINT falls through
       // to the default handler and forcibly terminates a server that is slow
       // to drain.
-      Deno.removeSignalListener("SIGTERM", shutdownHandler);
-      Deno.removeSignalListener("SIGINT", shutdownHandler);
+      Oden.removeSignalListener("SIGTERM", shutdownHandler);
+      Oden.removeSignalListener("SIGINT", shutdownHandler);
       // `shutdown()` already swallows the errors from an interrupted server,
       // but guard against any rejection becoming unhandled.
       PromisePrototypeCatch(server.shutdown(), () => {});
     };
     try {
-      Deno.addSignalListener("SIGTERM", shutdownHandler);
-      Deno.addSignalListener("SIGINT", shutdownHandler);
+      Oden.addSignalListener("SIGTERM", shutdownHandler);
+      Oden.addSignalListener("SIGINT", shutdownHandler);
     } catch {
       // Adding signal listeners can fail in restricted environments; fall back
       // to the default behavior in that case.

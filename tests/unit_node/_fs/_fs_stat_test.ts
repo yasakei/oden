@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import {
   assertCallbackErrorUncaught,
   assertStats,
@@ -7,33 +7,33 @@ import {
 import { BigIntStats, stat, Stats, statSync } from "node:fs";
 import { assert, assertEquals, fail } from "@std/assert";
 
-Deno.test({
+Oden.test({
   name: "ASYNC: get a file Stats",
   async fn() {
-    const file = Deno.makeTempFileSync();
+    const file = Oden.makeTempFileSync();
     await new Promise<Stats>((resolve, reject) => {
       stat(file, (err, stat) => {
         if (err) reject(err);
         resolve(stat);
       });
     })
-      .then((stat) => assertStats(stat, Deno.statSync(file)), () => fail())
-      .finally(() => Deno.removeSync(file));
+      .then((stat) => assertStats(stat, Oden.statSync(file)), () => fail())
+      .finally(() => Oden.removeSync(file));
   },
 });
 
-Deno.test({
+Oden.test({
   name: "SYNC: get a file Stats",
   fn() {
-    const file = Deno.makeTempFileSync();
-    assertStats(statSync(file), Deno.statSync(file));
+    const file = Oden.makeTempFileSync();
+    assertStats(statSync(file), Oden.statSync(file));
   },
 });
 
-Deno.test({
+Oden.test({
   name: "ASYNC: get a file BigInt Stats",
   async fn() {
-    const file = Deno.makeTempFileSync();
+    const file = Oden.makeTempFileSync();
     await new Promise<BigIntStats>((resolve, reject) => {
       stat(file, { bigint: true }, (err, stat) => {
         if (err) reject(err);
@@ -41,34 +41,34 @@ Deno.test({
       });
     })
       .then(
-        (stat) => assertStatsBigInt(stat, Deno.statSync(file)),
+        (stat) => assertStatsBigInt(stat, Oden.statSync(file)),
         () => fail(),
       )
-      .finally(() => Deno.removeSync(file));
+      .finally(() => Oden.removeSync(file));
   },
 });
 
-Deno.test({
+Oden.test({
   name: "SYNC: get a file BigInt Stats",
   fn() {
-    const file = Deno.makeTempFileSync();
-    assertStatsBigInt(statSync(file, { bigint: true }), Deno.statSync(file));
+    const file = Oden.makeTempFileSync();
+    assertStatsBigInt(statSync(file, { bigint: true }), Oden.statSync(file));
   },
 });
 
-Deno.test("[std/node/fs] stat callback isn't called twice if error is thrown", async () => {
-  const tempFile = await Deno.makeTempFile();
+Oden.test("[std/node/fs] stat callback isn't called twice if error is thrown", async () => {
+  const tempFile = await Oden.makeTempFile();
   const importUrl = new URL("node:fs", import.meta.url);
   await assertCallbackErrorUncaught({
     prelude: `import { stat } from ${JSON.stringify(importUrl)}`,
     invocation: `stat(${JSON.stringify(tempFile)}, `,
     async cleanup() {
-      await Deno.remove(tempFile);
+      await Oden.remove(tempFile);
     },
   });
 });
 
-Deno.test({
+Oden.test({
   name: "[std/node/fs] stat default methods",
   fn() {
     // stats ctor is private
@@ -84,7 +84,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[node/fs] stat invalid path error",
   async fn() {
     try {
@@ -104,7 +104,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[node/fs] statSync invalid path error",
   fn() {
     try {

@@ -1,5 +1,5 @@
 clearTimeout(setTimeout(() => {}, 1000));
 
-Deno.bench("bench1", () => {});
-Deno.bench("bench2", () => {});
-Deno.bench("bench3", () => {});
+Oden.bench("bench1", () => {});
+Oden.bench("bench2", () => {});
+Oden.bench("bench3", () => {});

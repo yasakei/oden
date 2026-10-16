@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
@@ -278,7 +278,7 @@ impl LockfilePackageGraph {
     // The ideal goal here is to only disassociate the package
     // from the root so that the current dependencies can be
     // reused in the new dependency resolution thereby causing
-    // minimal changes in the lockfile. After we let deno_npm or
+    // minimal changes in the lockfile. After we let oden_npm or
     // deno_graph clean up any stragglers.
     //
     // We're currently achieving this goal with npm packages, but

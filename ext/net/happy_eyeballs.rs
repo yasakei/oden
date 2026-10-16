@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::io::Error as IoError;
 use std::io::ErrorKind;
@@ -6,10 +6,10 @@ use std::net::SocketAddr;
 use std::rc::Rc;
 use std::time::Duration;
 
-use deno_core::CancelFuture;
-use deno_core::CancelHandle;
-use deno_core::futures::StreamExt;
-use deno_core::futures::stream::FuturesUnordered;
+use oden_core::CancelFuture;
+use oden_core::CancelHandle;
+use oden_core::futures::StreamExt;
+use oden_core::futures::stream::FuturesUnordered;
 use tokio::net::TcpStream;
 use tokio::time::Instant;
 use tokio::time::sleep_until;

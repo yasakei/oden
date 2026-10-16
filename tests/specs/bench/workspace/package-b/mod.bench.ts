@@ -1,6 +1,6 @@
 import { addOne } from "./mod.ts";
 
-Deno.bench("addOne", () => {
+Oden.bench("addOne", () => {
   if (addOne(1) !== 2) {
     throw new Error("failed");
   }

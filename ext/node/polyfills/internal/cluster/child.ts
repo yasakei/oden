@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent and Node contributors. All rights reserved. MIT license.
 
 // Ports lib/internal/cluster/child.js. The child-side state is wired onto
@@ -7,21 +7,21 @@
 // driven by NODE_UNIQUE_ID through `cluster.ts`'s dispatch.
 
 // TODO(petamoriken): enable prefer-primordials for node polyfills
-// deno-lint-ignore-file no-explicit-any deno-internal/prefer-primordials
+// deno-lint-ignore-file no-explicit-any oden-internal/prefer-primordials
 
 (function () {
 const { core, primordials } = __bootstrap;
 const lazyPath = core.createLazyLoader("node:path");
 const lazyProcess = core.createLazyLoader("node:process");
-const { isWindows } = core.loadExtScript("ext:deno_node/_util/os.ts");
+const { isWindows } = core.loadExtScript("ext:oden_node/_util/os.ts");
 const { Worker } = core.loadExtScript(
-  "ext:deno_node/internal/cluster/worker.ts",
+  "ext:oden_node/internal/cluster/worker.ts",
 );
 const { internal, sendHelper } = core.loadExtScript(
-  "ext:deno_node/internal/cluster/utils.ts",
+  "ext:oden_node/internal/cluster/utils.ts",
 );
 const { ownerSymbol } = core.loadExtScript(
-  "ext:deno_node/internal/async_hooks.ts",
+  "ext:oden_node/internal/async_hooks.ts",
 );
 
 const {

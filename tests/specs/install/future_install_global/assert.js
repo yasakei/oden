@@ -1,8 +1,8 @@
-const dirs = Deno.readDir("./bins/bin");
+const dirs = Oden.readDir("./bins/bin");
 
 let found = false;
 for await (const entry of dirs) {
-  if (entry.name.includes("deno-test-bin")) {
+  if (entry.name.includes("oden-test-bin")) {
     found = true;
   }
 }

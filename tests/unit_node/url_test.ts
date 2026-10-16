@@ -1,8 +1,8 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 import { domainToASCII, format } from "node:url";
 import { assertEquals, assertThrows } from "@std/assert";
 
-Deno.test({
+Oden.test({
   name: "[node/url] domainToASCII",
   fn() {
     assertEquals(domainToASCII("example.com"), "example.com");
@@ -43,7 +43,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[node/url] format() preserves auth credentials on WHATWG URL",
   fn() {
     // https://github.com/denoland/deno/issues/34925
@@ -73,7 +73,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[node/url] format() WHATWG URL with auth/fragment/search/unicode",
   fn() {
     const u = new URL(
@@ -119,7 +119,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+Oden.test({
   name: "[node/url] format() throws on non-object options",
   fn() {
     const u = new URL("http://example.com/");

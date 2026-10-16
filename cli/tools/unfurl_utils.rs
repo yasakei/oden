@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use deno_ast::SourcePos;
 use deno_ast::SourceRange;
@@ -71,7 +71,7 @@ fn javascript_literal_content(
     return None;
   }
 
-  let serialized = deno_core::serde_json::to_string(replacement).ok()?;
+  let serialized = oden_core::serde_json::to_string(replacement).ok()?;
   let mut content = serialized
     .get(1..serialized.len().checked_sub(1)?)?
     .to_string();

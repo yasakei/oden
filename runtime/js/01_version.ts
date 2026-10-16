@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 (function () {
 const { primordials } = __bootstrap;
@@ -7,17 +7,17 @@ const {
 } = primordials;
 
 const version = {
-  deno: "",
+  oden: "",
   v8: "",
   typescript: "",
 };
 
 function setVersions(
-  denoVersion,
+  odenVersion,
   v8Version,
   tsVersion,
 ) {
-  version.deno = denoVersion;
+  version.oden = odenVersion;
   version.v8 = v8Version;
   version.typescript = tsVersion;
 

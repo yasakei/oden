@@ -1,4 +1,4 @@
-Deno.test({
+Oden.test({
   name: "ignore",
   permissions: {
     read: true,

@@ -1,14 +1,14 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::path::Path;
 use std::path::PathBuf;
 
-use deno_core::OpState;
-use deno_core::op2;
-use deno_core::url::Url;
+use oden_core::OpState;
+use oden_core::op2;
+use oden_core::url::Url;
 use deno_error::JsErrorBox;
-use deno_permissions::PermissionsContainer;
+use oden_permissions::PermissionsContainer;
 
 use crate::ExtNodeSys;
 use crate::NodeRequireLoaderRc;
@@ -18,7 +18,7 @@ pub const DEFAULT_STACK_SIZE_MB: usize = 4;
 
 /// Resolved resource limits with V8 defaults filled in for unspecified values.
 /// Stored in the worker's OpState so the JS polyfill can read actual values.
-#[derive(deno_core::serde::Serialize, Clone, Debug, Default, PartialEq, Eq)]
+#[derive(oden_core::serde::Serialize, Clone, Debug, Default, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolvedResourceLimits {
   pub max_young_generation_size_mb: usize,
@@ -75,7 +75,7 @@ pub enum WorkerThreadsFilenameError {
   Fs(
     #[from]
     #[inherit]
-    deno_io::fs::FsError,
+    oden_io::fs::FsError,
   ),
   #[class(inherit)]
   #[error(transparent)]

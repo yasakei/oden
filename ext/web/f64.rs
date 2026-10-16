@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // TODO(petamoriken) Use f64::maximum instead https://github.com/rust-lang/rust/issues/91079
 #[inline]

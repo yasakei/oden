@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 // Mirrors WPT workers/Worker-structure-message: on a single request the worker
 // synchronously posts *two* messages back to the host. The host re-arms its

@@ -1,16 +1,16 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::sync::Arc;
 
-use deno_config::deno_json::NewestDependencyDate;
-use deno_config::deno_json::NodeModulesDirMode;
-use deno_core::error::AnyError;
-use deno_core::serde_json;
-use deno_core::url::Url;
+use oden_config::oden_json::NewestDependencyDate;
+use oden_config::oden_json::NodeModulesDirMode;
+use oden_core::error::AnyError;
+use oden_core::serde_json;
+use oden_core::url::Url;
 use deno_graph::packages::JsrPackageInfo;
 use deno_path_util::ResolveUrlOrPathError;
-use deno_runtime::WorkerExecutionMode;
-use deno_runtime::deno_permissions::PermissionsContainer;
+use oden_runtime::WorkerExecutionMode;
+use oden_runtime::oden_permissions::PermissionsContainer;
 
 use crate::args::ConfigFlag;
 use crate::args::DeployFlags;
@@ -28,18 +28,18 @@ pub async fn deploy(
   if deploy_flags.sandbox {
     // SAFETY: only this subcommand is running, nothing else, so it's safe to set an env var.
     unsafe {
-      std::env::set_var("DENO_DEPLOY_CLI_SANDBOX", "1");
+      std::env::set_var("ODEN_DEPLOY_CLI_SANDBOX", "1");
     }
   }
 
-  let dev_specifier = std::env::var("DENO_DEPLOY_CLI_SPECIFIER").ok();
+  let dev_specifier = std::env::var("ODEN_DEPLOY_CLI_SPECIFIER").ok();
 
   // The jsr-fetched CLI resolves its imports from JSR package metadata and
   // reads the user's config itself, in-process. Disable config discovery so
   // the workspace at the user's cwd isn't applied to the deploy CLI's own
   // module graph (which otherwise breaks when a workspace member's name
   // collides with one of the CLI's dependencies). The dev path
-  // (DENO_DEPLOY_CLI_SPECIFIER) still wants discovery relative to the CLI
+  // (ODEN_DEPLOY_CLI_SPECIFIER) still wants discovery relative to the CLI
   // source.
   if dev_specifier.is_none() {
     flags.config_flag = ConfigFlag::Disabled;
@@ -60,14 +60,14 @@ pub async fn deploy(
     let file = factory
       .file_fetcher()?
       .fetch_with_options(
-        &registry_url.join("@deno/deploy/meta.json").unwrap(),
-        deno_resolver::file_fetcher::FetchPermissionsOptionRef::AllowAll,
-        deno_resolver::file_fetcher::FetchOptions {
+        &registry_url.join("@oden/deploy/meta.json").unwrap(),
+        oden_resolver::file_fetcher::FetchPermissionsOptionRef::AllowAll,
+        oden_resolver::file_fetcher::FetchOptions {
           // jsr.io serves meta.json with `cache-control: max-age=60`, so
           // respect those headers rather than pinning the first cached copy
           // forever (see denoland/deno#35736).
           maybe_cache_setting: Some(
-            &deno_cache_dir::file_fetcher::CacheSetting::RespectHeaders,
+            &oden_cache_dir::file_fetcher::CacheSetting::RespectHeaders,
           ),
           ..Default::default()
         },
@@ -75,8 +75,8 @@ pub async fn deploy(
       .await?;
     let info = serde_json::from_slice::<JsrPackageInfo>(&file.source)?;
     let latest_version = resolve_deploy_cli_version(&info)
-      .expect("expected @deno/deploy to be published");
-    Url::parse(&format!("jsr:@deno/deploy@{latest_version}"))
+      .expect("expected @oden/deploy to be published");
+    Url::parse(&format!("jsr:@oden/deploy@{latest_version}"))
       .map_err(ResolveUrlOrPathError::UrlParse)?
   };
 
@@ -92,7 +92,7 @@ pub async fn deploy(
       PermissionsContainer::allow_all(
         factory.permission_desc_parser()?.clone(),
       ),
-      vec![ops::deploy::deno_deploy::init()],
+      vec![ops::deploy::oden_deploy::init()],
       Default::default(),
       None,
     )
@@ -108,7 +108,7 @@ fn resolve_deploy_cli_version(
 }
 
 pub fn get_token_entry() -> Result<keyring::Entry, keyring::Error> {
-  keyring::Entry::new("Deno Deploy Token", "Deno Deploy")
+  keyring::Entry::new("Oden Deploy Token", "Oden Deploy")
 }
 
 #[cfg(test)]

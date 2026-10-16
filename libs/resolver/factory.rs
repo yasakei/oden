@@ -1,4 +1,4 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::borrow::Cow;
 use std::collections::BTreeSet;
@@ -7,33 +7,33 @@ use std::path::PathBuf;
 
 use anyhow::bail;
 use boxed_error::Boxed;
-use deno_cache_dir::DenoDirResolutionError;
-use deno_cache_dir::GlobalHttpCacheRc;
-use deno_cache_dir::GlobalOrLocalHttpCache;
-use deno_cache_dir::LocalHttpCache;
-use deno_cache_dir::npm::NpmCacheDir;
-use deno_config::deno_json::MinimumDependencyAgeConfig;
-use deno_config::deno_json::NewestDependencyDate;
-use deno_config::deno_json::NodeModulesDirMode;
-use deno_config::deno_json::NodeModulesLinkerMode;
-use deno_config::workspace::FolderConfigs;
-use deno_config::workspace::VendorEnablement;
-use deno_config::workspace::WorkspaceDirectory;
-use deno_config::workspace::WorkspaceDirectoryEmptyOptions;
-use deno_config::workspace::WorkspaceDirectoryRc;
-use deno_config::workspace::WorkspaceDiscoverError;
-use deno_config::workspace::WorkspaceDiscoverOptions;
-use deno_config::workspace::WorkspaceDiscoverStart;
-use deno_maybe_sync::MaybeSend;
-use deno_maybe_sync::MaybeSync;
-use deno_maybe_sync::new_rc;
-pub use deno_npm::NpmSystemInfo;
-use deno_npm::resolution::NpmOverrides;
-use deno_npm::resolution::NpmVersionResolver;
+use oden_cache_dir::OdenDirResolutionError;
+use oden_cache_dir::GlobalHttpCacheRc;
+use oden_cache_dir::GlobalOrLocalHttpCache;
+use oden_cache_dir::LocalHttpCache;
+use oden_cache_dir::npm::NpmCacheDir;
+use oden_config::oden_json::MinimumDependencyAgeConfig;
+use oden_config::oden_json::NewestDependencyDate;
+use oden_config::oden_json::NodeModulesDirMode;
+use oden_config::oden_json::NodeModulesLinkerMode;
+use oden_config::workspace::FolderConfigs;
+use oden_config::workspace::VendorEnablement;
+use oden_config::workspace::WorkspaceDirectory;
+use oden_config::workspace::WorkspaceDirectoryEmptyOptions;
+use oden_config::workspace::WorkspaceDirectoryRc;
+use oden_config::workspace::WorkspaceDiscoverError;
+use oden_config::workspace::WorkspaceDiscoverOptions;
+use oden_config::workspace::WorkspaceDiscoverStart;
+use oden_maybe_sync::MaybeSend;
+use oden_maybe_sync::MaybeSync;
+use oden_maybe_sync::new_rc;
+pub use oden_npm::NpmSystemInfo;
+use oden_npm::resolution::NpmOverrides;
+use oden_npm::resolution::NpmVersionResolver;
 use deno_path_util::fs::canonicalize_path_maybe_not_exists;
 use deno_semver::package::PackageName;
 use futures::future::FutureExt;
-use node_resolver::DenoIsBuiltInNodeModuleChecker;
+use node_resolver::OdenIsBuiltInNodeModuleChecker;
 use node_resolver::NodeResolver;
 use node_resolver::NodeResolverOptions;
 use node_resolver::NodeResolverRc;
@@ -46,38 +46,38 @@ use node_resolver::cache::NodeResolutionSys;
 use thiserror::Error;
 use url::Url;
 
-use crate::DefaultRawDenoResolverRc;
-use crate::DenoResolverOptions;
+use crate::DefaultRawOdenResolverRc;
+use crate::OdenResolverOptions;
 use crate::NodeAndNpmResolvers;
 use crate::NpmCacheDirRc;
-use crate::RawDenoResolver;
+use crate::RawOdenResolver;
 use crate::WorkspaceResolverRc;
-use crate::cache::DenoDir;
-use crate::cache::DenoDirOptions;
-use crate::cache::DenoDirProvider;
-use crate::cache::DenoDirProviderRc;
-use crate::cache::DenoDirSys;
+use crate::cache::OdenDir;
+use crate::cache::OdenDirOptions;
+use crate::cache::OdenDirProvider;
+use crate::cache::OdenDirProviderRc;
+use crate::cache::OdenDirSys;
 use crate::cache::EmitCache;
 use crate::cache::EmitCacheRc;
 use crate::cjs::CjsTracker;
 use crate::cjs::CjsTrackerRc;
 use crate::cjs::IsCjsResolutionMode;
-use crate::cjs::analyzer::DenoCjsCodeAnalyzer;
+use crate::cjs::analyzer::OdenCjsCodeAnalyzer;
 use crate::cjs::analyzer::NodeAnalysisCacheRc;
 use crate::cjs::analyzer::NullNodeAnalysisCache;
-use crate::deno_json::CompilerOptionsOverrides;
-use crate::deno_json::CompilerOptionsResolver;
-use crate::deno_json::CompilerOptionsResolverRc;
+use crate::oden_json::CompilerOptionsOverrides;
+use crate::oden_json::CompilerOptionsResolver;
+use crate::oden_json::CompilerOptionsResolverRc;
 use crate::import_map::WorkspaceExternalImportMapLoader;
 use crate::import_map::WorkspaceExternalImportMapLoaderRc;
 use crate::loader::AllowJsonImports;
-use crate::loader::DenoNpmModuleLoaderRc;
+use crate::loader::OdenNpmModuleLoaderRc;
 use crate::loader::NpmModuleLoader;
 use crate::lockfile::LockfileLock;
 use crate::lockfile::LockfileLockRc;
 use crate::npm::ByonmNpmResolverCreateOptions;
 use crate::npm::CreateInNpmPkgCheckerOptions;
-use crate::npm::DenoInNpmPackageChecker;
+use crate::npm::OdenInNpmPackageChecker;
 use crate::npm::NpmReqResolver;
 use crate::npm::NpmReqResolverOptions;
 use crate::npm::NpmReqResolverRc;
@@ -103,26 +103,26 @@ type Deferred<T> = once_cell::sync::OnceCell<T>;
 #[cfg(not(feature = "sync"))]
 type Deferred<T> = once_cell::unsync::OnceCell<T>;
 
-pub type DenoCjsModuleExportAnalyzerRc<TSys> = CjsModuleExportAnalyzerRc<
-  DenoCjsCodeAnalyzer<TSys>,
-  DenoInNpmPackageChecker,
-  DenoIsBuiltInNodeModuleChecker,
+pub type OdenCjsModuleExportAnalyzerRc<TSys> = CjsModuleExportAnalyzerRc<
+  OdenCjsCodeAnalyzer<TSys>,
+  OdenInNpmPackageChecker,
+  OdenIsBuiltInNodeModuleChecker,
   NpmResolver<TSys>,
   TSys,
 >;
-pub type DenoNodeCodeTranslatorRc<TSys> = NodeCodeTranslatorRc<
-  DenoCjsCodeAnalyzer<TSys>,
-  DenoInNpmPackageChecker,
-  DenoIsBuiltInNodeModuleChecker,
+pub type OdenNodeCodeTranslatorRc<TSys> = NodeCodeTranslatorRc<
+  OdenCjsCodeAnalyzer<TSys>,
+  OdenInNpmPackageChecker,
+  OdenIsBuiltInNodeModuleChecker,
   NpmResolver<TSys>,
   TSys,
 >;
 #[allow(clippy::disallowed_types, reason = "definition")]
-pub type NpmVersionResolverRc = deno_maybe_sync::MaybeArc<NpmVersionResolver>;
+pub type NpmVersionResolverRc = oden_maybe_sync::MaybeArc<NpmVersionResolver>;
 #[cfg(feature = "graph")]
 #[allow(clippy::disallowed_types, reason = "definition")]
 pub type JsrVersionResolverRc =
-  deno_maybe_sync::MaybeArc<deno_graph::packages::JsrVersionResolver>;
+  oden_maybe_sync::MaybeArc<deno_graph::packages::JsrVersionResolver>;
 
 #[derive(Debug, Boxed)]
 pub struct HttpCacheCreateError(pub Box<HttpCacheCreateErrorKind>);
@@ -130,7 +130,7 @@ pub struct HttpCacheCreateError(pub Box<HttpCacheCreateErrorKind>);
 #[derive(Debug, Error)]
 pub enum HttpCacheCreateErrorKind {
   #[error(transparent)]
-  DenoDirResolution(#[from] DenoDirResolutionError),
+  OdenDirResolution(#[from] OdenDirResolutionError),
   #[error(transparent)]
   WorkspaceDiscover(#[from] WorkspaceDiscoverError),
 }
@@ -141,7 +141,7 @@ pub struct NpmCacheDirCreateError(pub Box<NpmCacheDirCreateErrorKind>);
 #[derive(Debug, Error)]
 pub enum NpmCacheDirCreateErrorKind {
   #[error(transparent)]
-  DenoDirResolution(#[from] DenoDirResolutionError),
+  OdenDirResolution(#[from] OdenDirResolutionError),
   #[error(transparent)]
   NpmRcCreate(#[from] NpmRcCreateError),
 }
@@ -212,16 +212,16 @@ pub struct WorkspaceFactoryOptions {
   pub lock_arg: Option<PathBuf>,
   /// Whether to skip writing to the lockfile.
   pub lockfile_skip_write: bool,
-  pub maybe_custom_deno_dir_root: Option<PathBuf>,
+  pub maybe_custom_oden_dir_root: Option<PathBuf>,
   pub node_modules_dir: Option<NodeModulesDirMode>,
   pub node_modules_linker: Option<NodeModulesLinkerMode>,
   pub no_lock: bool,
   pub no_npm: bool,
-  /// When no `deno.lock` exists, attempt to seed one by translating a
-  /// sibling `package-lock.json`. Currently set by `deno install`.
+  /// When no `oden.lock` exists, attempt to seed one by translating a
+  /// sibling `package-lock.json`. Currently set by `oden install`.
   pub import_npm_lockfile: bool,
   /// The process state if using ext/node and the current process was "forked".
-  /// This value is found at `deno_lib::args::NPM_PROCESS_STATE`
+  /// This value is found at `oden_lib::args::NPM_PROCESS_STATE`
   /// but in most scenarios this can probably just be `None`.
   pub npm_process_state: Option<NpmProcessStateOptions>,
   /// Override the path to the root node_modules directory.
@@ -231,15 +231,15 @@ pub struct WorkspaceFactoryOptions {
 
 #[allow(clippy::disallowed_types, reason = "definition")]
 pub type WorkspaceFactoryRc<TSys> =
-  deno_maybe_sync::MaybeArc<WorkspaceFactory<TSys>>;
+  oden_maybe_sync::MaybeArc<WorkspaceFactory<TSys>>;
 
 #[sys_traits::auto_impl]
 pub trait WorkspaceFactorySys:
-  DenoDirSys
+  OdenDirSys
   + crate::lockfile::LockfileSys
   + crate::npm::NpmResolverSys
-  + deno_cache_dir::GlobalHttpCacheSys
-  + deno_cache_dir::LocalHttpCacheSys
+  + oden_cache_dir::GlobalHttpCacheSys
+  + oden_cache_dir::LocalHttpCacheSys
   + crate::loader::NpmModuleLoaderSys
   + sys_traits::SystemTimeNow
 {
@@ -247,7 +247,7 @@ pub trait WorkspaceFactorySys:
 
 pub struct WorkspaceFactory<TSys: WorkspaceFactorySys> {
   sys: TSys,
-  deno_dir_provider: Deferred<DenoDirProviderRc<TSys>>,
+  oden_dir_provider: Deferred<OdenDirProviderRc<TSys>>,
   emit_cache: Deferred<EmitCacheRc<TSys>>,
   global_http_cache: Deferred<GlobalHttpCacheRc<TSys>>,
   http_cache: Deferred<GlobalOrLocalHttpCache<TSys>>,
@@ -274,7 +274,7 @@ impl<TSys: WorkspaceFactorySys> WorkspaceFactory<TSys> {
   ) -> Self {
     Self {
       sys,
-      deno_dir_provider: Default::default(),
+      oden_dir_provider: Default::default(),
       emit_cache: Default::default(),
       global_http_cache: Default::default(),
       http_cache: Default::default(),
@@ -300,13 +300,13 @@ impl<TSys: WorkspaceFactorySys> WorkspaceFactory<TSys> {
     self.workspace_directory = Deferred::from(workspace_directory);
   }
 
-  pub fn deno_dir_provider(&self) -> &DenoDirProviderRc<TSys> {
-    self.deno_dir_provider.get_or_init(|| {
-      new_rc(DenoDirProvider::new(
+  pub fn oden_dir_provider(&self) -> &OdenDirProviderRc<TSys> {
+    self.oden_dir_provider.get_or_init(|| {
+      new_rc(OdenDirProvider::new(
         self.sys.clone(),
-        DenoDirOptions {
+        OdenDirOptions {
           maybe_initial_cwd: Some(self.initial_cwd.clone()),
-          maybe_custom_root: self.options.maybe_custom_deno_dir_root.clone(),
+          maybe_custom_root: self.options.maybe_custom_oden_dir_root.clone(),
         },
       ))
     })
@@ -316,7 +316,7 @@ impl<TSys: WorkspaceFactorySys> WorkspaceFactory<TSys> {
     self.emit_cache.get_or_try_init(|| {
       Ok(new_rc(EmitCache::new(
         &self.sys,
-        self.deno_dir()?.gen_cache.clone(),
+        self.oden_dir()?.gen_cache.clone(),
         #[cfg(feature = "deno_ast")]
         Cow::Borrowed(deno_ast::VERSION),
         #[cfg(not(feature = "deno_ast"))]
@@ -363,14 +363,14 @@ impl<TSys: WorkspaceFactorySys> WorkspaceFactory<TSys> {
     let workspace = &self.workspace_directory()?.workspace;
 
     if let Some(pkg_json) = workspace.root_pkg_json() {
-      if let Ok(deno_dir) = self.deno_dir() {
-        let deno_dir = &deno_dir.root;
-        // `deno_dir` can be symlink in macOS or on the CI
-        if let Ok(deno_dir) =
-          canonicalize_path_maybe_not_exists(&self.sys, deno_dir)
-          && pkg_json.path.starts_with(deno_dir)
+      if let Ok(oden_dir) = self.oden_dir() {
+        let oden_dir = &oden_dir.root;
+        // `oden_dir` can be symlink in macOS or on the CI
+        if let Ok(oden_dir) =
+          canonicalize_path_maybe_not_exists(&self.sys, oden_dir)
+          && pkg_json.path.starts_with(oden_dir)
         {
-          // if the package.json is in deno_dir, then do not use node_modules
+          // if the package.json is in oden_dir, then do not use node_modules
           // next to it as local node_modules dir
           return Ok(NodeModulesDirMode::None);
         }
@@ -429,7 +429,7 @@ impl<TSys: WorkspaceFactorySys> WorkspaceFactory<TSys> {
           if dir_mode != NodeModulesDirMode::Manual {
             bail!(
               "The hoisted node_modules linker requires --node-modules-dir=manual. \
-               Add \"nodeModulesDir\": \"manual\" to your deno.json or pass \
+               Add \"nodeModulesDir\": \"manual\" to your oden.json or pass \
                --node-modules-dir=manual on the command line."
             );
           }
@@ -443,7 +443,7 @@ impl<TSys: WorkspaceFactorySys> WorkspaceFactory<TSys> {
   pub fn node_modules_dir_path(&self) -> Result<Option<&Path>, anyhow::Error> {
     fn resolve_from_root(root_folder: &FolderConfigs, cwd: &Path) -> PathBuf {
       root_folder
-        .deno_json
+        .oden_json
         .as_ref()
         .map(|c| Cow::Owned(c.dir_path()))
         .or_else(|| {
@@ -489,16 +489,16 @@ impl<TSys: WorkspaceFactorySys> WorkspaceFactory<TSys> {
       .map(|p| p.as_deref())
   }
 
-  pub fn deno_dir(&self) -> Result<&DenoDir<TSys>, DenoDirResolutionError> {
-    self.deno_dir_provider().get_or_create()
+  pub fn oden_dir(&self) -> Result<&OdenDir<TSys>, OdenDirResolutionError> {
+    self.oden_dir_provider().get_or_create()
   }
 
   pub fn global_http_cache(
     &self,
-  ) -> Result<&GlobalHttpCacheRc<TSys>, DenoDirResolutionError> {
+  ) -> Result<&GlobalHttpCacheRc<TSys>, OdenDirResolutionError> {
     self.global_http_cache.get_or_try_init(|| {
-      let global_cache_dir = self.deno_dir()?.remote_folder_path();
-      let global_http_cache = new_rc(deno_cache_dir::GlobalHttpCache::new(
+      let global_cache_dir = self.oden_dir()?.remote_folder_path();
+      let global_http_cache = new_rc(oden_cache_dir::GlobalHttpCache::new(
         self.sys.clone(),
         global_cache_dir,
       ));
@@ -508,7 +508,7 @@ impl<TSys: WorkspaceFactorySys> WorkspaceFactory<TSys> {
 
   pub fn http_cache(
     &self,
-  ) -> Result<&deno_cache_dir::GlobalOrLocalHttpCache<TSys>, HttpCacheCreateError>
+  ) -> Result<&oden_cache_dir::GlobalOrLocalHttpCache<TSys>, HttpCacheCreateError>
   {
     self.http_cache.get_or_try_init(|| {
       let global_cache = self.global_http_cache()?.clone();
@@ -517,7 +517,7 @@ impl<TSys: WorkspaceFactorySys> WorkspaceFactory<TSys> {
           let local_cache = LocalHttpCache::new(
             local_path.clone(),
             global_cache,
-            deno_cache_dir::GlobalToLocalCopy::Allow,
+            oden_cache_dir::GlobalToLocalCopy::Allow,
             self.jsr_url().clone(),
           );
           Ok(new_rc(local_cache).into())
@@ -529,7 +529,7 @@ impl<TSys: WorkspaceFactorySys> WorkspaceFactory<TSys> {
 
   pub async fn maybe_lockfile(
     &self,
-    npm_package_info_provider: &dyn deno_lockfile::NpmPackageInfoProvider,
+    npm_package_info_provider: &dyn oden_lockfile::NpmPackageInfoProvider,
   ) -> Result<Option<&LockfileLockRc<TSys>>, anyhow::Error> {
     self
       .lockfile
@@ -561,7 +561,7 @@ impl<TSys: WorkspaceFactorySys> WorkspaceFactory<TSys> {
           npm_package_info_provider,
         )
         .await?
-        .map(deno_maybe_sync::new_rc);
+        .map(oden_maybe_sync::new_rc);
 
         Ok(maybe_lock_file)
       })
@@ -573,7 +573,7 @@ impl<TSys: WorkspaceFactorySys> WorkspaceFactory<TSys> {
     &self,
   ) -> Result<&NpmCacheDirRc, NpmCacheDirCreateError> {
     self.npm_cache_dir.get_or_try_init(|| {
-      let npm_cache_dir = self.deno_dir()?.npm_folder_path();
+      let npm_cache_dir = self.oden_dir()?.npm_folder_path();
       Ok(new_rc(NpmCacheDir::new(
         &self.sys,
         npm_cache_dir,
@@ -614,12 +614,12 @@ impl<TSys: WorkspaceFactorySys> WorkspaceFactory<TSys> {
       });
       let resolve_workspace_discover_options = || {
         let discover_pkg_json = !self.options.no_npm
-          && !self.has_flag_env_var("DENO_NO_PACKAGE_JSON");
+          && !self.has_flag_env_var("ODEN_NO_PACKAGE_JSON");
         if !discover_pkg_json {
           log::debug!("package.json auto-discovery is disabled");
         }
         WorkspaceDiscoverOptions {
-          deno_json_cache: None,
+          oden_json_cache: None,
           pkg_json_cache: Some(&node_resolver::PackageJsonThreadLocalCache),
           workspace_cache: None,
           additional_config_file_names: self
@@ -694,7 +694,7 @@ impl<TSys: WorkspaceFactorySys> WorkspaceFactory<TSys> {
           workspace_dir.workspace.as_ref(),
         );
         if !npm_packages.0.is_empty() && !matches!(self.node_modules_dir_mode()?, NodeModulesDirMode::Auto | NodeModulesDirMode::Manual) {
-          bail!("Linking npm packages requires using a node_modules directory. Ensure you have a package.json or set the \"nodeModulesDir\" option to \"auto\" or \"manual\" in your workspace root deno.json.")
+          bail!("Linking npm packages requires using a node_modules directory. Ensure you have a package.json or set the \"nodeModulesDir\" option to \"auto\" or \"manual\" in your workspace root oden.json.")
         } else {
           Ok(npm_packages)
         }
@@ -736,34 +736,34 @@ pub struct ResolverFactoryOptions {
 pub struct ResolverFactory<TSys: WorkspaceFactorySys> {
   options: ResolverFactoryOptions,
   sys: NodeResolutionSys<TSys>,
-  cjs_module_export_analyzer: Deferred<DenoCjsModuleExportAnalyzerRc<TSys>>,
-  cjs_tracker: Deferred<CjsTrackerRc<DenoInNpmPackageChecker, TSys>>,
+  cjs_module_export_analyzer: Deferred<OdenCjsModuleExportAnalyzerRc<TSys>>,
+  cjs_tracker: Deferred<CjsTrackerRc<OdenInNpmPackageChecker, TSys>>,
   compiler_options_resolver: Deferred<CompilerOptionsResolverRc>,
   #[cfg(feature = "graph")]
-  deno_resolver:
-    async_once_cell::OnceCell<crate::graph::DefaultDenoResolverRc<TSys>>,
+  oden_resolver:
+    async_once_cell::OnceCell<crate::graph::DefaultOdenResolverRc<TSys>>,
   #[cfg(feature = "deno_ast")]
-  emitter: Deferred<crate::emit::EmitterRc<DenoInNpmPackageChecker, TSys>>,
+  emitter: Deferred<crate::emit::EmitterRc<OdenInNpmPackageChecker, TSys>>,
   #[cfg(feature = "graph")]
   found_package_json_dep_flag: crate::graph::FoundPackageJsonDepFlagRc,
-  in_npm_package_checker: Deferred<DenoInNpmPackageChecker>,
+  in_npm_package_checker: Deferred<OdenInNpmPackageChecker>,
   #[cfg(feature = "graph")]
   jsr_version_resolver: Deferred<JsrVersionResolverRc>,
   minimum_dependency_age: Deferred<MinimumDependencyAgeConfig>,
-  node_code_translator: Deferred<DenoNodeCodeTranslatorRc<TSys>>,
+  node_code_translator: Deferred<OdenNodeCodeTranslatorRc<TSys>>,
   node_resolver: Deferred<
     NodeResolverRc<
-      DenoInNpmPackageChecker,
-      DenoIsBuiltInNodeModuleChecker,
+      OdenInNpmPackageChecker,
+      OdenIsBuiltInNodeModuleChecker,
       NpmResolver<TSys>,
       TSys,
     >,
   >,
-  npm_module_loader: Deferred<DenoNpmModuleLoaderRc<TSys>>,
+  npm_module_loader: Deferred<OdenNpmModuleLoaderRc<TSys>>,
   npm_req_resolver: Deferred<
     NpmReqResolverRc<
-      DenoInNpmPackageChecker,
-      DenoIsBuiltInNodeModuleChecker,
+      OdenInNpmPackageChecker,
+      OdenIsBuiltInNodeModuleChecker,
       NpmResolver<TSys>,
       TSys,
     >,
@@ -776,7 +776,7 @@ pub struct ResolverFactory<TSys: WorkspaceFactorySys> {
   pkg_json_resolver: Deferred<PackageJsonResolverRc<TSys>>,
   #[cfg(all(feature = "graph", feature = "deno_ast"))]
   module_loader: Deferred<crate::loader::ModuleLoaderRc<TSys>>,
-  raw_deno_resolver: async_once_cell::OnceCell<DefaultRawDenoResolverRc<TSys>>,
+  raw_oden_resolver: async_once_cell::OnceCell<DefaultRawOdenResolverRc<TSys>>,
   workspace_factory: WorkspaceFactoryRc<TSys>,
   workspace_resolver: async_once_cell::OnceCell<WorkspaceResolverRc<TSys>>,
 }
@@ -794,9 +794,9 @@ impl<TSys: WorkspaceFactorySys> ResolverFactory<TSys> {
       cjs_module_export_analyzer: Default::default(),
       cjs_tracker: Default::default(),
       compiler_options_resolver: Default::default(),
-      raw_deno_resolver: Default::default(),
+      raw_oden_resolver: Default::default(),
       #[cfg(feature = "graph")]
-      deno_resolver: Default::default(),
+      oden_resolver: Default::default(),
       #[cfg(feature = "deno_ast")]
       emitter: Default::default(),
       #[cfg(feature = "graph")]
@@ -823,14 +823,14 @@ impl<TSys: WorkspaceFactorySys> ResolverFactory<TSys> {
     }
   }
 
-  pub async fn raw_deno_resolver(
+  pub async fn raw_oden_resolver(
     &self,
-  ) -> Result<&DefaultRawDenoResolverRc<TSys>, anyhow::Error> {
+  ) -> Result<&DefaultRawOdenResolverRc<TSys>, anyhow::Error> {
     self
-      .raw_deno_resolver
+      .raw_oden_resolver
       .get_or_try_init(
         async {
-          Ok(new_rc(RawDenoResolver::new(DenoResolverOptions {
+          Ok(new_rc(RawOdenResolver::new(OdenResolverOptions {
             in_npm_pkg_checker: self.in_npm_package_checker()?.clone(),
             node_and_req_resolver: if self.workspace_factory.no_npm() {
               None
@@ -858,9 +858,9 @@ impl<TSys: WorkspaceFactorySys> ResolverFactory<TSys> {
 
   pub fn cjs_module_export_analyzer(
     &self,
-  ) -> Result<&DenoCjsModuleExportAnalyzerRc<TSys>, anyhow::Error> {
+  ) -> Result<&OdenCjsModuleExportAnalyzerRc<TSys>, anyhow::Error> {
     self.cjs_module_export_analyzer.get_or_try_init(|| {
-      let code_analyzer = DenoCjsCodeAnalyzer::new(
+      let code_analyzer = OdenCjsCodeAnalyzer::new(
         self
           .options
           .node_analysis_cache
@@ -868,7 +868,7 @@ impl<TSys: WorkspaceFactorySys> ResolverFactory<TSys> {
           .unwrap_or_else(|| new_rc(NullNodeAnalysisCache)),
         self.cjs_tracker()?.clone(),
         #[cfg(feature = "deno_ast")]
-        new_rc(crate::cjs::analyzer::DenoAstModuleExportAnalyzer::new(
+        new_rc(crate::cjs::analyzer::OdenAstModuleExportAnalyzer::new(
           self.parsed_source_cache().clone(),
         )),
         #[cfg(not(feature = "deno_ast"))]
@@ -889,7 +889,7 @@ impl<TSys: WorkspaceFactorySys> ResolverFactory<TSys> {
 
   pub fn cjs_tracker(
     &self,
-  ) -> Result<&CjsTrackerRc<DenoInNpmPackageChecker, TSys>, anyhow::Error> {
+  ) -> Result<&CjsTrackerRc<OdenInNpmPackageChecker, TSys>, anyhow::Error> {
     self.cjs_tracker.get_or_try_init(|| {
       Ok(new_rc(CjsTracker::new(
         self.in_npm_package_checker()?.clone(),
@@ -918,7 +918,7 @@ impl<TSys: WorkspaceFactorySys> ResolverFactory<TSys> {
   pub fn emitter(
     &self,
   ) -> Result<
-    &crate::emit::EmitterRc<DenoInNpmPackageChecker, TSys>,
+    &crate::emit::EmitterRc<OdenInNpmPackageChecker, TSys>,
     anyhow::Error,
   > {
     self.emitter.get_or_try_init(|| {
@@ -939,14 +939,14 @@ impl<TSys: WorkspaceFactorySys> ResolverFactory<TSys> {
   }
 
   #[cfg(feature = "graph")]
-  pub async fn deno_resolver(
+  pub async fn oden_resolver(
     &self,
-  ) -> Result<&crate::graph::DefaultDenoResolverRc<TSys>, anyhow::Error> {
+  ) -> Result<&crate::graph::DefaultOdenResolverRc<TSys>, anyhow::Error> {
     self
-      .deno_resolver
+      .oden_resolver
       .get_or_try_init(async {
-        Ok(new_rc(crate::graph::DenoResolver::new(
-          self.raw_deno_resolver().await?.clone(),
+        Ok(new_rc(crate::graph::OdenResolver::new(
+          self.raw_oden_resolver().await?.clone(),
           self.workspace_factory.sys.clone(),
           self.found_package_json_dep_flag.clone(),
           self.options.on_mapped_resolution_diagnostic.clone(),
@@ -957,7 +957,7 @@ impl<TSys: WorkspaceFactorySys> ResolverFactory<TSys> {
 
   pub fn in_npm_package_checker(
     &self,
-  ) -> Result<&DenoInNpmPackageChecker, anyhow::Error> {
+  ) -> Result<&OdenInNpmPackageChecker, anyhow::Error> {
     self.in_npm_package_checker.get_or_try_init(|| {
       let options = match self.use_byonm()? {
         true => CreateInNpmPkgCheckerOptions::Byonm,
@@ -973,7 +973,7 @@ impl<TSys: WorkspaceFactorySys> ResolverFactory<TSys> {
           },
         ),
       };
-      Ok(DenoInNpmPackageChecker::new(options))
+      Ok(OdenInNpmPackageChecker::new(options))
     })
   }
 
@@ -1041,7 +1041,7 @@ impl<TSys: WorkspaceFactorySys> ResolverFactory<TSys> {
 
   pub fn node_code_translator(
     &self,
-  ) -> Result<&DenoNodeCodeTranslatorRc<TSys>, anyhow::Error> {
+  ) -> Result<&OdenNodeCodeTranslatorRc<TSys>, anyhow::Error> {
     self.node_code_translator.get_or_try_init(|| {
       Ok(new_rc(NodeCodeTranslator::new(
         self.cjs_module_export_analyzer()?.clone(),
@@ -1054,8 +1054,8 @@ impl<TSys: WorkspaceFactorySys> ResolverFactory<TSys> {
     &self,
   ) -> Result<
     &NodeResolverRc<
-      DenoInNpmPackageChecker,
-      DenoIsBuiltInNodeModuleChecker,
+      OdenInNpmPackageChecker,
+      OdenIsBuiltInNodeModuleChecker,
       NpmResolver<TSys>,
       TSys,
     >,
@@ -1064,7 +1064,7 @@ impl<TSys: WorkspaceFactorySys> ResolverFactory<TSys> {
     self.node_resolver.get_or_try_init(|| {
       Ok(new_rc(NodeResolver::new(
         self.in_npm_package_checker()?.clone(),
-        DenoIsBuiltInNodeModuleChecker,
+        OdenIsBuiltInNodeModuleChecker,
         self.npm_resolver()?.clone(),
         self.pkg_json_resolver().clone(),
         self.sys.clone(),
@@ -1075,7 +1075,7 @@ impl<TSys: WorkspaceFactorySys> ResolverFactory<TSys> {
 
   pub fn npm_module_loader(
     &self,
-  ) -> Result<&DenoNpmModuleLoaderRc<TSys>, anyhow::Error> {
+  ) -> Result<&OdenNpmModuleLoaderRc<TSys>, anyhow::Error> {
     self.npm_module_loader.get_or_try_init(|| {
       Ok(new_rc(NpmModuleLoader::new(
         self.cjs_tracker()?.clone(),
@@ -1094,8 +1094,8 @@ impl<TSys: WorkspaceFactorySys> ResolverFactory<TSys> {
     &self,
   ) -> Result<
     &NpmReqResolverRc<
-      DenoInNpmPackageChecker,
-      DenoIsBuiltInNodeModuleChecker,
+      OdenInNpmPackageChecker,
+      OdenIsBuiltInNodeModuleChecker,
       NpmResolver<TSys>,
       TSys,
     >,
@@ -1162,13 +1162,13 @@ impl<TSys: WorkspaceFactorySys> ResolverFactory<TSys> {
       // the `trust-policy` / `trust-policy-ignore-after` npmrc settings drive
       // the `no-downgrade` publishing-trust policy
       let npmrc = self.workspace_factory.npmrc()?;
-      let trust_policy = deno_npm::resolution::TrustPolicyOptions {
+      let trust_policy = oden_npm::resolution::TrustPolicyOptions {
         policy: match npmrc.trust_policy {
-          deno_npmrc::TrustPolicyConfig::NoDowngrade => {
-            deno_npm::resolution::NpmTrustPolicy::NoDowngrade
+          oden_npmrc::TrustPolicyConfig::NoDowngrade => {
+            oden_npm::resolution::NpmTrustPolicy::NoDowngrade
           }
-          deno_npmrc::TrustPolicyConfig::Off => {
-            deno_npm::resolution::NpmTrustPolicy::Off
+          oden_npmrc::TrustPolicyConfig::Off => {
+            oden_npm::resolution::NpmTrustPolicy::Off
           }
         },
         // turn the relative `trust-policy-ignore-after` minutes into an
@@ -1202,12 +1202,12 @@ impl<TSys: WorkspaceFactorySys> ResolverFactory<TSys> {
 
       Ok(new_rc(NpmVersionResolver {
         newest_dependency_date_options:
-          deno_npm::resolution::NewestDependencyDateOptions {
+          oden_npm::resolution::NewestDependencyDateOptions {
             date: minimum_dependency_age_config
               .age
               .as_ref()
               .and_then(|d| d.into_option())
-              .map(deno_npm::resolution::NewestDependencyDate),
+              .map(oden_npm::resolution::NewestDependencyDate),
             exclude,
             exclude_prefixes,
           },
@@ -1377,7 +1377,7 @@ fn apply_minimum_dependency_age_fallbacks(
     return;
   }
 
-  // Fall back to .npmrc's `min-release-age` when not configured in deno.json.
+  // Fall back to .npmrc's `min-release-age` when not configured in oden.json.
   config.age = Some(if let Some(days) = npmrc_min_release_age_days {
     if days == 0 {
       NewestDependencyDate::Disabled
@@ -1396,7 +1396,7 @@ fn apply_minimum_dependency_age_fallbacks(
 /// Returns `NpmOverrides::default()` if no overrides are present or if parsing fails.
 /// Logs a warning on parse failure.
 pub fn npm_overrides_from_workspace(
-  workspace: &deno_config::workspace::Workspace,
+  workspace: &oden_config::workspace::Workspace,
 ) -> NpmOverrides {
   let Some(overrides_json) = workspace.npm_overrides() else {
     return NpmOverrides::default();
@@ -1423,8 +1423,8 @@ pub fn npm_overrides_from_workspace(
 #[cfg(test)]
 mod tests {
   use chrono::TimeZone;
-  use deno_config::deno_json::MinimumDependencyAgeConfig;
-  use deno_config::deno_json::NewestDependencyDate;
+  use oden_config::oden_json::MinimumDependencyAgeConfig;
+  use oden_config::oden_json::NewestDependencyDate;
 
   use super::apply_minimum_dependency_age_fallbacks;
 

@@ -1,0 +1,7 @@
+{
+  "name": "@oden/foo",
+  "tasks": {
+    "dev": "echo '@oden/foo'"
+  },
+  "exports": {}
+}

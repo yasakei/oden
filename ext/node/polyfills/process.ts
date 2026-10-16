@@ -1,16 +1,16 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 // Copyright Joyent, Inc. and Node.js contributors. All rights reserved. MIT license.
 
 import { core, internals, primordials } from "ext:core/mod.js";
 // Installs `internals.__inspectorNetwork` so ext/fetch (and other
 // extensions) can emit Network.* CDP events without requiring user code
 // to import `node:inspector`. Side-effect import; no exports.
-core.loadExtScript("ext:deno_node/inspector_network_bridge.js");
+core.loadExtScript("ext:oden_node/inspector_network_bridge.js");
 const { initializeDebugEnv } = core.loadExtScript(
-  "ext:deno_node/internal/util/debuglog.ts",
+  "ext:oden_node/internal/util/debuglog.ts",
 );
 const { format } = core.loadExtScript(
-  "ext:deno_node/internal/util/inspect.mjs",
+  "ext:oden_node/internal/util/inspect.mjs",
 );
 import {
   op_current_thread_cpu_usage,
@@ -34,7 +34,7 @@ import {
   op_stream_base_register_state,
 } from "ext:core/ops";
 
-const { EventEmitter } = core.loadExtScript("ext:deno_node/_events.mjs");
+const { EventEmitter } = core.loadExtScript("ext:oden_node/_events.mjs");
 // Lazy: a static `import ... from "node:module"` makes node:process eagerly
 // pull node:module's entire eager closure (~95 loadExtScript) at process
 // bootstrap. When node:process is itself cold-bootstrapping (node-defer path),
@@ -43,10 +43,10 @@ const { EventEmitter } = core.loadExtScript("ext:deno_node/_events.mjs");
 // are only used at call time, so load node:module lazily on first use.
 const lazyNodeModule = core.createLazyLoader("node:module");
 const { report } = core.loadExtScript(
-  "ext:deno_node/internal/process/report.ts",
+  "ext:oden_node/internal/process/report.ts",
 );
 const { onWarning } = core.loadExtScript(
-  "ext:deno_node/internal/process/warning.ts",
+  "ext:oden_node/internal/process/warning.ts",
 );
 const {
   parseFileMode,
@@ -55,9 +55,9 @@ const {
   validateObject,
   validateString,
   validateUint32,
-} = core.loadExtScript("ext:deno_node/internal/validators.mjs");
+} = core.loadExtScript("ext:oden_node/internal/validators.mjs");
 const {
-  denoErrorToNodeError,
+  odenErrorToNodeError,
   ERR_INVALID_ARG_TYPE,
   ERR_INVALID_ARG_VALUE_RANGE,
   ERR_OUT_OF_RANGE,
@@ -66,13 +66,13 @@ const {
   ERR_WORKER_UNSUPPORTED_OPERATION,
   errnoException,
   NodeTypeError,
-} = core.loadExtScript("ext:deno_node/internal/errors.ts");
+} = core.loadExtScript("ext:oden_node/internal/errors.ts");
 const { getOptionValue } = core.loadExtScript(
-  "ext:deno_node/internal/options.ts",
+  "ext:oden_node/internal/options.ts",
 );
-const { default: assert } = core.loadExtScript("ext:deno_node/assert.ts");
+const { default: assert } = core.loadExtScript("ext:oden_node/assert.ts");
 import { join } from "node:path";
-const { pathFromURL } = core.loadExtScript("ext:deno_web/00_infra.js");
+const { pathFromURL } = core.loadExtScript("ext:oden_web/00_infra.js");
 const {
   arch: arch_,
   chdir,
@@ -81,8 +81,8 @@ const {
   nextTick: _nextTick,
   version,
   versions,
-} = core.loadExtScript("ext:deno_node/_process/process.ts");
-const { _exiting } = core.loadExtScript("ext:deno_node/_process/exiting.ts");
+} = core.loadExtScript("ext:oden_node/_process/process.ts");
+const { _exiting } = core.loadExtScript("ext:oden_node/_process/exiting.ts");
 export { _nextTick as nextTick, chdir, cwd, env, version, versions };
 // Lazily load the stream/tty machinery. Static imports here would pin
 // `node:stream`, `node:net` and `node:tty` (TTYWriteStream extends net.Socket)
@@ -92,15 +92,15 @@ export { _nextTick as nextTick, chdir, cwd, env, version, versions };
 // the stream/net/tty closure into the heap - the single biggest chunk of node
 // snapshot-deserialization time.
 const lazyStreamsMod = core.createLazyLoader(
-  "ext:deno_node/_process/streams.mjs",
+  "ext:oden_node/_process/streams.mjs",
 );
-const lazyTtyMod = core.createLazyLoader("ext:deno_node/internal/tty.js");
-const { enableNextTick } = core.loadExtScript("ext:deno_node/_next_tick.ts");
+const lazyTtyMod = core.createLazyLoader("ext:oden_node/internal/tty.js");
+const { enableNextTick } = core.loadExtScript("ext:oden_node/_next_tick.ts");
 const { isAndroid, isWindows } = core.loadExtScript(
-  "ext:deno_node/_util/os.ts",
+  "ext:oden_node/_util/os.ts",
 );
-const io = core.loadExtScript("ext:deno_io/12_io.js");
-const denoOs = core.loadExtScript("ext:deno_os/30_os.js");
+const io = core.loadExtScript("ext:oden_io/12_io.js");
+const odenOs = core.loadExtScript("ext:oden_os/30_os.js");
 
 export let argv0 = "";
 
@@ -115,29 +115,29 @@ let stdin, stdout, stderr;
 
 export { stderr, stdin, stdout };
 
-import { getBinding } from "ext:deno_node/internal_binding/mod.ts";
+import { getBinding } from "ext:oden_node/internal_binding/mod.ts";
 const constants = core.loadExtScript(
-  "ext:deno_node/internal_binding/constants.ts",
+  "ext:oden_node/internal_binding/constants.ts",
 );
-const uv = core.loadExtScript("ext:deno_node/internal_binding/uv.ts");
-import type { BindingName } from "ext:deno_node/internal_binding/mod.ts";
+const uv = core.loadExtScript("ext:oden_node/internal_binding/uv.ts");
+import type { BindingName } from "ext:oden_node/internal_binding/mod.ts";
 const { buildAllowedFlags } = core.loadExtScript(
-  "ext:deno_node/internal/process/per_thread.mjs",
+  "ext:oden_node/internal/process/per_thread.mjs",
 );
 const {
   getActiveHandles,
   getActiveRequests,
   getActiveResourceNames,
-} = core.loadExtScript("ext:deno_node/internal/process/active_resources.ts");
+} = core.loadExtScript("ext:oden_node/internal/process/active_resources.ts");
 const {
   getActiveResourcesInfo: getTimerActiveResourcesInfo,
-} = core.loadExtScript("ext:deno_node/internal/timers.mjs");
-import type fsUtils from "ext:deno_node/internal/fs/utils.mjs";
-import type * as utilModule from "ext:deno_node/util.ts";
+} = core.loadExtScript("ext:oden_node/internal/timers.mjs");
+import type fsUtils from "ext:oden_node/internal/fs/utils.mjs";
+import type * as utilModule from "ext:oden_node/util.ts";
 
 let fsUtilsModule: typeof fsUtils;
 const lazyLoadFsUtils = core.createLazyLoader<typeof fsUtils>(
-  "ext:deno_node/internal/fs/utils.mjs",
+  "ext:oden_node/internal/fs/utils.mjs",
 );
 // Lazy-loaded to avoid a static circular import:
 //   process.ts -> util.ts -> internal/util/parse_args/parse_args.js
@@ -201,7 +201,7 @@ export const exit = (code?: number | string) => {
     process.exitCode = code;
   }
 
-  ProcessExitCode = denoOs.getExitCode();
+  ProcessExitCode = odenOs.getExitCode();
   if (!process._exiting) {
     process._exiting = true;
     // FIXME(bartlomieju): this is wrong, we won't be using syscall to exit
@@ -210,15 +210,15 @@ export const exit = (code?: number | string) => {
     process.emit("exit", ProcessExitCode);
   }
 
-  // Any valid thing `process.exitCode` set is already held in Deno.exitCode.
+  // Any valid thing `process.exitCode` set is already held in Oden.exitCode.
   // At this point, we don't have to pass around Node's raw/string exit value.
   process.reallyExit(ProcessExitCode);
 
-  // In a worker, reallyExit() returns because Deno.exit() calls workerClose()
+  // In a worker, reallyExit() returns because Oden.exit() calls workerClose()
   // instead of std::process::exit(). workerClose() already called V8's
   // terminate_execution(). Unlike Node.js where reallyExit is a C++ binding
-  // and a single nop() call suffices to trigger the stack guard check, in Deno
-  // reallyExit goes through JS frames (Deno.exit -> exitHandler -> workerClose
+  // and a single nop() call suffices to trigger the stack guard check, in Oden
+  // reallyExit goes through JS frames (Oden.exit -> exitHandler -> workerClose
   // -> op), so we need a loop back-edge for V8 to reliably detect the pending
   // termination and throw an uncatchable TerminationException.
   // On the main thread reallyExit() normally never returns, but users can
@@ -241,7 +241,7 @@ export function umask(mask?: number | string): number {
   }
   // Note: reading the umask without setting has an inherent race condition
   // (two syscalls: set to 0 then restore). Node.js has the same issue and
-  // has deprecated process.umask() with no arguments. In Deno, the underlying
+  // has deprecated process.umask() with no arguments. In Oden, the underlying
   // op requires allow-sys=umask for both reading and setting.
   return op_fs_umask(null);
 }
@@ -280,7 +280,7 @@ function previousCpuUsageValueIsValid(num) {
 }
 
 export function cpuUsage(previousValue?: CpuUsage): CpuUsage {
-  const cpuValues = Deno.cpuUsage(previousValue);
+  const cpuValues = Oden.cpuUsage(previousValue);
 
   if (previousValue) {
     if (!previousCpuUsageValueIsValid(previousValue.user)) {
@@ -484,7 +484,7 @@ export function memoryUsage(): {
   arrayBuffers: number;
 } {
   return {
-    ...Deno.memoryUsage(),
+    ...Oden.memoryUsage(),
     arrayBuffers: 0,
   };
 }
@@ -527,7 +527,7 @@ export function getActiveResourcesInfo(): string[] {
 }
 
 export function availableMemory(): number {
-  return Deno.systemMemoryInfo().available;
+  return Oden.systemMemoryInfo().available;
 }
 
 export function constrainedMemory(): number {
@@ -646,14 +646,14 @@ function wrapIdSetter(
     try {
       fn(id);
     } catch (err) {
-      throw denoErrorToNodeError(err as Error, { syscall });
+      throw odenErrorToNodeError(err as Error, { syscall });
     }
   };
 }
 
 if (!isWindows) {
-  getgid = () => Deno.gid();
-  getuid = () => Deno.uid();
+  getgid = () => Oden.gid();
+  getuid = () => Oden.uid();
   getegid = () => op_getegid();
   geteuid = () => op_geteuid();
 
@@ -695,7 +695,7 @@ function uncaughtExceptionHandler(err: any, origin: string): boolean {
   // depending on how the uncaught exception was created. In Node.js,
   // exceptions thrown from the top level of a CommonJS module are reported as
   // 'uncaughtException', while exceptions thrown from the top level of an ESM
-  // module are reported as 'unhandledRejection'. Deno does not have a true
+  // module are reported as 'unhandledRejection'. Oden does not have a true
   // CommonJS implementation; sync throws in the entry CJS module are
   // dispatched up-front via Module._load (see ext/node/polyfills/01_require.js)
   // so this path only fires for real unhandled promise rejections.
@@ -737,7 +737,7 @@ ObjectDefineProperty(Process.prototype, "constructor", {
 
 // Maps original user listeners to wrapped versions that pass the signal name.
 // Node.js calls signal listeners with the signal name as the first argument,
-// but Deno.addSignalListener calls them with no arguments.
+// but Oden.addSignalListener calls them with no arguments.
 type SignalListener = (...args: string[]) => void;
 const _signalListenerWrappers = new SafeWeakMap<
   SignalListener,
@@ -776,7 +776,7 @@ function _unwrapSignalListener(
 
 // Look up the actual registered listener for a signal event. When `once()` is
 // used, EventEmitter wraps the listener in a function with a `.listener`
-// property. We need the wrapper to pass to `Deno.removeSignalListener`.
+// property. We need the wrapper to pass to `Oden.removeSignalListener`.
 function _findSignalListener(
   // deno-lint-ignore no-explicit-any
   target: any,
@@ -808,19 +808,19 @@ Process.prototype.on = function (
   listener: (...args: any[]) => void,
 ) {
   if (typeof event === "string" && StringPrototypeStartsWith(event, "SIG")) {
-    if (event === "SIGBREAK" && Deno.build.os !== "windows") {
+    if (event === "SIGBREAK" && Oden.build.os !== "windows") {
       // Ignores SIGBREAK if the platform is not windows.
-    } else if (event === "SIGTERM" && Deno.build.os === "windows") {
+    } else if (event === "SIGTERM" && Oden.build.os === "windows") {
       // Ignores SIGTERM on windows.
     } else if (
       event !== "SIGBREAK" && event !== "SIGINT" &&
-      event !== "SIGWINCH" && Deno.build.os === "windows"
+      event !== "SIGWINCH" && Oden.build.os === "windows"
     ) {
       // TODO(#26331): Ignores all signals except SIGBREAK, SIGINT, and SIGWINCH on windows.
     } else {
       FunctionPrototypeCall(EventEmitter.prototype.on, this, event, listener);
-      Deno.addSignalListener(
-        event as Deno.Signal,
+      Oden.addSignalListener(
+        event as Oden.Signal,
         _wrapSignalListener(event, listener),
       );
     }
@@ -839,23 +839,23 @@ Process.prototype.off = function (
   listener: (...args: any[]) => void,
 ) {
   if (typeof event === "string" && StringPrototypeStartsWith(event, "SIG")) {
-    if (event === "SIGBREAK" && Deno.build.os !== "windows") {
+    if (event === "SIGBREAK" && Oden.build.os !== "windows") {
       // Ignores SIGBREAK if the platform is not windows.
     } else if (
       event !== "SIGBREAK" && event !== "SIGINT" &&
-      event !== "SIGWINCH" && Deno.build.os === "windows"
+      event !== "SIGWINCH" && Oden.build.os === "windows"
     ) {
       // Ignores all signals except SIGBREAK, SIGINT, and SIGWINCH on windows.
     } else {
       // Find the actual registered listener before EventEmitter removes it.
       // When using `once()`, EventEmitter wraps the original listener in a
       // wrapper with a `.listener` property pointing to the original. We need
-      // to pass the wrapper (not the original) to Deno.removeSignalListener.
+      // to pass the wrapper (not the original) to Oden.removeSignalListener.
       const registered = _findSignalListener(this, event, listener);
       FunctionPrototypeCall(EventEmitter.prototype.off, this, event, listener);
       const unwrapped = _unwrapSignalListener(event, registered ?? listener);
-      Deno.removeSignalListener(
-        event as Deno.Signal,
+      Oden.removeSignalListener(
+        event as Oden.Signal,
         unwrapped,
       );
     }
@@ -888,7 +888,7 @@ Process.prototype.prependListener = function (
   listener: (...args: any[]) => void,
 ) {
   if (typeof event === "string" && StringPrototypeStartsWith(event, "SIG")) {
-    if (event === "SIGBREAK" && Deno.build.os !== "windows") {
+    if (event === "SIGBREAK" && Oden.build.os !== "windows") {
       // Ignores SIGBREAK if the platform is not windows.
     } else {
       FunctionPrototypeCall(
@@ -897,8 +897,8 @@ Process.prototype.prependListener = function (
         event,
         listener,
       );
-      Deno.addSignalListener(
-        event as Deno.Signal,
+      Oden.addSignalListener(
+        event as Oden.Signal,
         _wrapSignalListener(event, listener),
       );
     }
@@ -939,7 +939,7 @@ Process.prototype.removeAllListeners = function (
 ) {
   if (arguments.length === 0) {
     // Remove all listeners for all events - find all signal events and
-    // unregister their Deno signal listeners before clearing.
+    // unregister their Oden signal listeners before clearing.
     const events = this._events;
     if (events !== undefined) {
       const keys = ObjectKeys(events);
@@ -976,11 +976,11 @@ function _removeAllSignalListeners(
   if (list === undefined) return;
   if (typeof list === "function") {
     const actual = list.listener ?? list;
-    Deno.removeSignalListener(event as Deno.Signal, actual);
+    Oden.removeSignalListener(event as Oden.Signal, actual);
   } else {
     for (let i = 0; i < list.length; i++) {
       const actual = list[i].listener ?? list[i];
-      Deno.removeSignalListener(event as Deno.Signal, actual);
+      Oden.removeSignalListener(event as Oden.Signal, actual);
     }
   }
 }
@@ -1182,13 +1182,13 @@ ObjectDefineProperty(process, "config", {
     if (_configCache === undefined) {
       // Internal escape hatch for the node_compat test runner: allows a
       // single test to opt into the "externally-linked OpenSSL" branch of
-      // upstream Node test fixtures, where Deno's aws-lc-rs/BoringSSL
+      // upstream Node test fixtures, where Oden's aws-lc-rs/BoringSSL
       // backend matches that branch's expectations. Not for user code; the
-      // env var is reserved (DENO_INTERNAL_*) and undocumented.
+      // env var is reserved (ODEN_INTERNAL_*) and undocumented.
       let forceSharedOpenssl = false;
       try {
         forceSharedOpenssl =
-          Deno.env.get("DENO_INTERNAL_NODE_TEST_FORCE_SHARED_OPENSSL") === "1";
+          Oden.env.get("ODEN_INTERNAL_NODE_TEST_FORCE_SHARED_OPENSSL") === "1";
       } catch {
         // Permission denied or no env access; leave forceSharedOpenssl false.
       }
@@ -1263,7 +1263,7 @@ process._getActiveHandles = getActiveHandles;
 // is used by `node-tap`. It was marked for removal a couple of years
 // ago. See https://github.com/nodejs/node/blob/6a6b3c54022104cc110ab09044a2a0cecb8988e7/lib/internal/bootstrap/node.js#L172
 process.reallyExit = (code: number) => {
-  return Deno.exit(code || 0);
+  return Oden.exit(code || 0);
 };
 
 process._exiting = _exiting;
@@ -1335,7 +1335,7 @@ ObjectDefineProperty(process, "exitCode", {
       throw new ERR_INVALID_ARG_TYPE("code", "integer", code);
     }
 
-    denoOs.setExitCode(parsedCode);
+    odenOs.setExitCode(parsedCode);
     ProcessExitCode = code;
   },
 });
@@ -1360,7 +1360,7 @@ ObjectDefineProperty(process, "pid", {
 ObjectDefineProperty(process, "ppid", {
   __proto__: null,
   get() {
-    return Deno.ppid;
+    return Oden.ppid;
   },
 });
 
@@ -1379,15 +1379,15 @@ ObjectDefineProperty(process, "platform", {
 // https://nodejs.org/api/process.html#processsetsourcemapsenabledval
 process.setSourceMapsEnabled = (val: boolean) => {
   validateBoolean(val, "val");
-  // This is a no-op in Deno. Source maps are always enabled.
+  // This is a no-op in Oden. Source maps are always enabled.
   // TODO(@satyarohith): support disabling source maps if needed.
 };
 
-// Source maps are always enabled in Deno.
+// Source maps are always enabled in Oden.
 ObjectDefineProperty(process, "sourceMapsEnabled", {
   __proto__: null,
   get() {
-    return true; // Source maps are always enabled in Deno.
+    return true; // Source maps are always enabled in Oden.
   },
   enumerable: true,
   configurable: true,
@@ -1397,7 +1397,7 @@ ObjectDefineProperty(process, "sourceMapsEnabled", {
  * Returns the current high-resolution real time in a [seconds, nanoseconds]
  * tuple.
  *
- * Note: You need to give --allow-hrtime permission to Deno to actually get
+ * Note: You need to give --allow-hrtime permission to Oden to actually get
  * nanoseconds precision values. If you don't give 'hrtime' permission, the returned
  * values only have milliseconds precision.
  *
@@ -1517,13 +1517,13 @@ export function loadEnvFile(path = ".env") {
   try {
     return op_node_load_env_file(path);
   } catch (err) {
-    if (ObjectPrototypeIsPrototypeOf(Deno.errors.InvalidData.prototype, err)) {
+    if (ObjectPrototypeIsPrototypeOf(Oden.errors.InvalidData.prototype, err)) {
       throw new NodeTypeError(
         "ERR_INVALID_ARG_TYPE",
         `Contents of '${path}' should be a valid string.`,
       );
     }
-    throw denoErrorToNodeError(err as Error, { syscall: "open", path });
+    throw odenErrorToNodeError(err as Error, { syscall: "open", path });
   }
 }
 
@@ -1569,7 +1569,7 @@ const features = {
   // deno-lint-ignore camelcase
   tls_ocsp: true,
   tls: true,
-  // Deno uses aws-lc, which is BoringSSL-based.
+  // Oden uses aws-lc, which is BoringSSL-based.
   // deno-lint-ignore camelcase
   openssl_is_boringssl: true,
   quic: false,
@@ -1578,7 +1578,7 @@ const features = {
   // deno-lint-ignore camelcase
   require_module: true,
   get typescript() {
-    if (Deno.build.standalone) {
+    if (Oden.build.standalone) {
       return false;
     }
     return "transform";
@@ -1702,7 +1702,7 @@ function dispatchProcessBeforeExitEvent() {
       process.exitCode = 1;
     }
     dispatchProcessExitEvent();
-    Deno.exit(process.exitCode || 0);
+    Oden.exit(process.exitCode || 0);
   }
   core.processTicksAndRejections();
   return core.eventLoopHasMoreWork();
@@ -1735,7 +1735,7 @@ function synchronizeListeners() {
         // The synchronous Module._load path in 01_require.js already invoked
         // process._fatalException for this error. Re-firing here would
         // double-emit 'uncaughtExceptionMonitor' (and 'uncaughtException')
-        // for the same value. Skip and let Deno's default unhandled-rejection
+        // for the same value. Skip and let Oden's default unhandled-rejection
         // handling print the error and terminate the runtime.
         if (
           reason !== null && typeof reason === "object" &&
@@ -1805,16 +1805,16 @@ function synchronizeListeners() {
 internals.dispatchProcessBeforeExitEvent = dispatchProcessBeforeExitEvent;
 internals.dispatchProcessExitEvent = dispatchProcessExitEvent;
 
-// Resolves the value for `process.argv[1]` from `Deno.mainModule`. Converting a
+// Resolves the value for `process.argv[1]` from `Oden.mainModule`. Converting a
 // `file:` URL to a path can throw (e.g. `URIError: URI malformed` when the path
 // contains invalid percent-encoding), and this runs during bootstrap where an
 // uncaught throw aborts the runtime with a panic. Fall back to the raw
 // specifier so a non-decodable main module can't crash the process.
 function mainModuleArgv(
-  mainModule: string | undefined = Deno.mainModule,
+  mainModule: string | undefined = Oden.mainModule,
 ): string {
-  if (Deno.build.standalone) {
-    return Deno.execPath();
+  if (Oden.build.standalone) {
+    return Oden.execPath();
   }
   if (mainModule?.startsWith("file:")) {
     try {
@@ -1823,7 +1823,7 @@ function mainModuleArgv(
       return mainModule;
     }
   }
-  return join(Deno.cwd(), "$deno$node.mjs");
+  return join(Oden.cwd(), "$oden$node.mjs");
 }
 
 // Should be called only once, in `runtime/js/99_main.js` when the runtime is
@@ -1831,7 +1831,7 @@ function mainModuleArgv(
 internals.__bootstrapNodeProcess = function (
   argv0Val: string | undefined,
   args: string[],
-  denoVersions: Record<string, string>,
+  odenVersions: Record<string, string>,
   nodeDebug: string,
   warmup = false,
   runningOnMainThread = true,
@@ -1852,20 +1852,20 @@ internals.__bootstrapNodeProcess = function (
     // it. It is self-contained (no node:module), so run it here as part of the
     // process bootstrap that node:process triggers on first node:* use.
     const { streamBaseState } = core.loadExtScript(
-      "ext:deno_node/internal_binding/stream_wrap.ts",
+      "ext:oden_node/internal_binding/stream_wrap.ts",
     );
     op_stream_base_register_state(streamBaseState);
     argv0 = argv0Val || "";
-    argv[0] = Deno.execPath();
+    argv[0] = Oden.execPath();
     argv[1] = mainModuleArgv();
     // Manually concatenate these arrays to avoid triggering the getter
     for (let i = 0; i < args.length; i++) {
       argv[i + 2] = args[i];
     }
 
-    const denoVersionEntries = ObjectEntries(denoVersions);
-    for (let i = 0; i < denoVersionEntries.length; i++) {
-      const entry = denoVersionEntries[i];
+    const odenVersionEntries = ObjectEntries(odenVersions);
+    for (let i = 0; i < odenVersionEntries.length; i++) {
+      const entry = odenVersionEntries[i];
       versions[entry[0]] = entry[1];
     }
 
@@ -1874,8 +1874,8 @@ internals.__bootstrapNodeProcess = function (
     // process.stdout / process.stderr are built lazily on first access.
     // Constructing them eagerly here pulls the node stream/net/tty closure
     // into the snapshot for every program (TTYWriteStream extends net.Socket;
-    // the pipe path builds a node Writable). Most `deno run` invocations never
-    // touch process.stdout (Deno's own `console` doesn't route through it), so
+    // the pipe path builds a node Writable). Most `oden run` invocations never
+    // touch process.stdout (Oden's own `console` doesn't route through it), so
     // deferring construction keeps that closure out of the deserialized heap.
     const makeStdioWriteStream = (fd, ioStream, name) => {
       let s;
@@ -1929,14 +1929,14 @@ internals.__bootstrapNodeProcess = function (
         stderr = v;
       },
     });
-    core.loadExtScript("ext:deno_node/internal/console/constructor.mjs")
+    core.loadExtScript("ext:oden_node/internal/console/constructor.mjs")
       .bindStreamsLazy(globalThis.console, process);
 
     arch = arch_();
-    platform = isWindows ? "win32" : Deno.build.os;
-    pid = Deno.pid;
-    ppid = Deno.ppid;
-    execPath = Deno.execPath();
+    platform = isWindows ? "win32" : Oden.build.os;
+    pid = Oden.pid;
+    ppid = Oden.ppid;
+    execPath = Oden.execPath();
     initializeDebugEnv(nodeDebug);
 
     const title = getOptionValue("--title");
@@ -2090,8 +2090,8 @@ if (internals.__nodeBootstrapArgs !== undefined) {
   const a = internals.__nodeBootstrapArgs;
   internals.__bootstrapNodeProcess(
     a.argv0,
-    a.denoArgs,
-    a.denoVersion,
+    a.odenArgs,
+    a.odenVersion,
     a.nodeDebug ?? "",
     false,
     a.runningOnMainThread,

@@ -1,11 +1,11 @@
 ---
 name: review-pr
-description: Review a Deno runtime pull request for correctness, tests, security, and conventions. Use when asked to review a PR or when a PR number/URL is provided for review.
+description: Review a Oden runtime pull request for correctness, tests, security, and conventions. Use when asked to review a PR or when a PR number/URL is provided for review.
 argument-hint: <pr-number-or-url>
 allowed-tools: Bash(gh *) Bash(git *) Read Glob Grep Agent
 ---
 
-# Deno PR Reviewer
+# Oden PR Reviewer
 
 Review PR `$ARGUMENTS` on the `denoland/deno` repository.
 
@@ -63,7 +63,7 @@ to understand surrounding context when needed.
 - **Performance**: No unnecessary allocations/copies, no blocking in async code.
 - **Safety**: No `unsafe` without strong justification. No command injection,
   path traversal, or permission bypasses.
-- **Permissions**: New capabilities must go through Deno's permission system.
+- **Permissions**: New capabilities must go through Oden's permission system.
   Watch `ext/node/` especially — Node.js APIs sometimes assume full access.
 - **Dependencies**: New Cargo deps need strong justification. Prefer existing
   deps or stdlib.

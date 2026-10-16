@@ -1,12 +1,12 @@
-// Copyright 2018-2026 the Deno authors. MIT license.
+// Copyright 2018-2026 the Oden authors. MIT license.
 
 use std::fmt::Write as FmtWrite;
 use std::io::Write;
 
 use bytes::Bytes;
-use deno_core::anyhow::Context;
-use deno_core::error::AnyError;
-use deno_core::url::Url;
+use oden_core::anyhow::Context;
+use oden_core::error::AnyError;
+use oden_core::url::Url;
 use deno_graph::ModuleGraph;
 use sha2::Digest;
 use tar::Header;
