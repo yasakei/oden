@@ -1,0 +1,12 @@
+Download http://localhost:4260/abbrev
+Download http://localhost:4260/abbrev (full packument)
+Initialize abbrev@4.0.0
+Installed 1 package in [WILDCARD]
+Reused 0 packages from cache
+Downloaded 0 packages from JSR
+Downloaded 1 package from npm
++
+
+Dependencies:
++ npm:abbrev 4.0.0
+
