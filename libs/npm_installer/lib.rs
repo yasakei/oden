@@ -10,6 +10,8 @@ use deno_error::JsErrorBox;
 use oden_npm::NpmSystemInfo;
 use oden_npm::registry::NpmPackageInfo;
 use oden_npm::registry::NpmRegistryPackageInfoLoadError;
+use oden_npm::resolution::SerializedNpmResolutionSnapshot;
+use oden_npm::resolution::NpmResolutionSnapshot;
 use oden_npm::resolution::UnmetPeerDepDiagnostic;
 use oden_npm_cache::NpmCache;
 use oden_npm_cache::NpmCacheHttpClient;
@@ -438,6 +440,21 @@ impl<TNpmCacheHttpClient: NpmCacheHttpClient, TSys: NpmInstallerSys>
       self.npm_resolution_initializer.ensure_initialized().await?;
       self.fs_installer.cache_packages(caching).await
     }
+  }
+
+  /// Clears the current npm resolution so the next install re-resolves
+  /// every requirement from scratch, collapsing duplicate versions that
+  /// accumulated through additive updates. Only in-memory state is reset;
+  /// callers run the normal install flow afterwards, which rewrites the
+  /// lockfile and re-syncs node_modules.
+  pub async fn reset_resolution(&self) -> Result<(), JsErrorBox> {
+    self.npm_resolution_initializer.ensure_initialized().await?;
+    self.npm_resolution.set_snapshot(NpmResolutionSnapshot::new(
+      SerializedNpmResolutionSnapshot::default().into_valid_unsafe(),
+    ));
+    self.npm_resolution.mark_pending();
+    self.cached_reqs.lock().clear();
+    Ok(())
   }
 
   pub fn ensure_no_pkg_json_dep_errors(

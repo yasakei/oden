@@ -1,0 +1,33 @@
+{
+  "tests": {
+    "collapses_duplicate_versions": {
+      "tempDir": true,
+      "steps": [
+        {
+          // Plain install keeps both pins (additive resolution never
+          // reconsiders satisfied requirements).
+          "args": "install",
+          "output": "install.out"
+        },
+        {
+          "args": [
+            "eval",
+            "const lockfile = JSON.parse(await Oden.readTextFile('oden.lock')); console.log(Object.keys(lockfile.npm).length);"
+          ],
+          "output": "before.out"
+        },
+        {
+          "args": "dedupe",
+          "output": "dedupe.out"
+        },
+        {
+          "args": [
+            "eval",
+            "const lockfile = JSON.parse(await Oden.readTextFile('oden.lock')); console.log(Object.keys(lockfile.npm).length);"
+          ],
+          "output": "after.out"
+        }
+      ]
+    }
+  }
+}

@@ -192,6 +192,9 @@ async fn run_subcommand(
     OdenSubcommand::Clean(clean_flags) => spawn_subcommand(async move {
       tools::clean::clean(Arc::new(flags), clean_flags).await
     }),
+    OdenSubcommand::Dedupe(dedupe_flags) => spawn_subcommand(async move {
+      tools::pm::dedupe_command(Arc::new(flags), dedupe_flags).await
+    }),
     OdenSubcommand::Sbom(sbom_flags) => spawn_subcommand(async move {
       tools::sbom::sbom(Arc::new(flags), sbom_flags).await
     }),

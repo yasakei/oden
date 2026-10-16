@@ -698,6 +698,7 @@ impl CliFactory {
             | OdenSubcommand::Unlink { .. }
             | OdenSubcommand::Cache { .. }
             | OdenSubcommand::Ci { .. }
+            | OdenSubcommand::Dedupe { .. }
             | OdenSubcommand::Uninstall { .. } => true,
             OdenSubcommand::Install(flags) => match flags {
               InstallFlags::Local(flags, _) => match flags {
@@ -1585,6 +1586,7 @@ fn new_workspace_factory_options(
         | OdenSubcommand::Audit(_)
         | OdenSubcommand::Ci(_)
         | OdenSubcommand::Clean(_)
+        | OdenSubcommand::Dedupe(_)
         | OdenSubcommand::Init(_)
         | OdenSubcommand::Install(_)
         | OdenSubcommand::Link(_)

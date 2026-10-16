@@ -203,6 +203,7 @@ pub fn convert(result: ParseResult) -> Result<Flags, CliError> {
     Some("update") => outdated_parse(&result, &mut flags, true),
     Some("clean") => clean_parse(&result, &mut flags),
     Some("sbom") => sbom_parse(&result, &mut flags),
+    Some("dedupe") => dedupe_parse(&result, &mut flags),
     Some("list") => list_parse(&result, &mut flags),
     Some("link") => link_parse(&result, &mut flags),
     Some("unlink") => unlink_parse(&result, &mut flags),
@@ -2885,6 +2886,10 @@ fn sbom_parse(result: &ParseResult, flags: &mut Flags) {
   flags.subcommand = OdenSubcommand::Sbom(SbomFlags {
     output: result.get_one("output").map(|s| s.to_string()),
   });
+}
+
+fn dedupe_parse(_result: &ParseResult, flags: &mut Flags) {
+  flags.subcommand = OdenSubcommand::Dedupe(DedupeFlags {});
 }
 
 fn list_parse(result: &ParseResult, flags: &mut Flags) {

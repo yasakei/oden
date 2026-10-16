@@ -8098,6 +8098,18 @@ fn clean_subcommand() {
 }
 
 #[test]
+fn dedupe_subcommand() {
+  let r = flags_from_vec(svec!["oden", "dedupe"]).unwrap();
+  assert_eq!(
+    r,
+    Flags {
+      subcommand: OdenSubcommand::Dedupe(DedupeFlags {}),
+      ..Flags::default()
+    },
+  );
+}
+
+#[test]
 fn sbom_subcommand() {
   let cases = [
     (svec![], SbomFlags { output: None }),

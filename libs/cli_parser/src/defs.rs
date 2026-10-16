@@ -2666,12 +2666,27 @@ pub static SBOM_SUBCOMMAND: CommandDef = CommandDef {
   name: "sbom",
   about: "Generate a CycloneDX software bill of materials for the lockfile",
   aliases: &[],
-  args: &[ArgDef::new("output")
-    .long("output")
-    .short('o')
-    .action(ArgAction::Set)
-    .num_args(NumArgs::Exact(1))
-    .help("Write the SBOM JSON to the given file instead of stdout")],
+  args: &[
+    ArgDef::new("output")
+      .long("output")
+      .short('o')
+      .action(ArgAction::Set)
+      .num_args(NumArgs::Exact(1))
+      .help("Write the SBOM JSON to the given file instead of stdout"),
+  ],
+  arg_groups: &[UNSTABLE_DEPRECATED_ARG, UNSTABLE_FEATURE_ARGS],
+  subcommands: &[],
+  default_subcommand: None,
+  trailing_var_arg: false,
+  passthrough: false,
+  keep_double_dash: false,
+};
+
+pub static DEDUPE_SUBCOMMAND: CommandDef = CommandDef {
+  name: "dedupe",
+  about: "Re-resolve dependencies from scratch to collapse duplicate versions",
+  aliases: &[],
+  args: &[],
   arg_groups: &[UNSTABLE_DEPRECATED_ARG, UNSTABLE_FEATURE_ARGS],
   subcommands: &[],
   default_subcommand: None,
@@ -3515,6 +3530,7 @@ pub static ODEN_ROOT: CommandDef = CommandDef {
     SANDBOX_SUBCOMMAND,
     CLEAN_SUBCOMMAND,
     SBOM_SUBCOMMAND,
+    DEDUPE_SUBCOMMAND,
     LIST_SUBCOMMAND,
     LINK_SUBCOMMAND,
     UNLINK_SUBCOMMAND,
