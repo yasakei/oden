@@ -543,10 +543,20 @@ fn slim_package_info_bytes(
   }
   output.push(b'}');
 
-  write_json_property_name(&mut output, &mut first, "time")
-    .map_err(JsErrorBox::from_err)?;
-  write_string_map(&mut output, index.time.iter())
-    .map_err(JsErrorBox::from_err)?;
+  // The `time` map (per-version publish dates) is only ever consulted
+  // for full packument responses: with `minimumDependencyAge`/`no-downgrade`
+  // policies active the metadata is always fetched in full, and abbreviated
+  // responses (whose package `modified` predates the newest allowed date)
+  // can't contain a too-new version by construction — plus every reader
+  // fails open on missing dates. Dropping it here shrinks the cache entry
+  // (~11% on large packuments) and skips thousands of chrono/semver parses
+  // on every load.
+  if full_packument {
+    write_json_property_name(&mut output, &mut first, "time")
+      .map_err(JsErrorBox::from_err)?;
+    write_string_map(&mut output, index.time.iter())
+      .map_err(JsErrorBox::from_err)?;
+  }
 
   if let Some(modified) = index.modified {
     // keep the abbreviated manifest's last modified date in order to know
