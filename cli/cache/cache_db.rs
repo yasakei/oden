@@ -228,7 +228,8 @@ impl CacheDB {
       },
     };
 
-    Self::initialize_connection(self.config, &conn, version).unwrap();
+    Self::initialize_connection(self.config, self.path.as_deref(), &conn, version)
+      .unwrap();
 
     let cell = OnceCell::new();
     _ = cell.set(ConnectionState::Connected(conn));
@@ -264,11 +265,31 @@ impl CacheDB {
   /// Attempt to initialize that connection.
   fn initialize_connection(
     config: &CacheDBConfiguration,
+    path: Option<&Path>,
     conn: &Connection,
     version: &str,
   ) -> Result<(), rusqlite::Error> {
     let sql = config.create_combined_sql();
     conn.execute_batch(&sql)?;
+
+    // WAL frames survive process exit and accumulate across runs: brief write
+    // transactions never reach the 1000-page autocheckpoint threshold, so the
+    // WAL grows unbounded while every startup re-reads all of its pages
+    // (hundreds of preads once it reaches megabytes). Checkpoint when the
+    // offloaded file has grown beyond a small threshold so startups read few
+    // frames again. `busy=1` from concurrent writers is fine — the next
+    // opener retries.
+    if let Some(path) = path {
+      const WAL_CHECKPOINT_MIN_SIZE: u64 = 256 * 1024;
+      let mut wal = path.as_os_str().to_owned();
+      wal.push("-wal");
+      if std::fs::metadata(wal)
+        .map(|meta| meta.len() > WAL_CHECKPOINT_MIN_SIZE)
+        .unwrap_or(false)
+      {
+        let _ = conn.execute_batch("PRAGMA wal_checkpoint(TRUNCATE);");
+      }
+    }
 
     // Check the version
     let existing_version = conn
@@ -301,7 +322,7 @@ impl CacheDB {
     path: Option<&Path>,
   ) -> Result<Connection, rusqlite::Error> {
     let conn = self.actually_open_connection(path)?;
-    Self::initialize_connection(self.config, &conn, self.version)?;
+    Self::initialize_connection(self.config, path, &conn, self.version)?;
     Ok(conn)
   }
 
