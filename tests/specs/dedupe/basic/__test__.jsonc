@@ -17,9 +17,6 @@
           "output": "2\n"
         },
         {
-          // Output varies with cache warmth (download lines when packuments
-          // are uncached, silence when reused), so only the lockfile count
-          // steps below verify the collapse.
           "args": "dedupe",
           "output": "dedupe.out"
         },
