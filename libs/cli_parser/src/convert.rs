@@ -14,9 +14,9 @@ use std::num::NonZeroU8;
 use std::num::NonZeroU32;
 use std::num::NonZeroUsize;
 
-use oden_permissions::SysDescriptor;
 use deno_semver::jsr::JsrDepPackageReq;
 use deno_semver::package::PackageKind;
+use oden_permissions::SysDescriptor;
 
 use crate::error::CliError;
 use crate::error::CliErrorKind;

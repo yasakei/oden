@@ -6,6 +6,11 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use deno_error::JsErrorBox;
+use deno_graph::packages::JsrVersionResolver;
+use node_resolver::NodeConditionOptions;
+use node_resolver::NodeResolverOptions;
+use node_resolver::cache::NodeResolutionThreadLocalCache;
 use oden_bundle_runtime::BundlePlatform;
 use oden_cache_dir::GlobalOrLocalHttpCache;
 use oden_cache_dir::npm::NpmCacheDir;
@@ -15,8 +20,6 @@ use oden_core::error::AnyError;
 use oden_core::futures::FutureExt;
 use oden_core::serde_json;
 use oden_core::url::Url;
-use deno_error::JsErrorBox;
-use deno_graph::packages::JsrVersionResolver;
 use oden_lib::args::CaData;
 use oden_lib::args::get_root_cert_store;
 use oden_lib::args::npm_process_state;
@@ -35,8 +38,6 @@ use oden_npm_installer::process_state::NpmProcessStateKind;
 use oden_npmrc::ResolvedNpmRc;
 use oden_resolver::cache::ParsedSourceCache;
 use oden_resolver::cjs::IsCjsResolutionMode;
-use oden_resolver::oden_json::CompilerOptionsOverrides;
-use oden_resolver::oden_json::CompilerOptionsResolver;
 use oden_resolver::factory::ConfigDiscoveryOption;
 use oden_resolver::factory::NpmProcessStateOptions;
 use oden_resolver::factory::ResolverFactoryOptions;
@@ -44,6 +45,8 @@ use oden_resolver::factory::SpecifiedImportMapProvider;
 use oden_resolver::import_map::WorkspaceExternalImportMapLoader;
 use oden_resolver::loader::MemoryFiles;
 use oden_resolver::npm::OdenInNpmPackageChecker;
+use oden_resolver::oden_json::CompilerOptionsOverrides;
+use oden_resolver::oden_json::CompilerOptionsResolver;
 use oden_resolver::workspace::WorkspaceResolver;
 use oden_runtime::CpuProfilerConfig;
 use oden_runtime::FeatureChecker;
@@ -56,26 +59,23 @@ use oden_runtime::oden_tls::rustls::RootCertStore;
 use oden_runtime::oden_web::BlobStore;
 use oden_runtime::oden_web::BlobStoreTrait;
 use oden_runtime::permissions::RuntimePermissionDescriptorParser;
-use node_resolver::NodeConditionOptions;
-use node_resolver::NodeResolverOptions;
-use node_resolver::cache::NodeResolutionThreadLocalCache;
 use once_cell::sync::OnceCell;
 
 use crate::args::BundleFlags;
 use crate::args::CliLockfile;
 use crate::args::CliOptions;
 use crate::args::ConfigFlag;
-use crate::args::OdenSubcommand;
 use crate::args::Flags;
 use crate::args::FlagsExt;
 use crate::args::InstallFlags;
 use crate::args::InstallFlagsLocal;
+use crate::args::OdenSubcommand;
 use crate::args::npm_system_info;
 use crate::cache::Caches;
 use crate::cache::CodeCache;
-use crate::cache::OdenDir;
 use crate::cache::GlobalHttpCache;
 use crate::cache::ModuleInfoCache;
+use crate::cache::OdenDir;
 use crate::cache::SqliteNodeAnalysisCache;
 use crate::file_fetcher::CliFileFetcher;
 use crate::file_fetcher::CreateCliFileFetcherOptions;
@@ -99,8 +99,8 @@ use crate::npm::CliNpmGraphResolver;
 use crate::npm::CliNpmInstaller;
 use crate::npm::CliNpmInstallerFactory;
 use crate::npm::CliNpmResolver;
-use crate::npm::OdenTaskLifeCycleScriptsExecutor;
 use crate::npm::NpmPackumentFormat;
+use crate::npm::OdenTaskLifeCycleScriptsExecutor;
 use crate::resolver::CliCjsTracker;
 use crate::resolver::CliNpmReqResolver;
 use crate::resolver::CliResolver;
@@ -820,9 +820,9 @@ impl CliFactory {
         | OdenSubcommand::Ci(_) => Ok(Some(Arc::new(
           crate::tools::installer::InstallReporter::new(),
         ))),
-        OdenSubcommand::Dedupe { .. } | OdenSubcommand::Vendor { .. } => {
-          Ok(Some(Arc::new(crate::tools::installer::InstallReporter::new())))
-        }
+        OdenSubcommand::Dedupe { .. } | OdenSubcommand::Vendor { .. } => Ok(
+          Some(Arc::new(crate::tools::installer::InstallReporter::new())),
+        ),
         _ => Ok(None),
       })
       .map(|opt| opt.as_ref())

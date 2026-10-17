@@ -9,10 +9,10 @@ use oden_core::anyhow::Context;
 use oden_core::anyhow::bail;
 use oden_core::error::AnyError;
 
+use super::CacheTopLevelDepsOptions;
 use super::ConfigKind;
 use super::ConfigUpdater;
 use super::cache_top_level_deps;
-use super::CacheTopLevelDepsOptions;
 use crate::args::Flags;
 use crate::args::VendorFlags;
 use crate::factory::CliFactory;

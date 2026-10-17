@@ -2666,14 +2666,12 @@ pub static SBOM_SUBCOMMAND: CommandDef = CommandDef {
   name: "sbom",
   about: "Generate a CycloneDX software bill of materials for the lockfile",
   aliases: &[],
-  args: &[
-    ArgDef::new("output")
-      .long("output")
-      .short('o')
-      .action(ArgAction::Set)
-      .num_args(NumArgs::Exact(1))
-      .help("Write the SBOM JSON to the given file instead of stdout"),
-  ],
+  args: &[ArgDef::new("output")
+    .long("output")
+    .short('o')
+    .action(ArgAction::Set)
+    .num_args(NumArgs::Exact(1))
+    .help("Write the SBOM JSON to the given file instead of stdout")],
   arg_groups: &[UNSTABLE_DEPRECATED_ARG, UNSTABLE_FEATURE_ARGS],
   subcommands: &[],
   default_subcommand: None,

@@ -41,6 +41,8 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use args::TaskFlags;
+use deno_terminal::colors;
+use factory::CliFactory;
 use oden_config::glob::FilePatterns;
 use oden_core::anyhow::Context;
 use oden_core::error::AnyError;
@@ -56,8 +58,6 @@ use oden_runtime::WorkerExecutionMode;
 use oden_runtime::fmt_errors::format_js_error;
 use oden_runtime::tokio_util::create_and_run_current_thread_with_maybe_metrics;
 use oden_telemetry::OtelConfig;
-use deno_terminal::colors;
-use factory::CliFactory;
 use util::fs::canonicalize_path;
 
 const MODULE_NOT_FOUND: &str = "Module not found";
@@ -68,9 +68,9 @@ const UNSUPPORTED_DIR_IMPORT: &str =
 use self::util::draw_thread::DrawThread;
 use self::util::env::resolve_cwd;
 use crate::args::CompletionsFlags;
-use crate::args::OdenSubcommand;
 use crate::args::Flags;
 use crate::args::FlagsExt;
+use crate::args::OdenSubcommand;
 // Re-exported for the flag-parsing benchmark in `cli/benches/flags.rs`.
 #[doc(hidden)]
 pub use crate::args::flags_from_vec_with_initial_cwd;

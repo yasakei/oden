@@ -4,14 +4,6 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use oden_cache_dir::GlobalOrLocalHttpCache;
-use oden_cache_dir::file_fetcher::CacheSetting;
-use oden_core::anyhow::Context;
-use oden_core::anyhow::bail;
-use oden_core::error::AnyError;
-use oden_core::futures::FutureExt;
-use oden_core::futures::StreamExt;
-use oden_core::serde_json;
 use deno_path_util::url_to_file_path;
 use deno_semver::StackString;
 use deno_semver::Version;
@@ -25,6 +17,14 @@ use jsonc_parser::cst::CstObject;
 use jsonc_parser::cst::CstObjectProp;
 use jsonc_parser::cst::CstRootNode;
 use jsonc_parser::json;
+use oden_cache_dir::GlobalOrLocalHttpCache;
+use oden_cache_dir::file_fetcher::CacheSetting;
+use oden_core::anyhow::Context;
+use oden_core::anyhow::bail;
+use oden_core::error::AnyError;
+use oden_core::futures::FutureExt;
+use oden_core::futures::StreamExt;
+use oden_core::serde_json;
 
 use crate::args::AddFlags;
 use crate::args::CliOptions;
@@ -42,11 +42,11 @@ mod approve_scripts;
 mod audit;
 mod cache_deps;
 mod dedupe;
-mod vendor;
 pub(crate) mod deps;
 pub(crate) mod interactive_picker;
 mod list;
 pub(crate) mod outdated;
+mod vendor;
 mod why;
 
 pub use approve_scripts::approve_scripts;
@@ -54,9 +54,9 @@ pub use audit::audit;
 pub use cache_deps::CacheTopLevelDepsOptions;
 pub use cache_deps::cache_top_level_deps;
 pub use dedupe::dedupe_command;
-pub use vendor::vendor_command;
 pub use list::list;
 pub use outdated::outdated;
+pub use vendor::vendor_command;
 pub use why::why;
 
 #[derive(Debug, Copy, Clone, Hash)]
