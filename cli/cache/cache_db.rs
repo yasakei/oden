@@ -228,8 +228,13 @@ impl CacheDB {
       },
     };
 
-    Self::initialize_connection(self.config, self.path.as_deref(), &conn, version)
-      .unwrap();
+    Self::initialize_connection(
+      self.config,
+      self.path.as_deref(),
+      &conn,
+      version,
+    )
+    .unwrap();
 
     let cell = OnceCell::new();
     _ = cell.set(ConnectionState::Connected(conn));
