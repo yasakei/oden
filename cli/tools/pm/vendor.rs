@@ -45,12 +45,16 @@ pub async fn vendor_command(
     (vendor_dir, oden_json_path)
   };
 
-  // Future normal (non-flagged) runs only read from the vendor dir when the
-  // config enables it, so persist that here too.
+  // Persist "vendor": true so future normal (non-flagged) runs also use the
+  // vendor dir.
   let mut vendor_config =
     ConfigUpdater::new(ConfigKind::OdenJson, oden_json_path)?;
   vendor_config.set_vendor();
   vendor_config.commit()?;
+
+  // Promise the vendor dir exists even for npm-only projects, where the
+  // vendored HTTP cache would otherwise never be touched.
+  vendor_dir.create_dir_all();
 
   let start = Instant::now();
   if vendor_flags.entrypoints.is_empty() {

@@ -820,6 +820,9 @@ impl CliFactory {
         | OdenSubcommand::Ci(_) => Ok(Some(Arc::new(
           crate::tools::installer::InstallReporter::new(),
         ))),
+        OdenSubcommand::Dedupe { .. } | OdenSubcommand::Vendor { .. } => {
+          Ok(Some(Arc::new(crate::tools::installer::InstallReporter::new())))
+        }
         _ => Ok(None),
       })
       .map(|opt| opt.as_ref())
