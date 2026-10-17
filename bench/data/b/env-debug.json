@@ -1,0 +1,7 @@
+{
+  "host": "GitHub Codespaces (bug-free-space-disco), 4 vCPU shared, 32G disk",
+  "cpu": "4 vCPU",
+  "mem": "16 GB RAM",
+  "engines": "oden 2.9.7 (debug dev profile) · deno 2.9.7 (stable) · bun 1.4.3 · node 22.21.1",
+  "caveat": "⚠️ oden here is an UNOPTIMIZED dev-profile build — deno/bun/node are release builds. Fair-loop version pending below."
+}

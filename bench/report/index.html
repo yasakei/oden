@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Oden startup benchmarks</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { background:#0d1117; color:#c9d1d9; font:15px/1.5 "Segoe UI",system-ui,sans-serif; margin:0; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 34px 20px 60px; }
+  h1 { font-size: 27px; margin: 0 0 2px; color:#fff; letter-spacing:-.5px; }
+  h1 .accent { color:#ff6b5e; }
+  .sub { color:#8b949e; margin: 0 0 26px; }
+  .chart { background:#161b22; border:1px solid #30363d; border-radius:14px; padding:20px 22px 16px; margin-bottom:20px;
+           box-shadow:0 2px 16px rgba(0,0,0,.4); }
+  .chart h2 { margin:0; font-size:16px; color:#e6edf3; }
+  .blurb { margin:2px 0 14px; color:#8b949e; font-size:12.5px; }
+  .row { display:grid; grid-template-columns:64px 1fr; align-items:center; gap:12px; margin:9px 0; }
+  .label { font-weight:700; text-align:right; color:#e6edf3; font-size:13px; }
+  .track { position:relative; height:30px; background:#21262d; border-radius:8px; overflow:hidden; cursor:help; }
+  .bar { position:absolute; inset:0 auto 0 0; border-radius:8px; }
+  .value { position:absolute; left:10px; top:50%; transform:translateY(-50%); font-variant-numeric:tabular-nums;
+           font-weight:700; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.7); font-size:13px; }
+  .ratio { position:absolute; right:10px; top:50%; transform:translateY(-50%); font-size:11.5px; color:#58a6ff; font-weight:600; }
+  .meta { margin-top:10px; color:#6e7681; font-size:11.5px; }
+  .foot { color:#8b949e; font-size:12px; border-top:1px solid #30363d; padding-top:14px; }
+  code { background:#21262d; border-radius:4px; padding:1px 5px; font-size:12px; }
+</style></head>
+<body><div class="wrap">
+<h1>⚡ <span class="accent">Oden</span> startup benchmarks</h1>
+<div class="sub">CLI startup comparison: Oden vs deno · bun · node — 2026-10-17 09:49 UTC</div>
+  <section class="chart">
+    <h2>CLI parse only (`--version`)</h2>
+    <p class="blurb">process boot + arg parsing, no JS execution</p>
+      <div class="row">
+        <div class="label">oden</div>
+        <div class="track" title="/workspaces/oden/target/release/oden --version">
+          <div class="bar" style="width:89.3%;background:linear-gradient(90deg,#c92c2c,#ff6b5e)"></div>
+          <div class="value">4.8 ms</div>
+          <div class="ratio">fastest ⚡</div>
+        </div>
+      </div>
+    <div class="meta">/workspaces/oden/target/release/oden --version · ? runs</div>
+  </section>
+  <section class="chart">
+    <h2>Eval tiny script</h2>
+    <p class="blurb">full bootstrap + JS execution + teardown</p>
+      <div class="row">
+        <div class="label">bun</div>
+        <div class="track" title="/tmp/runtimes/bun -e &quot;1&quot;">
+          <div class="bar" style="width:15.8%;background:linear-gradient(90deg,#f08c00,#ffe066)"></div>
+          <div class="value">4.3 ms</div>
+          <div class="ratio">fastest ⚡</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="label">deno</div>
+        <div class="track" title="/tmp/runtimes/deno eval &quot;1&quot;">
+          <div class="bar" style="width:78.1%;background:linear-gradient(90deg,#2f9e44,#8ce99a)"></div>
+          <div class="value">21.0 ms</div>
+          <div class="ratio">4.9× slower</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="label">node</div>
+        <div class="track" title="node -e &quot;1&quot;">
+          <div class="bar" style="width:87.4%;background:linear-gradient(90deg,#74b816,#a9e34b)"></div>
+          <div class="value">23.5 ms</div>
+          <div class="ratio">5.5× slower</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="label">oden</div>
+        <div class="track" title="/workspaces/oden/target/release/oden eval &quot;1&quot;">
+          <div class="bar" style="width:89.0%;background:linear-gradient(90deg,#c92c2c,#ff6b5e)"></div>
+          <div class="value">23.9 ms</div>
+          <div class="ratio">5.6× slower</div>
+        </div>
+      </div>
+    <div class="meta">/workspaces/oden/target/release/oden eval &quot;1&quot; · ? runs</div>
+  </section>
+  <section class="chart">
+    <h2>Run tiny file</h2>
+    <p class="blurb">bootstrap + module loading + JS execution</p>
+      <div class="row">
+        <div class="label">bun</div>
+        <div class="track" title="/tmp/runtimes/bun main.js">
+          <div class="bar" style="width:17.5%;background:linear-gradient(90deg,#f08c00,#ffe066)"></div>
+          <div class="value">4.3 ms</div>
+          <div class="ratio">fastest ⚡</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="label">deno</div>
+        <div class="track" title="/tmp/runtimes/deno run main.js">
+          <div class="bar" style="width:71.4%;background:linear-gradient(90deg,#2f9e44,#8ce99a)"></div>
+          <div class="value">17.5 ms</div>
+          <div class="ratio">4.1× slower</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="label">oden</div>
+        <div class="track" title="/workspaces/oden/target/release/oden run main.js">
+          <div class="bar" style="width:84.3%;background:linear-gradient(90deg,#c92c2c,#ff6b5e)"></div>
+          <div class="value">20.6 ms</div>
+          <div class="ratio">4.8× slower</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="label">node</div>
+        <div class="track" title="node main.js">
+          <div class="bar" style="width:89.2%;background:linear-gradient(90deg,#74b816,#a9e34b)"></div>
+          <div class="value">21.9 ms</div>
+          <div class="ratio">5.1× slower</div>
+        </div>
+      </div>
+    <div class="meta">/workspaces/oden/target/release/oden run main.js · ? runs</div>
+  </section>
+  <section class="chart">
+    <h2>Run file with npm dependency import</h2>
+    <p class="blurb">startup + npm package resolution + package loading (bun uses bare `import(&quot;abbrev&quot;)` — bun 1.4 dropped the `npm:` prefix; same node_modules workload)</p>
+      <div class="row">
+        <div class="label">deno</div>
+        <div class="track" title="/tmp/runtimes/deno run main-npm.js">
+          <div class="bar" style="width:81.9%;background:linear-gradient(90deg,#2f9e44,#8ce99a)"></div>
+          <div class="value">43.0 ms</div>
+          <div class="ratio">fastest ⚡</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="label">oden</div>
+        <div class="track" title="/workspaces/oden/target/release/oden run main-npm.js">
+          <div class="bar" style="width:89.3%;background:linear-gradient(90deg,#c92c2c,#ff6b5e)"></div>
+          <div class="value">46.9 ms</div>
+          <div class="ratio">1.1× slower</div>
+        </div>
+      </div>
+    <div class="meta">/workspaces/oden/target/release/oden run main-npm.js · ? runs</div>
+  </section>
+
+<div class="foot">
+  <strong style="color:#e6edf3">oden 2.9.7 (release) · deno 2.9.7 (stable) · bun 1.4.3 · node 22.21.1</strong> · measured with hyperfine on the codespace (4 vCPU · 16 GB RAM)<br>
+  All binaries are optimized release builds, measured in the same session with hyperfine (N runs, 5 warmups). Statistical outliers flagged by hyperfine were left in as-is; stored JSON keeps min/max/σ.
+</div>
+</div></body></html>
