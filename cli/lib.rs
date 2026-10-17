@@ -963,8 +963,12 @@ pub fn main() {
   #[cfg(feature = "dhat-heap")]
   drop(profiler);
 
+  boot_phase("subcommand returned");
   match result {
-    Ok(exit_code) => oden_runtime::exit(exit_code),
+    Ok(exit_code) => {
+      boot_phase("before exit");
+      oden_runtime::exit(exit_code)
+    }
     Err(err) => exit_for_error(err, initial_cwd.as_deref()),
   }
 }
