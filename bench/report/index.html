@@ -27,7 +27,7 @@
 </style></head>
 <body><div class="wrap">
 <h1>⚡ <span class="accent">Oden</span> startup benchmarks</h1>
-<div class="sub">CLI startup comparison: Oden vs deno · bun · node — 2026-10-17 10:21 UTC</div>
+<div class="sub">CLI startup comparison: Oden vs deno · bun · node — 2026-10-17 11:20 UTC</div>
   <section class="chart">
     <h2>CLI parse only (`--version`)</h2>
     <p class="blurb">process boot + arg parsing, no JS execution</p>
@@ -63,7 +63,7 @@
       <div class="row">
         <div class="label">bun</div>
         <div class="track" title="/tmp/runtimes/bun -e &quot;1&quot;">
-          <div class="bar" style="width:15.5%;background:linear-gradient(90deg,#f08c00,#ffe066)"></div>
+          <div class="bar" style="width:16.2%;background:linear-gradient(90deg,#f08c00,#ffe066)"></div>
           <div class="value">4.2 ms</div>
           <div class="ratio">fastest ⚡</div>
         </div>
@@ -71,25 +71,17 @@
       <div class="row">
         <div class="label">deno</div>
         <div class="track" title="/tmp/runtimes/deno eval &quot;1&quot;">
-          <div class="bar" style="width:79.8%;background:linear-gradient(90deg,#2f9e44,#8ce99a)"></div>
-          <div class="value">21.5 ms</div>
-          <div class="ratio">5.2× slower</div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="label">node</div>
-        <div class="track" title="node -e &quot;1&quot;">
-          <div class="bar" style="width:84.6%;background:linear-gradient(90deg,#74b816,#a9e34b)"></div>
-          <div class="value">22.7 ms</div>
-          <div class="ratio">5.5× slower</div>
+          <div class="bar" style="width:79.9%;background:linear-gradient(90deg,#2f9e44,#8ce99a)"></div>
+          <div class="value">20.7 ms</div>
+          <div class="ratio">4.9× slower</div>
         </div>
       </div>
       <div class="row">
         <div class="label">oden</div>
         <div class="track" title="/workspaces/oden/target/release/oden eval &quot;1&quot;">
-          <div class="bar" style="width:89.0%;background:linear-gradient(90deg,#c92c2c,#ff6b5e)"></div>
-          <div class="value">23.9 ms</div>
-          <div class="ratio">5.7× slower</div>
+          <div class="bar" style="width:89.1%;background:linear-gradient(90deg,#c92c2c,#ff6b5e)"></div>
+          <div class="value">23.1 ms</div>
+          <div class="ratio">5.5× slower</div>
         </div>
       </div>
     <div class="meta">/workspaces/oden/target/release/oden eval &quot;1&quot; · ? runs</div>
@@ -137,7 +129,7 @@
       <div class="row">
         <div class="label">bun</div>
         <div class="track" title="/tmp/runtimes/bun main-npm-bun.js">
-          <div class="bar" style="width:11.1%;background:linear-gradient(90deg,#f08c00,#ffe066)"></div>
+          <div class="bar" style="width:11.8%;background:linear-gradient(90deg,#f08c00,#ffe066)"></div>
           <div class="value">6.0 ms</div>
           <div class="ratio">fastest ⚡</div>
         </div>
@@ -145,24 +137,24 @@
       <div class="row">
         <div class="label">deno</div>
         <div class="track" title="/tmp/runtimes/deno run main-npm.js">
-          <div class="bar" style="width:78.7%;background:linear-gradient(90deg,#2f9e44,#8ce99a)"></div>
-          <div class="value">42.3 ms</div>
-          <div class="ratio">7.1× slower</div>
+          <div class="bar" style="width:80.1%;background:linear-gradient(90deg,#2f9e44,#8ce99a)"></div>
+          <div class="value">40.6 ms</div>
+          <div class="ratio">6.8× slower</div>
         </div>
       </div>
       <div class="row">
         <div class="label">oden</div>
         <div class="track" title="/workspaces/oden/target/release/oden run main-npm.js">
-          <div class="bar" style="width:88.4%;background:linear-gradient(90deg,#c92c2c,#ff6b5e)"></div>
-          <div class="value">47.5 ms</div>
-          <div class="ratio">8.0× slower</div>
+          <div class="bar" style="width:88.5%;background:linear-gradient(90deg,#c92c2c,#ff6b5e)"></div>
+          <div class="value">44.8 ms</div>
+          <div class="ratio">7.5× slower</div>
         </div>
       </div>
     <div class="meta">/workspaces/oden/target/release/oden run main-npm.js · ? runs</div>
   </section>
 
 <div class="foot">
-  <strong style="color:#e6edf3">oden 2.9.7 (release, with WAL-checkpoint fix) · deno 2.9.7 (stable) · bun 1.4.3 · node 22.21.1</strong> · measured with hyperfine on the codespace (4 vCPU · 16 GB RAM)<br>
-  All binaries are optimized release builds measured in the same session (hyperfine, 30-60 runs, 10 warmups). oden includes the new cache-DB WAL checkpoint fix (startup no longer re-reads megabytes of uncheckpointed WAL frames — a 2.4MB WAL is folded into the main DB on first open). bun npm number uses bare import (bun 1.4 dropped the `npm:` specifier prefix); same node_modules workload.
+  <strong style="color:#e6edf3">oden 2.9.7 (release + WAL-checkpoint fix) · deno 2.9.7 (stable) · bun 1.4.3 · node 22.21.1</strong> · measured with hyperfine on the codespace (4 vCPU · 16 GB RAM)<br>
+  All release builds. Cache states normalized (SQLite WALs checkpointed on both engines' disk caches) before the run so neither engine races ahead on stale WAL reads. oden additionally keeps its WALs small automatically at startup (fix shipped this session, verified: 2.4MB WAL folded to 0 bytes on first open). The ~2.5-4ms remaining gap vs deno lives in V8 snapshot deserialization + per-statement SQLite file-size checks + npm resolution.
 </div>
 </div></body></html>
