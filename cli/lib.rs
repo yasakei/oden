@@ -527,10 +527,9 @@ async fn run_subcommand(
       );
       tools::bump_version::bump_version_command(Arc::new(flags), version_flags)
     }),
-    OdenSubcommand::Vendor => exit_with_message(
-      "⚠️  `oden vendor` was removed in Oden 2.\n\nSee the Oden 1.x to 2.x Migration Guide for migration instructions: https://docs.deno.com/runtime/manual/advanced/migrate_deprecations",
-      1,
-    ),
+    OdenSubcommand::Vendor(vendor_flags) => spawn_subcommand(async move {
+      tools::pm::vendor_command(Arc::new(flags), vendor_flags).await
+    }),
     OdenSubcommand::Publish(publish_flags) => spawn_subcommand(async {
       tools::publish::publish(Arc::new(flags), publish_flags).await
     }),

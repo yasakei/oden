@@ -8110,6 +8110,32 @@ fn dedupe_subcommand() {
 }
 
 #[test]
+fn vendor_subcommand() {
+  let r = flags_from_vec(svec!["oden", "vendor"]).unwrap();
+  assert_eq!(
+    r,
+    Flags {
+      vendor: Some(true),
+      subcommand: OdenSubcommand::Vendor(VendorFlags {
+        entrypoints: vec![]
+      }),
+      ..Flags::default()
+    },
+  );
+  let r = flags_from_vec(svec!["oden", "vendor", "main.ts"]).unwrap();
+  assert_eq!(
+    r,
+    Flags {
+      vendor: Some(true),
+      subcommand: OdenSubcommand::Vendor(VendorFlags {
+        entrypoints: svec!["main.ts"]
+      }),
+      ..Flags::default()
+    },
+  );
+}
+
+#[test]
 fn sbom_subcommand() {
   let cases = [
     (svec![], SbomFlags { output: None }),

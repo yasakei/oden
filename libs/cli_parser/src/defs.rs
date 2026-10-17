@@ -2771,9 +2771,13 @@ pub static LSP_SUBCOMMAND: CommandDef = CommandDef {
 
 pub static VENDOR_SUBCOMMAND: CommandDef = CommandDef {
   name: "vendor",
-  about: "`oden vendor` was removed in Oden 2.\n\nSee the Oden 1.x to 2.x Migration Guide for migration instructions: https://docs.deno.com/runtime/manual/advanced/migrate_deprecations",
+  about: "Vendors remote and JSR dependencies into a local vendor directory so the project can run offline\n\nSets \"vendor\": true in oden.json and caches the dependencies for the entrypoints (or the workspace top-level dependencies when no entrypoints are given)",
   aliases: &[],
   args: &[
+    ArgDef::new("entrypoints")
+      .positional()
+      .action(ArgAction::Append)
+      .num_args(NumArgs::Optional),
     ArgDef::new("help")
       .short('h')
       .long("help")

@@ -751,6 +751,11 @@ pub struct SbomFlags {
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct DedupeFlags {}
 
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
+pub struct VendorFlags {
+  pub entrypoints: Vec<String>,
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct BundleFlags {
   pub entrypoints: Vec<String>,
@@ -833,7 +838,7 @@ pub enum OdenSubcommand {
   Outdated(OutdatedFlags),
   Types,
   Upgrade(UpgradeFlags),
-  Vendor,
+  Vendor(VendorFlags),
   Why(WhyFlags),
   BumpVersion(VersionFlags),
   Publish(PublishFlags),

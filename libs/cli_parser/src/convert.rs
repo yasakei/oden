@@ -213,7 +213,7 @@ pub fn convert(result: ParseResult) -> Result<Flags, CliError> {
     }
     Some("types") => types_parse(&mut flags),
     Some("lsp") => lsp_parse(&mut flags),
-    Some("vendor") => vendor_parse(&mut flags),
+    Some("vendor") => vendor_parse(&result, &mut flags),
     Some("deploy") => deploy_parse(&mut flags, false),
     Some("sandbox") => deploy_parse(&mut flags, true),
     Some("bundle") => bundle_parse(&result, &mut flags),
@@ -2959,8 +2959,15 @@ fn lsp_parse(flags: &mut Flags) {
   flags.subcommand = OdenSubcommand::Lsp;
 }
 
-fn vendor_parse(flags: &mut Flags) {
-  flags.subcommand = OdenSubcommand::Vendor;
+fn vendor_parse(result: &ParseResult, flags: &mut Flags) {
+  let entrypoints = result
+    .get_many("entrypoints")
+    .map(|v| v.iter().map(|s| s.to_string()).collect())
+    .unwrap_or_default();
+  // The locally vendored cache is only consulted when the vendor dir is
+  // enabled, so force it on for the run.
+  flags.vendor = Some(true);
+  flags.subcommand = OdenSubcommand::Vendor(VendorFlags { entrypoints });
 }
 
 fn deploy_parse(flags: &mut Flags, sandbox: bool) {

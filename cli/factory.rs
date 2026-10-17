@@ -699,6 +699,7 @@ impl CliFactory {
             | OdenSubcommand::Cache { .. }
             | OdenSubcommand::Ci { .. }
             | OdenSubcommand::Dedupe { .. }
+            | OdenSubcommand::Vendor { .. }
             | OdenSubcommand::Uninstall { .. } => true,
             OdenSubcommand::Install(flags) => match flags {
               InstallFlags::Local(flags, _) => match flags {
@@ -742,7 +743,6 @@ impl CliFactory {
             | OdenSubcommand::Outdated { .. }
             | OdenSubcommand::Types
             | OdenSubcommand::Upgrade { .. }
-            | OdenSubcommand::Vendor
             | OdenSubcommand::Why { .. }
             | OdenSubcommand::Pack { .. }
             | OdenSubcommand::Publish { .. }

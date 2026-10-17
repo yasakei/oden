@@ -42,6 +42,7 @@ mod approve_scripts;
 mod audit;
 mod cache_deps;
 mod dedupe;
+mod vendor;
 pub(crate) mod deps;
 pub(crate) mod interactive_picker;
 mod list;
@@ -53,6 +54,7 @@ pub use audit::audit;
 pub use cache_deps::CacheTopLevelDepsOptions;
 pub use cache_deps::cache_top_level_deps;
 pub use dedupe::dedupe_command;
+pub use vendor::vendor_command;
 pub use list::list;
 pub use outdated::outdated;
 pub use why::why;
@@ -351,6 +353,20 @@ impl ConfigUpdater {
     } else {
       let index = self.root_object.properties().len();
       self.root_object.insert(index, "allowScripts", value);
+    }
+    self.modified = true;
+  }
+
+  fn set_vendor(&mut self) {
+    if let Some(prop) = self.root_object.get("vendor") {
+      prop.set_value(jsonc_parser::cst::CstInputValue::Bool(true));
+    } else {
+      let index = self.root_object.properties().len();
+      self.root_object.insert(
+        index,
+        "vendor",
+        jsonc_parser::cst::CstInputValue::Bool(true),
+      );
     }
     self.modified = true;
   }
