@@ -54,7 +54,9 @@ pub async fn vendor_command(
 
   // Promise the vendor dir exists even for npm-only projects, where the
   // vendored HTTP cache would otherwise never be touched.
-  vendor_dir.create_dir_all();
+  std::fs::create_dir_all(&vendor_dir).with_context(|| {
+    format!("Failed to create vendor directory {}", vendor_dir.display())
+  })?;
 
   let start = Instant::now();
   if vendor_flags.entrypoints.is_empty() {
