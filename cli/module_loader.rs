@@ -245,6 +245,7 @@ impl ModuleLoadPreparer {
     }
     log::debug!("Building module graph.");
     let has_type_checked = !graph.roots.is_empty();
+    crate::boot_phase("prepare_module: start");
 
     self
       .module_graph_builder
@@ -258,6 +259,7 @@ impl ModuleLoadPreparer {
         },
       )
       .await?;
+    crate::boot_phase("prepare_module: graph built");
 
     if !skip_graph_roots_validation {
       self.graph_roots_valid(
@@ -297,6 +299,7 @@ impl ModuleLoadPreparer {
     }
 
     log::debug!("Prepared module load.");
+    crate::boot_phase("prepare_module: graph validated");
 
     Ok(())
   }
